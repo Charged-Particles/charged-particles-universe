@@ -1,0 +1,29 @@
+{
+  "manifestVersion": "2.2",
+  "contracts": {
+    "ChargedParticles": "ChargedParticles",
+    "AaveWalletManager": "AaveWalletManager"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts-ethereum-package": "^3.0.0"
+  },
+  "name": "charged-particles",
+  "version": "0.1.0",
+  "telemetryOptIn": false,
+  "compiler": {
+    "manager": "openzeppelin",
+    "solcVersion": "0.6.12",
+    "compilerSettings": {
+      "optimizer": {
+        "enabled": true,
+        "runs": "200"
+      },
+      "evmVersion": "istanbul"
+    },
+    "artifactsDir": "build",
+    "contractsDir": "contracts",
+    "typechain": {
+      "enabled": false
+    }
+  }
+}
