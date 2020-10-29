@@ -1,0 +1,29 @@
+*~
+*.swp
+tmp/
+npm-debug.log
+.DS_Store
+.idea
+merged/
+.next
+.vscode/
+node_modules/
+resources.txt
+.env
+.versionFilesList.json
+build/
+bin/
+notes.txt
+cache
+
+# OpenZeppelin
+.openzeppelin/dev-*.json
+.openzeppelin/.session
+
+# Code Coverage
+coverage
+.coverage
+coverage.json
+coverageEnv
+artifacts
+test-results.xml
