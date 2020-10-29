@@ -28,12 +28,10 @@ pragma solidity >=0.6.0;
  * @notice Common Vars for Charged Particles
  */
 contract Common {
-    uint256 constant internal DEPOSIT_FEE_MODIFIER = 1e4;   // 10000  (100%)
+    uint256 constant internal PERCENTAGE_SCALE = 1e4;       // 10000  (100%)
     uint256 constant internal MAX_CUSTOM_DEPOSIT_FEE = 5e3; // 5000   (50%)
-    uint256 constant internal MIN_DEPOSIT_FEE = 1e6;        // 1000000 (0.000000000001 ETH  or  1000000 WEI)
 
     // Interface Signatures
-    bytes4 constant internal INTERFACE_SIGNATURE_ERC165 = 0x01ffc9a7;
     bytes4 constant internal INTERFACE_SIGNATURE_ERC721 = 0x80ac58cd;
     bytes4 constant internal INTERFACE_SIGNATURE_ERC1155 = 0xd9b67a26;
 }

@@ -24,12 +24,16 @@
 pragma solidity >=0.6.0;
 
 import "../interfaces/ISmartWallet.sol";
+import "./Common.sol";
 
 /**
  * @notice ERC20-Token Smart-Wallet Bridge to Bloom
  * @dev Non-upgradeable Contract
  */
-abstract contract SmartWalletBase is ISmartWallet {
+abstract contract SmartWalletBase is ISmartWallet, Common {
+
+  address internal nftCreator;
+  uint256 internal nftCreatorAnnuityPct;
 
   address internal _walletManager;
 
@@ -57,26 +61,30 @@ abstract contract SmartWalletBase is ISmartWallet {
     return _assetTokens.length;
   }
 
-  function getAssetTokenByIndex(uint256 _index) external view virtual override returns (address) {
-    if (_index >= _assetTokens.length) {
+  function getAssetTokenByIndex(uint256 index) external view virtual override returns (address) {
+    if (index >= _assetTokens.length) {
       return address(0);
     }
-    return _assetTokens[_index];
+    return _assetTokens[index];
   }
 
-  function getInterestTokenOfAsset(address _assetToken) external view virtual override returns (address) {
-    return _assetToInterestToken[_assetToken];
+  function getInterestTokenOfAsset(address assetToken) external view virtual override returns (address) {
+    return _assetToInterestToken[assetToken];
   }
 
+  function setNftCreator(address creator, uint256 annuityPct) external virtual override onlyWalletManager {
+    nftCreator = creator;
+    nftCreatorAnnuityPct = annuityPct;
+  }
 
   /***********************************|
   |         Private Functions         |
   |__________________________________*/
 
-  function _addAssetToken(address _assetToken, address _interestToken) internal virtual {
-    if (_assetToInterestToken[_assetToken] == address(0x0)) {
-      _assetTokens.push(_assetToken);
-      _assetToInterestToken[_assetToken] = _interestToken;
+  function _addAssetToken(address assetToken, address interestToken) internal virtual {
+    if (_assetToInterestToken[assetToken] == address(0x0)) {
+      _assetTokens.push(assetToken);
+      _assetToInterestToken[assetToken] = interestToken;
     }
   }
 

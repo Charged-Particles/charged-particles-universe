@@ -29,18 +29,22 @@ pragma solidity >=0.6.0;
  */
 interface ISmartWallet {
   function getAssetTokenCount() external view returns (uint256);
-  function getAssetTokenByIndex(uint256 _index) external view returns (address);
-  function getInterestTokenOfAsset(address _assetToken) external view returns (address);
+  function getAssetTokenByIndex(uint256 index) external view returns (address);
+  function getInterestTokenOfAsset(address assetToken) external view returns (address);
 
-  function isReserveActive(address _assetToken) external view returns (bool);
-  function getReserveInterestToken(address _assetToken) external view returns (address);
+  function setNftCreator(address creator, uint256 annuityPct) external;
 
-  function getPrincipal(address _assetToken) external returns (uint256);
-  function getInterest(address _assetToken) external returns (uint256);
-  function getBalance(address _assetToken) external returns (uint256);
-  function getRewards(address _assetToke) external returns (uint256);
+  function isReserveActive(address assetToken) external view returns (bool);
+  function getReserveInterestToken(address assetToken) external view returns (address);
 
-  function deposit(address _assetToken, uint256 _assetAmount) external returns (uint256);
-  function withdraw(address _receiver, address _assetToken) external returns (uint256);
-  function withdrawAmount(address _receiver, address _assetToken, uint256 _assetAmount) external returns (uint256);
+  function getPrincipal(address assetToken) external returns (uint256);
+  function getInterest(address assetToken) external returns (uint256);
+  function getBalance(address assetToken) external returns (uint256);
+  function getAnnuities(address assetToken) external returns (uint256);
+  function getRewards(address assetToken) external returns (uint256);
+
+  function deposit(address assetToken, uint256 assetAmount) external returns (uint256);
+  function withdraw(address receiver, address assetToken) external returns (uint256);
+  function withdrawAmount(address receiver, address assetToken, uint256 assetAmount) external returns (uint256);
+  function withdrawRewards(address receiver, address rewardsToken, uint256 rewardsAmount) external returns (uint256);
 }

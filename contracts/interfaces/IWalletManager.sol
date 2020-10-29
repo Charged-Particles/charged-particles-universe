@@ -29,24 +29,25 @@ pragma solidity >=0.6.0;
  */
 interface IWalletManager {
 
-  event NewSmartWallet(uint256 indexed _uuid, address indexed smartWallet);
-  event WalletEnergized(uint256 indexed _uuid, address indexed _assetToken, uint256 assetAmount, uint256 interestAmount);
-  event WalletDischarged(uint256 indexed _uuid, address indexed _assetToken, uint256 assetAmount);
-  event WalletReleased(uint256 indexed _uuid, address indexed receiver, address indexed _assetToken, uint256 assetAmount);
-
+  event NewSmartWallet(uint256 indexed uuid, address indexed smartWallet);
+  event WalletEnergized(uint256 indexed uuid, address indexed assetToken, uint256 assetAmount, uint256 yieldTokensAmount);
+  event WalletDischarged(uint256 indexed uuid, address indexed assetToken, uint256 assetAmount);
+  event WalletReleased(uint256 indexed uuid, address indexed receiver, address indexed assetToken, uint256 assetAmount);
+  event WalletRewarded(uint256 indexed uuid, address indexed receiver, address indexed rewardsToken, uint256 rewardsAmount);
 
   function isPaused() external view returns (bool);
 
-  function isReserveActive(uint256 _uuid, address _assetToken) external view returns (bool);
-  function getReserveInterestToken(uint256 _uuid, address _assetToken) external view returns (address);
+  function isReserveActive(uint256 uuid, address assetToken) external view returns (bool);
+  function getReserveInterestToken(uint256 uuid, address assetToken) external view returns (address);
 
-  function getPrincipal(uint256 _uuid, address _assetToken) external returns (uint256);
-  function getInterest(uint256 _uuid, address _assetToken) external returns (uint256);
-  function getRewards(uint256 _uuid, address _assetToken) external returns (uint256);
-  function getBalance(uint256 _uuid, address _assetToken) external returns (uint256);
+  function getPrincipal(uint256 uuid, address assetToken) external returns (uint256);
+  function getInterest(uint256 uuid, address assetToken) external returns (uint256);
+  function getRewards(uint256 uuid, address assetToken) external returns (uint256);
+  function getBalance(uint256 uuid, address assetToken) external returns (uint256);
 
-  function energize(uint256 _uuid, address _assetToken, uint256 _assetAmount) external returns (uint256 _interestAmount);
-  function discharge(address _receiver, uint256 _uuid, address _assetToken) external returns (uint256 _amount);
-  function dischargeAmount(address _receiver, uint256 _uuid, address _assetToken, uint256 _assetAmount) external returns (uint256 _amount);
-  function release(address _receiver, uint256 _uuid, address _assetToken) external returns (uint256 _amount);
+  function energize(uint256 uuid, address assetToken, uint256 assetAmount, address creator, uint256 annuityPct) external returns (uint256 yieldTokensAmount);
+  function discharge(address receiver, uint256 uuid, address assetToken) external returns (uint256 amount);
+  function dischargeAmount(address receiver, uint256 uuid, address assetToken, uint256 assetAmount) external returns (uint256 amount);
+  function release(address receiver, uint256 uuid, address assetToken) external returns (uint256 amount);
+  function withdrawRewards(address receiver, uint256 uuid, address rewardsToken, uint256 rewardsAmount) external returns (uint256 amount);
 }

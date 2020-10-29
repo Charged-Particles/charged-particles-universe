@@ -110,11 +110,13 @@ contract AaveWalletManager is Initializable, WalletManagerBase {
   function energize(
     uint256 _uuid,
     address _assetToken,
-    uint256 _assetAmount
+    uint256 _assetAmount, 
+    address creator, 
+    uint256 annuityPct
   )
     external
     override
-    returns (uint256 interestAmount)
+    returns (uint256 yieldTokensAmount)
   {
     address wallet = _wallets[_uuid];
 
@@ -122,16 +124,20 @@ contract AaveWalletManager is Initializable, WalletManagerBase {
     if (wallet == address(0x0)) {
       wallet = _createWallet(_uuid);
       _wallets[_uuid] = wallet;
+
+      if (creator != address(0x0)) {
+        AaveSmartWallet(wallet).setNftCreator(creator, annuityPct);
+      }
     }
 
     // Collect Asset Token (reverts on fail)
     _collectAssetToken(_msgSender(), _assetToken, _assetAmount);
 
     // Deposit into Smart-Wallet
-    interestAmount = AaveSmartWallet(wallet).deposit(_assetToken, _assetAmount);
+    yieldTokensAmount = AaveSmartWallet(wallet).deposit(_assetToken, _assetAmount);
 
     // Log Event
-    emit WalletEnergized(_uuid, _assetToken, _assetAmount, interestAmount);
+    emit WalletEnergized(_uuid, _assetToken, _assetAmount, yieldTokensAmount);
   }
 
   function discharge(
@@ -199,6 +205,27 @@ contract AaveWalletManager is Initializable, WalletManagerBase {
 
     // Log Event
     emit WalletReleased(_uuid, _receiver, _assetToken, assetAmount);
+  }
+
+  function withdrawRewards(
+    address _receiver,
+    uint256 _uuid,
+    address _rewardsToken,
+    uint256 _rewardsAmount
+  )
+    external
+    override
+    onlyController
+    returns (uint256 amount)
+  {
+    address wallet = _wallets[_uuid];
+    require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
+
+    // Withdraw Rewards to Receiver
+    amount = AaveSmartWallet(wallet).withdrawRewards(_receiver, _rewardsToken, _rewardsAmount);
+
+    // Log Event
+    emit WalletRewarded(_uuid, _receiver, _rewardsToken, amount);
   }
 
 

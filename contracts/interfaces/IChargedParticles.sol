@@ -22,160 +22,233 @@
 // SOFTWARE.
 
 pragma solidity >=0.6.0;
-
+pragma experimental ABIEncoderV2;
 
 /**
  * @notice Interface for Charged Particles
  */
 interface IChargedParticles {
 
-  event RegisterParticleContract(
-    address indexed _contractAddress
-  );
-  event DischargeApproval(
-    address indexed _contractAddress,
-    uint256 indexed _tokenId,
-    address indexed _owner,
-    address _operator
-  );
-  event ReleaseApproval(
-    address indexed _contractAddress,
-    uint256 indexed _tokenId,
-    address indexed _owner,
-    address _operator
-  );
-  event EnergizedParticle(
-    address indexed _contractAddress,
-    uint256 indexed _tokenId,
-    string _liquidityProviderId,
-    address _assetToken,
-    uint256 _assetBalance
-  );
-  event DischargedParticle(
-    address indexed _contractAddress,
-    uint256 indexed _tokenId,
-    address indexed _receiver,
-    string _liquidityProviderId,
-    address _assetToken,
-    uint256 _receivedAmount
-  );
-  event ReleasedParticle(
-    address indexed _contractAddress,
-    uint256 indexed _tokenId,
-    address indexed _receiver,
-    string _liquidityProviderId,
-    address _assetToken,
-    uint256 _receivedAmount
-  );
-  event FeesWithdrawn(
-    address indexed _contractAddress,
-    address indexed _receiver,
-    string _liquidityProviderId,
-    address _assetToken,
-    uint256 _interestAmoount
-  );
+  // Optional Limits set by Owner of External Token Contracts;
+  //  - Any user can add any ERC721 or ERC1155 token as a Charged Particle without Limits,
+  //    unless the Owner of the ERC721 or ERC1155 token contract registers the token here
+  //    and sets the Custom Limits for their token(s)
+  struct NftContractConfig {
+    // Specific Liquidity-Provider that is allowed (otherwise, any Liquidity-Provider is allowed)
+    string liquidityProvider;
 
-  function isLiquidityProviderEnabled(string calldata _liquidityProviderId) external view returns (bool);
+    // Deposit Fees to be earned for Contract Owner
+    uint256 assetDepositFee;
+
+    // Allowed Limit of Asset Token [min, max]
+    uint256 assetDepositMin;
+    uint256 assetDepositMax;
+  }
+
+  struct NftCreatorConfig {
+    uint256 annuityPercent;
+    bool burnToRelease;
+  }
+
+  struct NftState {
+    address dischargeApproval;
+    address releaseApproval;
+    address timelockApproval;
+    uint256 dischargeTimelock;
+    uint256 releaseTimelock;
+    address assetToBeReleasedBy;
+  }
+
+  /***********************************|
+  |             Public API            |
+  |__________________________________*/
+
+  function isLiquidityProviderEnabled(string calldata liquidityProviderId) external view returns (bool);
   function getLiquidityProvidersCount() external view returns (uint);
-  function getLiquidityProviderByIndex(uint _index) external view returns (string memory);
+  function getLiquidityProviderByIndex(uint index) external view returns (string memory);
 
-  function getWalletManager(string calldata _liquidityProviderId) external view returns (address);
+  function getTokenUUID(address contractAddress, uint256 tokenId) external pure returns (uint256);
+  function getOwnerUUID(string calldata liquidityProviderId, address owner) external pure returns (uint256);
 
-  function getTokenUUID(address _contractAddress, uint256 _tokenId) external pure returns (uint256);
-  function getOwnerUUID(string calldata _liquidityProviderId, address _owner) external pure returns (uint256);
+  function setDischargeApproval(address contractAddress, uint256 tokenId, address operator) external;
+  function setReleaseApproval(address contractAddress, uint256 tokenId, address operator) external;
+  function setTimelockApproval(address contractAddress, uint256 tokenId, address operator) external;
+  function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
+  function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
+  function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
 
-  function getAssetMinDeposit(address _contractAddress) external view returns (uint256);
-  function getAssetMaxDeposit(address _contractAddress) external view returns (uint256);
-  function getCustomLiquidityProviderId(address _contractAddress) external view returns (string memory);
-  function getCustomReleaseRequiresBurn(address _contractAddress) external view returns (bool);
+  function getFeesForDeposit(address contractAddress, uint256 assetAmount) external view returns (uint256 protocolFee, uint256 externalFee);
+  function getFeeForDeposit(address contractAddress, uint256 assetAmount) external view returns (uint256);
 
-  function setDischargeApproval(address _contractAddress, uint256 _tokenId, address _operator) external;
-  function setReleaseApproval(address _contractAddress, uint256 _tokenId, address _operator) external;
-  function isApprovedForDischarge(address _contractAddress, uint256 _tokenId, address _operator) external view returns (bool);
-  function isApprovedForRelease(address _contractAddress, uint256 _tokenId, address _operator) external view returns (bool);
-
-  function getFeesForDeposit(address _contractAddress, uint256 _assetAmount) external view returns (uint256 _depositFee, uint256 _customFee);
-  function getFeeForDeposit(address _contractAddress, uint256 _assetAmount) external view returns (uint256);
-
-  function baseParticleMass(address _contractAddress, uint256 _tokenId, string calldata _liquidityProviderId, address _assetToken) external returns (uint256);
-  function currentParticleCharge(address _contractAddress, uint256 _tokenId, string calldata _liquidityProviderId, address _assetToken) external returns (uint256);
-  function currentParticleKinetics(address _contractAddress, uint256 _tokenId, string calldata _liquidityProviderId, address _assetToken) external returns (uint256);
+  function baseParticleMass(address contractAddress, uint256 tokenId, string calldata liquidityProviderId, address assetToken) external returns (uint256);
+  function currentParticleCharge(address contractAddress, uint256 tokenId, string calldata liquidityProviderId, address assetToken) external returns (uint256);
+  function currentParticleKinetics(address contractAddress, uint256 tokenId, string calldata liquidityProviderId, address assetToken) external returns (uint256);
 
   /***********************************|
   |     Register Contract Settings    |
   |(For External Contract Integration)|
   |__________________________________*/
 
-  function isContractOwner(address _account, address _contractAddress) external view returns (bool);
-  function registerContractType(address _contractAddress) external;
-  function registerContractSettingReleaseBurn(address _contractAddress, bool _releaseRequiresBurn) external;
-  function registerContractSettingLiquidityProvider(address _contractAddress, string calldata _assetPairId) external;
-  function registerContractSettingDepositFee(address _contractAddress, uint256 _depositFee) external;
-  function registerContractSettingMinDeposit(address _contractAddress, uint256 _minDeposit) external;
-  function registerContractSettingMaxDeposit(address _contractAddress, uint256 _maxDeposit) external;
+  function isContractOwner(address contractAddress, address account) external view returns (bool);
+  function isTokenCreator(address contractAddress, uint256 tokenId, address account) external view returns (bool);
+
+  function setExternalContractConfigs(address contractAddress, NftContractConfig calldata config) external;
+  function setCreatorConfigs(address contractAddress, uint256 tokenId, NftCreatorConfig calldata config) external;
 
   function getCollectedFees(
-    address _contractAddress,
-    string calldata _liquidityProviderId,
-    address _assetToken
-  ) external returns (uint256 _balance, uint256 _interestAccrued);
+    address contractAddress,
+    string calldata liquidityProviderId,
+    address assetToken
+  ) external returns (uint256 balance, uint256 interestAccrued);
 
   function storeCollectedFees(
-    address _contractAddress,
-    string calldata _liquidityProviderId,
-    address _assetToken
-  ) external  returns (uint256 _amountStored);
+    address contractAddress,
+    string calldata liquidityProviderId,
+    address assetToken
+  ) external  returns (uint256 amountStored);
 
   function withdrawContractFees(
-    address _contractAddress,
-    address _receiver,
-    string calldata _liquidityProviderId,
-    address _assetToken
-  ) external returns (uint256 _amount);
+    address contractAddress,
+    address receiver,
+    string calldata liquidityProviderId,
+    address assetToken
+  ) external returns (uint256 amount);
 
+  function setDischargeTimelock(
+    address contractAddress,
+    uint256 tokenId,
+    uint256 unlockBlock
+  ) external;
+
+  function setReleaseTimelock(
+    address contractAddress,
+    uint256 tokenId,
+    uint256 unlockBlock
+  ) external;
 
   /***********************************|
   |          Particle Charge          |
   |__________________________________*/
 
   function energizeParticle(
-      address _contractAddress,
-      uint256 _tokenId,
-      string calldata _liquidityProviderId,
-      address _assetToken,
-      uint256 _assetAmount
-  ) external returns (uint256 _interestAmount);
+      address contractAddress,
+      uint256 tokenId,
+      string calldata liquidityProviderId,
+      address assetToken,
+      uint256 assetAmount
+  ) external returns (uint256 interestAmount);
 
   function dischargeParticle(
-      address _receiver,
-      address _contractAddress,
-      uint256 _tokenId,
-      string calldata _liquidityProviderId,
-      address _assetToken
-  ) external returns (uint256 _amount);
+      address receiver,
+      address contractAddress,
+      uint256 tokenId,
+      string calldata liquidityProviderId,
+      address assetToken
+  ) external returns (uint256 amount);
 
   function dischargeParticleAmount(
-      address _receiver,
-      address _contractAddress,
-      uint256 _tokenId,
-      string calldata _liquidityProviderId,
-      address _assetToken,
-      uint256 _assetAmount
-  ) external returns (uint256 _amount);
+      address receiver,
+      address contractAddress,
+      uint256 tokenId,
+      string calldata liquidityProviderId,
+      address assetToken,
+      uint256 assetAmount
+  ) external returns (uint256 amount);
 
   function releaseParticle(
-      address _receiver,
-      address _contractAddress,
-      uint256 _tokenId,
-      string calldata _liquidityProviderId,
-      address _assetToken
-  ) external returns (uint256 _amount);
+      address receiver,
+      address contractAddress,
+      uint256 tokenId,
+      string calldata liquidityProviderId,
+      address assetToken
+  ) external returns (uint256 amount);
 
   function finalizeRelease(
-      address _receiver,
-      address _contractAddress,
-      uint256 _tokenId,
-      string calldata _liquidityProviderId,
-      address _assetToken
-  ) external returns (uint256 _amount);
+      address receiver,
+      address contractAddress,
+      uint256 tokenId,
+      string calldata liquidityProviderId,
+      address assetToken
+  ) external returns (uint256 amount);
+
+  /***********************************|
+  |          Particle Events          |
+  |__________________________________*/
+
+  event TokenContractConfigsSet(
+    address indexed contractAddress,
+    string indexed liquidityProvider,
+    uint256 assetDepositFee,
+    uint256 assetDepositMin,
+    uint256 assetDepositMax
+  );
+  event TokenCreatorConfigsSet(
+    address indexed contractAddress,
+    uint256 annuityPercent,
+    bool burnToRelease
+  );
+  event DischargeApproval(
+    address indexed contractAddress,
+    uint256 indexed tokenId,
+    address indexed owner,
+    address operator
+  );
+  event ReleaseApproval(
+    address indexed contractAddress,
+    uint256 indexed tokenId,
+    address indexed owner,
+    address operator
+  );
+  event TimelockApproval(
+    address indexed contractAddress,
+    uint256 indexed tokenId,
+    address indexed owner,
+    address operator
+  );
+  event TokenDischargeTimelock(
+    address indexed contractAddress,
+    uint256 indexed tokenId,
+    address indexed operator,
+    uint256 unlockBlock
+  );
+  event TokenReleaseTimelock(
+    address indexed contractAddress,
+    uint256 indexed tokenId,
+    address indexed operator,
+    uint256 unlockBlock
+  );
+  event EnergizedParticle(
+    address indexed contractAddress,
+    uint256 indexed tokenId,
+    string liquidityProviderId,
+    address assetToken,
+    uint256 assetAmount
+  );
+  event DischargedParticle(
+    address indexed contractAddress,
+    uint256 indexed tokenId,
+    address indexed receiver,
+    string liquidityProviderId,
+    address assetToken,
+    uint256 receivedAmount
+  );
+  event ReleasedParticle(
+    address indexed contractAddress,
+    uint256 indexed tokenId,
+    address indexed receiver,
+    string liquidityProviderId,
+    address assetToken,
+    uint256 receivedAmount
+  );
+  event FeesWithdrawn(
+    address indexed contractAddress,
+    address indexed receiver,
+    string liquidityProviderId,
+    address assetToken,
+    uint256 amount
+  );
+  event UpdateContractBlacklist(
+    address indexed contractAddress,
+    bool state
+  );
 }

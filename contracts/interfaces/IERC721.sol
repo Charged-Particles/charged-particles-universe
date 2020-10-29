@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// YearnWalletManager.sol -- Charged Particles
+// IERC721.sol -- Charged Particles
 // Copyright (c) 2019, 2020 Rob Secord <robsecord.eth>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,46 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-pragma solidity 0.6.12;
+pragma solidity >=0.6.0;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
-
-import "../../lib/WalletManagerBase.sol";
-import "./YearnSmartWallet.sol";
-
-/**
- * @notice Wallet Manager for yEarn
- * @dev Non-upgradeable Contract
- */
-contract YearnWalletManager is Initializable/*, WalletManagerBase*/ {
-
-  function initialize() public initializer {
-    // WalletManagerBase.initializeBase();
-
-    // _walletTemplate = address(new YearnSmartWallet());
-  }
-
-
-
-  /***********************************|
-  |         Private Functions         |
-  |__________________________________*/
-
-
-  /**
-    * @dev todo..
-    */
-  // function _createWallet(
-  //   uint256 _uuid
-  // )
-  //   internal
-  //   returns (address)
-  // {
-  //   address newWallet = _createClone(_walletTemplate);
-  //   YearnSmartWallet(newWallet).initialize();
-
-  //   emit NewSmartWallet(_uuid, newWallet);
-  //   return newWallet;
-  // }
+interface IERC721 {
+    function owner() external view returns (address);
+    function ownerOf(uint256 tokenId) external view returns (address);
+    function creatorOf(uint256 tokenId) external view returns (address);
+    function isApprovedForAll(address tokenOwner, address operator) external view returns (bool);
 }

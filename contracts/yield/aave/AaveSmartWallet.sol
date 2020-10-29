@@ -92,8 +92,12 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
     return _getBalance(_assetToken);
   }
 
-  function getRewards(address _assetToken) external override returns (uint256) {
-    return 0;
+  function getAnnuities(address _assetToken) external override returns (uint256) {
+    return _getCreatorPortion(_assetToken, _getBalance(_assetToken));
+  }
+
+  function getRewards(address _rewardToken) external override returns (uint256) {
+    return IERC20(_rewardToken).balanceOf(address(this));
   }
 
 
@@ -134,6 +138,19 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
     return _withdraw(_receiver, _assetToken, _assetAmount);
   }
 
+  function withdrawRewards(
+    address _receiver,
+    address _rewardsToken,
+    uint256 _rewardsAmount
+  )
+    external
+    override
+    onlyWalletManager
+    returns (uint256)
+  {
+    return _withdrawRewards(_receiver, _rewardsToken, _rewardsAmount);
+  }
+
 
   /***********************************|
   |         Private Functions         |
@@ -170,7 +187,6 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
     return aTokensAmount;
   }
 
-
   function _withdraw(
     address _receiver,
     address _assetToken,
@@ -186,18 +202,47 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
     IERC20 assetToken = IERC20(_assetToken);
     IAToken aToken = IAToken(aTokenAddress);
 
-    uint256 walletBalance = _getBalance(_assetToken);
-    require(walletBalance >= _assetAmount, "AaveSmartWallet: INSUFF_BALANCE");
+    uint256 walletBalance = aToken.balanceOf(self);
+    uint256 withdrawalAmount = (walletBalance >= _assetAmount) ? _assetAmount : walletBalance;
+    require(withdrawalAmount > 0, "AaveSmartWallet: INSUFF_BALANCE");
+
+    // Get Creator Annuities
+    uint256 creatorAmount = _getCreatorPortion(_assetToken, withdrawalAmount);
 
     // Redeem aTokens for Asset Tokens
     uint256 preBalance = assetToken.balanceOf(self);
-    aToken.redeem(_assetAmount);
+    aToken.redeem(withdrawalAmount);
     uint256 postBalance = assetToken.balanceOf(self);
-    uint256 redeemedAssets = postBalance.sub(preBalance);
+    uint256 receiverAmount = postBalance.sub(preBalance);
+
+    // Transfer Assets to Creator
+    if (creatorAmount > 0) {
+      receiverAmount = receiverAmount.sub(creatorAmount);
+      require(assetToken.transfer(nftCreator, creatorAmount), "AaveSmartWallet: WITHDRAW_CREATOR_FAILED");
+    }
 
     // Transfer Assets to Receiver
-    require(assetToken.transfer(_receiver, redeemedAssets), "AaveSmartWallet: WITHDRAW_TRANSFER_FAILED");
-    return redeemedAssets;
+    require(assetToken.transfer(_receiver, receiverAmount), "AaveSmartWallet: WITHDRAW_RECEIVER_FAILED");
+    return receiverAmount;
+  }
+
+  function _withdrawRewards(
+    address _receiver,
+    address _rewardsToken,
+    uint256 _rewardsAmount
+  )
+    internal
+    returns (uint256)
+  {
+    address self = address(this);
+    IERC20 rewardsToken = IERC20(_rewardsToken);
+
+    uint256 walletBalance = rewardsToken.balanceOf(self);
+    require(walletBalance >= _rewardsAmount, "AaveSmartWallet: INSUFF_BALANCE");
+
+    // Transfer Rewards to Receiver
+    require(rewardsToken.transfer(_receiver, _rewardsAmount), "AaveSmartWallet: WITHDRAW_TRANSFER_FAILED");
+    return _rewardsAmount;
   }
 
 
@@ -209,6 +254,22 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
     return aToken.balanceOf(address(this));
   }
 
+  function _getCreatorPortion(address _assetToken, uint256 _amount) internal returns (uint256) {
+    if (nftCreatorAnnuityPct == 0) { return 0; }
+
+    address self = address(this);
+    address aTokenAddress = _assetToInterestToken[_assetToken];
+    IAToken aToken = IAToken(aTokenAddress);
+
+    uint256 walletBalance = aToken.balanceOf(self);
+    uint256 walletPrincipal = aToken.principalBalanceOf(self);
+    uint256 walletInterest = walletBalance.sub(walletPrincipal);
+    uint256 interestPortion = (walletInterest > _amount) ? _amount : walletInterest;
+    if (interestPortion <= PERCENTAGE_SCALE) { return 0; }
+
+    // Creator Annuity
+    return interestPortion.mul(nftCreatorAnnuityPct).div(PERCENTAGE_SCALE);
+  }
 
 
   /**

@@ -28,7 +28,28 @@ pragma solidity >=0.6.0;
  * @dev ...
  */
 interface IUniverse {
-    function onEnergize(address _contractAddress, uint256 _tokenId, string calldata _liquidityProviderId, address _assetToken, uint256 _assetAmount) external;
-    function onDischarge(address _contractAddress, uint256 _tokenId, string calldata _liquidityProviderId, address _assetToken, uint256 _assetAmount) external;
-    function onRelease(address _contractAddress, uint256 _tokenId, string calldata _liquidityProviderId, address _assetToken, uint256 _assetAmount) external;
+
+  function onEnergize(
+    address contractAddress, 
+    uint256 tokenId, 
+    string calldata liquidityProviderId, 
+    address assetToken, 
+    uint256 assetAmount
+  ) external;
+  
+  function onDischarge(
+    address contractAddress, 
+    uint256 tokenId, 
+    string calldata liquidityProviderId, 
+    address assetToken, 
+    uint256 assetAmount
+  ) external;
+
+  function onRelease(
+    address contractAddress, 
+    uint256 tokenId, 
+    string calldata liquidityProviderId, 
+    address assetToken, 
+    uint256 assetAmount
+  ) external;
 }
