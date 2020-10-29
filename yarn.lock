@@ -860,18 +860,6 @@
     safe-buffer "^5.1.1"
     util.promisify "^1.0.0"
 
-"@nomiclabs/hardhat-etherscan@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@nomiclabs/hardhat-etherscan/-/hardhat-etherscan-2.0.0.tgz#43b01bd3fe82f04d96acc33d3b829a59230ee8ed"
-  integrity sha512-bPFxhoyDmhbguhEk2Fco6flXmcV4Cca9V1qEi/hhrTJSxUQf52LcB5WbxLSCPl79oHFKvcRoKVmpK+CUkeYAHA==
-  dependencies:
-    "@ethersproject/abi" "^5.0.2"
-    "@ethersproject/address" "^5.0.2"
-    cbor "^5.0.2"
-    fs-extra "^7.0.1"
-    node-fetch "^2.6.0"
-    semver "^6.3.0"
-
 "@oclif/command@^1.5.20", "@oclif/command@^1.8.0":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@oclif/command/-/command-1.8.0.tgz#c1a499b10d26e9d1a611190a81005589accbb339"

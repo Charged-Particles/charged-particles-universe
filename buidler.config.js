@@ -6,7 +6,7 @@ require('dotenv').config();
 usePlugin('@nomiclabs/buidler-waffle');
 usePlugin('@nomiclabs/buidler-etherscan');
 usePlugin('@nomiclabs/buidler-ethers');
-usePlsugin('@openzeppelin/buidler-upgrades');
+usePlugin('@openzeppelin/buidler-upgrades');
 usePlugin('buidler-gas-reporter');
 usePlugin('solidity-coverage');
 usePlugin('buidler-deploy');

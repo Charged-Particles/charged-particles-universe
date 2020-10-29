@@ -25,9 +25,7 @@
     "deploy": "buidler run ./scripts/deploy-all.js --network",
     "gen-docs": "solidity-docgen -i contracts -o docs"
   },
-  "dependencies": {
-    "@nomiclabs/hardhat-etherscan": "^2.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.3",
     "@nomiclabs/buidler-ethers": "^2.0.0",
