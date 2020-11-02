@@ -24,13 +24,14 @@
 pragma solidity >=0.6.0;
 
 import "../interfaces/ISmartWallet.sol";
-import "./Common.sol";
 
 /**
  * @notice ERC20-Token Smart-Wallet Bridge to Bloom
  * @dev Non-upgradeable Contract
  */
-abstract contract SmartWalletBase is ISmartWallet, Common {
+abstract contract SmartWalletBase is ISmartWallet {
+
+  uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
 
   address internal nftCreator;
   uint256 internal nftCreatorAnnuityPct;
@@ -77,6 +78,25 @@ abstract contract SmartWalletBase is ISmartWallet, Common {
     nftCreatorAnnuityPct = annuityPct;
   }
 
+  function withdrawEther(address payable receiver, uint256 amount) external virtual override onlyWalletManager {
+    receiver.transfer(amount);
+  }
+
+  function executeForAccount(
+    address contractAddress,
+    uint256 ethValue,
+    bytes memory encodedParams
+  )
+    external
+    override
+    onlyWalletManager
+    returns (bytes memory)
+  {
+    (bool success, bytes memory result) = contractAddress.call{value: ethValue}(encodedParams);
+    require(success, string(result));
+    return result;
+  }
+
   /***********************************|
   |         Private Functions         |
   |__________________________________*/
@@ -87,7 +107,6 @@ abstract contract SmartWalletBase is ISmartWallet, Common {
       _assetToInterestToken[assetToken] = interestToken;
     }
   }
-
 
   /***********************************|
   |             Modifiers             |

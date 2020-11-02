@@ -69,7 +69,6 @@ abstract contract WalletManagerBase is Initializable, OwnableUpgradeSafe, IWalle
     return _paused;
   }
 
-
   /***********************************|
   |          Only Admin/DAO           |
   |__________________________________*/

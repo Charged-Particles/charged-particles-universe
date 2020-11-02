@@ -110,8 +110,8 @@ contract AaveWalletManager is Initializable, WalletManagerBase {
   function energize(
     uint256 _uuid,
     address _assetToken,
-    uint256 _assetAmount, 
-    address creator, 
+    uint256 _assetAmount,
+    address creator,
     uint256 annuityPct
   )
     external
@@ -148,19 +148,19 @@ contract AaveWalletManager is Initializable, WalletManagerBase {
     external
     override
     onlyController
-    returns (uint256 assetAmount)
+    returns (uint256 interestAmount)
   {
     address wallet = _wallets[_uuid];
     require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
 
-    uint256 interestAmount = AaveSmartWallet(wallet).getInterest(_assetToken);
-    require(interestAmount > 0, "AaveWalletManager: INSUFF_CHARGE");
+    uint256 availableInterest = AaveSmartWallet(wallet).getInterest(_assetToken);
+    require(availableInterest > 0, "AaveWalletManager: INSUFF_CHARGE");
 
     // Discharge the full amount of interest
-    assetAmount = AaveSmartWallet(wallet).withdrawAmount(_receiver, _assetToken, interestAmount);
+    interestAmount = AaveSmartWallet(wallet).withdrawAmount(_receiver, _assetToken, availableInterest);
 
     // Log Event
-    emit WalletDischarged(_uuid, _assetToken, assetAmount);
+    emit WalletDischarged(_uuid, _assetToken, interestAmount);
   }
 
   function dischargeAmount(
@@ -172,19 +172,19 @@ contract AaveWalletManager is Initializable, WalletManagerBase {
     external
     override
     onlyController
-    returns (uint256 assetAmount)
+    returns (uint256 interestAmount)
   {
     address wallet = _wallets[_uuid];
     require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
 
-    uint256 interestAmount = AaveSmartWallet(wallet).getInterest(_assetToken);
-    require(_assetAmount > 0 && interestAmount >= _assetAmount, "AaveWalletManager: INSUFF_CHARGE");
+    uint256 availableInterest = AaveSmartWallet(wallet).getInterest(_assetToken);
+    require(_assetAmount > 0 && availableInterest >= _assetAmount, "AaveWalletManager: INSUFF_CHARGE");
 
     // Discharge a portion of the interest
-    assetAmount = AaveSmartWallet(wallet).withdrawAmount(_receiver, _assetToken, _assetAmount);
+    interestAmount = AaveSmartWallet(wallet).withdrawAmount(_receiver, _assetToken, _assetAmount);
 
     // Log Event
-    emit WalletDischarged(_uuid, _assetToken, assetAmount);
+    emit WalletDischarged(_uuid, _assetToken, interestAmount);
   }
 
   function release(
@@ -195,16 +195,18 @@ contract AaveWalletManager is Initializable, WalletManagerBase {
     external
     override
     onlyController
-    returns (uint256 assetAmount)
+    returns (uint256 principalAmount, uint256 interestAmount)
   {
     address wallet = _wallets[_uuid];
     require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
 
     // Release Assets to Receiver
-    assetAmount = AaveSmartWallet(wallet).withdraw(_receiver, _assetToken);
+    principalAmount = AaveSmartWallet(wallet).getPrincipal(_assetToken);
+    interestAmount = AaveSmartWallet(wallet).getInterest(_assetToken);
+    AaveSmartWallet(wallet).withdraw(_receiver, _assetToken);
 
     // Log Event
-    emit WalletReleased(_uuid, _receiver, _assetToken, assetAmount);
+    emit WalletReleased(_uuid, _receiver, _assetToken, principalAmount, interestAmount);
   }
 
   function withdrawRewards(
@@ -227,6 +229,27 @@ contract AaveWalletManager is Initializable, WalletManagerBase {
     // Log Event
     emit WalletRewarded(_uuid, _receiver, _rewardsToken, amount);
   }
+
+  function withdrawEther(uint256 _uuid, address payable receiver, uint256 amount) external virtual override onlyController {
+    address wallet = _wallets[_uuid];
+    return AaveSmartWallet(wallet).withdrawEther(receiver, amount);
+  }
+
+  function executeForAccount(
+    uint256 _uuid,
+    address contractAddress,
+    uint256 ethValue,
+    bytes memory encodedParams
+  )
+    external
+    override
+    onlyController
+    returns (bytes memory)
+  {
+    address wallet = _wallets[_uuid];
+    return AaveSmartWallet(wallet).executeForAccount(contractAddress, ethValue, encodedParams);
+  }
+
 
 
   /***********************************|

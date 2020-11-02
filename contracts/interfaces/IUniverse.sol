@@ -29,27 +29,30 @@ pragma solidity >=0.6.0;
  */
 interface IUniverse {
 
+  event RewardIssued(address indexed receiver, address rewardToken, uint256 rewardAmount);
+
   function onEnergize(
-    address contractAddress, 
-    uint256 tokenId, 
-    string calldata liquidityProviderId, 
-    address assetToken, 
-    uint256 assetAmount
-  ) external;
-  
-  function onDischarge(
-    address contractAddress, 
-    uint256 tokenId, 
-    string calldata liquidityProviderId, 
-    address assetToken, 
+    address contractAddress,
+    uint256 tokenId,
+    string calldata liquidityProviderId,
+    address assetToken,
     uint256 assetAmount
   ) external;
 
+  function onDischarge(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata liquidityProviderId,
+    address assetToken,
+    uint256 interestAmount
+  ) external;
+
   function onRelease(
-    address contractAddress, 
-    uint256 tokenId, 
-    string calldata liquidityProviderId, 
-    address assetToken, 
-    uint256 assetAmount
+    address contractAddress,
+    uint256 tokenId,
+    string calldata liquidityProviderId,
+    address assetToken,
+    uint256 principalAmount,
+    uint256 interestAmount
   ) external;
 }

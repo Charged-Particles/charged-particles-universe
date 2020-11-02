@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// Common.sol -- Charged Particles
+// IIonTimelock.sol -- Charged Particles
 // Copyright (c) 2019, 2020 Rob Secord <robsecord.eth>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,15 +23,23 @@
 
 pragma solidity >=0.6.0;
 
-
 /**
- * @notice Common Vars for Charged Particles
+ * @title Charged Particles Ion-Timelock Interface
+ * @dev ...
  */
-contract Common {
-    uint256 constant internal PERCENTAGE_SCALE = 1e4;       // 10000  (100%)
-    uint256 constant internal MAX_CUSTOM_DEPOSIT_FEE = 5e3; // 5000   (50%)
+interface IIonTimelock {
 
-    // Interface Signatures
-    bytes4 constant internal INTERFACE_SIGNATURE_ERC721 = 0x80ac58cd;
-    bytes4 constant internal INTERFACE_SIGNATURE_ERC1155 = 0xd9b67a26;
+  struct Portion {
+    uint256 amount;
+    uint256 releaseTime;
+    bool claimed;
+  }
+
+  function addPortions(uint256[] memory amounts, uint256[] memory releaseTimes) external returns (bool);
+  function nextReleaseTime() external view returns (uint256 releaseTime);
+  function nextReleaseAmount() external view returns (uint256 releaseAmount);
+  function release() external returns (uint256 amount);
+
+  event PortionsAdded(uint256[] amounts, uint256[] releaseTimes);
+  event PortionReleased(uint256 amounts, uint256 releaseTime);
 }

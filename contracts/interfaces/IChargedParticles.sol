@@ -66,6 +66,7 @@ interface IChargedParticles {
   function isLiquidityProviderEnabled(string calldata liquidityProviderId) external view returns (bool);
   function getLiquidityProvidersCount() external view returns (uint);
   function getLiquidityProviderByIndex(uint index) external view returns (string memory);
+  function getWalletManager(string calldata liquidityProviderId) external view returns (address);
 
   function getTokenUUID(address contractAddress, uint256 tokenId) external pure returns (uint256);
   function getOwnerUUID(string calldata liquidityProviderId, address owner) external pure returns (uint256);
@@ -144,7 +145,7 @@ interface IChargedParticles {
       uint256 tokenId,
       string calldata liquidityProviderId,
       address assetToken
-  ) external returns (uint256 amount);
+  ) external returns (uint256 interestAmount);
 
   function dischargeParticleAmount(
       address receiver,
@@ -153,7 +154,7 @@ interface IChargedParticles {
       string calldata liquidityProviderId,
       address assetToken,
       uint256 assetAmount
-  ) external returns (uint256 amount);
+  ) external returns (uint256 interestAmount);
 
   function releaseParticle(
       address receiver,
@@ -230,7 +231,7 @@ interface IChargedParticles {
     address indexed receiver,
     string liquidityProviderId,
     address assetToken,
-    uint256 receivedAmount
+    uint256 interestAmount
   );
   event ReleasedParticle(
     address indexed contractAddress,
@@ -238,7 +239,8 @@ interface IChargedParticles {
     address indexed receiver,
     string liquidityProviderId,
     address assetToken,
-    uint256 receivedAmount
+    uint256 principalAmount,
+    uint256 interestAmount
   );
   event FeesWithdrawn(
     address indexed contractAddress,

@@ -27,25 +27,26 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/introspection/IERC165.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Receiver.sol";
 
-import "./interfaces/IERC721.sol";
+import "./interfaces/IERC721Chargeable.sol";
 import "./interfaces/IUniverse.sol";
 import "./interfaces/IChargedParticles.sol";
 import "./interfaces/IWalletManager.sol";
+// import "./interfaces/IStorageManager.sol";
 
 import "./lib/RelayRecipient.sol";
-import "./lib/Common.sol";
 
 
 /**
  * @notice Charged Particles Contract
  * @dev Upgradeable Contract
  */
-contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, RelayRecipient, Common {
+contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, RelayRecipient, IERC721Receiver {
   using SafeMath for uint256;
 
   //
@@ -63,9 +64,18 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   //                              - Released Tokens are either Burned/Destroyed or left in their Original State as an NFT
   //
 
+  uint256 constant internal PERCENTAGE_SCALE = 1e4;       // 10000  (100%)
+  uint256 constant internal MAX_CUSTOM_DEPOSIT_FEE = 5e3; // 5000   (50%)
+
+  // Interface Signatures
+  bytes4 constant internal INTERFACE_SIGNATURE_ERC721 = 0x80ac58cd;
+  bytes4 constant internal INTERFACE_SIGNATURE_ERC1155 = 0xd9b67a26;
+
+  // Linked Contracts
   IUniverse internal _universe;
   string[] internal _liquidityProviders;
   mapping (string => IWalletManager) internal _lpWalletManager;
+  // IStorageManager internal _storageManager;
 
   // Blacklisted External Token Contracts that are not allowed to "Charge" tokens.
   //  - This is usually due to a contract being upgradeable or mutable in some way by a single EOA.
@@ -126,8 +136,12 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     return _liquidityProviders[index];
   }
 
-  // function getWalletManager(string calldata liquidityProviderId) external override view returns (address) {
-  //   return address(_lpWalletManager[liquidityProviderId]);
+  function getWalletManager(string calldata liquidityProviderId) external override view returns (address) {
+    return address(_lpWalletManager[liquidityProviderId]);
+  }
+
+  // function getStorageManager() external override view returns (address) {
+  //   return address(storageManager);
   // }
 
   function getTokenUUID(address contractAddress, uint256 tokenId) external override pure returns (uint256) {
@@ -138,30 +152,9 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     return _getOwnerUUID(liquidityProviderId, ownerAddress);
   }
 
-  // function getAssetMinDeposit(address contractAddress) external override view returns (uint256) {
-  //   return nftContractConfig[contractAddress].assetDepositMin;
-  // }
-
-  // function getAssetMaxDeposit(address contractAddress) external override view returns (uint256) {
-  //   return nftContractConfig[contractAddress].assetDepositMax;
-  // }
-
-  // function getCustomLiquidityProviderId(address contractAddress) external override view returns (string memory) {
-  //   string memory lpid = nftContractConfig[contractAddress].liquidityProvider;
-  //   return lpid;
-  // }
-
-  // function getAnnuityPercent(uint256 tokenUuid) external override view returns (uint256) {
-  //   return nftCreatorConfig[tokenUuid].annuityPercent;
-  // }
-
-  // function getReleaseTimelock(uint256 tokenUuid) external override view returns (uint256) {
-  //   return nftCreatorConfig[tokenUuid].releaseTimelock;
-  // }
-
-  // function getBurnToRelease(uint256 tokenUuid) external override view returns (bool) {
-  //   return nftCreatorConfig[tokenUuid].burnToRelease;
-  // }
+  function onERC721Received(address, address, uint256, bytes calldata) external override returns (bytes4) {
+    return IERC721Receiver(0).onERC721Received.selector;
+  }
 
   /**
     * @notice Sets an Operator as Approved to Discharge a specific Token
@@ -171,15 +164,15 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @param operator         The Address of the Operator to Approve
     */
   function setDischargeApproval(
-    address contractAddress, 
-    uint256 tokenId, 
+    address contractAddress,
+    uint256 tokenId,
     address operator
-  ) 
-    external 
-    override 
-    onlyTokenOwnerOrOperator(contractAddress, tokenId, _msgSender())
+  )
+    external
+    override
+    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    IERC721 tokenInterface = IERC721(contractAddress);
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenOwner = tokenInterface.ownerOf(tokenId);
     require(operator != tokenOwner, "ChargedParticles: CANNOT_BE_SELF");
 
@@ -196,15 +189,15 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @param operator         The Address of the Operator to Approve
     */
   function setReleaseApproval(
-    address contractAddress, 
-    uint256 tokenId, 
+    address contractAddress,
+    uint256 tokenId,
     address operator
-  ) 
-    external 
-    override 
-    onlyTokenOwnerOrOperator(contractAddress, tokenId, _msgSender())
+  )
+    external
+    override
+    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    IERC721 tokenInterface = IERC721(contractAddress);
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenOwner = tokenInterface.ownerOf(tokenId);
     require(operator != tokenOwner, "ChargedParticles: CANNOT_BE_SELF");
 
@@ -221,15 +214,15 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @param operator         The Address of the Operator to Approve
     */
   function setTimelockApproval(
-    address contractAddress, 
-    uint256 tokenId, 
+    address contractAddress,
+    uint256 tokenId,
     address operator
-  ) 
-    external 
-    override 
-    onlyTokenOwnerOrOperator(contractAddress, tokenId, _msgSender())
+  )
+    external
+    override
+    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    IERC721 tokenInterface = IERC721(contractAddress);
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenOwner = tokenInterface.ownerOf(tokenId);
     require(operator != tokenOwner, "ChargedParticles: CANNOT_BE_SELF");
 
@@ -401,8 +394,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   function setExternalContractConfigs(
     address contractAddress,
     NftContractConfig calldata config
-  ) 
-    external 
+  )
+    external
     override
     onlyValidExternalContract(contractAddress)
     onlyContractOwnerOrAdmin(contractAddress, msg.sender)
@@ -416,10 +409,10 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     nftContractConfig[contractAddress].assetDepositMax = config.assetDepositMax;
 
     emit TokenContractConfigsSet(
-      contractAddress, 
-      config.liquidityProvider, 
-      config.assetDepositFee, 
-      config.assetDepositMin, 
+      contractAddress,
+      config.liquidityProvider,
+      config.assetDepositFee,
+      config.assetDepositMin,
       config.assetDepositMax
     );
   }
@@ -428,8 +421,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     address contractAddress,
     uint256 tokenId,
     NftCreatorConfig calldata config
-  ) 
-    external 
+  )
+    external
     override
     onlyTokenCreator(contractAddress, tokenId, _msgSender())
   {
@@ -440,8 +433,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     nftCreatorConfig[tokenUuid].burnToRelease = config.burnToRelease;
 
     emit TokenCreatorConfigsSet(
-      contractAddress, 
-      config.annuityPercent, 
+      contractAddress,
+      config.annuityPercent,
       config.burnToRelease
     );
   }
@@ -523,8 +516,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     uint256 unstoredFees = depositFeesEarned[contractAddress][address(assetToken)];
     depositFeesEarned[contractAddress][address(assetToken)] = 0;
 
-    uint256 storedFees = lpWalletMgr.release(receiver, ownerUuid, assetToken);
-    amount = storedFees.add(unstoredFees);
+    (uint256 principalAmount, uint256 interestAmount) = lpWalletMgr.release(receiver, ownerUuid, assetToken);
+    amount = principalAmount.add(interestAmount).add(unstoredFees);
 
     require(IERC20(assetToken).transfer(receiver, unstoredFees), "ChargedParticles: WITHDRAW_TRANSFER_FAILED");
 
@@ -587,6 +580,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @param contractAddress The Address to the Contract of the Token to Energize
     * @param tokenId The ID of the Token to Energize
     * @param liquidityProviderId The Asset-Pair to Energize the Token with
+    * @param assetToken The Address of the Asset Token being used
     * @param assetAmount The Amount of Asset Token to Energize the Token with
     * @return yieldTokensAmount The amount of Yield-bearing Tokens added to the escrow for the Token
     */
@@ -603,7 +597,6 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     nonReentrant
     returns (uint256 yieldTokensAmount)
   {
-    // require(customRegisteredContract[contractAddress], "ChargedParticles: UNREGISTERED");
     require(!isBlacklistedExternalContract(contractAddress), "ChargedParticles: Contract Blacklisted");
     _validateDeposit(contractAddress, tokenId, liquidityProviderId, assetToken, assetAmount);
 
@@ -612,8 +605,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     // Get Wallet-Manager for LP
     IWalletManager lpWalletMgr = _lpWalletManager[liquidityProviderId];
 
-    // Transfer Asset Token from Caller to Contract
-    _collectAssetToken(_msgSender(), assetToken, assetAmount);
+    // Transfer ERC20 Token from Caller to Contract (reverts on fail)
+    _collectErc20Tokens(_msgSender(), assetToken, assetAmount);
 
     uint256 amountForDeposit = _collectDepositFees(contractAddress, assetToken, assetAmount);
     (address creator, uint256 annuityPct) = _getCreatorAnnuity(contractAddress, tokenId);
@@ -641,7 +634,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @param contractAddress  The Address to the Contract of the Token to Discharge
     * @param tokenId          The ID of the Token to Discharge
     * @param liquidityProviderId      The Asset-Pair to Discharge from the Token
-    * @return amount Amount of Asset Token Received
+    * @param assetToken The Address of the Asset Token being used
+    * @return interestAmount Amount of Asset Token Received
     */
   function dischargeParticle(
     address receiver,
@@ -654,7 +648,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     override
     lpEnabled(liquidityProviderId)
     nonReentrant
-    returns (uint256 amount)
+    returns (uint256 interestAmount)
   {
     require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "ChargedParticles: INVALID_OPERATOR");
 
@@ -665,13 +659,13 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
       require(block.number >= nftState[tokenUuid].dischargeTimelock, "ChargedParticles: TOKEN_TIMELOCKED");
     }
 
-    amount = _lpWalletManager[liquidityProviderId].discharge(receiver, tokenUuid, assetToken);
+    interestAmount = _lpWalletManager[liquidityProviderId].discharge(receiver, tokenUuid, assetToken);
 
     if (address(_universe) != address(0)) {
-      _universe.onDischarge(contractAddress, tokenId, liquidityProviderId, assetToken, amount);
+      _universe.onDischarge(contractAddress, tokenId, liquidityProviderId, assetToken, interestAmount);
     }
 
-    emit DischargedParticle(contractAddress, tokenId, receiver, liquidityProviderId, assetToken, amount);
+    emit DischargedParticle(contractAddress, tokenId, receiver, liquidityProviderId, assetToken, interestAmount);
   }
 
   /**
@@ -681,8 +675,9 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @param contractAddress  The Address to the Contract of the Token to Discharge
     * @param tokenId          The ID of the Token to Discharge
     * @param liquidityProviderId      The Asset-Pair to Discharge from the Token
+    * @param assetToken The Address of the Asset Token being used
     * @param assetAmount      The specific amount of Asset Token to Discharge from the Token
-    * @return amount Amount of Asset Token Received
+    * @return interestAmount Amount of Asset Token Received
     */
   function dischargeParticleAmount(
     address receiver,
@@ -696,7 +691,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     override
     lpEnabled(liquidityProviderId)
     nonReentrant
-    returns (uint256 amount)
+    returns (uint256 interestAmount)
   {
     require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "ChargedParticles: INVALID_OPERATOR");
 
@@ -707,13 +702,13 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
       require(block.number >= nftState[tokenUuid].dischargeTimelock, "ChargedParticles: TOKEN_TIMELOCKED");
     }
 
-    amount = _lpWalletManager[liquidityProviderId].dischargeAmount(receiver, tokenUuid, assetToken, assetAmount);
+    interestAmount = _lpWalletManager[liquidityProviderId].dischargeAmount(receiver, tokenUuid, assetToken, assetAmount);
 
     if (address(_universe) != address(0)) {
-      _universe.onDischarge(contractAddress, tokenId, liquidityProviderId, assetToken, amount);
+      _universe.onDischarge(contractAddress, tokenId, liquidityProviderId, assetToken, interestAmount);
     }
 
-    emit DischargedParticle(contractAddress, tokenId, receiver, liquidityProviderId, assetToken, amount);
+    emit DischargedParticle(contractAddress, tokenId, receiver, liquidityProviderId, assetToken, interestAmount);
   }
 
 
@@ -734,7 +729,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @param contractAddress  The Address to the Contract of the Token to Release
     * @param tokenId          The ID of the Token to Release
     * @param liquidityProviderId      The Asset-Pair to Release from the Token
-    * @return amount The Total Amount of Asset Tokens Released including all converted Interest
+    * @return The Total Amount of Asset Tokens Released including all converted Interest
     */
   function releaseParticle(
     address receiver,
@@ -747,7 +742,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     override
     lpEnabled(liquidityProviderId)
     nonReentrant
-    returns (uint256 amount)
+    returns (uint256) // principal + interest
   {
     require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "ChargedParticles: INVALID_OPERATOR");
     require(_baseParticleMass(contractAddress, tokenId, liquidityProviderId, assetToken) > 0, "ChargedParticles: INSUFF_MASS");
@@ -766,20 +761,23 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     }
 
     // Release Particle to Receiver
-    amount = _lpWalletManager[liquidityProviderId].release(receiver, tokenUuid, assetToken);
+    (uint256 principalAmount, uint256 interestAmount) = _lpWalletManager[liquidityProviderId].release(receiver, tokenUuid, assetToken);
 
     if (address(_universe) != address(0)) {
-      _universe.onRelease(contractAddress, tokenId, liquidityProviderId, assetToken, amount);
+      _universe.onRelease(contractAddress, tokenId, liquidityProviderId, assetToken, principalAmount, interestAmount);
     }
 
     emit ReleasedParticle(
-      contractAddress, 
-      tokenId, 
-      receiver, 
-      liquidityProviderId, 
-      assetToken, 
-      amount
+      contractAddress,
+      tokenId,
+      receiver,
+      liquidityProviderId,
+      assetToken,
+      principalAmount,
+      interestAmount
     );
+
+    return principalAmount.add(interestAmount);
   }
 
   /**
@@ -788,7 +786,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @param contractAddress  The Address to the Contract of the Token to Release
     * @param tokenId          The ID of the Token to Release
     * @param liquidityProviderId      The Asset-Pair to Release from the Token
-    * @return amount The Total Amount of Asset Token Released including all converted Interest
+    * @return The Total Amount of Asset Token Released including all converted Interest
     */
   function finalizeRelease(
     address receiver,
@@ -800,7 +798,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     external
     override
     lpEnabled(liquidityProviderId)
-    returns (uint256 amount)
+    returns (uint256) // principal + interest
   {
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
@@ -813,21 +811,127 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     require(isExternalTokenBurned(contractAddress, tokenId), "ChargedParticles: INVALID_BURN");
 
     // Release Particle to Receiver
-    amount = _lpWalletManager[liquidityProviderId].release(receiver, tokenUuid, assetToken);
+    (uint256 principalAmount, uint256 interestAmount) = _lpWalletManager[liquidityProviderId].release(receiver, tokenUuid, assetToken);
 
     if (address(_universe) != address(0)) {
-      _universe.onRelease(contractAddress, tokenId, liquidityProviderId, assetToken, amount);
+      _universe.onRelease(contractAddress, tokenId, liquidityProviderId, assetToken, principalAmount, interestAmount);
     }
 
     emit ReleasedParticle(
-      contractAddress, 
-      tokenId, 
-      receiver, 
-      liquidityProviderId, 
-      assetToken, 
-      amount
+      contractAddress,
+      tokenId,
+      receiver,
+      liquidityProviderId,
+      assetToken,
+      principalAmount,
+      interestAmount
     );
+
+    return principalAmount.add(interestAmount);
   }
+
+
+  // /***********************************|
+  // |          Particle Storage         |
+  // |__________________________________*/
+
+  // function storeFT(
+  //   // Particle
+  //   address contractAddress,
+  //   uint256 tokenId,
+
+  //   // Fungible Token
+  //   address tokenAddress,
+  //   uint256 tokenAmount
+  // )
+  //   external
+  //   override
+  //   nonReentrant
+  //   storageManagerEnabled
+  //   returns (bool)
+  // {
+  //   require(!isBlacklistedExternalContract(contractAddress), "ChargedParticles: Contract Blacklisted");
+  //   require(!isBlacklistedExternalContract(tokenAddress), "ChargedParticles: Contract Blacklisted");
+
+  //   uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+
+  //   // Transfer ERC20 Token from Caller to Contract (reverts on fail)
+  //   _collectErc20Tokens(_msgSender(), tokenAddress, tokenAmount);
+
+  //   // Deposit Tokens into Storage (reverts on fail)
+  //   IERC20(tokenAddress).approve(address(storageManager), tokenAmount);
+  //   storageManager.storeFT(tokenUuid, tokenAddress, tokenAmount);
+
+  //   return true;
+  // }
+
+
+  // function retreiveFT(
+  //   // Particle
+  //   address contractAddress,
+  //   uint256 tokenId,
+
+  //   // Fungible Token
+  //   address tokenAddress,
+  //   uint256 tokenAmount
+  // )
+  //   external
+  //   override
+  //   nonReentrant
+  //   storageManagerEnabled
+  //   returns (uint256)
+  // {
+  //   require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "ChargedParticles: INVALID_OPERATOR");
+
+  //   uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+  // }
+
+  // function storeNFT(
+  //   // Particle
+  //   address contractAddress,
+  //   uint256 tokenId,
+
+  //   // Non-Fungible Token
+  //   IERC721 tokenAddress,
+  //   uint256[] memory tokenIds
+  // )
+  //   external
+  //   override
+  //   nonReentrant
+  //   storageManagerEnabled
+  //   returns (bool)
+  // {
+  //   require(!isBlacklistedExternalContract(contractAddress), "ChargedParticles: Contract Blacklisted");
+  //   require(!isBlacklistedExternalContract(tokenAddress), "ChargedParticles: Contract Blacklisted");
+
+  //   uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+
+  //   // Transfer ERC721 Token from Caller to Contract (reverts on fail)
+  //   _collectErc721Tokens(_msgSender(), tokenAddress, tokenIds);
+
+  //   // Deposit Tokens into Storage (reverts on fail)
+  //   IERC721(tokenAddress).setApprovalForAll(address(storageManager), true);
+  //   storageManager.storeNFT(tokenUuid, tokenAddress, tokenIds);
+
+  //   return true;
+  // }
+
+  // function retreiveNFT(
+  //   // Particle
+  //   address contractAddress,
+  //   uint256 tokenId,
+
+  //   // Non-Fungible Token
+  //   IERC721 tokenAddress,
+  //   uint256[] memory tokenIds
+  // )
+  //   external
+  //   override
+  //   nonReentrant
+  //   storageManagerEnabled
+  //   returns (uint256)
+  // {
+  // }
 
 
   /***********************************|
@@ -847,6 +951,13 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   function setDepositFee(uint256 fee) external onlyOwner {
     depositFee = fee;
   }
+
+  /**
+    * @dev Setup the Storage Manager contract
+    */
+  // function setStorageManager(address manager) external onlyOwner {
+  //   storageManager = IStorageManager(manager);
+  // }
 
   /**
     * @dev Register Contracts for Asset/Interest Pairs
@@ -895,7 +1006,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @return True if the account is Approved
     */
   function _isApprovedForDischarge(address contractAddress, uint256 tokenId, address account) internal view returns (bool) {
-    IERC721 tokenInterface = IERC721(contractAddress);
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenOwner = tokenInterface.ownerOf(tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     return tokenOwner == account || nftState[tokenUuid].dischargeApproval == account;
@@ -909,7 +1020,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @return True if the account is Approved
     */
   function _isApprovedForRelease(address contractAddress, uint256 tokenId, address account) internal view returns (bool) {
-    IERC721 tokenInterface = IERC721(contractAddress);
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenOwner = tokenInterface.ownerOf(tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     return tokenOwner == account || nftState[tokenUuid].releaseApproval == account;
@@ -923,7 +1034,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @return True if the account is Approved
     */
   function _isApprovedForTimelock(address contractAddress, uint256 tokenId, address account) internal view returns (bool) {
-    IERC721 tokenInterface = IERC721(contractAddress);
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenOwner = tokenInterface.ownerOf(tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     return tokenOwner == account || nftState[tokenUuid].timelockApproval == account;
@@ -953,7 +1064,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   }
 
   function isExternalTokenBurned(address contractAddress, uint256 tokenId) internal view returns (bool) {
-    IERC721 tokenInterface = IERC721(contractAddress);
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenOwner = tokenInterface.ownerOf(tokenId);
     return (tokenOwner == address(0x0));
   }
@@ -972,30 +1083,30 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @return True if the _account is the Owner of the _contract
     */
   function _isContractOwner(address contractAddress, address account) internal view returns (bool) {
-    address contractOwner = IERC721(contractAddress).owner();
+    address contractOwner = IERC721Chargeable(contractAddress).owner();
     return contractOwner != address(0x0) && contractOwner == account;
   }
 
   function _isTokenCreator(address contractAddress, uint256 tokenId, address sender) internal view returns (bool) {
-    IERC721 tokenInterface = IERC721(contractAddress);
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenCreator = tokenInterface.creatorOf(tokenId);
     return (sender == tokenCreator);
   }
 
-  function _isTokenOwnerOrOperator(address contractAddress, uint256 tokenId, address sender) internal view returns (bool) {
-    IERC721 tokenInterface = IERC721(contractAddress);
+  function _isErc721OwnerOrOperator(address contractAddress, uint256 tokenId, address sender) internal view returns (bool) {
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenOwner = tokenInterface.ownerOf(tokenId);
     return (sender == tokenOwner || tokenInterface.isApprovedForAll(tokenOwner, sender));
   }
 
   function _validateDeposit(
-    address contractAddress, 
-    uint256 tokenId, 
+    address contractAddress,
+    uint256 tokenId,
     string calldata liquidityProviderId,
-    address assetToken, 
+    address assetToken,
     uint256 assetAmount
-  ) 
-    internal 
+  )
+    internal
   {
     IWalletManager lpWalletMgr = _lpWalletManager[liquidityProviderId];
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
@@ -1045,28 +1156,48 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   function _getCreatorAnnuity(
     address contractAddress,
     uint256 tokenId
-  ) 
-    internal 
-    view 
-    returns (address creator, uint256 annuityPct) 
+  )
+    internal
+    view
+    returns (address creator, uint256 annuityPct)
   {
-    IERC721 tokenInterface = IERC721(contractAddress);
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     creator = tokenInterface.creatorOf(tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     annuityPct = nftCreatorConfig[tokenUuid].annuityPercent;
   }
 
   /**
-    * @dev Collects the Required Asset Token from the users wallet
-    * @param _from         The owner address to collect the Assets from
-    * @param assetAmount  The Amount of Asset Tokens to Collect
+    * @dev Collects the Required ERC20 Token(s) from the users wallet
+    * @param from         The owner address to collect the tokens from
+    * @param tokenAddress  The addres of the token to transfer
+    * @param tokenAmount  The amount of tokens to collect
     */
-  function _collectAssetToken(address _from, address assetToken, uint256 assetAmount) internal {
-    uint256 _userAssetBalance = IERC20(assetToken).balanceOf(_from);
-    require(assetAmount <= _userAssetBalance, "ChargedParticles: INSUFF_ASSETS");
-    // Be sure to Approve this Contract to transfer your Asset Token
-    require(IERC20(assetToken).transferFrom(_from, address(this), assetAmount), "ChargedParticles: TRANSFER_FAILED");
+  function _collectErc20Tokens(address from, address tokenAddress, uint256 tokenAmount) internal {
+    uint256 userBalance = IERC20(tokenAddress).balanceOf(from);
+    require(tokenAmount <= userBalance, "ChargedParticles: INSUFF_ASSETS");
+    // Be sure to Approve this Contract to transfer your Token(s)
+    require(IERC20(tokenAddress).transferFrom(from, address(this), tokenAmount), "ChargedParticles: TRANSFER_FAILED");
   }
+
+  /**
+    * @dev Collects the Required ERC721 Token(s) from the users wallet
+    * @param from         The owner address to collect the tokens from
+    * @param tokenAddress  The addres of the token to transfer
+    * @param tokenIDs The IDs of the tokens to transfer
+    */
+  // function _collectErc721Tokens(address from, address tokenAddress, uint256[] memory tokenIDs) internal {
+  //   IERC721 nft = IERC721(tokenAddress);
+  //   uint256 tokenCount = tokenIDs.length;
+  //   for (uint i = 0; i < tokenCount; i++) {
+  //     uint256 tokenId = tokenIDs[i];
+  //     require(nft.ownerOf(tokenId) == _msgSender(), "ChargedParticles: NOT_OWNER");
+
+  //     // Be sure to Approve this Contract to transfer your Token(s)
+  //     nft.transferFrom(from, address(this), tokenId);
+  //     require(nft.ownerOf(tokenId) == address(this), "ChargedParticles: TRANSFER_FAILED");
+  //   }
+  // }
 
   /**
     * @dev Gets the Amount of Asset Tokens that have been Deposited into the Particle
@@ -1175,8 +1306,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     _;
   }
 
-  modifier onlyTokenOwnerOrOperator(address contractAddress, uint256 tokenId, address sender) {
-    require(_isTokenOwnerOrOperator(contractAddress, tokenId, sender), "ChargedParticles: NOT_TOKEN_OPERATOR");
+  modifier onlyErc721OwnerOrOperator(address contractAddress, uint256 tokenId, address sender) {
+    require(_isErc721OwnerOrOperator(contractAddress, tokenId, sender), "ChargedParticles: NOT_TOKEN_OPERATOR");
     _;
   }
 
@@ -1189,4 +1320,9 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     require(!_isLiquidityProviderPaused(liquidityProviderId), "ChargedParticles: LP_PAUSED");
     _;
   }
+
+  // modifier storageManagerEnabled() {
+  //   require(storageManager != address(0x0), "ChargedParticles: NO_STORAGE_MGR");
+  //   _;
+  // }
 }

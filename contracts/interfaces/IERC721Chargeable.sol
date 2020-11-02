@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// IERC721.sol -- Charged Particles
+// IERC721Chargeable.sol -- Charged Particles
 // Copyright (c) 2019, 2020 Rob Secord <robsecord.eth>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +23,7 @@
 
 pragma solidity >=0.6.0;
 
-interface IERC721 {
+interface IERC721Chargeable {
     function owner() external view returns (address);
     function ownerOf(uint256 tokenId) external view returns (address);
     function creatorOf(uint256 tokenId) external view returns (address);
