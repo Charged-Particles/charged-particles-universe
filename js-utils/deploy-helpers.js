@@ -41,6 +41,44 @@ const presets = {
   }
 }
 
+
+
+// DEPLOYMENT PROCEDURES:
+
+// Deploy Contracts:
+//  - Universe            (Upgradeable)
+//  - ChargedParticles    (Upgradeable)
+//  - AaveWalletManager   (Non-Upgradeable)
+//  - Ion Token           (Non-Upgradeable, ERC20)
+//  - Proton Token        (Non-Upgradeable, ERC721)
+//  - IonTimelock         (Non-Upgradeable)
+//     - Foundation (x1)
+//     - Team       (x1)
+//     - Advisors   (x3 ??)
+
+
+// Config Contracts:
+// - Universe
+//     - setChargedParticles
+//     - setIonToken
+//     - setIonRewardsMultiplier
+//     - setIonRewardsForAssetToken
+//  - ChargedParticles
+//     - setUniverse
+//     - setDepositFee
+//     - registerLiquidityProvider
+//     - setStorageManager ??
+//     - updateBlacklist
+//  - AaveWalletManager
+//     - setReferralCode
+//  - Ion Token
+//     - setUniverse
+//     - mintToUniverse
+//     - mintToTimelock
+//  - Proton Token
+//     - setChargedParticles
+
+
 // const _getDeployedContract = async (bre, deployer, contractName, contractArgs = []) => {
 //     const {deployments} = bre
 //     const {deployIfDifferent, log} = deployments;
