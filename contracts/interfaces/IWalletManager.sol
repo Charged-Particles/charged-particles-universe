@@ -44,6 +44,7 @@ interface IWalletManager {
   function getInterest(uint256 uuid, address assetToken) external returns (uint256);
   function getRewards(uint256 uuid, address assetToken) external returns (uint256);
   function getBalance(uint256 uuid, address assetToken) external returns (uint256);
+  function getAnnuities(uint256 uuid, address assetToken) external returns (uint256);
 
   function energize(uint256 uuid, address assetToken, uint256 assetAmount, address creator, uint256 annuityPct) external returns (uint256 yieldTokensAmount);
   function discharge(address receiver, uint256 uuid, address assetToken) external returns (uint256 amount);

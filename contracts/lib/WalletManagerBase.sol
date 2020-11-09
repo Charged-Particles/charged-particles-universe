@@ -23,21 +23,17 @@
 
 pragma solidity >=0.6.0;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "../interfaces/IWalletManager.sol";
-import "../interfaces/IChargedParticles.sol";
 
 
 /**
  * @notice Wallet-Manager-Base Contract
  * @dev Non-upgradeable Contract
  */
-abstract contract WalletManagerBase is Initializable, OwnableUpgradeSafe, IWalletManager {
-  using SafeMath for uint256;
+abstract contract WalletManagerBase is Ownable, IWalletManager {
 
   // The Controller Contract Address
   address internal _controller;
@@ -50,15 +46,6 @@ abstract contract WalletManagerBase is Initializable, OwnableUpgradeSafe, IWalle
 
   // State of Wallet Manager
   bool internal _paused;
-
-
-  /***********************************|
-  |          Initialization           |
-  |__________________________________*/
-
-  function initializeBase() public initializer {
-    __Ownable_init();
-  }
 
 
   /***********************************|

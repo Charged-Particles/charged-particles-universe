@@ -23,9 +23,6 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
-
 import "../../lib/WalletManagerBase.sol";
 import "./AaveSmartWallet.sol";
 
@@ -33,8 +30,7 @@ import "./AaveSmartWallet.sol";
  * @notice Wallet Manager for Aave
  * @dev Non-upgradeable Contract
  */
-contract AaveWalletManager is Initializable, WalletManagerBase {
-  using SafeMath for uint256;
+contract AaveWalletManager is WalletManagerBase {
 
   address public lendingPoolProvider;
   uint256 public referralCode;
@@ -44,14 +40,9 @@ contract AaveWalletManager is Initializable, WalletManagerBase {
   |          Initialization           |
   |__________________________________*/
 
-  function initialize(address _aaveLendingProvider) public initializer {
-    require(_aaveLendingProvider != address(0x0), "AaveWalletManager: INVALID_LENDING_POOL");
-    WalletManagerBase.initializeBase();
-
-    lendingPoolProvider = _aaveLendingProvider;
+  constructor () public {
     _walletTemplate = address(new AaveSmartWallet());
   }
-
 
   /***********************************|
   |              Public               |
@@ -85,6 +76,11 @@ contract AaveWalletManager is Initializable, WalletManagerBase {
   function getInterest(uint256 _uuid, address _assetToken) external override returns (uint256) {
     if (_wallets[_uuid] == address(0x0)) { return 0; }
     return AaveSmartWallet(_wallets[_uuid]).getInterest(_assetToken);
+  }
+
+  function getAnnuities(uint256 _uuid, address _assetToken) external override returns (uint256) {
+    if (_wallets[_uuid] == address(0x0)) { return 0; }
+    return AaveSmartWallet(_wallets[_uuid]).getAnnuities(_assetToken);
   }
 
   /**
@@ -255,6 +251,11 @@ contract AaveWalletManager is Initializable, WalletManagerBase {
   /***********************************|
   |          Only Admin/DAO           |
   |__________________________________*/
+
+  function setLendingPoolProvider(address _aaveLendingProvider) external onlyOwner {
+    require(_aaveLendingProvider != address(0x0), "AaveWalletManager: INVALID_LENDING_POOL");
+    lendingPoolProvider = _aaveLendingProvider;
+  }
 
   // ref: https://docs.aave.com/developers/developing-on-aave/the-protocol/lendingpool
   function setReferralCode(uint256 _referralCode) external onlyOwner {

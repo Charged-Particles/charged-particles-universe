@@ -51,8 +51,8 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
 
   // ION Token Rewards
   IERC20 public ionToken;
-  uint256 public ionRewardsMultiplier;
-  mapping (address => bool) internal rewardIonsFor;
+  //   Asset Token => Reward Multiplier
+  mapping (address => uint256) internal ionRewardsMultiplier;
 
 
   /***********************************|
@@ -61,8 +61,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
 
   function initialize() public initializer {
     __Ownable_init();
-
-    ionRewardsMultiplier = 10000; // default 1:1 ratio of Interest:ION
   }
 
 
@@ -96,9 +94,9 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
     onlyChargedParticles
   {
     // Reward ION tokens
-    if (rewardIonsFor[assetToken] && interestAmount > 0) {
+    if (ionRewardsMultiplier[assetToken] > 0 && interestAmount > 0) {
       address receiver = IERC721(contractAddress).ownerOf(tokenId);
-      _rewardIonTokens(receiver, interestAmount);
+      _rewardIonTokens(receiver, assetToken, interestAmount);
     }
   }
 
@@ -115,9 +113,9 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
     onlyChargedParticles
   {
     // Reward ION tokens
-    if (rewardIonsFor[assetToken] && interestAmount > 0) {
+    if (ionRewardsMultiplier[assetToken] > 0 && interestAmount > 0) {
       address receiver = IERC721(contractAddress).ownerOf(tokenId);
-      _rewardIonTokens(receiver, interestAmount);
+      _rewardIonTokens(receiver, assetToken, interestAmount);
     }
   }
 
@@ -150,23 +148,14 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
   }
 
   function setIonRewardsMultiplier(
+    address assetToken,
     uint256 multiplier
   )
     external
     onlyOwner
+    // onlyValidContractAddress(assetToken)
   {
-    ionRewardsMultiplier = multiplier;
-  }
-
-  function setIonRewardsForAssetToken(
-    address assetToken,
-    bool state
-  )
-    external
-    onlyOwner
-    onlyValidContractAddress(assetToken)
-  {
-    rewardIonsFor[assetToken] = state;
+    ionRewardsMultiplier[assetToken] = multiplier;
   }
 
 
@@ -174,21 +163,21 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
   |         Private Functions         |
   |__________________________________*/
 
-  function _rewardIonTokens(address receiver, uint256 baseAmount) internal {
+  function _rewardIonTokens(address receiver, address assetToken, uint256 baseAmount) internal {
     if (address(ionToken) == address(0x0) || receiver == address(0x0)) { return; }
 
     // Calculate rewards multiplier
     uint256 balance = ionToken.balanceOf(address(this));
-    uint256 amount = baseAmount.mul(ionRewardsMultiplier).div(PERCENTAGE_SCALE);
+    if (balance == 0) { return; }
+
+    uint256 amount = baseAmount.mul(ionRewardsMultiplier[assetToken]).div(PERCENTAGE_SCALE);
     if (amount > balance) {
       amount = balance;
     }
 
-    if (ionToken.balanceOf(address(this)) >= amount) {
-      ionToken.safeTransfer(receiver, amount);
+    ionToken.safeTransfer(receiver, amount);
 
-      emit RewardIssued(receiver, address(ionToken), amount);
-    }
+    emit RewardIssued(receiver, address(ionToken), amount);
   }
 
 

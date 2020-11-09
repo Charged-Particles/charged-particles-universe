@@ -23,10 +23,10 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/utils/SafeCast.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/proxy/Initializable.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/SafeCast.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./IAToken.sol";
 import "./ILendingPool.sol";

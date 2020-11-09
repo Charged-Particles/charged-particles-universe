@@ -30,7 +30,7 @@ import "../interfaces/IUniverse.sol";
 import "../interfaces/IIonTimelock.sol";
 
 
-contract IonToken is ERC20, Ownable {
+contract Ion is ERC20, Ownable {
 
   event LockApproval(address indexed owner, address indexed operator, uint256 amount);
 

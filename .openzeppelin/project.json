@@ -1,8 +1,12 @@
 {
   "manifestVersion": "2.2",
   "contracts": {
+    "Universe": "Universe",
     "ChargedParticles": "ChargedParticles",
-    "AaveWalletManager": "AaveWalletManager"
+    "AaveWalletManager": "AaveWalletManager",
+    "Ion": "Ion",
+    "IonTimelock": "IonTimelock",
+    "Proton": "Proton"
   },
   "dependencies": {
     "@openzeppelin/contracts-ethereum-package": "^3.0.0"

@@ -22,7 +22,11 @@
     "coverage": "yarn clean && yarn clean-test && buidler compile && buidler coverage --network coverage --temp build; rm -rf cache",
     "gas": "REPORT_GAS=true buidler test --network local",
     "start": "buidler node --port 8545",
-    "deploy": "buidler run ./scripts/deploy-all.js --network",
+    "deploy-protocol": "buidler run ./scripts/deploy-protocol.js --network",
+    "deploy-aave": "buidler run ./scripts/deploy-aave.js --network",
+    "deploy-proton": "buidler run ./scripts/deploy-proton.js --network",
+    "deploy-ion": "buidler run ./scripts/deploy-ion.js --network",
+    "deploy-timelocks": "buidler run ./scripts/deploy-timelocks.js --network",
     "gen-docs": "solidity-docgen -i contracts -o docs"
   },
   "dependencies": {},

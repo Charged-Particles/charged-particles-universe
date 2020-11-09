@@ -29,36 +29,6 @@ pragma experimental ABIEncoderV2;
  */
 interface IChargedParticles {
 
-  // Optional Limits set by Owner of External Token Contracts;
-  //  - Any user can add any ERC721 or ERC1155 token as a Charged Particle without Limits,
-  //    unless the Owner of the ERC721 or ERC1155 token contract registers the token here
-  //    and sets the Custom Limits for their token(s)
-  struct NftContractConfig {
-    // Specific Liquidity-Provider that is allowed (otherwise, any Liquidity-Provider is allowed)
-    string liquidityProvider;
-
-    // Deposit Fees to be earned for Contract Owner
-    uint256 assetDepositFee;
-
-    // Allowed Limit of Asset Token [min, max]
-    uint256 assetDepositMin;
-    uint256 assetDepositMax;
-  }
-
-  struct NftCreatorConfig {
-    uint256 annuityPercent;
-    bool burnToRelease;
-  }
-
-  struct NftState {
-    address dischargeApproval;
-    address releaseApproval;
-    address timelockApproval;
-    uint256 dischargeTimelock;
-    uint256 releaseTimelock;
-    address assetToBeReleasedBy;
-  }
-
   /***********************************|
   |             Public API            |
   |__________________________________*/
@@ -93,8 +63,20 @@ interface IChargedParticles {
   function isContractOwner(address contractAddress, address account) external view returns (bool);
   function isTokenCreator(address contractAddress, uint256 tokenId, address account) external view returns (bool);
 
-  function setExternalContractConfigs(address contractAddress, NftContractConfig calldata config) external;
-  function setCreatorConfigs(address contractAddress, uint256 tokenId, NftCreatorConfig calldata config) external;
+  function setExternalContractConfigs(
+    address contractAddress,
+    string calldata liquidityProvider,
+    uint256 assetDepositFee,
+    uint256 assetDepositMin,
+    uint256 assetDepositMax
+  ) external;
+
+  function setCreatorConfigs(
+    address contractAddress,
+    uint256 tokenId,
+    uint256 annuityPercent,
+    bool burnToRelease
+  ) external;
 
   function getCollectedFees(
     address contractAddress,
@@ -249,7 +231,7 @@ interface IChargedParticles {
     address assetToken,
     uint256 amount
   );
-  event UpdateContractBlacklist(
+  event UpdateContractWhitelist(
     address indexed contractAddress,
     bool state
   );

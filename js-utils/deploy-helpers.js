@@ -1,10 +1,15 @@
-const { ethers } = require('ethers')
+const { ethers } = require('ethers');
+const fs = require('fs');
+const path = require('path');
+const _ = require('lodash');
 
-const toWei = ethers.utils.parseEther
-const toEth = ethers.utils.formatEther
-const toStr = (val) => ethers.utils.toUtf8String(val).replace(/\0/g, '')
+const toWei = ethers.utils.parseEther;
+const toEth = ethers.utils.formatEther;
+const toBN = ethers.BigNumber.from;
+const toStr = (val) => ethers.utils.toUtf8String(val).replace(/\0/g, '');
+const weiPerEth = ethers.constants.WeiPerEther;
 
-const txOverrides = (options = {}) => ({gas: 15000000, ...options})
+const txOverrides = (options = {}) => ({gasLimit: 15000000, ...options});
 
 const chainName = (chainId) => {
   switch (chainId) {
@@ -14,7 +19,57 @@ const chainName = (chainId) => {
     case 31337: return 'BuidlerEVM'
     default: return 'Unknown'
   }
+};
+
+const blockTimeFromDate = (dateStr) => {
+  return Date.parse(dateStr) / 1000;
+};
+
+const ensureDirectoryExistence = (filePath) => {
+  var dirname = path.dirname(filePath);
+  if (fs.existsSync(dirname)) {
+    return true;
+  }
+  ensureDirectoryExistence(dirname);
+  fs.mkdirSync(dirname);
+};
+
+const saveDeploymentData = ({chainId, deployData}) => {
+  const network = chainName(chainId).toLowerCase();
+  const deployPath = path.join(__dirname, '..', 'deployed');
+  const filename = `${deployPath}/${network}.json`;
+
+  let existingData = {};
+  if (fs.existsSync(filename)) {
+    existingData = JSON.parse(fs.readFileSync(filename));
+  }
+
+  const newData = _.merge(existingData, deployData);
+  ensureDirectoryExistence(filename);
+  fs.writeFileSync(filename, JSON.stringify(newData, null, "\t"));
+  return filename;
+};
+
+const getContractAbi = (contractName) => {
+  const buildPath = path.join(__dirname, '..', 'build');
+  const filename = `${buildPath}/${contractName}.json`;
+  const contractJson = require(filename);
+  return contractJson.abi;
+};
+
+const getDeployData = ({chainId}) => {
+  const network = chainName(chainId).toLowerCase();
+  const deployPath = path.join(__dirname, '..', 'deployed');
+  const filename = `${deployPath}/${network}.json`;
+  const contractJson = require(filename);
+  return contractJson;
 }
+
+const getTxGasCost = ({deployTransaction}) => {
+  const gasCost = toEth(deployTransaction.gasLimit.mul(deployTransaction.gasPrice));
+  return `${gasCost} ETH`;
+};
+
 
 const presets = {
   ChargedParticles: {
@@ -22,7 +77,31 @@ const presets = {
       deposit: 50, // 0.5%
     }
   },
+  Ion: {
+    rewardsForAssetTokens: [
+      {assetTokenId: 'Aave.dai', multiplier: '5000'}, // DAI
+    ],
+    timelocks: [
+      {
+        receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76',  // Testing - Account 3
+        portions: [
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('10 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('11 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('12 Nov 2020 00:00:00 GMT')},
+        ]
+      },
+      {
+        receiver: '0xF55D5df4fa26c454a5635B4697C2Acf92f55cfD8',  // Testing - Account 4
+        portions: [
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('10 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('11 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('12 Nov 2020 00:00:00 GMT')},
+        ]
+      },
+    ],
+  },
   Aave: {
+    referralCode: '123456789',
     dai: {
       1: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // mainnet
       3: '0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108', // ropsten
@@ -39,87 +118,103 @@ const presets = {
       42: '0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5', // kovan
     }
   }
-}
+};
 
 
-
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // DEPLOYMENT PROCEDURES:
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Deploy Contracts:
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Step 1  -  scripts/deploy-protocol.js
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// Deploy Protocol:
 //  - Universe            (Upgradeable)
 //  - ChargedParticles    (Upgradeable)
+// Config:
+// - Universe
+//     - setChargedParticles
+//  - ChargedParticles
+//     - setUniverse
+//     - setDepositFee
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Step 2  -  scripts/deploy-aave.js
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// Deploy Liquidity Provider:
 //  - AaveWalletManager   (Non-Upgradeable)
-//  - Ion Token           (Non-Upgradeable, ERC20)
+// Config:
+//  - AaveWalletManager
+//     - setLendingPoolProvider
+//     - setReferralCode
+//  - ChargedParticles
+//     - registerLiquidityProvider
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Step 3  -  scripts/deploy-proton.js
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// Deploy Proton (ERC721):
 //  - Proton Token        (Non-Upgradeable, ERC721)
+// Config:
+//  - ChargedParticles
+//     - updateWhitelist
+//  - Proton Token
+//     - setChargedParticles
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Step 4  -  scripts/deploy-ion.js
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// Deploy Ion (ERC20):
+//  - Ion Token           (Non-Upgradeable, ERC20)
+// Config:
+//  - Ion Token
+//     - setUniverse
+// - Universe
+//     - setIonToken
+//     - setIonRewardsMultiplier
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Step 5  -  scripts/deploy-timelock.js
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// Deploy Ion Timelocks:
 //  - IonTimelock         (Non-Upgradeable)
 //     - Foundation (x1)
 //     - Team       (x1)
 //     - Advisors   (x3 ??)
+// Config:
+//  -
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Step 6 -  scripts/mint-ions.js
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Config Contracts:
-// - Universe
-//     - setChargedParticles
-//     - setIonToken
-//     - setIonRewardsMultiplier
-//     - setIonRewardsForAssetToken
-//  - ChargedParticles
-//     - setUniverse
-//     - setDepositFee
-//     - registerLiquidityProvider
-//     - setStorageManager ??
-//     - updateBlacklist
-//  - AaveWalletManager
-//     - setReferralCode
+// Mint Ions:
 //  - Ion Token
-//     - setUniverse
 //     - mintToUniverse
 //     - mintToTimelock
-//  - Proton Token
-//     - setChargedParticles
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-// const _getDeployedContract = async (bre, deployer, contractName, contractArgs = []) => {
-//     const {deployments} = bre
-//     const {deployIfDifferent, log} = deployments;
-//     const overrides = txOverrides({from: deployer})
-
-//     let contract = await deployments.getOrNull(contractName)
-//     if (!contract) {
-//         log(`  Deploying ${contractName}...`)
-//         const deployResult = await deployIfDifferent(['data'], contractName, overrides, contractName, ...contractArgs)
-//         contract = await deployments.get(contractName)
-//         if (deployResult.newlyDeployed) {
-//             log(`  - deployed at ${contract.address} for ${deployResult.receipt.gasUsed} WEI`)
-//         }
-//     }
-//     return contract
-// }
-
-// // Used in deployment initialization scripts and unit-tests
-// const contractManager = (bre) => async (contractName, contractArgs = []) => {
-//     const [ deployer ] = await bre.ethers.getSigners()
-
-//     //  Return an Ethers Contract instance with the "deployer" as Signer
-//     const contract = await _getDeployedContract(bre, deployer._address, contractName, contractArgs)
-//     return new bre.ethers.Contract(contract.address, contract.abi, deployer)
-// }
-
-// // Used in deployment scripts run by buidler-deploy
-// const contractDeployer = (contractName, contractArgs = []) => async (bre) => {
-//     const {getNamedAccounts} = bre
-//     const namedAccounts = await getNamedAccounts()
-//     return await _getDeployedContract(bre, namedAccounts.deployer, contractName, contractArgs)
-// }
 
 
 module.exports = {
   txOverrides,
   chainName,
+  saveDeploymentData,
+  getContractAbi,
+  getDeployData,
+  getTxGasCost,
   // contractDeployer,
   // contractManager,
   presets,
   toWei,
   toEth,
+  toBN,
   toStr,
-}
+};
