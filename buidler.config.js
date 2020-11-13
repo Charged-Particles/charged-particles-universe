@@ -8,6 +8,7 @@ usePlugin('@nomiclabs/buidler-etherscan');
 usePlugin('@nomiclabs/buidler-ethers');
 usePlugin('@openzeppelin/buidler-upgrades');
 usePlugin('buidler-gas-reporter');
+usePlugin('buidler-abi-exporter');
 usePlugin('solidity-coverage');
 usePlugin('buidler-deploy');
 
@@ -80,6 +81,21 @@ module.exports = {
         currency: 'USD',
         gasPrice: 1,
         enabled: (process.env.REPORT_GAS) ? true : false
+    },
+    abiExporter: {
+      path: './abis',
+      clear: true,
+      flat: true,
+      only: [
+        'Universe',
+        'ChargedParticles',
+        'AaveWalletManager',
+        'Ion',
+        'IonTimelock',
+        'Proton',
+        'ERC20',
+        'ERC721'
+      ],
     },
     namedAccounts: {
         deployer: {
