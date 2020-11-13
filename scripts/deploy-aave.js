@@ -20,32 +20,27 @@ async function main() {
   // Named accounts, defined in buidler.config.js:
   const { deployer, owner } = await getNamedAccounts();
 
-  const deployData = getDeployData({chainId: network.chainId});
+  const ddChargedParticles = getDeployData('ChargedParticles', network.chainId);
+  const deployData = {};
 
-  log("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-  log("Charged Particles LP: Aave - Contract Initialization");
-  log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+  log('Charged Particles LP: Aave - Contract Initialization');
+  log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-  log("  Using Network: ", chainName(network.chainId));
-  log("  Using Accounts:");
-  log("  - Deployer:    ", deployer);
-  log("  - Owner:       ", owner);
-  log(" ");
+  log('  Using Network: ', chainName(network.chainId));
+  log('  Using Accounts:');
+  log('  - Deployer:    ', deployer);
+  log('  - Owner:       ', owner);
+  log(' ');
 
-  log("  Loading ChargedParticles from: ", deployData['ChargedParticles'].address);
+  log('  Loading ChargedParticles from: ', ddChargedParticles.address);
   const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
-  const chargedParticles = await ChargedParticles.attach(deployData['ChargedParticles'].address);
+  const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
-  log("\n  Deploying AaveWalletManager...");
-  const lastKnownAddress = _.get(deployData, 'AaveWalletManager.address', '');
+  log('\n  Deploying AaveWalletManager...');
   const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
   const AaveWalletManagerInstance = await AaveWalletManager.deploy();
   const aaveWalletManager = await AaveWalletManagerInstance.deployed();
-  if (lastKnownAddress === aaveWalletManager.address) {
-    log("\n  No Changes! Contracts Already Deployed at:");
-    log("  - AaveWalletManager:  ", aaveWalletManager.address);
-    return;
-  }
 
   const lendingPoolProvider = presets.Aave.lendingPoolProvider[network.chainId];
   deployData['AaveWalletManager'] = {
@@ -55,31 +50,30 @@ async function main() {
     deployTransaction: aaveWalletManager.deployTransaction,
   }
 
-  log("  - Setting Lending Pool Provider...");
+  log('  - Setting Lending Pool Provider...');
   await aaveWalletManager.setLendingPoolProvider(lendingPoolProvider);
 
   if (presets.Aave.referralCode.length > 0) {
-    log("  - Setting Referral Code...");
+    log('  - Setting Referral Code...');
     await aaveWalletManager.setReferralCode(presets.Aave.referralCode);
   }
 
-  log("  - Registering LP with ChargedParticles...");
+  log('  - Registering LP with ChargedParticles...');
   await chargedParticles.registerLiquidityProvider('aave', aaveWalletManager.address);
 
-  // log(`  Transferring Contract Ownership to "${owner}"...`);
+  // log(`  Transferring Contract Ownership to '${owner}'...`);
   // await aaveWalletManager.transferOwnership(owner);
 
 
   // Display Contract Addresses
-  log("\n  Contract Deployments Complete!\n\n  Contracts:");
-  log("  - AaveWalletManager:  ", aaveWalletManager.address);
-  log("     - Gas Cost:        ", getTxGasCost({deployTransaction: aaveWalletManager.deployTransaction}));
+  log('\n  Contract Deployments Complete!\n\n  Contracts:');
+  log('  - AaveWalletManager:  ', aaveWalletManager.address);
+  log('     - Gas Cost:        ', getTxGasCost({deployTransaction: aaveWalletManager.deployTransaction}));
 
-  const filename = saveDeploymentData({chainId: network.chainId, deployData});
-  log("\n  Contract Deployment Data saved to file: ");
-  log("   ", filename);
+  saveDeploymentData({chainId: network.chainId, deployData});
+  log('\n  Contract Deployment Data saved to "deployed" directory.');
 
-  log("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
 

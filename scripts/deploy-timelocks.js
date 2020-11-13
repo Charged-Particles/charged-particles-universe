@@ -21,27 +21,28 @@ async function main() {
   // Named accounts, defined in buidler.config.js:
   const { deployer, owner } = await getNamedAccounts();
 
-  const deployData = getDeployData({chainId: network.chainId});
+  const ddIon = getDeployData('Ion', network.chainId);
+  const deployData = {
+    IonTimelock: []
+  };
 
-  log("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-  log("Charged Particles: Ion Token Timelocks ");
-  log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+  log('Charged Particles: Ion Token Timelocks ');
+  log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-  log("  Using Network: ", chainName(network.chainId));
-  log("  Using Accounts:");
-  log("  - Deployer:    ", deployer);
-  log("  - Owner:       ", owner);
-  log(" ");
+  log('  Using Network: ', chainName(network.chainId));
+  log('  Using Accounts:');
+  log('  - Deployer:    ', deployer);
+  log('  - Owner:       ', owner);
+  log(' ');
 
-  log("  Loading Ion from: ", deployData['Ion'].address);
+  log('  Loading Ion from: ', ddIon.address);
   const Ion = await ethers.getContractFactory('Ion');
-  const ion = await Ion.attach(deployData['Ion'].address);
+  const ion = await Ion.attach(ddIon.address);
 
   const IonTimelock = await ethers.getContractFactory('IonTimelock');
   const ionTimelockAbi = getContractAbi('IonTimelock');
-  const ionAddress = deployData['Ion'].address;
-
-  deployData['IonTimelock'] = deployData['IonTimelock'] || [];
+  const ionAddress = ddIon.address;
 
   const _getDeployedTimelock = async (receiver) => {
     const ionTimelockDeployData = _.find(deployData['IonTimelock'], ['receiver', receiver]);
@@ -52,18 +53,18 @@ async function main() {
   };
 
   const _deployTimelock = async (timelockData) => {
-    log("\n  Deploying Ion Timelock for Receiver: ", timelockData.receiver);
+    log('\n  Deploying Ion Timelock for Receiver: ', timelockData.receiver);
 
     const ionTimelockInstance = await IonTimelock.deploy(timelockData.receiver, ionAddress);
     const ionTimelockDeployed = await ionTimelockInstance.deployed();
 
-    log("  - IonTimelock: ", ionTimelockDeployed.address);
-    log("     - Gas Cost: ", getTxGasCost({deployTransaction: ionTimelockDeployed.deployTransaction}));
+    log('  - IonTimelock: ', ionTimelockDeployed.address);
+    log('     - Gas Cost: ', getTxGasCost({deployTransaction: ionTimelockDeployed.deployTransaction}));
     return ionTimelockDeployed;
   };
 
   const _mintToTimelock = async (timelockData, ionTimelock) => {
-    log("\n  Minting Ions to Timelock for Receiver: ", timelockData.receiver);
+    log('\n  Minting Ions to Timelock for Receiver: ', timelockData.receiver);
 
     const amounts = _.map(timelockData.portions, 'amount');
     const timestamps = _.map(timelockData.portions, 'releaseDate');
@@ -71,7 +72,7 @@ async function main() {
     await ion.mintToTimelock(ionTimelock.address, amounts, timestamps);
 
     const totalMinted = _.reduce(amounts, (sum, amt) => sum.add(amt), toBN('0'));
-    log("  - Total Minted: ", toEth(totalMinted));
+    log('  - Total Minted: ', toEth(totalMinted));
     return totalMinted;
   };
 
@@ -100,13 +101,12 @@ async function main() {
     deployData['IonTimelock'].push(deployTxData);
   }
 
-  log("\n  Contract Deployments & Ion Minting Complete!");
+  log('\n  Contract Deployments & Ion Minting Complete!');
 
-  const filename = saveDeploymentData({chainId: network.chainId, deployData});
-  log("\n  Contract Deployment Data saved to file: ");
-  log("   ", filename);
+  saveDeploymentData(network.chainId, deployData);
+  log('\n  Contract Deployment Data saved to "deployed" directory.');
 
-  log("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
 

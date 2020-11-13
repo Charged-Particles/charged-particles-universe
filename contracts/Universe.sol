@@ -135,6 +135,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
     onlyValidContractAddress(_chargedParticles)
   {
     chargedParticles = _chargedParticles;
+    emit ChargedParticlesSet(_chargedParticles);
   }
 
   function setIonToken(
@@ -145,6 +146,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
     onlyValidContractAddress(_ionToken)
   {
     ionToken = IERC20(_ionToken);
+    emit IonTokenSet(_ionToken);
   }
 
   function setIonRewardsMultiplier(
@@ -156,6 +158,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
     // onlyValidContractAddress(assetToken)
   {
     ionRewardsMultiplier[assetToken] = multiplier;
+    emit IonRewardsMultiplierSet(assetToken, multiplier);
   }
 
 

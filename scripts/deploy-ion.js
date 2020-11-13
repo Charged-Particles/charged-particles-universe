@@ -20,43 +20,37 @@ async function main() {
   // Named accounts, defined in buidler.config.js:
   const { deployer, owner } = await getNamedAccounts();
 
-  const deployData = getDeployData({chainId: network.chainId});
+  const ddUniverse = getDeployData('Universe', network.chainId);
+  const deployData = {};
 
-  log("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-  log("Charged Particles FT: Ion - Contract Initialization");
-  log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+  log('Charged Particles FT: Ion - Contract Initialization');
+  log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-  log("  Using Network: ", chainName(network.chainId));
-  log("  Using Accounts:");
-  log("  - Deployer:    ", deployer);
-  log("  - Owner:       ", owner);
-  log(" ");
+  log('  Using Network: ', chainName(network.chainId));
+  log('  Using Accounts:');
+  log('  - Deployer:    ', deployer);
+  log('  - Owner:       ', owner);
+  log(' ');
 
-  log("  Loading Universe from: ", deployData['Universe'].address);
+  log('  Loading Universe from: ', ddUniverse.address);
   const Universe = await ethers.getContractFactory('Universe');
-  const universe = await Universe.attach(deployData['Universe'].address);
+  const universe = await Universe.attach(ddUniverse.address);
 
-  log("\n  Deploying Ion FT...");
-  const lastKnownAddress = _.get(deployData, 'Ion.address', '');
+  log('\n  Deploying Ion FT...');
   const Ion = await ethers.getContractFactory('Ion');
   const IonInstance = await Ion.deploy();
   const ion = await IonInstance.deployed();
-  if (lastKnownAddress === ion.address) {
-    log("\n  No Changes! Contracts Already Deployed at:");
-    log("  - Ion:  ", ion.address);
-    return;
-  }
-
   deployData['Ion'] = {
     abi: getContractAbi('Ion'),
     address: ion.address,
     deployTransaction: ion.deployTransaction,
   }
 
-  log("  - Registering Universe with Ion...");
-  await ion.setUniverse(deployData['Universe'].address);
+  log('  - Registering Universe with Ion...');
+  await ion.setUniverse(ddUniverse.address);
 
-  log("  - Registering Ion with Universe...");
+  log('  - Registering Ion with Universe...');
   await universe.setIonToken(ion.address);
 
   let assetTokenId;
@@ -67,20 +61,19 @@ async function main() {
     assetTokenAddress = _.get(presets, assetTokenId, {})[network.chainId];
     assetTokenMultiplier = presets.Ion.rewardsForAssetTokens[i].multiplier;
 
-    log("  - Setting Rewards Multiplier for Asset Token: ", assetTokenAddress, " to: ", assetTokenMultiplier);
+    log('  - Setting Rewards Multiplier for Asset Token: ', assetTokenAddress, ' to: ', assetTokenMultiplier);
     await universe.setIonRewardsMultiplier(assetTokenAddress, assetTokenMultiplier);
   }
 
   // Display Contract Addresses
-  log("\n  Contract Deployments Complete!\n\n  Contracts:");
-  log("  - Ion:         ", ion.address);
-  log("     - Gas Cost: ", getTxGasCost({deployTransaction: ion.deployTransaction}));
+  log('\n  Contract Deployments Complete!\n\n  Contracts:');
+  log('  - Ion:         ', ion.address);
+  log('     - Gas Cost: ', getTxGasCost({deployTransaction: ion.deployTransaction}));
 
-  const filename = saveDeploymentData({chainId: network.chainId, deployData});
-  log("\n  Contract Deployment Data saved to file: ");
-  log("   ", filename);
+  saveDeploymentData(network.chainId, deployData);
+  log('\n  Contract Deployment Data saved to "deployed" directory.');
 
-  log("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
 

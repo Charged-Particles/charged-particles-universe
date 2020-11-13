@@ -57,6 +57,7 @@ contract Proton is ERC721, Ownable {
   }
 
   function createChargedParticle(
+    address creator,
     address receiver,
     string memory tokenMetaUri,
     string calldata liquidityProviderId,
@@ -68,9 +69,7 @@ contract Proton is ERC721, Ownable {
     public
     returns (uint256 newTokenId)
   {
-    require(address(_chargedParticles) != address(0x0), "Proton: charged particles not set");
-
-    newTokenId = createProton(receiver, tokenMetaUri, annuityPercent, burnToRelease);
+    newTokenId = createProton(creator, receiver, tokenMetaUri, annuityPercent, burnToRelease);
 
     _collectAssetToken(_msgSender(), assetToken, assetAmount);
 
@@ -84,6 +83,7 @@ contract Proton is ERC721, Ownable {
   }
 
   function createProton(
+    address creator,
     address receiver,
     string memory tokenMetaUri,
     uint256 annuityPercent,
@@ -92,16 +92,19 @@ contract Proton is ERC721, Ownable {
     public
     returns (uint256 newTokenId)
   {
+    require(address(_chargedParticles) != address(0x0), "Proton: charged particles not set");
+
     _tokenIds.increment();
 
     newTokenId = _tokenIds.current();
     _safeMint(receiver, newTokenId);
-    _tokenCreator[newTokenId] = _msgSender();
+    _tokenCreator[newTokenId] = creator;
 
     _setTokenURI(newTokenId, tokenMetaUri);
 
     _chargedParticles.setCreatorConfigs(
       address(this),
+      creator,
       newTokenId,
       annuityPercent,
       burnToRelease

@@ -34,20 +34,24 @@ const ensureDirectoryExistence = (filePath) => {
   fs.mkdirSync(dirname);
 };
 
-const saveDeploymentData = ({chainId, deployData}) => {
+const saveDeploymentData = (chainId, deployData) => {
   const network = chainName(chainId).toLowerCase();
   const deployPath = path.join(__dirname, '..', 'deployed');
-  const filename = `${deployPath}/${network}.json`;
 
-  let existingData = {};
-  if (fs.existsSync(filename)) {
-    existingData = JSON.parse(fs.readFileSync(filename));
-  }
+  _.forEach(_.keys(deployData), (contractName) => {
+    const filename = `${deployPath}/${contractName}.json`;
 
-  const newData = _.merge(existingData, deployData);
-  ensureDirectoryExistence(filename);
-  fs.writeFileSync(filename, JSON.stringify(newData, null, "\t"));
-  return filename;
+    let existingData = {};
+    if (fs.existsSync(filename)) {
+      existingData = JSON.parse(fs.readFileSync(filename));
+    }
+
+    const newData = _.merge(existingData, {
+      [chainId]: deployData[contractName]
+    });
+    ensureDirectoryExistence(filename);
+    fs.writeFileSync(filename, JSON.stringify(newData, null, "\t"));
+  });
 };
 
 const getContractAbi = (contractName) => {
@@ -57,12 +61,11 @@ const getContractAbi = (contractName) => {
   return contractJson.abi;
 };
 
-const getDeployData = ({chainId}) => {
-  const network = chainName(chainId).toLowerCase();
+const getDeployData = (contractName, chainId) => {
   const deployPath = path.join(__dirname, '..', 'deployed');
-  const filename = `${deployPath}/${network}.json`;
+  const filename = `${deployPath}/${contractName}.json`;
   const contractJson = require(filename);
-  return contractJson;
+  return contractJson[chainId];
 }
 
 const getTxGasCost = ({deployTransaction}) => {
@@ -85,17 +88,17 @@ const presets = {
       {
         receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76',  // Testing - Account 3
         portions: [
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('10 Nov 2020 00:00:00 GMT')},
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('11 Nov 2020 00:00:00 GMT')},
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('12 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('20 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('21 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('22 Nov 2020 00:00:00 GMT')},
         ]
       },
       {
         receiver: '0xF55D5df4fa26c454a5635B4697C2Acf92f55cfD8',  // Testing - Account 4
         portions: [
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('10 Nov 2020 00:00:00 GMT')},
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('11 Nov 2020 00:00:00 GMT')},
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('12 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('20 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('21 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('22 Nov 2020 00:00:00 GMT')},
         ]
       },
     ],

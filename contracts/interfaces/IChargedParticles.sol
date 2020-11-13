@@ -73,6 +73,7 @@ interface IChargedParticles {
 
   function setCreatorConfigs(
     address contractAddress,
+    address creator,
     uint256 tokenId,
     uint256 annuityPercent,
     bool burnToRelease
@@ -167,6 +168,7 @@ interface IChargedParticles {
   );
   event TokenCreatorConfigsSet(
     address indexed contractAddress,
+    address indexed creatorAddress,
     uint256 annuityPercent,
     bool burnToRelease
   );

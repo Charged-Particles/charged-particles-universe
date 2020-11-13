@@ -434,13 +434,14 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
 
   function setCreatorConfigs(
     address contractAddress,
+    address creator,
     uint256 tokenId,
     uint256 annuityPercent,
     bool burnToRelease
   )
     external
     override
-    onlyTokenCreator(contractAddress, tokenId, _msgSender())
+    onlyTokenCreator(contractAddress, creator, tokenId, _msgSender())
   {
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
@@ -450,6 +451,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
 
     emit TokenCreatorConfigsSet(
       contractAddress,
+      creator,
       annuityPercent,
       burnToRelease
     );
@@ -1103,9 +1105,10 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     return contractOwner != address(0x0) && contractOwner == account;
   }
 
-  function _isTokenCreator(address contractAddress, uint256 tokenId, address sender) internal view returns (bool) {
+  function _isTokenCreator(address contractAddress, address creator, uint256 tokenId, address sender) internal view returns (bool) {
     IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenCreator = tokenInterface.creatorOf(tokenId);
+    if (sender == contractAddress && creator == tokenCreator) { return true; }
     return (sender == tokenCreator);
   }
 
@@ -1317,8 +1320,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     _;
   }
 
-  modifier onlyTokenCreator(address contractAddress, uint256 tokenId, address sender) {
-    require(_isTokenCreator(contractAddress, tokenId, sender), "ChargedParticles: NOT_TOKEN_CREATOR");
+  modifier onlyTokenCreator(address contractAddress, address creator, uint256 tokenId, address sender) {
+    require(_isTokenCreator(contractAddress, creator, tokenId, sender), "ChargedParticles: NOT_TOKEN_CREATOR");
     _;
   }
 

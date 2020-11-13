@@ -18,24 +18,21 @@ async function main() {
   // Named accounts, defined in buidler.config.js:
   const { deployer, owner, trustedForwarder } = await getNamedAccounts();
 
-  const deployData = {
-    deployer,
-    owner,
-  };
+  const deployData = {};
 
-  log("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-  log("Charged Particles Protocol - Contract Initialization");
-  log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+  log('Charged Particles Protocol - Contract Initialization');
+  log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-  log("  Using Network: ", chainName(network.chainId));
-  log("  Using Accounts:");
-  log("  - Deployer:          ", deployer);
-  log("  - Owner:             ", owner);
-  log("  - Trusted Forwarder: ", trustedForwarder);
-  log(" ");
+  log('  Using Network: ', chainName(network.chainId));
+  log('  Using Accounts:');
+  log('  - Deployer:          ', deployer);
+  log('  - Owner:             ', owner);
+  log('  - Trusted Forwarder: ', trustedForwarder);
+  log(' ');
 
 
-  log("  Deploying Universe...");
+  log('  Deploying Universe...');
   const Universe = await ethers.getContractFactory('Universe');
   const UniverseInstance = await upgrades.deployProxy(Universe, []);
   const universe = await UniverseInstance.deployed();
@@ -45,7 +42,7 @@ async function main() {
     deployTransaction: universe.deployTransaction,
   }
 
-  log("  Deploying ChargedParticles...");
+  log('  Deploying ChargedParticles...');
   const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
   const ChargedParticlesInstance = await upgrades.deployProxy(ChargedParticles, [trustedForwarder]);
   const chargedParticles = await ChargedParticlesInstance.deployed();
@@ -55,31 +52,30 @@ async function main() {
     deployTransaction: chargedParticles.deployTransaction,
   }
 
-  log("  - Registering ChargedParticles with Universe...");
+  log('  - Registering ChargedParticles with Universe...');
   await universe.setChargedParticles(chargedParticles.address);
 
-  log("  - Registering Universe with ChargedParticles...");
+  log('  - Registering Universe with ChargedParticles...');
   await chargedParticles.setUniverse(universe.address);
 
-  log("  - Setting Deposit Fee...");
+  log('  - Setting Deposit Fee...');
   await chargedParticles.setDepositFee(presets.ChargedParticles.fees.deposit);
 
-  // log(`  Transferring Contract Ownership to "${owner}"...`);
+  // log(`  Transferring Contract Ownership to '${owner}'...`);
   // await universe.transferOwnership(owner);
   // await chargedParticles.transferOwnership(owner);
 
   // Display Contract Addresses
-  log("\n  Contract Deployments Complete!\n\n  Contracts:");
-  log("  - Universe:         ", universe.address);
-  log("     - Gas Cost:      ", getTxGasCost({deployTransaction: universe.deployTransaction}));
-  log("  - ChargedParticles: ", chargedParticles.address);
-  log("     - Gas Cost:      ", getTxGasCost({deployTransaction: chargedParticles.deployTransaction}));
+  log('\n  Contract Deployments Complete!\n\n  Contracts:');
+  log('  - Universe:         ', universe.address);
+  log('     - Gas Cost:      ', getTxGasCost({deployTransaction: universe.deployTransaction}));
+  log('  - ChargedParticles: ', chargedParticles.address);
+  log('     - Gas Cost:      ', getTxGasCost({deployTransaction: chargedParticles.deployTransaction}));
 
-  const filename = saveDeploymentData({chainId: network.chainId, deployData});
-  log("\n  Contract Deployment Data saved to file: ");
-  log("   ", filename);
+  saveDeploymentData(network.chainId, deployData);
+  log('\n  Contract Deployment Data saved to "deployed" directory.');
 
-  log("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
 

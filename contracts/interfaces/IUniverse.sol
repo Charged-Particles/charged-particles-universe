@@ -29,6 +29,9 @@ pragma solidity >=0.6.0;
  */
 interface IUniverse {
 
+  event ChargedParticlesSet(address indexed chargedParticles);
+  event IonTokenSet(address indexed ionToken);
+  event IonRewardsMultiplierSet(address indexed assetToken, uint256 multiplier);
   event RewardIssued(address indexed receiver, address rewardToken, uint256 rewardAmount);
 
   function onEnergize(
