@@ -104,8 +104,8 @@ contract Proton is ERC721, Ownable {
 
     _chargedParticles.setCreatorConfigs(
       address(this),
-      creator,
       newTokenId,
+      creator,
       annuityPercent,
       burnToRelease
     );

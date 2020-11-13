@@ -400,7 +400,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   }
 
   function isTokenCreator(address contractAddress, uint256 tokenId, address account) external override view returns (bool) {
-    return _isTokenCreator(contractAddress, tokenId, account);
+    return _isTokenCreator(contractAddress, tokenId, account, _msgSender());
   }
 
   function setExternalContractConfigs(
@@ -434,14 +434,14 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
 
   function setCreatorConfigs(
     address contractAddress,
-    address creator,
     uint256 tokenId,
+    address creator,
     uint256 annuityPercent,
     bool burnToRelease
   )
     external
     override
-    onlyTokenCreator(contractAddress, creator, tokenId, _msgSender())
+    onlyTokenCreator(contractAddress, tokenId, creator, _msgSender())
   {
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
@@ -1105,7 +1105,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     return contractOwner != address(0x0) && contractOwner == account;
   }
 
-  function _isTokenCreator(address contractAddress, address creator, uint256 tokenId, address sender) internal view returns (bool) {
+  function _isTokenCreator(address contractAddress, uint256 tokenId, address creator, address sender) internal view returns (bool) {
     IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenCreator = tokenInterface.creatorOf(tokenId);
     if (sender == contractAddress && creator == tokenCreator) { return true; }
@@ -1320,8 +1320,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     _;
   }
 
-  modifier onlyTokenCreator(address contractAddress, address creator, uint256 tokenId, address sender) {
-    require(_isTokenCreator(contractAddress, creator, tokenId, sender), "ChargedParticles: NOT_TOKEN_CREATOR");
+  modifier onlyTokenCreator(address contractAddress, uint256 tokenId, address creator, address sender) {
+    require(_isTokenCreator(contractAddress, tokenId, creator, sender), "ChargedParticles: NOT_TOKEN_CREATOR");
     _;
   }
 

@@ -73,8 +73,8 @@ interface IChargedParticles {
 
   function setCreatorConfigs(
     address contractAddress,
-    address creator,
     uint256 tokenId,
+    address creator,
     uint256 annuityPercent,
     bool burnToRelease
   ) external;
