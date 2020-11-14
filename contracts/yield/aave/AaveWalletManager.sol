@@ -32,6 +32,8 @@ import "./AaveSmartWallet.sol";
  */
 contract AaveWalletManager is WalletManagerBase {
 
+  event LendingPoolProviderSet(address indexed aaveLendingProvider);
+
   address public lendingPoolProvider;
   uint256 public referralCode;
 
@@ -118,12 +120,14 @@ contract AaveWalletManager is WalletManagerBase {
 
     // Create Smart-Wallet if none exists
     if (wallet == address(0x0)) {
-      wallet = _createWallet(_uuid);
+      wallet = _createWallet();
       _wallets[_uuid] = wallet;
 
       if (creator != address(0x0)) {
         AaveSmartWallet(wallet).setNftCreator(creator, annuityPct);
       }
+
+      emit NewSmartWallet(_uuid, wallet, creator, annuityPct);
     }
 
     // Collect Asset Token (reverts on fail)
@@ -255,6 +259,7 @@ contract AaveWalletManager is WalletManagerBase {
   function setLendingPoolProvider(address _aaveLendingProvider) external onlyOwner {
     require(_aaveLendingProvider != address(0x0), "AaveWalletManager: INVALID_LENDING_POOL");
     lendingPoolProvider = _aaveLendingProvider;
+    emit LendingPoolProviderSet(_aaveLendingProvider);
   }
 
   // ref: https://docs.aave.com/developers/developing-on-aave/the-protocol/lendingpool
@@ -270,16 +275,12 @@ contract AaveWalletManager is WalletManagerBase {
   /**
     * @dev todo..
     */
-  function _createWallet(
-    uint256 _uuid
-  )
+  function _createWallet()
     internal
     returns (address)
   {
     address newWallet = _createClone(_walletTemplate);
     AaveSmartWallet(newWallet).initialize(lendingPoolProvider, referralCode);
-
-    emit NewSmartWallet(_uuid, newWallet);
     return newWallet;
   }
 }

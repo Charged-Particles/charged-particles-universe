@@ -35,6 +35,9 @@ import "../interfaces/IWalletManager.sol";
  */
 abstract contract WalletManagerBase is Ownable, IWalletManager {
 
+  event ControllerSet(address indexed controller);
+  event PausedStateSet(bool isPaused);
+
   // The Controller Contract Address
   address internal _controller;
 
@@ -65,6 +68,7 @@ abstract contract WalletManagerBase is Ownable, IWalletManager {
     */
   function setPausedState(bool paused) external onlyOwner {
     _paused = paused;
+    emit PausedStateSet(paused);
   }
 
   /**
@@ -72,6 +76,7 @@ abstract contract WalletManagerBase is Ownable, IWalletManager {
     */
   function setController(address controller) external onlyOwner {
     _controller = controller;
+    emit ControllerSet(controller);
   }
 
 

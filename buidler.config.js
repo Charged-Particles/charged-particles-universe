@@ -65,7 +65,7 @@ module.exports = {
         },
         ropsten: {
             url: `https://ropsten.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            gasPrice: 50e9,
+            gasPrice: 10e9,
             blockGasLimit: 200000000,
             accounts: {
                 mnemonic: mnemonic.testnet,

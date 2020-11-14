@@ -1,9 +1,9 @@
 {
   "manifestVersion": "3.1",
   "impls": {
-    "c5542e90e064cda98ce7c54d3341409f7f9d29d97e746b46fa8ee9cf6c61a4c2": {
-      "address": "0x1056172A16DB27b327B714A2d7eB019B70412400",
-      "txHash": "0x75edd44f2075132977ec72b95dbcf10836cdd43d1dee8b0a4c0747dcf8a709ff",
+    "f57998a1aa7d8af9d5e1bbe912bf6b5f7346be1835a1aaa30fbb91b6c4148726": {
+      "address": "0xEe8399F170662a4252997d7cbCeF6070f6a6d4C1",
+      "txHash": "0x4acac8a990d1e7238901c7a3d6ed865cb05c2490bdf3b95ff43f3e71f3a0825f",
       "layout": {
         "storage": [
           {
@@ -77,9 +77,9 @@
         }
       }
     },
-    "21deec43038aa0cd8447c9f030df7437151579c86ef886e85ef741146cec10f1": {
-      "address": "0xa6967259c809Eac149D7D4e197c1ABe198dB119D",
-      "txHash": "0x36834c8b559436166191322bc68eacf60359642e489dd195f1f3f3dcb51551da",
+    "3dd5b0a7ca34ccbf254c23e96bba336bad55cdc1a1511b151f4ebd89ff4b250c": {
+      "address": "0xe5864e405A6A601e8bA9B78764d855bE12266a6C",
+      "txHash": "0x89a9fc5390847987a41be05591ea844f0c4a521f9a01b33907248420079f6469",
       "layout": {
         "storage": [
           {
@@ -133,7 +133,7 @@
           {
             "contract": "ChargedParticles",
             "label": "_universe",
-            "type": "t_contract(IUniverse)8704",
+            "type": "t_contract(IUniverse)8780",
             "src": "contracts/ChargedParticles.sol:75"
           },
           {
@@ -145,7 +145,7 @@
           {
             "contract": "ChargedParticles",
             "label": "_lpWalletManager",
-            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)8909)",
+            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)8989)",
             "src": "contracts/ChargedParticles.sol:77"
           },
           {
@@ -205,48 +205,48 @@
           {
             "contract": "ChargedParticles",
             "label": "_dischargeApproval",
-            "type": "t_mapping(t_uint256,t_address)",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
             "src": "contracts/ChargedParticles.sol:115"
           },
           {
             "contract": "ChargedParticles",
             "label": "_releaseApproval",
-            "type": "t_mapping(t_uint256,t_address)",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
             "src": "contracts/ChargedParticles.sol:116"
           },
           {
             "contract": "ChargedParticles",
             "label": "_timelockApproval",
-            "type": "t_mapping(t_uint256,t_address)",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
             "src": "contracts/ChargedParticles.sol:117"
           },
           {
             "contract": "ChargedParticles",
             "label": "_dischargeTimelock",
             "type": "t_mapping(t_uint256,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:118"
+            "src": "contracts/ChargedParticles.sol:119"
           },
           {
             "contract": "ChargedParticles",
             "label": "_releaseTimelock",
             "type": "t_mapping(t_uint256,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:119"
+            "src": "contracts/ChargedParticles.sol:120"
           },
           {
             "contract": "ChargedParticles",
             "label": "_assetToBeReleasedBy",
             "type": "t_mapping(t_uint256,t_address)",
-            "src": "contracts/ChargedParticles.sol:120"
+            "src": "contracts/ChargedParticles.sol:121"
           }
         ],
         "types": {
-          "t_contract(IUniverse)8704": {
+          "t_contract(IUniverse)8780": {
             "label": "contract IUniverse"
           },
           "t_array(t_string_storage)dyn_storage": {
             "label": "string[]"
           },
-          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)8909)": {
+          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)8989)": {
             "label": "mapping(string => contract IWalletManager)"
           },
           "t_mapping(t_address,t_bool)": {
@@ -270,6 +270,9 @@
           "t_mapping(t_uint256,t_bool)": {
             "label": "mapping(uint256 => bool)"
           },
+          "t_mapping(t_uint256,t_mapping(t_address,t_address))": {
+            "label": "mapping(uint256 => mapping(address => address))"
+          },
           "t_mapping(t_uint256,t_address)": {
             "label": "mapping(uint256 => address)"
           },
@@ -290,7 +293,7 @@
     }
   },
   "admin": {
-    "address": "0xB36E7765C571bB75deeD6F9D8A25A05786E93a8E",
-    "txHash": "0x61a04939f1e31da3c25baef1836b8eb79cbac929282a8eab2e88f83b533a5a50"
+    "address": "0x60905E2eC619e18608379f32Cd67a3fa5Af658Bc",
+    "txHash": "0xb1bd4455c12c7b2123ee6f036e1e91bccbe864a14230d77c2f2e2e2d2ff3bd8c"
   }
 }

@@ -15,6 +15,7 @@
     "reinstall": "rm -rf node_modules && rm -f yarn.lock && yarn clean && yarn clean-test && yarn",
     "verify": "yarn hint && yarn test",
     "clean": "rm -rf build cache",
+    "clean-deployed": "rm -rf abis deployed && rm -f .openzeppelin/ropsten.json",
     "clean-test": "rm -rf deployments/buidlerevm_31337 test-results.xml",
     "compile": "buidler --show-stack-traces --max-memory 8192 compile",
     "test": "yarn clean-test && buidler test",
@@ -27,6 +28,7 @@
     "deploy-proton": "buidler run ./scripts/deploy-proton.js --network",
     "deploy-ion": "buidler run ./scripts/deploy-ion.js --network",
     "deploy-timelocks": "buidler run ./scripts/deploy-timelocks.js --network",
+    "run-tx": "buidler run ./scripts/run-tx.js --network",
     "gen-docs": "solidity-docgen -i contracts -o docs"
   },
   "dependencies": {},

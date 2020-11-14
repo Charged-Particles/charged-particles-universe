@@ -111,10 +111,11 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   mapping (uint256 => uint256) internal _creatorAnnuityPercent;
   mapping (uint256 => bool) internal _creatorBurnToRelease;
 
+  // TokenUUID => NFT Owner => NFT State
+  mapping (uint256 => mapping (address => address)) internal _dischargeApproval;
+  mapping (uint256 => mapping (address => address)) internal _releaseApproval;
+  mapping (uint256 => mapping (address => address)) internal _timelockApproval;
   // TokenUUID => NFT State
-  mapping (uint256 => address) internal _dischargeApproval;
-  mapping (uint256 => address) internal _releaseApproval;
-  mapping (uint256 => address) internal _timelockApproval;
   mapping (uint256 => uint256) internal _dischargeTimelock;
   mapping (uint256 => uint256) internal _releaseTimelock;
   mapping (uint256 => address) internal _assetToBeReleasedBy;
@@ -184,12 +185,11 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     override
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
-    address tokenOwner = tokenInterface.ownerOf(tokenId);
+    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     require(operator != tokenOwner, "ChargedParticles: CANNOT_BE_SELF");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    _dischargeApproval[tokenUuid] = operator;
+    _dischargeApproval[tokenUuid][tokenOwner] = operator;
     emit DischargeApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
@@ -209,12 +209,11 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     override
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
-    address tokenOwner = tokenInterface.ownerOf(tokenId);
+    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     require(operator != tokenOwner, "ChargedParticles: CANNOT_BE_SELF");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    _releaseApproval[tokenUuid] = operator;
+    _releaseApproval[tokenUuid][tokenOwner] = operator;
     emit ReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
@@ -234,12 +233,11 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     override
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
-    address tokenOwner = tokenInterface.ownerOf(tokenId);
+    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     require(operator != tokenOwner, "ChargedParticles: CANNOT_BE_SELF");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    _timelockApproval[tokenUuid] = operator;
+    _timelockApproval[tokenUuid][tokenOwner] = operator;
     emit TimelockApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
@@ -451,6 +449,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
 
     emit TokenCreatorConfigsSet(
       contractAddress,
+      tokenId,
       creator,
       annuityPercent,
       burnToRelease
@@ -961,6 +960,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     */
   function setUniverse(address universe) external onlyOwner {
     _universe = IUniverse(universe);
+    emit UniverseSet(universe);
   }
 
   /**
@@ -968,6 +968,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     */
   function setDepositFee(uint256 fee) external onlyOwner {
     depositFee = fee;
+    emit DepositFeeSet(fee);
   }
 
   /**
@@ -988,6 +989,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     // Register Pair
     _liquidityProviders.push(liquidityProviderId);
     _lpWalletManager[liquidityProviderId] = newWalletMgr;
+    emit LiquidityProviderRegistered(liquidityProviderId, walletManager);
   }
 
   function updateWhitelist(address contractAddress, bool state) external onlyOwner {
@@ -1016,6 +1018,11 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     return uint256(keccak256(abi.encodePacked(liquidityProviderId, _owner)));
   }
 
+  function _getTokenOwner(address contractAddress, uint256 tokenId) internal view returns (address) {
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
+    return tokenInterface.ownerOf(tokenId);
+  }
+
   /**
     * @notice Checks if an account is allowed to Discharge a specific Token
     * @param contractAddress The Address to the Contract of the Token
@@ -1024,10 +1031,9 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @return True if the account is Approved
     */
   function _isApprovedForDischarge(address contractAddress, uint256 tokenId, address account) internal view returns (bool) {
-    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
-    address tokenOwner = tokenInterface.ownerOf(tokenId);
+    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    return tokenOwner == account || _dischargeApproval[tokenUuid] == account;
+    return tokenOwner == account || _dischargeApproval[tokenUuid][tokenOwner] == account;
   }
 
   /**
@@ -1038,10 +1044,9 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @return True if the account is Approved
     */
   function _isApprovedForRelease(address contractAddress, uint256 tokenId, address account) internal view returns (bool) {
-    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
-    address tokenOwner = tokenInterface.ownerOf(tokenId);
+    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    return tokenOwner == account || _releaseApproval[tokenUuid] == account;
+    return tokenOwner == account || _releaseApproval[tokenUuid][tokenOwner] == account;
   }
 
   /**
@@ -1052,10 +1057,9 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @return True if the account is Approved
     */
   function _isApprovedForTimelock(address contractAddress, uint256 tokenId, address account) internal view returns (bool) {
-    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
-    address tokenOwner = tokenInterface.ownerOf(tokenId);
+    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    return tokenOwner == account || _timelockApproval[tokenUuid] == account;
+    return tokenOwner == account || _timelockApproval[tokenUuid][tokenOwner] == account;
   }
 
   function _collectDepositFees(
@@ -1082,8 +1086,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   }
 
   function isExternalTokenBurned(address contractAddress, uint256 tokenId) internal view returns (bool) {
-    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
-    address tokenOwner = tokenInterface.ownerOf(tokenId);
+    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     return (tokenOwner == address(0x0));
   }
 

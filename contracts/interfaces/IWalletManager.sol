@@ -29,7 +29,7 @@ pragma solidity >=0.6.0;
  */
 interface IWalletManager {
 
-  event NewSmartWallet(uint256 indexed uuid, address indexed smartWallet);
+  event NewSmartWallet(uint256 indexed uuid, address indexed smartWallet, address indexed creator, uint256 annuityPct);
   event WalletEnergized(uint256 indexed uuid, address indexed assetToken, uint256 assetAmount, uint256 yieldTokensAmount);
   event WalletDischarged(uint256 indexed uuid, address indexed assetToken, uint256 interestAmount);
   event WalletReleased(uint256 indexed uuid, address indexed receiver, address indexed assetToken, uint256 principalAmount, uint256 interestAmount);

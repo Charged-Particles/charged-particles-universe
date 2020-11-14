@@ -50,6 +50,9 @@ async function main() {
     deployTransaction: aaveWalletManager.deployTransaction,
   }
 
+  log('  - Setting Charged Particles as Controller...');
+  await aaveWalletManager.setController(ddChargedParticles.address);
+
   log('  - Setting Lending Pool Provider...');
   await aaveWalletManager.setLendingPoolProvider(lendingPoolProvider);
 
@@ -70,7 +73,7 @@ async function main() {
   log('  - AaveWalletManager:  ', aaveWalletManager.address);
   log('     - Gas Cost:        ', getTxGasCost({deployTransaction: aaveWalletManager.deployTransaction}));
 
-  saveDeploymentData({chainId: network.chainId, deployData});
+  saveDeploymentData(network.chainId, deployData);
   log('\n  Contract Deployment Data saved to "deployed" directory.');
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');

@@ -159,6 +159,16 @@ interface IChargedParticles {
   |          Particle Events          |
   |__________________________________*/
 
+  event UniverseSet(
+    address indexed universeAddress
+  );
+  event DepositFeeSet(
+    uint256 depositFee
+  );
+  event LiquidityProviderRegistered(
+    string indexed liquidityProviderId,
+    address indexed walletManager
+  );
   event TokenContractConfigsSet(
     address indexed contractAddress,
     string indexed liquidityProvider,
@@ -168,6 +178,7 @@ interface IChargedParticles {
   );
   event TokenCreatorConfigsSet(
     address indexed contractAddress,
+    uint256 indexed tokenId,
     address indexed creatorAddress,
     uint256 annuityPercent,
     bool burnToRelease
