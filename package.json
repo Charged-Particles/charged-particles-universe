@@ -23,11 +23,8 @@
     "coverage": "yarn clean && yarn clean-test && buidler compile && buidler coverage --network coverage --temp build; rm -rf cache",
     "gas": "REPORT_GAS=true buidler test --network local",
     "start": "buidler node --port 8545",
-    "deploy-protocol": "buidler run ./scripts/deploy-protocol.js --network",
-    "deploy-aave": "buidler run ./scripts/deploy-aave.js --network",
-    "deploy-proton": "buidler run ./scripts/deploy-proton.js --network",
-    "deploy-ion": "buidler run ./scripts/deploy-ion.js --network",
-    "deploy-timelocks": "buidler run ./scripts/deploy-timelocks.js --network",
+    "deploy": "buidler --network ${npm_config_network:-buidlerevm} --show-stack-traces deploy $(${npm_config_protocol:-false} && pritnf \"--protocol\") $(${npm_config_aave:-false} && printf \"--aave\") $(${npm_config_proton:-false} && printf \"--proton\") $(${npm_config_ion:-false} && printf \"--ion\") $(${npm_config_timelocks:-false} && printf \"--timelocks\")",
+    "deploy-all": "yarn compile && yarn deploy --protocol --aave --proton --ion --timelocks",
     "run-tx": "buidler run ./scripts/run-tx.js --network",
     "gen-docs": "solidity-docgen -i contracts -o docs"
   },

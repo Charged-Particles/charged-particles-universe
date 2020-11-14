@@ -1,5 +1,6 @@
 const {
     buidler,
+    deploy,
     deployments,
     deployMockContract,
     ethers,
