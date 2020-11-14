@@ -190,6 +190,10 @@ const deploy = function (hre) {
       log('\n  Contract Deployment Data saved to "deployed" directory.');
 
       log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
+
+      return {
+        aaveWalletManager: aaveWalletManager
+      }
     },
     ion: async () => {
       // const { log } = deployments;
@@ -253,6 +257,10 @@ const deploy = function (hre) {
       log('\n  Contract Deployment Data saved to "deployed" directory.');
 
       log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
+
+      return {
+        ion: ion
+      }
     },
     protocol: async () => {
       // const { log } = deployments;
@@ -320,6 +328,11 @@ const deploy = function (hre) {
       log('\n  Contract Deployment Data saved to "deployed" directory.');
 
       log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
+
+      return {
+        universe: universe,
+        chargedParticles: chargedParticles
+      }
     },
     proton: async () => {
       // const { log } = deployments;
@@ -371,6 +384,10 @@ const deploy = function (hre) {
       log('\n  Contract Deployment Data saved to "deployed" directory.');
 
       log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
+
+      return {
+        proton: proton
+      }
     },
     timelocks: async () => {
       // const { log } = deployments;
@@ -436,9 +453,11 @@ const deploy = function (hre) {
       };
 
       let ionTimelock;
+      let ionTimelocks = [];
       let ionTimelockData;
       let totalIonAmount;
       let deployTxData;
+
       for (let i = 0; i < presets.Ion.timelocks.length; i++) {
         ionTimelockData = presets.Ion.timelocks[i];
         deployTxData = { receiver: ionTimelockData.receiver };
@@ -451,6 +470,7 @@ const deploy = function (hre) {
           deployTxData['deployTransaction'] = ionTimelock.deployTransaction;
         }
         deployTxData['address'] = ionTimelock.address;
+        ionTimelocks.push(ionTimelock);
 
         // Mint
         totalIonAmount = await _mintToTimelock(ionTimelockData, ionTimelock);
@@ -466,6 +486,10 @@ const deploy = function (hre) {
       log('\n  Contract Deployment Data saved to "deployed" directory.');
 
       log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
+
+      return {
+        ionTimelocks: ionTimelocks
+      }
     },
     mintUniverseIons: async () => {
       // const { log } = deployments;

@@ -1,5 +1,4 @@
 const {TASK_COMPILE_GET_COMPILER_INPUT} = require('@nomiclabs/buidler/builtin-tasks/task-names');
-usePlugin("@nomiclabs/buidler-ethers");
 
 require('dotenv').config();
 
