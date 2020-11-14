@@ -1,5 +1,5 @@
 const buidler = require("@nomiclabs/buidler");
-const { deploy, toBN } = require("../js-utils/deploy-helpers");
+const { deploy } = require("../js-utils/deploy-helpers");
 const { expect } = require("chai");
 
 describe("Charged Particles", () => {
