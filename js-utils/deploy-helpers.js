@@ -2,6 +2,8 @@ const { ethers } = require('ethers');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
+const { sleep } = require("sleep");
+const { deployments } = require('../test/util/testEnv');
 
 const toWei = ethers.utils.parseEther;
 const toEth = ethers.utils.formatEther;
@@ -123,14 +125,14 @@ const presets = {
   }
 };
 
-const deploy = function (hre) {
+const deploy = function (hre, alchemyTimeout=0) {
   return {
     aave: async () => {
       // const { log } = deployments;
       const log = console.log;
       const network = await hre.ethers.provider.getNetwork();
 
-      // Named accounts, defined in buidler.config.js:
+      // Named accounts, defined in hardhat.config.js:
       const { deployer, owner } = await hre.getNamedAccounts();
 
       const ddChargedParticles = getDeployData('ChargedParticles', network.chainId);
@@ -150,10 +152,14 @@ const deploy = function (hre) {
       const ChargedParticles = await hre.ethers.getContractFactory('ChargedParticles');
       const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
+      sleep(alchemyTimeout);
+
       log('\n  Deploying AaveWalletManager...');
       const AaveWalletManager = await hre.ethers.getContractFactory('AaveWalletManager');
       const AaveWalletManagerInstance = await AaveWalletManager.deploy();
       const aaveWalletManager = await AaveWalletManagerInstance.deployed();
+
+      sleep(alchemyTimeout);
 
       const lendingPoolProvider = presets.Aave.lendingPoolProvider[network.chainId];
       deployData['AaveWalletManager'] = {
@@ -166,16 +172,24 @@ const deploy = function (hre) {
       log('  - Setting Charged Particles as Controller...');
       await aaveWalletManager.setController(ddChargedParticles.address);
 
+      sleep(alchemyTimeout);
+
       log('  - Setting Lending Pool Provider...');
       lendingPoolProvider && await aaveWalletManager.setLendingPoolProvider(lendingPoolProvider);
+
+      sleep(alchemyTimeout);
 
       if (presets.Aave.referralCode.length > 0) {
         log('  - Setting Referral Code...');
         await aaveWalletManager.setReferralCode(presets.Aave.referralCode);
       }
 
+      sleep(alchemyTimeout);
+
       log('  - Registering LP with ChargedParticles...');
       await chargedParticles.registerLiquidityProvider('aave', aaveWalletManager.address);
+
+      sleep(alchemyTimeout);
 
       // log(`  Transferring Contract Ownership to '${owner}'...`);
       // await aaveWalletManager.transferOwnership(owner);
@@ -198,7 +212,7 @@ const deploy = function (hre) {
       const log = console.log;
       const network = await hre.ethers.provider.getNetwork();
 
-      // Named accounts, defined in buidler.config.js:
+      // Named accounts, defined in hardhat.config.js:
       const { deployer, owner } = await hre.getNamedAccounts();
 
       const ddUniverse = getDeployData('Universe', network.chainId);
@@ -218,10 +232,15 @@ const deploy = function (hre) {
       const Universe = await hre.ethers.getContractFactory('Universe');
       const universe = await Universe.attach(ddUniverse.address);
 
+      sleep(alchemyTimeout);
+
       log('\n  Deploying Ion FT...');
       const Ion = await hre.ethers.getContractFactory('Ion');
       const IonInstance = await Ion.deploy();
       const ion = await IonInstance.deployed();
+
+      sleep(alchemyTimeout);
+
       deployData['Ion'] = {
         abi: getContractAbi('Ion'),
         address: ion.address,
@@ -244,6 +263,8 @@ const deploy = function (hre) {
 
         log('  - Setting Rewards Multiplier for Asset Token: ', assetTokenAddress, ' to: ', assetTokenMultiplier);
         assetTokenAddress && await universe.setIonRewardsMultiplier(assetTokenAddress, assetTokenMultiplier);
+
+        sleep(alchemyTimeout);
       }
 
       // Display Contract Addresses
@@ -263,7 +284,7 @@ const deploy = function (hre) {
       const log = console.log;
       const network = await hre.ethers.provider.getNetwork();
 
-      // Named accounts, defined in buidler.config.js:
+      // Named accounts, defined in hardhat.config.js:
       const { deployer, owner, trustedForwarder } = await hre.getNamedAccounts();
 
       const deployData = {};
@@ -281,33 +302,30 @@ const deploy = function (hre) {
 
 
       log('  Deploying Universe...');
-      const Universe = await hre.ethers.getContractFactory('Universe');
-      const UniverseInstance = await hre.upgrades.deployProxy(Universe, []);
-      const universe = await UniverseInstance.deployed();
-      deployData['Universe'] = {
-        abi: getContractAbi('Universe'),
-        address: universe.address,
-        deployTransaction: universe.deployTransaction,
-      }
+      const universe = await hre.deployments.deploy('Universe', { from: deployer });
+
+      sleep(alchemyTimeout);
 
       log('  Deploying ChargedParticles...');
-      const ChargedParticles = await hre.ethers.getContractFactory('ChargedParticles');
-      const ChargedParticlesInstance = await hre.upgrades.deployProxy(ChargedParticles, [trustedForwarder]);
-      const chargedParticles = await ChargedParticlesInstance.deployed();
-      deployData['ChargedParticles'] = {
-        abi: getContractAbi('ChargedParticles'),
-        address: chargedParticles.address,
-        deployTransaction: chargedParticles.deployTransaction,
-      }
+      const chargedParticles = await hre.ethers.getContractFactory('ChargedParticles');
+      chargedParticles = await chargedParticles.deploy(trustedForwarder);
+
+      sleep(alchemyTimeout);
 
       log('  - Registering ChargedParticles with Universe...');
       await universe.setChargedParticles(chargedParticles.address);
 
+      sleep(alchemyTimeout);
+
       log('  - Registering Universe with ChargedParticles...');
       await chargedParticles.setUniverse(universe.address);
 
+      sleep(alchemyTimeout);
+
       log('  - Setting Deposit Fee...');
       await chargedParticles.setDepositFee(presets.ChargedParticles.fees.deposit);
+
+      sleep(alchemyTimeout);
 
       // log(`  Transferring Contract Ownership to '${owner}'...`);
       // await universe.transferOwnership(owner);
@@ -320,7 +338,6 @@ const deploy = function (hre) {
       log('  - ChargedParticles: ', chargedParticles.address);
       log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedParticles.deployTransaction }));
 
-      saveDeploymentData(network.chainId, deployData);
       log('\n  Contract Deployment Data saved to "deployed" directory.');
 
       log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
@@ -335,7 +352,7 @@ const deploy = function (hre) {
       const log = console.log;
       const network = await hre.ethers.provider.getNetwork();
 
-      // Named accounts, defined in buidler.config.js:
+      // Named accounts, defined in hardhat.config.js:
       const { deployer, owner } = await hre.getNamedAccounts();
 
       const ddChargedParticles = getDeployData('ChargedParticles', network.chainId);
@@ -355,10 +372,15 @@ const deploy = function (hre) {
       const ChargedParticles = await hre.ethers.getContractFactory('ChargedParticles');
       const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
+      sleep(alchemyTimeout);
+
       log('\n  Deploying Proton NFT...');
       const Proton = await hre.ethers.getContractFactory('Proton');
       const ProtonInstance = await Proton.deploy();
       const proton = await ProtonInstance.deployed();
+
+      sleep(alchemyTimeout);
+
       deployData['Proton'] = {
         abi: getContractAbi('Proton'),
         address: proton.address,
@@ -368,8 +390,12 @@ const deploy = function (hre) {
       log('  - Registering ChargedParticles with Proton...');
       await proton.setChargedParticles(ddChargedParticles.address);
 
+      sleep(alchemyTimeout);
+
       log('  - Registering Proton with ChargedParticles...');
       await chargedParticles.updateWhitelist(proton.address, true);
+
+      sleep(alchemyTimeout);
 
       // Display Contract Addresses
       log('\n  Contract Deployments Complete!\n\n  Contracts:');
@@ -388,7 +414,7 @@ const deploy = function (hre) {
       const log = console.log;
       const network = await hre.ethers.provider.getNetwork();
 
-      // Named accounts, defined in buidler.config.js:
+      // Named accounts, defined in hardhat.config.js:
       const { deployer, owner } = await hre.getNamedAccounts();
 
       const ddIon = getDeployData('Ion', network.chainId);
@@ -410,6 +436,8 @@ const deploy = function (hre) {
       const Ion = await hre.ethers.getContractFactory('Ion');
       const ion = await Ion.attach(ddIon.address);
 
+      sleep(alchemyTimeout);
+
       const IonTimelock = await hre.ethers.getContractFactory('IonTimelock');
       const ionTimelockAbi = getContractAbi('IonTimelock');
       const ionAddress = ddIon.address;
@@ -419,6 +447,9 @@ const deploy = function (hre) {
         if (!ionTimelockDeployData) { return; }
 
         const ionTimelockDeployed = await IonTimelock.attach(ionTimelockDeployData.address);
+
+        sleep(alchemyTimeout);
+
         return ionTimelockDeployed;
       };
 
@@ -427,6 +458,8 @@ const deploy = function (hre) {
 
         const ionTimelockInstance = await IonTimelock.deploy(timelockData.receiver, ionAddress);
         const ionTimelockDeployed = await ionTimelockInstance.deployed();
+
+        sleep(alchemyTimeout);
 
         log('  - IonTimelock: ', ionTimelockDeployed.address);
         log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionTimelockDeployed.deployTransaction }));
@@ -440,6 +473,8 @@ const deploy = function (hre) {
         const timestamps = _.map(timelockData.portions, 'releaseDate');
 
         await ion.mintToTimelock(ionTimelock.address, amounts, timestamps);
+
+        sleep(alchemyTimeout);
 
         const totalMinted = _.reduce(amounts, (sum, amt) => sum.add(amt), toBN('0'));
         log('  - Total Minted: ', toEth(totalMinted));
@@ -460,6 +495,9 @@ const deploy = function (hre) {
         ionTimelock = await _getDeployedTimelock(ionTimelockData.receiver);
         if (!ionTimelock) {
           ionTimelock = await _deployTimelock(ionTimelockData);
+
+          sleep(alchemyTimeout);
+
           deployTxData['abi'] = ionTimelockAbi;
           deployTxData['deployTransaction'] = ionTimelock.deployTransaction;
         }
@@ -468,6 +506,9 @@ const deploy = function (hre) {
 
         // Mint
         totalIonAmount = await _mintToTimelock(ionTimelockData, ionTimelock);
+
+        sleep(alchemyTimeout);
+
         deployTxData['mintedIons'] = totalIonAmount;
 
         // Save deployment data
@@ -488,7 +529,7 @@ const deploy = function (hre) {
       const log = console.log;
       const network = await hre.ethers.provider.getNetwork();
 
-      // Named accounts, defined in buidler.config.js:
+      // Named accounts, defined in hardhat.config.js:
       const { deployer, owner } = await hre.getNamedAccounts();
 
       const deployData = getDeployData({ chainId: network.chainId });
@@ -543,7 +584,7 @@ const deploy = function (hre) {
       const log = console.log;
       const network = await hre.ethers.provider.getNetwork();
 
-      // Named accounts, defined in buidler.config.js:
+      // Named accounts, defined in hardhat.config.js:
       const { deployer, owner } = await hre.getNamedAccounts();
 
       const ddChargedParticles = getDeployData('ChargedParticles', network.chainId);

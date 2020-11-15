@@ -1,6 +1,8 @@
-const buidler = require("@nomiclabs/buidler");
-const { deploy } = require("../js-utils/deploy-helpers");
-const { expect } = require("chai");
+const hre = require('hardhat');
+const { presets, deploy } = require('../js-utils/deploy-helpers');
+const { expect } = require('chai');
+
+let alchemyTimeout = 1; // wait 1s between requests, so Infura doesn't overheat.
 
 describe("Charged Particles", () => {
 
@@ -12,17 +14,21 @@ describe("Charged Particles", () => {
     let timelocks;
 
     beforeEach(async () => {
-        let protocolDeployments = await deploy(buidler).protocol();
+        let protocolDeployments = await deploy(hre, alchemyTimeout).protocol();
         universe = protocolDeployments.universe;
         chargedParticles = protocolDeployments.chargedParticles;
-        aaveWalletManager = await deploy(buidler).aave();
-        proton = await deploy(buidler).proton();
-        ion = await deploy(buidler).ion();
-        timelocks = await deploy(buidler).timelocks();
+        aaveWalletManager = await deploy(hre, alchemyTimeout).aave();
+        proton = await deploy(hre, alchemyTimeout).proton();
+        ion = await deploy(hre, alchemyTimeout).ion();
+        timelocks = await deploy(hre, alchemyTimeout).timelocks();
     });
 
-    it("liquidity provider is Aave", async () => {
+    it("Liquidity provider is Aave", async () => {
       expect(await chargedParticles.isLiquidityProviderEnabled('aave')).to.equal(true);
+    });
+
+    it("Lending Pool has been set for Aave", async () => {
+        expect((aaveWalletManager.filters.LendingPoolProviderSet(presets.Aave.lendingPoolProvider[hre.network.chainId])).length).to.equal(1);
     });
 
   });
