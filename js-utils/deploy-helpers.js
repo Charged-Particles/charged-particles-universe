@@ -191,9 +191,7 @@ const deploy = function (hre) {
 
       log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-      return {
-        aaveWalletManager: aaveWalletManager
-      }
+      return aaveWalletManager;
     },
     ion: async () => {
       // const { log } = deployments;
@@ -258,9 +256,7 @@ const deploy = function (hre) {
 
       log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-      return {
-        ion: ion
-      }
+      return ion;
     },
     protocol: async () => {
       // const { log } = deployments;
@@ -385,9 +381,7 @@ const deploy = function (hre) {
 
       log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-      return {
-        proton: proton
-      }
+      return proton;
     },
     timelocks: async () => {
       // const { log } = deployments;
@@ -487,9 +481,7 @@ const deploy = function (hre) {
 
       log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-      return {
-        ionTimelocks: ionTimelocks
-      }
+      return ionTimelocks;
     },
     mintUniverseIons: async () => {
       // const { log } = deployments;

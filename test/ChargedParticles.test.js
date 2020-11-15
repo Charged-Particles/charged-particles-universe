@@ -12,19 +12,17 @@ describe("Charged Particles", () => {
     let timelocks;
 
     beforeEach(async () => {
-        let res = await deploy(buidler).protocol();
-        universe = res.universe; chargedParticles = res.chargedParticles;
-        res = await deploy(buidler).aave();
-        aaveWalletManager = res.aaveWalletManager;
-        res = await deploy(buidler).proton();
-        proton = res.proton;
-        res = await deploy(buidler).ion();
-        ion = res.ion;
-        res = await deploy(buidler).timelocks();
-        timelocks = res.ionTimelocks
+        let protocolDeployments = await deploy(buidler).protocol();
+        universe = protocolDeployments.universe;
+        chargedParticles = protocolDeployments.chargedParticles;
+        aaveWalletManager = await deploy(buidler).aave();
+        proton = await deploy(buidler).proton();
+        ion = await deploy(buidler).ion();
+        timelocks = await deploy(buidler).timelocks();
     });
 
     it("liquidity provider is Aave", async () => {
       expect(await chargedParticles.isLiquidityProviderEnabled('aave')).to.equal(true);
     });
+
   });
