@@ -1,5 +1,6 @@
 const {TASK_COMPILE_GET_COMPILER_INPUT} = require('@nomiclabs/buidler/builtin-tasks/task-names');
 
+
 require('dotenv').config();
 
 usePlugin('@nomiclabs/buidler-waffle');
@@ -17,23 +18,6 @@ task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
   input.settings.metadata.useLiteralContent = false;
   return input;
 });
-
-
-task("deploy", "Deploy Charged Particles!")
-  .addFlag("protocol", "Protocol deployment flag")
-  .addFlag("aave", "Aave deployment flag")
-  .addFlag("proton", "Proton deployment flag")
-  .addFlag("ion", "Ion deployment flag")
-  .addFlag("timelocks", "Timelocks deployment flag")
-  .setAction(async ({ protocol, aave, proton, ion, timelocks }, hre) => {
-    const { deploy } = require("./js-utils/deploy-helpers");
-    protocol && await deploy(hre).protocol();
-    aave && await deploy(hre).aave();
-    proton && await deploy(hre).proton();
-    ion && await deploy(hre).ion();
-    timelocks && await deploy(hre).timelocks();
-  })
-
 
 const mnemonic = {
   testnet: `${process.env.TESTNET_MNEMONIC}`.replace(/_/g, ' '),

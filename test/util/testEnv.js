@@ -4,7 +4,7 @@ const { deployments } = buidler;
 const { deployContract, deployMockContract } = require('ethereum-waffle');
 const { ethers } = require('ethers');
 const { expect } = require('chai');
-const { deploy } = require('../../js-utils/deploy-helpers');
+
 // buidler.ethers.errors.setLogLevel('error');
 
 module.exports = {
@@ -12,7 +12,6 @@ module.exports = {
     deployments,
     ethers,
     expect,
-    deploy,
 
     deployContract,
     deployMockContract,
