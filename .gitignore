@@ -19,6 +19,10 @@ cache
 # OpenZeppelin
 .openzeppelin/dev-*.json
 .openzeppelin/.session
+# We have to add this one to .gitignore since the hardhat network, which forks mainnet, is interpreedted as mainnet
+.openzeppelin/mainnet.json
+deployments/hardhat/*.json
+
 
 # Code Coverage
 coverage
