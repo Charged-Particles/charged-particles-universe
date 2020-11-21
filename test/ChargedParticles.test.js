@@ -1,8 +1,11 @@
-const hre = require('hardhat');
-const { presets, deploy } = require('../js-utils/deploy-helpers');
+const { presets, getDeployData } = require('../js-utils/deploy-helpers');
 const { expect } = require('chai');
+const { ethers, network } = require('hardhat');
+const { exit } = require('process');
 
-let alchemyTimeout = 1; // wait 1s between requests, so Infura doesn't overheat.
+const alchemyTimeout = 1; // wait 1s between requests, so AlchemyAPI doesn't overheat.
+
+const decoder = new ethers.utils.AbiCoder();
 
 describe("Charged Particles", () => {
 
@@ -14,13 +17,12 @@ describe("Charged Particles", () => {
     let timelocks;
 
     beforeEach(async () => {
-        let protocolDeployments = await deploy(hre, alchemyTimeout).protocol();
-        universe = protocolDeployments.universe;
-        chargedParticles = protocolDeployments.chargedParticles;
-        aaveWalletManager = await deploy(hre, alchemyTimeout).aave();
-        proton = await deploy(hre, alchemyTimeout).proton();
-        ion = await deploy(hre, alchemyTimeout).ion();
-        timelocks = await deploy(hre, alchemyTimeout).timelocks();
+      universe = await (await ethers.getContractFactory('Universe')).attach(getDeployData('Universe', network.config.chainId).address);
+      chargedParticles = await (await ethers.getContractFactory('ChargedParticles')).attach(getDeployData('ChargedParticles', network.config.chainId).address);
+      aaveWalletManager = await (await ethers.getContractFactory('AaveWalletManager')).attach(getDeployData('AaveWalletManager', network.config.chainId).address);
+      proton = await (await ethers.getContractFactory('Proton')).attach(getDeployData('Proton', network.config.chainId).address);
+      ion = await (await ethers.getContractFactory('Ion')).attach(getDeployData('Ion', network.config.chainId).address);
+      timelocks = Object.values(getDeployData('IonTimelocks', network.config.chainId)).map(async ionTimelock => await (await ethers.getContractFactory('IonTimelock')).attach(ionTimelock.address));
     });
 
     it("Liquidity provider is Aave", async () => {
@@ -28,7 +30,7 @@ describe("Charged Particles", () => {
     });
 
     it("Lending Pool has been set for Aave", async () => {
-        expect((aaveWalletManager.filters.LendingPoolProviderSet(presets.Aave.lendingPoolProvider[hre.network.chainId])).length).to.equal(1);
+      expect(await aaveWalletManager.lendingPoolProvider()).to.equal(presets.Aave.lendingPoolProvider[network.config.chainId])
     });
 
   });

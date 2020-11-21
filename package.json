@@ -16,18 +16,15 @@
     "verify": "yarn hint && yarn test",
     "clean": "rm -rf build cache",
     "clean-deployed": "rm -rf abis deployed && rm -f .openzeppelin/ropsten.json",
-    "clean-test": "rm -rf deployments/hardhat_31337 test-results.xml",
+    "clean-test": "rm -rf .openzeppelin/${npm_config_network:-mainnet}.json deployments/${npm_config_network:-hardhat}/*.json test-results.xml",
     "compile": "hardhat --show-stack-traces --max-memory 8192 compile",
-    "test": "yarn clean-test && hardhat --show-stack-traces test",
+    "test": "yarn clean-test && hardhat --show-stack-traces test --deploy-fixture",
     "hint": "solhint \"contracts/**/*.sol\"",
     "coverage": "yarn clean && yarn clean-test && hardhat compile && hardhat coverage --network coverage --temp build; rm -rf cache",
     "gas": "REPORT_GAS=true hardhat test --network local",
     "start": "hardhat node --port 8545",
-    "deploy": "hardhat --network ${npm_config_network:-hardhat} --show-stack-traces deploy $(${npm_config_protocol:-false} && pritnf \"--protocol\") $(${npm_config_aave:-false} && printf \"--aave\") $(${npm_config_proton:-false} && printf \"--proton\") $(${npm_config_ion:-false} && printf \"--ion\") $(${npm_config_timelocks:-false} && printf \"--timelocks\")",
-    "deploy-all": "yarn compile && yarn deploy --protocol --aave --proton --ion --timelocks",
-    "run-tx": "hardhat run ./scripts/run-tx.js --network",
-    "gen-docs": "solidity-docgen -i contracts -o docs",
-    "fork": "URI='https:^^mainnet.infura.io^v3^' && KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) && npx ganache-cli -f $(echo `${URI//^//}${KEY}`) --chainId 1"
+    "deploy": "yarn clean-test && hardhat deploy",
+    "gen-docs": "solidity-docgen -i contracts -o docs"
   },
   "dependencies": {
     "hardhat-deploy": "^0.7.0-beta.28",

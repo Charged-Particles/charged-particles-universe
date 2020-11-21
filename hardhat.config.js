@@ -21,22 +21,6 @@ task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
 });
 
 
-task("deploy", "Deploy Charged Particles!")
-  .addFlag("protocol", "Protocol deployment flag")
-  .addFlag("aave", "Aave deployment flag")
-  .addFlag("proton", "Proton deployment flag")
-  .addFlag("ion", "Ion deployment flag")
-  .addFlag("timelocks", "Timelocks deployment flag")
-  .setAction(async ({ protocol, aave, proton, ion, timelocks }, hre) => {
-    const { deploy } = require("./js-utils/deploy-helpers");
-    protocol && await deploy(hre).protocol();
-    aave && await deploy(hre).aave();
-    proton && await deploy(hre).proton();
-    ion && await deploy(hre).ion();
-    timelocks && await deploy(hre).timelocks();
-  })
-
-
 const mnemonic = {
   testnet: `${process.env.TESTNET_MNEMONIC}`.replace(/_/g, ' '),
   mainnet: `${process.env.MAINNET_MNEMONIC}`.replace(/_/g, ' '),
@@ -54,7 +38,7 @@ module.exports = {
         evmVersion: 'istanbul'
     },
     paths: {
-        artifacts: './build',
+        artifacts: './build/contracts',
         deploy: './deploy',
         deployments: './deployments'
     },
@@ -64,15 +48,16 @@ module.exports = {
             allowUnlimitedContractSize: true,
             gasPrice: 8e9,
             forking: {
-                url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`
-            }
+                url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+                timeout: 1000000
+            },
         },
         coverage: {
             url: 'http://127.0.0.1:8555',
             blockGasLimit: 200000000,
             allowUnlimitedContractSize: true
         },
-        local: {
+        localhost: {
             url: 'http://127.0.0.1:8545',
             blockGasLimit: 200000000
         },
@@ -124,7 +109,7 @@ module.exports = {
         deployer: {
             default: 0,
         },
-        owner: {
+        protocolOwner: {
           default: 1,
         },
         trustedForwarder: {
