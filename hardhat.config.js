@@ -20,7 +20,6 @@ task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
   return input;
 });
 
-
 const mnemonic = {
   testnet: `${process.env.TESTNET_MNEMONIC}`.replace(/_/g, ' '),
   mainnet: `${process.env.MAINNET_MNEMONIC}`.replace(/_/g, ' '),
