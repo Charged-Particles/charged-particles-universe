@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const { sleep } = require("sleep");
-const { deployments } = require('../test/util/testEnv');
 
 const toWei = ethers.utils.parseEther;
 const toEth = ethers.utils.formatEther;

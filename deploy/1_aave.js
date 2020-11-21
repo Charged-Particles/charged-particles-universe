@@ -80,3 +80,5 @@ module.exports = async (hre) => {
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };
+
+module.exports.tags = ['aave']

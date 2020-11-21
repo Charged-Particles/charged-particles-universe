@@ -117,3 +117,5 @@ module.exports = async (hre) => {
 
     return ionTimelocks;
 }
+
+module.exports.tags = ['timelocks']

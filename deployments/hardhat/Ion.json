@@ -587,8 +587,8 @@
 	"address": "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
 	"deployTransaction": {
 		"hash": "0x2beacbd5636c9bfb5dc4010b3098b1645e9f1c8f666d37c636af2fc005688ffa",
-		"blockHash": "0xe022a584d9e932bbff163855d76ee85f5b7d174787c14a0274995c9d7fea3484",
-		"blockNumber": 11303082,
+		"blockHash": "0x4eb71faffc1da2bc8035356894f1e0cf8b5e23de7bba7655ecbc743a72b07dc1",
+		"blockNumber": 11303169,
 		"transactionIndex": 0,
 		"confirmations": 1,
 		"from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",

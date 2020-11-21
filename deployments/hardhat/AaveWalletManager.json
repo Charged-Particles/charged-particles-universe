@@ -742,8 +742,8 @@
 	"lendingPoolProvider": "0x24a42fD28C976A61Df5D00D0599C34c4f90748c8",
 	"deployTransaction": {
 		"hash": "0x576babb71c1a83541227cfac2246d53aa84ea9a139806005cfaabf983a2ddc79",
-		"blockHash": "0x981a72a5b0a6047a9af57deb254242a5fef5c79a658800ce709bc580c60d41be",
-		"blockNumber": 11303074,
+		"blockHash": "0x66aeed223445534f521a9b4efac4191a0066d68f550c7729c512d84f744cb20f",
+		"blockNumber": 11303161,
 		"transactionIndex": 0,
 		"confirmations": 1,
 		"from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
