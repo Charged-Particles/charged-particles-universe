@@ -19,6 +19,8 @@ cache
 # OpenZeppelin
 .openzeppelin/dev-*.json
 .openzeppelin/.session
+deployments/hardhat/*.json
+
 
 # Code Coverage
 coverage

@@ -2,6 +2,7 @@ const { ethers } = require('ethers');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
+const { sleep } = require("sleep");
 
 const toWei = ethers.utils.parseEther;
 const toEth = ethers.utils.formatEther;
@@ -36,7 +37,7 @@ const ensureDirectoryExistence = (filePath) => {
 
 const saveDeploymentData = (chainId, deployData) => {
   const network = chainName(chainId).toLowerCase();
-  const deployPath = path.join(__dirname, '..', 'deployed');
+  const deployPath = path.join(__dirname, '..', 'deployments', network);
 
   _.forEach(_.keys(deployData), (contractName) => {
     const filename = `${deployPath}/${contractName}.json`;
@@ -46,26 +47,25 @@ const saveDeploymentData = (chainId, deployData) => {
       existingData = JSON.parse(fs.readFileSync(filename));
     }
 
-    const newData = _.merge(existingData, {
-      [chainId]: deployData[contractName]
-    });
+    const newData = _.merge(existingData, deployData[contractName]);
     ensureDirectoryExistence(filename);
     fs.writeFileSync(filename, JSON.stringify(newData, null, "\t"));
   });
 };
 
 const getContractAbi = (contractName) => {
-  const buildPath = path.join(__dirname, '..', 'build');
+  const buildPath = path.join(__dirname, '..', 'abis');
   const filename = `${buildPath}/${contractName}.json`;
   const contractJson = require(filename);
-  return contractJson.abi;
+  return contractJson;
 };
 
 const getDeployData = (contractName, chainId) => {
-  const deployPath = path.join(__dirname, '..', 'deployed');
+  const network = chainName(chainId).toLowerCase();
+  const deployPath = path.join(__dirname, '..', 'deployments', network);
   const filename = `${deployPath}/${contractName}.json`;
   const contractJson = require(filename);
-  return contractJson[chainId];
+  return contractJson;
 }
 
 const getTxGasCost = ({deployTransaction}) => {

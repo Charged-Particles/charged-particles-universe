@@ -1,18 +1,20 @@
-const {TASK_COMPILE_GET_COMPILER_INPUT} = require('@nomiclabs/buidler/builtin-tasks/task-names');
+const {TASK_COMPILE_GET_COMPILER_INPUT} = require('hardhat/builtin-tasks/task-names');
 
 
 require('dotenv').config();
 
-usePlugin('@nomiclabs/buidler-waffle');
-usePlugin('@nomiclabs/buidler-etherscan');
-usePlugin('@nomiclabs/buidler-ethers');
-usePlugin('@openzeppelin/buidler-upgrades');
-usePlugin('buidler-gas-reporter');
-usePlugin('buidler-abi-exporter');
-usePlugin('solidity-coverage');
-usePlugin('buidler-deploy');
+require('@nomiclabs/hardhat-waffle');
+require('@nomiclabs/hardhat-etherscan');
+require('@nomiclabs/hardhat-ethers');
+require('@openzeppelin/hardhat-upgrades');
+require('hardhat-gas-reporter');
+require('hardhat-abi-exporter');
+// Not available (yet!) in hardhat, they are working on it
+// require('solidity-coverage');
+require('hardhat-deploy');
+require('hardhat-deploy-ethers');
 
-// This must occur after buidler-deploy!
+// This must occur after hardhat-deploy!
 task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
   const input = await runSuper();
   input.settings.metadata.useLiteralContent = false;
@@ -25,31 +27,38 @@ const mnemonic = {
 };
 
 module.exports = {
-    solc: {
+    solidity: {
         version: '0.6.12',
-        optimizer: {
-            enabled: true,
-            runs: 200
+        settings: {
+            optimizer: {
+                enabled: true,
+                runs: 200
+            }
         },
         evmVersion: 'istanbul'
     },
     paths: {
-        artifacts: './build',
+        artifacts: './build/contracts',
         deploy: './deploy',
         deployments: './deployments'
     },
     networks: {
-        buidlerevm: {
+        hardhat: {
             blockGasLimit: 200000000,
             allowUnlimitedContractSize: true,
-            gasPrice: 8e9
+            gasPrice: 8e9,
+            forking: {
+                url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+                blockNumber: 11320000,
+                timeout: 1000000
+            },
         },
         coverage: {
             url: 'http://127.0.0.1:8555',
             blockGasLimit: 200000000,
             allowUnlimitedContractSize: true
         },
-        local: {
+        localhost: {
             url: 'http://127.0.0.1:8545',
             blockGasLimit: 200000000
         },
@@ -113,7 +122,7 @@ module.exports = {
         deployer: {
           default: 0,
         },
-        owner: {
+        protocolOwner: {
           default: 1,
         },
         user1: {

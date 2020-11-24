@@ -84,7 +84,7 @@ Join our community, share ideas and help support the project in anyway you want!
     - OpenZeppelin Ethereum Contracts **v3.0.0**
     - Solidity  **v0.6.12** (solc-js)
     - NodeJS **v12.16.3**
-    - Buidler **v1.3.8**
+    - hardhat **v1.3.8**
     - EthersJS **v5.0.3**
 
 ### Prepare environment:
