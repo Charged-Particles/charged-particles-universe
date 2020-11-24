@@ -34,6 +34,8 @@ import "../interfaces/IChargedParticles.sol";
 contract Proton is ERC721, Ownable {
   using Counters for Counters.Counter;
 
+  event ChargedParticlesSet(address indexed chargedParticles);
+
   IChargedParticles internal _chargedParticles;
 
   Counters.Counter internal _tokenIds;
@@ -121,6 +123,7 @@ contract Proton is ERC721, Ownable {
     */
   function setChargedParticles(address chargedParticles) external onlyOwner {
     _chargedParticles = IChargedParticles(chargedParticles);
+    emit ChargedParticlesSet(chargedParticles);
   }
 
 

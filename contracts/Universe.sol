@@ -22,7 +22,6 @@
 // SOFTWARE.
 
 pragma solidity 0.6.12;
-pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
@@ -87,16 +86,17 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
     uint256 tokenId,
     string calldata,
     address assetToken,
-    uint256 interestAmount
+    uint256,
+    uint256 receiverAmount
   )
     external
     override
     onlyChargedParticles
   {
     // Reward ION tokens
-    if (ionRewardsMultiplier[assetToken] > 0 && interestAmount > 0) {
+    if (ionRewardsMultiplier[assetToken] > 0 && receiverAmount > 0) {
       address receiver = IERC721(contractAddress).ownerOf(tokenId);
-      _rewardIonTokens(receiver, assetToken, interestAmount);
+      _rewardIonTokens(receiver, assetToken, receiverAmount);
     }
   }
 
@@ -105,14 +105,16 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
     uint256 tokenId,
     string calldata,
     address assetToken,
+    uint256 principalAmount,
     uint256,
-    uint256 interestAmount
+    uint256 receiverAmount
   )
     external
     override
     onlyChargedParticles
   {
     // Reward ION tokens
+    uint256 interestAmount = receiverAmount.sub(principalAmount);
     if (ionRewardsMultiplier[assetToken] > 0 && interestAmount > 0) {
       address receiver = IERC721(contractAddress).ownerOf(tokenId);
       _rewardIonTokens(receiver, assetToken, interestAmount);

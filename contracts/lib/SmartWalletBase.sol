@@ -41,8 +41,8 @@ abstract contract SmartWalletBase is ISmartWallet {
   // List of Asset Tokens held in Wallet
   address[] internal _assetTokens;
 
-  //   Asset Token => Interest Token
-  mapping (address => address) internal _assetToInterestToken;
+  //   Asset Token => Added to List
+  mapping (address => bool) internal _assetTokenAdded;
 
 
   /***********************************|
@@ -69,16 +69,13 @@ abstract contract SmartWalletBase is ISmartWallet {
     return _assetTokens[index];
   }
 
-  function getInterestTokenOfAsset(address assetToken) external view virtual override returns (address) {
-    return _assetToInterestToken[assetToken];
-  }
-
   function setNftCreator(address creator, uint256 annuityPct) external virtual override onlyWalletManager {
     nftCreator = creator;
     nftCreatorAnnuityPct = annuityPct;
   }
 
   function withdrawEther(address payable receiver, uint256 amount) external virtual override onlyWalletManager {
+    require(receiver != address(0x0), "SmartWalletBase: INVALID_RECEIVER");
     receiver.transfer(amount);
   }
 
@@ -101,10 +98,10 @@ abstract contract SmartWalletBase is ISmartWallet {
   |         Private Functions         |
   |__________________________________*/
 
-  function _addAssetToken(address assetToken, address interestToken) internal virtual {
-    if (_assetToInterestToken[assetToken] == address(0x0)) {
+  function _trackAssetToken(address assetToken) internal virtual {
+    if (!_assetTokenAdded[assetToken]) {
       _assetTokens.push(assetToken);
-      _assetToInterestToken[assetToken] = interestToken;
+      _assetTokenAdded[assetToken] = true;
     }
   }
 

@@ -30,7 +30,6 @@ pragma solidity >=0.6.0;
 interface ISmartWallet {
   function getAssetTokenCount() external view returns (uint256);
   function getAssetTokenByIndex(uint256 index) external view returns (address);
-  function getInterestTokenOfAsset(address assetToken) external view returns (address);
 
   function setNftCreator(address creator, uint256 annuityPct) external;
 
@@ -38,14 +37,13 @@ interface ISmartWallet {
   function getReserveInterestToken(address assetToken) external view returns (address);
 
   function getPrincipal(address assetToken) external returns (uint256);
-  function getInterest(address assetToken) external returns (uint256);
-  function getBalance(address assetToken) external returns (uint256);
-  function getAnnuities(address assetToken) external returns (uint256);
+  function getInterest(address assetToken) external returns (uint256 creatorInterest, uint256 ownerInterest);
+  function getTotal(address assetToken) external returns (uint256);
   function getRewards(address assetToken) external returns (uint256);
 
-  function deposit(address assetToken, uint256 assetAmount) external returns (uint256);
-  function withdraw(address receiver, address assetToken) external returns (uint256);
-  function withdrawAmount(address receiver, address assetToken, uint256 assetAmount) external returns (uint256);
+  function deposit(address assetToken, uint256 assetAmount, uint256 referralCode) external returns (uint256);
+  function withdraw(address receiver, address assetToken) external returns (uint256 creatorAmount, uint256 receiverAmount);
+  function withdrawAmount(address receiver, address assetToken, uint256 assetAmount) external returns (uint256 creatorAmount, uint256 receiverAmount);
   function withdrawRewards(address receiver, address rewardsToken, uint256 rewardsAmount) external returns (uint256);
   function withdrawEther(address payable receiver, uint256 amount) external;
   function executeForAccount(address contractAddress, uint256 ethValue, bytes memory encodedParams) external returns (bytes memory);

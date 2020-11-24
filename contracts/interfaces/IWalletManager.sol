@@ -31,8 +31,8 @@ interface IWalletManager {
 
   event NewSmartWallet(uint256 indexed uuid, address indexed smartWallet, address indexed creator, uint256 annuityPct);
   event WalletEnergized(uint256 indexed uuid, address indexed assetToken, uint256 assetAmount, uint256 yieldTokensAmount);
-  event WalletDischarged(uint256 indexed uuid, address indexed assetToken, uint256 interestAmount);
-  event WalletReleased(uint256 indexed uuid, address indexed receiver, address indexed assetToken, uint256 principalAmount, uint256 interestAmount);
+  event WalletDischarged(uint256 indexed uuid, address indexed assetToken, uint256 creatorAmount, uint256 receiverAmount);
+  event WalletReleased(uint256 indexed uuid, address indexed receiver, address indexed assetToken, uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount);
   event WalletRewarded(uint256 indexed uuid, address indexed receiver, address indexed rewardsToken, uint256 rewardsAmount);
 
   function isPaused() external view returns (bool);
@@ -40,16 +40,15 @@ interface IWalletManager {
   function isReserveActive(uint256 uuid, address assetToken) external view returns (bool);
   function getReserveInterestToken(uint256 uuid, address assetToken) external view returns (address);
 
+  function getTotal(uint256 uuid, address assetToken) external returns (uint256);
   function getPrincipal(uint256 uuid, address assetToken) external returns (uint256);
-  function getInterest(uint256 uuid, address assetToken) external returns (uint256);
-  function getRewards(uint256 uuid, address assetToken) external returns (uint256);
-  function getBalance(uint256 uuid, address assetToken) external returns (uint256);
-  function getAnnuities(uint256 uuid, address assetToken) external returns (uint256);
+  function getInterest(uint256 uuid, address assetToken) external returns (uint256 creatorInterest, uint256 ownerInterest);
+  function getRewards(uint256 uuid, address rewardToken) external returns (uint256);
 
   function energize(uint256 uuid, address assetToken, uint256 assetAmount, address creator, uint256 annuityPct) external returns (uint256 yieldTokensAmount);
-  function discharge(address receiver, uint256 uuid, address assetToken) external returns (uint256 amount);
-  function dischargeAmount(address receiver, uint256 uuid, address assetToken, uint256 assetAmount) external returns (uint256 amount);
-  function release(address receiver, uint256 uuid, address assetToken) external returns (uint256 assetAmount, uint256 interestAmount);
+  function discharge(address receiver, uint256 uuid, address assetToken) external returns (uint256 creatorAmount, uint256 receiverAmount);
+  function dischargeAmount(address receiver, uint256 uuid, address assetToken, uint256 assetAmount) external returns (uint256 creatorAmount, uint256 receiverAmount);
+  function release(address receiver, uint256 uuid, address assetToken) external returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount);
   function withdrawRewards(address receiver, uint256 uuid, address rewardsToken, uint256 rewardsAmount) external returns (uint256 amount);
   function withdrawEther(uint256 _uuid, address payable receiver, uint256 amount) external;
   function executeForAccount(uint256 uuid, address contractAddress, uint256 ethValue, bytes memory encodedParams) external returns (bytes memory);
