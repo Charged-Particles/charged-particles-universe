@@ -1,7 +1,6 @@
 const { presets, getDeployData } = require('../js-utils/deploy-helpers');
 const { expect } = require('chai');
 const { ethers, network } = require('hardhat');
-const { exit } = require('process');
 
 const alchemyTimeout = 1; // wait 1s between requests, so AlchemyAPI doesn't overheat.
 
