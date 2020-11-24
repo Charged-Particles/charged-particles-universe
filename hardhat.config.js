@@ -1,39 +1,24 @@
-const {TASK_COMPILE_GET_COMPILER_INPUT} = require('@nomiclabs/buidler/builtin-tasks/task-names');
+const {TASK_COMPILE_GET_COMPILER_INPUT} = require('hardhat/builtin-tasks/task-names');
 
 require('dotenv').config();
 
-usePlugin('@nomiclabs/buidler-waffle');
-usePlugin('@nomiclabs/buidler-etherscan');
-usePlugin('@nomiclabs/buidler-ethers');
-usePlugin('@openzeppelin/buidler-upgrades');
-usePlugin('buidler-gas-reporter');
-usePlugin('buidler-abi-exporter');
-usePlugin('solidity-coverage');
-usePlugin('buidler-deploy');
+require('@nomiclabs/hardhat-waffle');
+require('@nomiclabs/hardhat-etherscan');
+require('@nomiclabs/hardhat-ethers');
+require('@openzeppelin/hardhat-upgrades');
+require('hardhat-gas-reporter');
+require('hardhat-abi-exporter');
+// Not available (yet!) in hardhat, they are working on it
+// require('solidity-coverage');
+require('hardhat-deploy');
+require('hardhat-deploy-ethers');
 
-// This must occur after buidler-deploy!
+// This must occur after hardhat-deploy!
 task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
   const input = await runSuper();
   input.settings.metadata.useLiteralContent = false;
   return input;
 });
-
-
-task("deploy", "Deploy Charged Particles!")
-  .addFlag("protocol", "Protocol deployment flag")
-  .addFlag("aave", "Aave deployment flag")
-  .addFlag("proton", "Proton deployment flag")
-  .addFlag("ion", "Ion deployment flag")
-  .addFlag("timelocks", "Timelocks deployment flag")
-  .setAction(async ({ protocol, aave, proton, ion, timelocks }, hre) => {
-    const { deploy } = require("./js-utils/deploy-helpers");
-    protocol && await deploy(hre).protocol();
-    aave && await deploy(hre).aave();
-    proton && await deploy(hre).proton();
-    ion && await deploy(hre).ion();
-    timelocks && await deploy(hre).timelocks();
-  })
-
 
 const mnemonic = {
   testnet: `${process.env.TESTNET_MNEMONIC}`.replace(/_/g, ' '),
@@ -41,31 +26,37 @@ const mnemonic = {
 };
 
 module.exports = {
-    solc: {
+    solidity: {
         version: '0.6.12',
-        optimizer: {
-            enabled: true,
-            runs: 200
+        settings: {
+            optimizer: {
+                enabled: true,
+                runs: 200
+            }
         },
         evmVersion: 'istanbul'
     },
     paths: {
-        artifacts: './build',
+        artifacts: './build/contracts',
         deploy: './deploy',
         deployments: './deployments'
     },
     networks: {
-        buidlerevm: {
+        hardhat: {
             blockGasLimit: 200000000,
             allowUnlimitedContractSize: true,
-            gasPrice: 8e9
+            gasPrice: 8e9,
+            forking: {
+                url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+                timeout: 1000000
+            },
         },
         coverage: {
             url: 'http://127.0.0.1:8555',
             blockGasLimit: 200000000,
             allowUnlimitedContractSize: true
         },
-        local: {
+        localhost: {
             url: 'http://127.0.0.1:8545',
             blockGasLimit: 200000000
         },
@@ -117,7 +108,7 @@ module.exports = {
         deployer: {
             default: 0,
         },
-        owner: {
+        protocolOwner: {
           default: 1,
         },
         trustedForwarder: {
