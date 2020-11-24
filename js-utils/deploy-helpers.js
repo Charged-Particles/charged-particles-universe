@@ -82,43 +82,61 @@ const presets = {
   },
   Ion: {
     rewardsForAssetTokens: [
-      {assetTokenId: 'Aave.dai', multiplier: '5000'}, // DAI
+      {assetTokenId: 'Aave.v1.dai', multiplier: '5000'}, // DAI
     ],
     timelocks: [
       {
         receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76',  // Testing - Account 3
         portions: [
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('20 Nov 2020 00:00:00 GMT')},
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('21 Nov 2020 00:00:00 GMT')},
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('22 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('27 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('28 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('29 Nov 2020 00:00:00 GMT')},
         ]
       },
       {
         receiver: '0xF55D5df4fa26c454a5635B4697C2Acf92f55cfD8',  // Testing - Account 4
         portions: [
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('20 Nov 2020 00:00:00 GMT')},
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('21 Nov 2020 00:00:00 GMT')},
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('22 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('27 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('28 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('29 Nov 2020 00:00:00 GMT')},
         ]
       },
     ],
   },
   Aave: {
-    referralCode: '123456789',
-    dai: {
-      1: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // mainnet
-      3: '0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108', // ropsten
-      42: '0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD', // kovan
+    referralCode: {
+      1: '0',
+      3: '0',
+      4: '0',
+      42: '0',
     },
-    aDai: {
-      1: '0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d', // mainnet
-      3: '0xcB1Fe6F440c49E9290c3eb7f158534c2dC374201', // ropsten
-      42: '0x58AD4cB396411B691A9AAb6F74545b2C5217FE6a', // kovan
+    v1: {
+      dai: {
+        1: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // mainnet
+        3: '0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108', // ropsten
+        4: '', // rinkeby
+        42: '0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD', // kovan
+      },
+      lendingPoolProvider: {
+        1: '0x24a42fD28C976A61Df5D00D0599C34c4f90748c8', // mainnet
+        3: '0x1c8756FD2B28e9426CDBDcC7E3c4d64fa9A54728', // ropsten
+        4: '', // rinkeby
+        42: '0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5', // kovan
+      }
     },
-    lendingPoolProvider: {
-      1: '0x24a42fD28C976A61Df5D00D0599C34c4f90748c8', // mainnet
-      3: '0x1c8756FD2B28e9426CDBDcC7E3c4d64fa9A54728', // ropsten
-      42: '0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5', // kovan
+    v2: {
+      dai: {
+        1: '', // mainnet
+        3: '', // ropsten
+        4: '', // rinkeby
+        42: '0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD', // kovan
+      },
+      lendingPoolProvider: {
+        1: '', // mainnet
+        3: '', // ropsten
+        4: '', // rinkeby
+        42: '0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b', // kovan
+      }
     }
   }
 };

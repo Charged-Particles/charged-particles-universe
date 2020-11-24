@@ -53,26 +53,36 @@ module.exports = {
             url: 'http://127.0.0.1:8545',
             blockGasLimit: 200000000
         },
-        kovan: {
-            url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            gasPrice: 10e9,
+        rinkeby: {
+            url: `https://rinkeby.infura.io/v3/${process.env.INFURA_APIKEY}`,
+            gasPrice: 12e9,
             blockGasLimit: 200000000,
             accounts: {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
-                count: 3,
+                count: 10,
             }
         },
         ropsten: {
             url: `https://ropsten.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            gasPrice: 10e9,
-            blockGasLimit: 200000000,
+            gasPrice: 32e9,
+            // blockGasLimit: 200000000,
             accounts: {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
-                count: 3,
+                count: 10,
             }
-        }
+        },
+        kovan: {
+            url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
+            gasPrice: 12e9,
+            // blockGasLimit: 200000000,
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            }
+        },
     },
     etherscan: {
       apiKey: process.env.ETHERSCAN_APIKEY
@@ -90,6 +100,8 @@ module.exports = {
         'Universe',
         'ChargedParticles',
         'AaveWalletManager',
+        'AaveBridgeV1',
+        'AaveBridgeV2',
         'Ion',
         'IonTimelock',
         'Proton',
@@ -99,16 +111,26 @@ module.exports = {
     },
     namedAccounts: {
         deployer: {
-            default: 0,
+          default: 0,
         },
         owner: {
           default: 1,
         },
+        user1: {
+          default: 2
+        },
+        user2: {
+          default: 3
+        },
+        user3: {
+          default: 4
+        },
         trustedForwarder: {
-            default: 7, // Account 8
-            1: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // mainnet
-            3: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // ropsten
-            42: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // kovan
+          default: 7, // Account 8
+          1: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // mainnet
+          3: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // ropsten
+          4: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // rinkeby
+          42: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // kovan
         }
     }
 };

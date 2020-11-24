@@ -29,7 +29,7 @@ async function main() {
   log('  - Owner:       ', owner);
   log(' ');
 
-  log('  Loading AaveWalletManager from: ', ddChargedParticles.address);
+  log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
   const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
   const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
 
