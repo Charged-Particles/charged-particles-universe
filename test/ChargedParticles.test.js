@@ -16,19 +16,24 @@ describe("Charged Particles", () => {
   let timelocks;
 
   beforeEach(async () => {
-    universe = await (await ethers.getContractFactory('Universe')).attach(getDeployData('Universe', network.config.chainId).address);
-    chargedParticles = await (await ethers.getContractFactory('ChargedParticles')).attach(getDeployData('ChargedParticles', network.config.chainId).address);
-    aaveWalletManager = await (await ethers.getContractFactory('AaveWalletManager')).attach(getDeployData('AaveWalletManager', network.config.chainId).address);
-    proton = await (await ethers.getContractFactory('Proton')).attach(getDeployData('Proton', network.config.chainId).address);
-    ion = await (await ethers.getContractFactory('Ion')).attach(getDeployData('Ion', network.config.chainId).address);
-    timelocks = Object.values(getDeployData('IonTimelocks', network.config.chainId)).map(async ionTimelock => await (await ethers.getContractFactory('IonTimelock')).attach(ionTimelock.address));
+    const Universe = await ethers.getContractFactory('Universe');
+    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
+    const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
+    const Proton = await ethers.getContractFactory('Proton');
+    const Ion = await ethers.getContractFactory('Ion');
+    const IonTimelock = await ethers.getContractFactory('IonTimelock');
+
+    universe = Universe.attach(getDeployData('Universe', network.config.chainId).address);
+    chargedParticles = ChargedParticles.attach(getDeployData('ChargedParticles', network.config.chainId).address);
+    aaveWalletManager = AaveWalletManager.attach(getDeployData('AaveWalletManager', network.config.chainId).address);
+    proton = Proton.attach(getDeployData('Proton', network.config.chainId).address);
+    ion = Ion.attach(getDeployData('Ion', network.config.chainId).address);
+    timelocks = Object.values(getDeployData('IonTimelocks', network.config.chainId))
+      .map(async ionTimelock => (IonTimelock.attach(ionTimelock.address)));
   });
 
-  it("Liquidity provider is Aave", async () => {
+  it("should deploy with the liquidity provider set to 'Aave'", async () => {
     expect(await chargedParticles.isLiquidityProviderEnabled('aave')).to.equal(true);
   });
 
-  it("Lending Pool has been set for Aave", async () => {
-    expect(await aaveWalletManager.lendingPoolProvider()).to.equal(presets.Aave.lendingPoolProvider[network.config.chainId])
-  });
 });

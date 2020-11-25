@@ -22,7 +22,6 @@
 // SOFTWARE.
 
 pragma solidity >=0.6.0;
-pragma experimental ABIEncoderV2;
 
 /**
  * @notice Interface for Charged Particles
@@ -49,7 +48,7 @@ interface IChargedParticles {
   function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
 
   function getFeesForDeposit(address contractAddress, uint256 assetAmount) external view returns (uint256 protocolFee, uint256 externalFee);
-  function getFeeForDeposit(address contractAddress, uint256 assetAmount) external view returns (uint256);
+  function getTotalFeeForDeposit(address contractAddress, uint256 assetAmount) external view returns (uint256);
 
   function baseParticleMass(address contractAddress, uint256 tokenId, string calldata liquidityProviderId, address assetToken) external returns (uint256);
   function currentParticleCharge(address contractAddress, uint256 tokenId, string calldata liquidityProviderId, address assetToken) external returns (uint256);
@@ -89,7 +88,7 @@ interface IChargedParticles {
     address contractAddress,
     string calldata liquidityProviderId,
     address assetToken
-  ) external  returns (uint256 amountStored);
+  ) external returns (uint256 amountStored);
 
   function withdrawContractFees(
     address contractAddress,
@@ -120,7 +119,7 @@ interface IChargedParticles {
       string calldata liquidityProviderId,
       address assetToken,
       uint256 assetAmount
-  ) external returns (uint256 interestAmount);
+  ) external returns (uint256 yieldTokensAmount);
 
   function dischargeParticle(
       address receiver,
@@ -128,7 +127,7 @@ interface IChargedParticles {
       uint256 tokenId,
       string calldata liquidityProviderId,
       address assetToken
-  ) external returns (uint256 interestAmount);
+  ) external returns (uint256 creatorAmount, uint256 receiverAmount);
 
   function dischargeParticleAmount(
       address receiver,
@@ -137,7 +136,7 @@ interface IChargedParticles {
       string calldata liquidityProviderId,
       address assetToken,
       uint256 assetAmount
-  ) external returns (uint256 interestAmount);
+  ) external returns (uint256 creatorAmount, uint256 receiverAmount);
 
   function releaseParticle(
       address receiver,
@@ -145,7 +144,7 @@ interface IChargedParticles {
       uint256 tokenId,
       string calldata liquidityProviderId,
       address assetToken
-  ) external returns (uint256 amount);
+  ) external returns (uint256 creatorAmount, uint256 receiverAmount);
 
   function finalizeRelease(
       address receiver,
@@ -153,7 +152,7 @@ interface IChargedParticles {
       uint256 tokenId,
       string calldata liquidityProviderId,
       address assetToken
-  ) external returns (uint256 amount);
+  ) external returns (uint256 creatorAmount, uint256 receiverAmount);
 
   /***********************************|
   |          Particle Events          |
@@ -212,30 +211,6 @@ interface IChargedParticles {
     uint256 indexed tokenId,
     address indexed operator,
     uint256 unlockBlock
-  );
-  event EnergizedParticle(
-    address indexed contractAddress,
-    uint256 indexed tokenId,
-    string liquidityProviderId,
-    address assetToken,
-    uint256 assetAmount
-  );
-  event DischargedParticle(
-    address indexed contractAddress,
-    uint256 indexed tokenId,
-    address indexed receiver,
-    string liquidityProviderId,
-    address assetToken,
-    uint256 interestAmount
-  );
-  event ReleasedParticle(
-    address indexed contractAddress,
-    uint256 indexed tokenId,
-    address indexed receiver,
-    string liquidityProviderId,
-    address assetToken,
-    uint256 principalAmount,
-    uint256 interestAmount
   );
   event FeesWithdrawn(
     address indexed contractAddress,

@@ -28,10 +28,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "./IAToken.sol";
-import "./ILendingPool.sol";
-import "./ILendingPoolAddressesProvider.sol";
-
+import "../../interfaces/IAaveBridge.sol";
 import "../../lib/SmartWalletBase.sol";
 
 /**
@@ -42,18 +39,26 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
   using SafeMath for uint256;
   using SafeCast for uint256;
 
-  ILendingPoolAddressesProvider public lendingPoolProvider;
-  uint256 public referralCode;
+  uint256 constant internal RAY = 1e27;
+
+  IAaveBridge internal _bridge;
+
+  //   Asset Token => Principal Balance
+  mapping (address => uint256) internal _assetPrincipalBalance;
 
 
   /***********************************|
   |          Initialization           |
   |__________________________________*/
 
-  function initialize(address aaveLendingProvider, uint256 aaveReferralCode) public initializer {
+  function initialize(
+    address aaveBridge
+  )
+    public
+    initializer
+  {
     SmartWalletBase.initializeBase();
-    lendingPoolProvider = ILendingPoolAddressesProvider(aaveLendingProvider);
-    referralCode = aaveReferralCode;
+    _bridge = IAaveBridge(aaveBridge);
   }
 
 
@@ -62,54 +67,63 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
   |__________________________________*/
 
   function isReserveActive(address assetToken) external view override returns (bool) {
-    ILendingPool lendingPool = ILendingPool(lendingPoolProvider.getLendingPool());
-    return _isReserveActive(lendingPool, assetToken);
+    return _bridge.isReserveActive(assetToken);
   }
 
   function getReserveInterestToken(address assetToken) external view override returns (address) {
-    ILendingPool lendingPool = ILendingPool(lendingPoolProvider.getLendingPool());
-    return _getReserveAToken(lendingPool, assetToken);
+    return _bridge.getReserveInterestToken(assetToken);
   }
 
   function getPrincipal(address assetToken) external override returns (uint256) {
-    address aTokenAddress = _assetToInterestToken[assetToken];
-    if (aTokenAddress == address(0x0)) { return 0; }
-    IAToken aToken = IAToken(aTokenAddress);
-
-    return aToken.principalBalanceOf(address(this));
+    return _getPrincipal(assetToken);
   }
 
-  function getInterest(address assetToken) external override returns (uint256) {
-    address aTokenAddress = _assetToInterestToken[assetToken];
-    if (aTokenAddress == address(0x0)) { return 0; }
-    IAToken aToken = IAToken(aTokenAddress);
-
-    uint256 principal = aToken.principalBalanceOf(address(this));
-    return aToken.balanceOf(address(this)).sub(principal);
+  function getInterest(address assetToken) external override returns (uint256 creatorInterest, uint256 ownerInterest) {
+    return _getInterest(assetToken);
   }
 
-  function getBalance(address assetToken) external override returns (uint256) {
-    return _getBalance(assetToken);
-  }
-
-  function getAnnuities(address assetToken) external override returns (uint256) {
-    return _getCreatorPortion(assetToken, _getBalance(assetToken));
+  function getTotal(address assetToken) external override returns (uint256) {
+    return _getTotal(assetToken);
   }
 
   function getRewards(address rewardToken) external override returns (uint256) {
     return IERC20(rewardToken).balanceOf(address(this));
   }
 
+  // function migrateToAaveV2(address assetToken)
+  //   external
+  //   onlyWalletManager
+  //   returns (uint256 amountMigrated, uint256 creatorAmount)
+  // {
+  //   require(!enableAaveV2, "AaveSmartWallet: ALREADY_ON_V2");
+
+  //   // Migrate all deposits for asset from V1
+  //   uint256 walletPrincipal = _getPrincipal(assetToken);
+  //   (uint256 creatorInterest, uint256 ownerInterest) = _getInterest(assetToken);
+  //   uint256 amountToMigrate = walletPrincipal.add(ownerInterest);
+  //   creatorAmount = creatorInterest;
+
+  //   _withdrawFromV1(address(this), assetToken, creatorAmount, amountToMigrate);
+  //   amountMigrated = _depositIntoV2(assetToken, amountToMigrate);
+
+  //   // Track Principal
+  //   // _assetPrincipalBalance[assetToken] = walletPrincipal;
+
+  //   // Switch to Aave V2
+  //   enableAaveV2 = true;
+  // }
+
 
   function deposit(
     address assetToken,
-    uint256 assetAmount
+    uint256 assetAmount,
+    uint256 referralCode
   )
     external
     override
     returns (uint256)
   {
-    return _deposit(assetToken, assetAmount);
+    return _deposit(assetToken, assetAmount, referralCode);
   }
 
 
@@ -120,9 +134,11 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
     external
     override
     onlyWalletManager
-    returns (uint256)
+    returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    return _withdraw(receiver, assetToken, _getBalance(assetToken));
+    uint256 walletPrincipal = _getPrincipal(assetToken);
+    (, uint256 ownerInterest) = _getInterest(assetToken);
+    return _withdraw(receiver, assetToken, walletPrincipal.add(ownerInterest));
   }
 
   function withdrawAmount(
@@ -133,7 +149,7 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
     external
     override
     onlyWalletManager
-    returns (uint256)
+    returns (uint256 creatorAmount, uint256 receiverAmount)
   {
     return _withdraw(receiver, assetToken, assetAmount);
   }
@@ -157,30 +173,22 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
 
   function _deposit(
     address assetToken,
-    uint256 assetAmount
+    uint256 assetAmount,
+    uint256 referralCode
   )
     internal
     returns (uint256)
   {
-    address self = address(this);
-    ILendingPool lendingPool = ILendingPool(lendingPoolProvider.getLendingPool());
-    require(_isReserveActive(lendingPool, assetToken), "AaveSmartWallet: INVALID_ASSET");
-
-    address aTokenAddress = _getReserveAToken(lendingPool, assetToken);
-    IAToken aToken = IAToken(aTokenAddress);
-    _addAssetToken(assetToken, aTokenAddress);
-
     // Collect Asset Token (reverts on fail)
-    _collectAssetToken(assetToken, assetAmount);
+    _collectToken(_walletManager, assetToken, assetAmount);
+    _trackAssetToken(assetToken);
 
-    // Approve LendingPool contract to transfer Assets
-    IERC20(assetToken).approve(lendingPoolProvider.getLendingPoolCore(), assetAmount);
+    // Deposit Assets into Aave (reverts on fail)
+    IERC20(assetToken).approve(address(_bridge), assetAmount);
+    uint256 aTokensAmount = _bridge.deposit(assetToken, assetAmount, referralCode);
 
-    // Deposit Assets into Aave
-    uint256 preBalance = aToken.balanceOf(self);
-    lendingPool.deposit(assetToken, assetAmount, referralCode.toUint16());
-    uint256 postBalance = aToken.balanceOf(self);
-    uint256 aTokensAmount = postBalance.sub(preBalance);
+    // Track Principal
+    _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].add(assetAmount);
 
     // Return amount of aTokens transfered
     return aTokensAmount;
@@ -188,41 +196,47 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
 
   function _withdraw(
     address receiver,
-    address assetTokenAddress,
+    address assetToken,
     uint256 assetAmount
   )
     internal
-    returns (uint256)
+    returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    address aTokenAddress = _assetToInterestToken[assetTokenAddress];
-    require(aTokenAddress != address(0x0), "AaveSmartWallet: INVALID_ASSET");
+    uint256 walletPrincipal = _getPrincipal(assetToken);
+    (uint256 creatorInterest, uint256 ownerInterest) = _getInterest(assetToken);
 
-    address self = address(this);
-    IERC20 assetToken = IERC20(assetTokenAddress);
-    IAToken aToken = IAToken(aTokenAddress);
-
-    uint256 walletBalance = aToken.balanceOf(self);
-    uint256 withdrawalAmount = (walletBalance >= assetAmount) ? assetAmount : walletBalance;
-    require(withdrawalAmount > 0, "AaveSmartWallet: INSUFF_BALANCE");
-
-    // Get Creator Annuities
-    uint256 creatorAmount = _getCreatorPortion(assetTokenAddress, withdrawalAmount);
-
-    // Redeem aTokens for Asset Tokens
-    uint256 preBalance = assetToken.balanceOf(self);
-    aToken.redeem(withdrawalAmount);
-    uint256 postBalance = assetToken.balanceOf(self);
-    uint256 receiverAmount = postBalance.sub(preBalance);
-
-    // Transfer Assets to Creator
-    if (creatorAmount > 0) {
-      receiverAmount = receiverAmount.sub(creatorAmount);
-      require(assetToken.transfer(nftCreator, creatorAmount), "AaveSmartWallet: WITHDRAW_CREATOR_FAILED");
+    // Withdraw from Interest only
+    if (assetAmount < ownerInterest) {
+      uint256 ratio = assetAmount.mul(RAY).div(ownerInterest);
+      creatorAmount = creatorInterest.mul(ratio).div(RAY);
+      receiverAmount = assetAmount;
     }
 
-    // Transfer Assets to Receiver
-    require(assetToken.transfer(receiver, receiverAmount), "AaveSmartWallet: WITHDRAW_RECEIVER_FAILED");
-    return receiverAmount;
+    // Withdraw from Interest + Principal
+    else {
+      uint256 fromPrincipal = assetAmount.sub(ownerInterest);
+      if (fromPrincipal > walletPrincipal) {
+        fromPrincipal = walletPrincipal;
+      }
+
+      creatorAmount = creatorInterest;
+      receiverAmount = ownerInterest.add(fromPrincipal);
+
+      // Track Principal
+      _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].sub(fromPrincipal);
+    }
+
+    // Send aTokens to Bridge
+    address aTokenAddress = _bridge.getReserveInterestToken(assetToken);
+    _sendToken(address(_bridge), aTokenAddress, receiverAmount.add(creatorAmount));
+
+    // Withdraw Assets for Creator
+    if (creatorAmount > 0) {
+      _bridge.withdraw(nftCreator, assetToken, creatorAmount);
+    }
+
+    // Withdraw Assets for Receiver
+    _bridge.withdraw(receiver, assetToken, receiverAmount);
   }
 
   function _withdrawRewards(
@@ -240,54 +254,46 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
     require(walletBalance >= rewardsAmount, "AaveSmartWallet: INSUFF_BALANCE");
 
     // Transfer Rewards to Receiver
-    require(rewardsToken.transfer(receiver, rewardsAmount), "AaveSmartWallet: WITHDRAW_TRANSFER_FAILED");
+    require(rewardsToken.transfer(receiver, rewardsAmount), "AaveSmartWallet: REWARDS_TRANSFER_FAILED");
     return rewardsAmount;
   }
 
-
-  function _getBalance(address assetToken) internal returns (uint256) {
-    address aTokenAddress = _assetToInterestToken[assetToken];
-    if (aTokenAddress == address(0x0)) { return 0; }
-    IAToken aToken = IAToken(aTokenAddress);
-
-    return aToken.balanceOf(address(this));
+  function _getTotal(address assetToken) internal view returns (uint256) {
+    return _bridge.getTotalBalance(address(this), assetToken);
   }
 
-  function _getCreatorPortion(address assetToken, uint256 amount) internal returns (uint256) {
-    if (nftCreatorAnnuityPct == 0) { return 0; }
-
-    address self = address(this);
-    address aTokenAddress = _assetToInterestToken[assetToken];
-    IAToken aToken = IAToken(aTokenAddress);
-
-    uint256 walletBalance = aToken.balanceOf(self);
-    uint256 walletPrincipal = aToken.principalBalanceOf(self);
-    uint256 walletInterest = walletBalance.sub(walletPrincipal);
-    uint256 interestPortion = (walletInterest > amount) ? amount : walletInterest;
-    if (interestPortion <= PERCENTAGE_SCALE) { return 0; }
-
-    // Creator Annuity
-    return interestPortion.mul(nftCreatorAnnuityPct).div(PERCENTAGE_SCALE);
+  function _getPrincipal(address assetToken) internal view returns (uint256) {
+    return _assetPrincipalBalance[assetToken];
   }
 
+  function _getInterest(address assetToken) internal view returns (uint256 creatorInterest, uint256 ownerInterest) {
+    uint256 total = _getTotal(assetToken);
+    uint256 principal = _getPrincipal(assetToken);
+    uint256 interest = total.sub(principal);
 
-  /**
-    * @dev Collects the Required Asset Token from the users wallet
-    */
-  function _collectAssetToken(address assetToken, uint256 assetAmount) internal {
-    uint256 assetBalance = IERC20(assetToken).balanceOf(_walletManager);
-    require(assetAmount <= assetBalance, "AaveSmartWallet: INSUFF_FUNDS");
-    require(IERC20(assetToken).transferFrom(_walletManager, address(this), assetAmount), "AaveSmartWallet: TRANSFER_FAILED");
+    // Creator Royalties
+    if (nftCreatorAnnuityPct > 0) {
+
+      // Interest too small to calculate percentage; split evenly
+      if (interest <= PERCENTAGE_SCALE) {
+        creatorInterest = interest.div(2);
+      }
+
+      // Calculate percentage for Creator
+      else {
+        creatorInterest = interest.mul(nftCreatorAnnuityPct).div(PERCENTAGE_SCALE);
+      }
+    }
+
+    // Owner Portion
+    ownerInterest = interest.sub(creatorInterest);
   }
 
-
-  function _isReserveActive(ILendingPool lendingPool, address assetToken) internal view returns (bool) {
-    (,,,, bool usageAsCollateralEnabled,,, bool isActive) = lendingPool.getReserveConfigurationData(assetToken);
-    return (isActive && usageAsCollateralEnabled);
+  function _collectToken(address from, address token, uint256 amount) internal {
+    require(IERC20(token).transferFrom(from, address(this), amount), "AaveSmartWallet: COLLECT_FAILED");
   }
 
-  function _getReserveAToken(ILendingPool lendingPool, address assetToken) internal view returns (address) {
-    (,,,,,,,,,,, address aTokenAddress,) = lendingPool.getReserveData(assetToken);
-    return aTokenAddress;
+  function _sendToken(address to, address token, uint256 amount) internal {
+    require(IERC20(token).transfer(to, amount), "AaveSmartWallet: SEND_FAILED");
   }
 }

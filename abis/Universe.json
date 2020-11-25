@@ -145,7 +145,12 @@
       },
       {
         "internalType": "uint256",
-        "name": "interestAmount",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "receiverAmount",
         "type": "uint256"
       }
     ],
@@ -211,12 +216,17 @@
       },
       {
         "internalType": "uint256",
+        "name": "principalAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "interestAmount",
+        "name": "receiverAmount",
         "type": "uint256"
       }
     ],

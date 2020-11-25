@@ -1,19 +1,27 @@
-const { toEth, toBN, chainName, getContractAbi, getDeployData, getTxGasCost, presets, saveDeploymentData } = require("../js-utils/deploy-helpers");
+const {
+  chainName,
+  saveDeploymentData,
+  getContractAbi,
+  getDeployData,
+  getTxGasCost,
+  log,
+  presets,
+  toEth,
+  toBN,
+} = require("../js-utils/deploy-helpers");
+
 const _ = require('lodash');
-const { sleep } = require("sleep");
 
 module.exports = async (hre) => {
-
-    let alchemyTimeout = 1;
-
-    const { deployer, protocolOwner, trustedForwarder } = await hre.getNamedAccounts();
+    const { ethers, getNamedAccounts } = hre;
+    const { deployer, protocolOwner } = await getNamedAccounts();
     const network = await hre.network;
-    const log = console.log;
-
-    const ddIon = getDeployData('Ion', network.config.chainId);
+    const alchemyTimeout = 1;
     const deployData = {
         IonTimelocks: []
     };
+
+    const ddIon = getDeployData('Ion', network.config.chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles: Ion Token Timelocks ');
@@ -26,12 +34,10 @@ module.exports = async (hre) => {
     log(' ');
 
     log('  Loading Ion from: ', ddIon.address);
-    const Ion = await hre.ethers.getContractFactory('Ion');
+    const Ion = await ethers.getContractFactory('Ion');
     const ion = await Ion.attach(ddIon.address);
 
-    sleep(alchemyTimeout);
-
-    const IonTimelock = await hre.ethers.getContractFactory('IonTimelock');
+    const IonTimelock = await ethers.getContractFactory('IonTimelock');
     const ionTimelockAbi = getContractAbi('IonTimelock');
     const ionAddress = ddIon.address;
 
@@ -40,19 +46,14 @@ module.exports = async (hre) => {
         if (!ionTimelockDeployData) { return; }
 
         const ionTimelockDeployed = await IonTimelock.attach(ionTimelockDeployData.address);
-
-        sleep(alchemyTimeout);
-
         return ionTimelockDeployed;
     };
 
     const _deployTimelock = async (timelockData) => {
-        log('\n  Deploying Ion Timelock for Receiver: ', timelockData.receiver);
+        log('\n  Deploying Ion Timelock for Receiver: ', timelockData.receiver)(alchemyTimeout);
 
         const ionTimelockInstance = await IonTimelock.deploy(timelockData.receiver, ionAddress);
         const ionTimelockDeployed = await ionTimelockInstance.deployed();
-
-        sleep(alchemyTimeout);
 
         log('  - IonTimelock: ', ionTimelockDeployed.address);
         log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionTimelockDeployed.deployTransaction }));
@@ -60,14 +61,12 @@ module.exports = async (hre) => {
     };
 
     const _mintToTimelock = async (timelockData, ionTimelock) => {
-        log('\n  Minting Ions to Timelock for Receiver: ', timelockData.receiver);
+        log('\n  Minting Ions to Timelock for Receiver: ', timelockData.receiver)(alchemyTimeout);
 
         const amounts = _.map(timelockData.portions, 'amount');
         const timestamps = _.map(timelockData.portions, 'releaseDate');
 
         await ion.mintToTimelock(ionTimelock.address, amounts, timestamps);
-
-        sleep(alchemyTimeout);
 
         const totalMinted = _.reduce(amounts, (sum, amt) => sum.add(amt), toBN('0'));
         log('  - Total Minted: ', toEth(totalMinted));
@@ -88,9 +87,6 @@ module.exports = async (hre) => {
         ionTimelock = await _getDeployedTimelock(ionTimelockData.receiver);
         if (!ionTimelock) {
             ionTimelock = await _deployTimelock(ionTimelockData);
-
-            sleep(alchemyTimeout);
-
             deployTxData['abi'] = ionTimelockAbi;
             deployTxData['deployTransaction'] = ionTimelock.deployTransaction;
         }
@@ -99,9 +95,6 @@ module.exports = async (hre) => {
 
         // Mint
         totalIonAmount = await _mintToTimelock(ionTimelockData, ionTimelock);
-
-        sleep(alchemyTimeout);
-
         deployTxData['mintedIons'] = totalIonAmount;
 
         // Save deployment data

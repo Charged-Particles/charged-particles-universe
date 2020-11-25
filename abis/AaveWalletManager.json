@@ -10,11 +10,11 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "controller",
+        "name": "aaveBridge",
         "type": "address"
       }
     ],
-    "name": "ControllerSet",
+    "name": "AaveBridgeSet",
     "type": "event"
   },
   {
@@ -23,11 +23,11 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "aaveLendingProvider",
+        "name": "controller",
         "type": "address"
       }
     ],
-    "name": "LendingPoolProviderSet",
+    "name": "ControllerSet",
     "type": "event"
   },
   {
@@ -111,7 +111,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "interestAmount",
+        "name": "creatorAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "receiverAmount",
         "type": "uint256"
       }
     ],
@@ -179,7 +185,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "interestAmount",
+        "name": "creatorAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "receiverAmount",
         "type": "uint256"
       }
     ],
@@ -218,6 +230,25 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "rewardsToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "state",
+        "type": "bool"
+      }
+    ],
+    "name": "WhitelistedRewardsTokenSet",
+    "type": "event"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -239,7 +270,12 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "interestAmount",
+        "name": "creatorAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "receiverAmount",
         "type": "uint256"
       }
     ],
@@ -273,7 +309,12 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "interestAmount",
+        "name": "creatorAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "receiverAmount",
         "type": "uint256"
       }
     ],
@@ -366,59 +407,16 @@
         "type": "address"
       }
     ],
-    "name": "getAnnuities",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_uuid",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_assetToken",
-        "type": "address"
-      }
-    ],
-    "name": "getBalance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_uuid",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_assetToken",
-        "type": "address"
-      }
-    ],
     "name": "getInterest",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "creatorInterest",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "ownerInterest",
         "type": "uint256"
       }
     ],
@@ -482,11 +480,35 @@
       },
       {
         "internalType": "address",
-        "name": "_assetToken",
+        "name": "_rewardToken",
         "type": "address"
       }
     ],
     "name": "getRewards",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_uuid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_assetToken",
+        "type": "address"
+      }
+    ],
+    "name": "getTotal",
     "outputs": [
       {
         "internalType": "uint256",
@@ -536,38 +558,12 @@
   },
   {
     "inputs": [],
-    "name": "lendingPoolProvider",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "owner",
     "outputs": [
       {
         "internalType": "address",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "referralCode",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -600,7 +596,12 @@
       },
       {
         "internalType": "uint256",
-        "name": "interestAmount",
+        "name": "creatorAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "receiverAmount",
         "type": "uint256"
       }
     ],
@@ -618,11 +619,30 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "controller",
+        "name": "",
         "type": "address"
       }
     ],
-    "name": "setController",
+    "name": "rewardsTokenWhitelist",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "aaveBridge",
+        "type": "address"
+      }
+    ],
+    "name": "setAaveBridge",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -631,11 +651,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_aaveLendingProvider",
+        "name": "controller",
         "type": "address"
       }
     ],
-    "name": "setLendingPoolProvider",
+    "name": "setController",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -657,11 +677,29 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_referralCode",
+        "name": "referralCode",
         "type": "uint256"
       }
     ],
     "name": "setReferralCode",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_rewardsToken",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_state",
+        "type": "bool"
+      }
+    ],
+    "name": "setWhitelistedRewardsToken",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

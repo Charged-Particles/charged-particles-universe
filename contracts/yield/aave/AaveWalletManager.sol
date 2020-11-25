@@ -23,7 +23,9 @@
 
 pragma solidity 0.6.12;
 
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../../lib/WalletManagerBase.sol";
+
 import "./AaveSmartWallet.sol";
 
 /**
@@ -31,12 +33,16 @@ import "./AaveSmartWallet.sol";
  * @dev Non-upgradeable Contract
  */
 contract AaveWalletManager is WalletManagerBase {
+  using SafeMath for uint256;
 
-  event LendingPoolProviderSet(address indexed aaveLendingProvider);
+  event AaveBridgeSet(address indexed aaveBridge);
+  event WhitelistedRewardsTokenSet(address indexed rewardsToken, bool state);
+  // event WalletMigrated(uint256 indexed uuid, address indexed operator, address indexed assetToken, uint256 creatorAmount, uint256 ownerAmount);
 
-  address public lendingPoolProvider;
-  uint256 public referralCode;
+  address internal _aaveBridge;
+  uint256 internal _referralCode;
 
+  mapping (address => bool) public rewardsTokenWhitelist;
 
   /***********************************|
   |          Initialization           |
@@ -73,16 +79,13 @@ contract AaveWalletManager is WalletManagerBase {
   /**
     * @notice Gets the Interest-Amount that the Token has generated
     * @param _uuid  The ID of the Token
-    * @return  The Interest-Amount of the Token
+    * @return creatorInterest The NFT Creator's portion of the Interest
+    * @return ownerInterest The NFT Owner's portion of the Interest
     */
-  function getInterest(uint256 _uuid, address _assetToken) external override returns (uint256) {
-    if (_wallets[_uuid] == address(0x0)) { return 0; }
-    return AaveSmartWallet(_wallets[_uuid]).getInterest(_assetToken);
-  }
-
-  function getAnnuities(uint256 _uuid, address _assetToken) external override returns (uint256) {
-    if (_wallets[_uuid] == address(0x0)) { return 0; }
-    return AaveSmartWallet(_wallets[_uuid]).getAnnuities(_assetToken);
+  function getInterest(uint256 _uuid, address _assetToken) external override returns (uint256 creatorInterest, uint256 ownerInterest) {
+    if (_wallets[_uuid] != address(0x0)) {
+      return AaveSmartWallet(_wallets[_uuid]).getInterest(_assetToken);
+    }
   }
 
   /**
@@ -90,14 +93,14 @@ contract AaveWalletManager is WalletManagerBase {
     * @param _uuid  The ID of the Token
     * @return  The Available Balance of the Token
     */
-  function getBalance(uint256 _uuid, address _assetToken) external override returns (uint256) {
+  function getTotal(uint256 _uuid, address _assetToken) external override returns (uint256) {
     if (_wallets[_uuid] == address(0x0)) { return 0; }
-    return AaveSmartWallet(_wallets[_uuid]).getBalance(_assetToken);
+    return AaveSmartWallet(_wallets[_uuid]).getTotal(_assetToken);
   }
 
-  function getRewards(uint256 _uuid, address _assetToken) external override returns (uint256) {
+  function getRewards(uint256 _uuid, address _rewardToken) external override returns (uint256) {
     if (_wallets[_uuid] == address(0x0)) { return 0; }
-    return AaveSmartWallet(_wallets[_uuid]).getRewards(_assetToken);
+    return AaveSmartWallet(_wallets[_uuid]).getRewards(_rewardToken);
   }
 
 
@@ -134,7 +137,8 @@ contract AaveWalletManager is WalletManagerBase {
     _collectAssetToken(_msgSender(), _assetToken, _assetAmount);
 
     // Deposit into Smart-Wallet
-    yieldTokensAmount = AaveSmartWallet(wallet).deposit(_assetToken, _assetAmount);
+    IERC20(_assetToken).approve(wallet, _assetAmount);
+    yieldTokensAmount = AaveSmartWallet(wallet).deposit(_assetToken, _assetAmount, _referralCode);
 
     // Log Event
     emit WalletEnergized(_uuid, _assetToken, _assetAmount, yieldTokensAmount);
@@ -148,19 +152,19 @@ contract AaveWalletManager is WalletManagerBase {
     external
     override
     onlyController
-    returns (uint256 interestAmount)
+    returns (uint256 creatorAmount, uint256 receiverAmount)
   {
     address wallet = _wallets[_uuid];
     require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
 
-    uint256 availableInterest = AaveSmartWallet(wallet).getInterest(_assetToken);
-    require(availableInterest > 0, "AaveWalletManager: INSUFF_CHARGE");
+    (, uint256 ownerInterest) = AaveSmartWallet(wallet).getInterest(_assetToken);
+    require(ownerInterest > 0, "AaveWalletManager: INSUFF_CHARGE");
 
     // Discharge the full amount of interest
-    interestAmount = AaveSmartWallet(wallet).withdrawAmount(_receiver, _assetToken, availableInterest);
+    (creatorAmount, receiverAmount) = AaveSmartWallet(wallet).withdrawAmount(_receiver, _assetToken, ownerInterest);
 
     // Log Event
-    emit WalletDischarged(_uuid, _assetToken, interestAmount);
+    emit WalletDischarged(_uuid, _assetToken, creatorAmount, receiverAmount);
   }
 
   function dischargeAmount(
@@ -172,19 +176,19 @@ contract AaveWalletManager is WalletManagerBase {
     external
     override
     onlyController
-    returns (uint256 interestAmount)
+    returns (uint256 creatorAmount, uint256 receiverAmount)
   {
     address wallet = _wallets[_uuid];
     require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
 
-    uint256 availableInterest = AaveSmartWallet(wallet).getInterest(_assetToken);
-    require(_assetAmount > 0 && availableInterest >= _assetAmount, "AaveWalletManager: INSUFF_CHARGE");
+    (, uint256 ownerInterest) = AaveSmartWallet(wallet).getInterest(_assetToken);
+    require(_assetAmount > 0 && ownerInterest >= _assetAmount, "AaveWalletManager: INSUFF_CHARGE");
 
     // Discharge a portion of the interest
-    interestAmount = AaveSmartWallet(wallet).withdrawAmount(_receiver, _assetToken, _assetAmount);
+    (creatorAmount, receiverAmount) = AaveSmartWallet(wallet).withdrawAmount(_receiver, _assetToken, _assetAmount);
 
     // Log Event
-    emit WalletDischarged(_uuid, _assetToken, interestAmount);
+    emit WalletDischarged(_uuid, _assetToken, creatorAmount, receiverAmount);
   }
 
   function release(
@@ -195,18 +199,17 @@ contract AaveWalletManager is WalletManagerBase {
     external
     override
     onlyController
-    returns (uint256 principalAmount, uint256 interestAmount)
+    returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount)
   {
     address wallet = _wallets[_uuid];
     require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
 
-    // Release Assets to Receiver
+    // Release Principal + Interest
     principalAmount = AaveSmartWallet(wallet).getPrincipal(_assetToken);
-    interestAmount = AaveSmartWallet(wallet).getInterest(_assetToken);
-    AaveSmartWallet(wallet).withdraw(_receiver, _assetToken);
+    (creatorAmount, receiverAmount) = AaveSmartWallet(wallet).withdraw(_receiver, _assetToken);
 
     // Log Event
-    emit WalletReleased(_uuid, _receiver, _assetToken, principalAmount, interestAmount);
+    emit WalletReleased(_uuid, _receiver, _assetToken, principalAmount, creatorAmount, receiverAmount);
   }
 
   function withdrawRewards(
@@ -222,6 +225,7 @@ contract AaveWalletManager is WalletManagerBase {
   {
     address wallet = _wallets[_uuid];
     require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
+    require(rewardsTokenWhitelist[_rewardsToken], "AaveWalletManager: INVALID_REWARD_TOKEN");
 
     // Withdraw Rewards to Receiver
     amount = AaveSmartWallet(wallet).withdrawRewards(_receiver, _rewardsToken, _rewardsAmount);
@@ -250,21 +254,41 @@ contract AaveWalletManager is WalletManagerBase {
     return AaveSmartWallet(wallet).executeForAccount(contractAddress, ethValue, encodedParams);
   }
 
+  // function migrateToAaveV2(
+  //   uint256 _uuid,
+  //   address assetToken
+  // )
+  //   external
+  //   returns (uint256 creatorAmount, uint256 amountMigrated)
+  // {
+  //   require(enableAaveV2, "AaveSmartWallet: V2_NOT_ENABLED");
+
+  //   address wallet = _wallets[_uuid];
+  //   (amountMigrated, creatorAmount) = AaveSmartWallet(wallet).migrateToAaveV2(assetToken);
+
+  //   // Log Event
+  //   emit WalletMigrated(_uuid, msg.sender, assetToken, creatorAmount, amountMigrated);
+  // }
 
 
   /***********************************|
   |          Only Admin/DAO           |
   |__________________________________*/
 
-  function setLendingPoolProvider(address _aaveLendingProvider) external onlyOwner {
-    require(_aaveLendingProvider != address(0x0), "AaveWalletManager: INVALID_LENDING_POOL");
-    lendingPoolProvider = _aaveLendingProvider;
-    emit LendingPoolProviderSet(_aaveLendingProvider);
+  function setAaveBridge(address aaveBridge) external onlyOwner {
+    require(aaveBridge != address(0x0), "AaveWalletManager: INVALID_LP_BRIDGE");
+    _aaveBridge = aaveBridge;
+    emit AaveBridgeSet(aaveBridge);
   }
 
   // ref: https://docs.aave.com/developers/developing-on-aave/the-protocol/lendingpool
-  function setReferralCode(uint256 _referralCode) external onlyOwner {
-    referralCode = _referralCode;
+  function setReferralCode(uint256 referralCode) external onlyOwner {
+    _referralCode = referralCode;
+  }
+
+  function setWhitelistedRewardsToken(address _rewardsToken, bool _state) external onlyOwner {
+    rewardsTokenWhitelist[_rewardsToken] = _state;
+    emit WhitelistedRewardsTokenSet(_rewardsToken, _state);
   }
 
 
@@ -272,15 +296,12 @@ contract AaveWalletManager is WalletManagerBase {
   |         Private Functions         |
   |__________________________________*/
 
-  /**
-    * @dev todo..
-    */
   function _createWallet()
     internal
     returns (address)
   {
     address newWallet = _createClone(_walletTemplate);
-    AaveSmartWallet(newWallet).initialize(lendingPoolProvider, referralCode);
+    AaveSmartWallet(newWallet).initialize(_aaveBridge);
     return newWallet;
   }
 }

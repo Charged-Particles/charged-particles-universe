@@ -12,10 +12,10 @@
     "npm": ">=6.14.4"
   },
   "scripts": {
-    "reinstall": "rm -rf node_modules && rm -f yarn.lock && yarn clean && yarn clean-test && yarn",
+    "reinstall": "rm -rf node_modules && rm -f yarn.lock && yarn clean && yarn",
     "verify": "yarn hint && yarn test",
     "clean": "rm -rf build cache",
-    "clean-deployed": "rm -rf abis deployed && rm -f .openzeppelin/ropsten.json",
+    "clean-deployed": "rm -rf abis && rm -f .openzeppelin/ropsten.json && rm -f .openzeppelin/kovan.json && rm -f .openzeppelin/rinkeby.json",
     "clean-test": "rm -rf .openzeppelin/${npm_config_network:-mainnet}.json deployments/${npm_config_network:-hardhat}/*.json test-results.xml",
     "compile": "hardhat --show-stack-traces --max-memory 8192 compile",
     "test": "yarn clean-test && hardhat --show-stack-traces test --deploy-fixture",
@@ -25,10 +25,6 @@
     "start": "hardhat node --port 8545",
     "deploy": "yarn clean-test && hardhat deploy",
     "gen-docs": "solidity-docgen -i contracts -o docs"
-  },
-  "dependencies": {
-    "hardhat-deploy": "^0.7.0-beta.28",
-    "hardhat-deploy-ethers": "^0.3.0-beta.5"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
@@ -51,6 +47,8 @@
     "ganache-cli": "^6.9.0",
     "hardhat": "^2.0.3",
     "hardhat-abi-exporter": "^2.0.6",
+    "hardhat-deploy": "^0.7.0-beta.28",
+    "hardhat-deploy-ethers": "^0.3.0-beta.5",
     "hardhat-gas-reporter": "^1.0.1",
     "lodash": "^4.17.15",
     "mocha-junit-reporter": "^2.0.0",

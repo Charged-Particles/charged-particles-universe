@@ -1,17 +1,22 @@
-const { chainName, getContractAbi, getDeployData, getTxGasCost, presets, saveDeploymentData } = require("../js-utils/deploy-helpers");
+const {
+  chainName,
+  saveDeploymentData,
+  getContractAbi,
+  getDeployData,
+  getTxGasCost,
+  log,
+  presets,
+} = require("../js-utils/deploy-helpers");
 const _ = require('lodash');
-const { sleep } = require("sleep");
 
 module.exports = async (hre) => {
-
-    let alchemyTimeout = 1;
-
-    const { deployer, protocolOwner, trustedForwarder } = await hre.getNamedAccounts();
+    const { ethers, getNamedAccounts } = hre;
+    const { deployer, protocolOwner } = await getNamedAccounts();
     const network = await hre.network;
-    const log = console.log;
+    const alchemyTimeout = 1;
+    const deployData = {};
 
     const ddUniverse = getDeployData('Universe', network.config.chainId);
-    const deployData = {};
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles FT: Ion - Contract Initialization');
@@ -24,22 +29,23 @@ module.exports = async (hre) => {
     log(' ');
 
     log('  Loading Universe from: ', ddUniverse.address);
-    const Universe = await hre.ethers.getContractFactory('Universe');
+    const Universe = await ethers.getContractFactory('Universe');
     const universe = await Universe.attach(ddUniverse.address);
 
-    sleep(alchemyTimeout);
-
-    log('\n  Deploying Ion FT...');
-    const Ion = await hre.ethers.getContractFactory('Ion');
+    log('\n  Deploying Ion FT...')(alchemyTimeout);
+    const Ion = await ethers.getContractFactory('Ion');
     const IonInstance = await Ion.deploy();
     const ion = await IonInstance.deployed();
+    deployData['Ion'] = {
+      abi: getContractAbi('Ion'),
+      address: ion.address,
+      deployTransaction: ion.deployTransaction,
+    }
 
-    sleep(alchemyTimeout);
-
-    log('  - Registering Universe with Ion...');
+    log('  - Registering Universe with Ion...')(alchemyTimeout);
     await ion.setUniverse(ddUniverse.address);
 
-    log('  - Registering Ion with Universe...');
+    log('  - Registering Ion with Universe...')(alchemyTimeout);
     await universe.setIonToken(ion.address);
 
     let assetTokenId;
@@ -50,23 +56,16 @@ module.exports = async (hre) => {
         assetTokenAddress = _.get(presets, assetTokenId, {})[network.config.chainId];
         assetTokenMultiplier = presets.Ion.rewardsForAssetTokens[i].multiplier;
 
-        log('  - Setting Rewards Multiplier for Asset Token: ', assetTokenAddress, ' to: ', assetTokenMultiplier);
+        log('  - Setting Rewards Multiplier for Asset Token: ', assetTokenAddress, ' to: ', assetTokenMultiplier)(alchemyTimeout);
         await universe.setIonRewardsMultiplier(assetTokenAddress, assetTokenMultiplier);
-
-        sleep(alchemyTimeout);
     }
 
     // Display Contract Addresses
-    log('\n  Contract Deployments Complete!\n\n  Contracts:');
+    log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
     log('  - Ion:         ', ion.address);
     log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ion.deployTransaction }));
 
-    saveDeploymentData(network.config.chainId, {'Ion': {
-        abi: getContractAbi('Ion'),
-        address: ion.address,
-        deployTransaction: ion.deployTransaction,
-    }})
-
+    saveDeploymentData(network.config.chainId, deployData);
     log('\n  Contract Deployment Data saved to "deployed" directory.');
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');

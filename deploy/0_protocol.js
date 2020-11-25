@@ -1,13 +1,18 @@
-const { chainName, getContractAbi, getTxGasCost, presets, saveDeploymentData } = require("../js-utils/deploy-helpers");
-const { sleep } = require("sleep");
+const {
+  chainName,
+  saveDeploymentData,
+  getContractAbi,
+  getTxGasCost,
+  log,
+  presets,
+} = require("../js-utils/deploy-helpers");
 
 module.exports = async (hre) => {
-
-    let alchemyTimeout = 1;
-
-    const { deployer, protocolOwner, trustedForwarder } = await hre.getNamedAccounts();
+    const { ethers, upgrades, getNamedAccounts } = hre;
+    const { deployer, protocolOwner, trustedForwarder } = await getNamedAccounts();
     const network = await hre.network;
-    const log = console.log;
+    const alchemyTimeout = 1;
+    const deployData = {};
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Initialization');
@@ -20,64 +25,47 @@ module.exports = async (hre) => {
     log('  - Trusted Forwarder: ', trustedForwarder);
     log(' ');
 
-
     log('  Deploying Universe...');
-    const Universe = await hre.ethers.getContractFactory('Universe');
-    universe = await hre.upgrades.deployProxy(Universe, [], { initializer: 'initialize' });
-    await universe.deployed();
-    // let universe = await hre.deployments.deploy('Universe', {
-    //     from: protocolOwner,
-    //     proxy: {
-    //       methodName: 'initialize',
-    //     },
-    //     args: []
-    //   });
+    const Universe = await ethers.getContractFactory('Universe');
+    const UniverseInstance = await upgrades.deployProxy(Universe, []);
+    const universe = await UniverseInstance.deployed();
+    deployData['Universe'] = {
+      abi: getContractAbi('Universe'),
+      address: universe.address,
+      deployTransaction: universe.deployTransaction,
+    }
 
-    sleep(alchemyTimeout);
+    log('  Deploying ChargedParticles...')(alchemyTimeout);
+    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
+    const ChargedParticlesInstance = await upgrades.deployProxy(ChargedParticles, [trustedForwarder]);
+    const chargedParticles = await ChargedParticlesInstance.deployed();
+    deployData['ChargedParticles'] = {
+      abi: getContractAbi('ChargedParticles'),
+      address: chargedParticles.address,
+      deployTransaction: chargedParticles.deployTransaction,
+    }
 
-    log('  Deploying ChargedParticles...');
-    const ChargedParticles = await hre.ethers.getContractFactory('ChargedParticles');
-    chargedParticles = await hre.upgrades.deployProxy(ChargedParticles, [trustedForwarder], { initializer: 'initialize' });
-    await chargedParticles.deployed();
-    // let chargedParticles = await hre.deployments.deploy('ChargedParticles', {
-    //     from: protocolOwner,
-    //     proxy: {
-    //       methodName: 'initialize',
-    //     },
-    //     args: [trustedForwarder]
-    //   });
-
-    sleep(alchemyTimeout);
-
-    log('  - Registering ChargedParticles with Universe...');
+    log('  - Registering ChargedParticles with Universe...')(alchemyTimeout);
     await universe.setChargedParticles(chargedParticles.address);
 
-    sleep(alchemyTimeout);
-
-    log('  - Registering Universe with ChargedParticles...');
+    log('  - Registering Universe with ChargedParticles...')(alchemyTimeout);
     await chargedParticles.setUniverse(universe.address);
 
-    sleep(alchemyTimeout);
-
-    log('  - Setting Deposit Fee...');
+    log('  - Setting Deposit Fee...')(alchemyTimeout);
     await chargedParticles.setDepositFee(presets.ChargedParticles.fees.deposit);
 
-    sleep(alchemyTimeout);
-
-    // log(`  Transferring Contract Ownership to '${owner}'...`);
+    // log(`  Transferring Contract Ownership to '${owner}'...`)(alchemyTimeout);
     // await universe.transferOwnership(owner);
     // await chargedParticles.transferOwnership(owner);
 
     // Display Contract Addresses
-    log('\n  Contract Deployments Complete!\n\n  Contracts:');
+    log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
     log('  - Universe:         ', universe.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
     log('  - ChargedParticles: ', chargedParticles.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedParticles.deployTransaction }));
 
-    saveDeploymentData(network.config.chainId, { 'Universe': { abi: getContractAbi('Universe'), address: universe.address, deployTransaction: universe.deployTransaction }});
-    saveDeploymentData(network.config.chainId, { 'ChargedParticles': { abi: getContractAbi('ChargedParticles'), address: chargedParticles.address, deployTransaction: chargedParticles.deployTransaction }});
-
+    saveDeploymentData(network.config.chainId, deployData);
     log('\n  Contract Deployment Data saved to "deployed" directory.');
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
