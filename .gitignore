@@ -19,7 +19,7 @@ cache
 # OpenZeppelin
 .openzeppelin/dev-*.json
 .openzeppelin/.session
-.openzeppelin/.mainnet
+.openzeppelin/mainnet.json
 deployments/hardhat/*.json
 
 
