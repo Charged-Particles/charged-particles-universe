@@ -20,13 +20,13 @@ async function main() {
   // Named accounts, defined in buidler.config.js:
   const { deployer, owner } = await getNamedAccounts();
 
-  const deployData = getDeployData({chainId: network.chainId});
+  const deployData = getDeployData({chainId: network.config.chainId});
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles: Mint Ion Tokens ');
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-  log('  Using Network: ', chainName(network.chainId));
+  log('  Using Network: ', chainName(network.config.chainId));
   log('  Using Accounts:');
   log('  - Deployer:    ', deployer);
   log('  - Owner:       ', owner);
@@ -61,7 +61,7 @@ async function main() {
   // Display Contract Addresses
   log('\n  Contract Deployments Complete!');
 
-  const filename = saveDeploymentData({chainId: network.chainId, deployData});
+  const filename = saveDeploymentData({chainId: network.config.chainId, deployData});
   log('\n  Contract Deployment Data saved to file: ');
   log('   ', filename);
 

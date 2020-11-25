@@ -15,7 +15,7 @@
     "reinstall": "rm -rf node_modules && rm -f yarn.lock && yarn clean && yarn",
     "verify": "yarn hint && yarn test",
     "clean": "rm -rf build cache",
-    "clean-deployed": "rm -rf abis deployed && rm -f .openzeppelin/ropsten.json && rm -f .openzeppelin/kovan.json && rm -f .openzeppelin/rinkeby.json",
+    "clean-deployed": "rm -rf abis && rm -f .openzeppelin/ropsten.json && rm -f .openzeppelin/kovan.json && rm -f .openzeppelin/rinkeby.json",
     "clean-test": "rm -rf .openzeppelin/${npm_config_network:-mainnet}.json deployments/${npm_config_network:-hardhat}/*.json test-results.xml",
     "compile": "hardhat --show-stack-traces --max-memory 8192 compile",
     "test": "yarn clean-test && hardhat --show-stack-traces test --deploy-fixture",

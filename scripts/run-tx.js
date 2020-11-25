@@ -16,14 +16,14 @@ async function main() {
   // Named accounts, defined in buidler.config.js:
   const { deployer, owner } = await getNamedAccounts();
 
-  const ddChargedParticles = getDeployData('ChargedParticles', network.chainId);
-  const ddAaveWalletManager = getDeployData('AaveWalletManager', network.chainId);
+  const ddChargedParticles = getDeployData('ChargedParticles', network.config.chainId);
+  const ddAaveWalletManager = getDeployData('AaveWalletManager', network.config.chainId);
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles: Execute Transaction');
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-  log('  Using Network: ', chainName(network.chainId));
+  log('  Using Network: ', chainName(network.config.chainId));
   log('  Using Accounts:');
   log('  - Deployer:    ', deployer);
   log('  - Owner:       ', owner);

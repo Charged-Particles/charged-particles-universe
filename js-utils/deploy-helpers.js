@@ -12,8 +12,13 @@ const weiPerEth = ethers.constants.WeiPerEther;
 
 const txOverrides = (options = {}) => ({gasLimit: 15000000, ...options});
 
+const log = (...args) => {
+  console.log(...args);
+  return (delay = 0) => (delay && sleep(delay))
+}
+
 const chainName = (chainId) => {
-  switch (chainId) {
+  switch (parseInt(chainId, 10)) {
     case 1: return 'Mainnet'
     case 3: return 'Ropsten'
     case 42: return 'Kovan'
@@ -109,6 +114,7 @@ const presets = {
       3: '0',
       4: '0',
       42: '0',
+      31337: '0',
     },
     v1: {
       dai: {
@@ -116,12 +122,14 @@ const presets = {
         3: '0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108', // ropsten
         4: '', // rinkeby
         42: '0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD', // kovan
+        31337: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // Hardhat - Forked Mainnet
       },
       lendingPoolProvider: {
         1: '0x24a42fD28C976A61Df5D00D0599C34c4f90748c8', // mainnet
         3: '0x1c8756FD2B28e9426CDBDcC7E3c4d64fa9A54728', // ropsten
         4: '', // rinkeby
         42: '0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5', // kovan
+        31337: '0x24a42fD28C976A61Df5D00D0599C34c4f90748c8', // Hardhat - Forked Mainnet
       }
     },
     v2: {
@@ -130,12 +138,14 @@ const presets = {
         3: '', // ropsten
         4: '', // rinkeby
         42: '0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD', // kovan
+        31337: '', // Hardhat - Forked Mainnet
       },
       lendingPoolProvider: {
         1: '', // mainnet
         3: '', // ropsten
         4: '', // rinkeby
         42: '0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b', // kovan
+        31337: '', // Hardhat - Forked Mainnet
       }
     }
   }
@@ -231,8 +241,7 @@ module.exports = {
   getContractAbi,
   getDeployData,
   getTxGasCost,
-  // contractDeployer,
-  // contractManager,
+  log,
   presets,
   toWei,
   toEth,
