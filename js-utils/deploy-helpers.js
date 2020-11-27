@@ -17,10 +17,22 @@ const log = (...args) => {
   return (delay = 0) => (delay && sleep(delay))
 }
 
-const chainName = (chainId) => {
+const chainIdByName = (chainName) => {
+  switch (_.toLower(chainName)) {
+    case 'mainnet': return 1
+    case 'ropsten': return 3
+    case 'rinkeby': return 4
+    case 'kovan': return 42
+    case 'hardhat': return 31337
+    default: return 0
+  }
+};
+
+const chainNameById = (chainId) => {
   switch (parseInt(chainId, 10)) {
     case 1: return 'Mainnet'
     case 3: return 'Ropsten'
+    case 4: return 'Rinkeby'
     case 42: return 'Kovan'
     case 31337: return 'Hardhat'
     default: return 'Unknown'
@@ -41,7 +53,7 @@ const ensureDirectoryExistence = (filePath) => {
 };
 
 const saveDeploymentData = (chainId, deployData) => {
-  const network = chainName(chainId).toLowerCase();
+  const network = chainNameById(chainId).toLowerCase();
   const deployPath = path.join(__dirname, '..', 'deployments', network);
 
   _.forEach(_.keys(deployData), (contractName) => {
@@ -66,7 +78,7 @@ const getContractAbi = (contractName) => {
 };
 
 const getDeployData = (contractName, chainId) => {
-  const network = chainName(chainId).toLowerCase();
+  const network = chainNameById(chainId).toLowerCase();
   const deployPath = path.join(__dirname, '..', 'deployments', network);
   const filename = `${deployPath}/${contractName}.json`;
   const contractJson = require(filename);
@@ -93,28 +105,28 @@ const presets = {
       {
         receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76',  // Testing - Account 3
         portions: [
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('27 Nov 2020 00:00:00 GMT')},
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('28 Nov 2020 00:00:00 GMT')},
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('29 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('27 Dec 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('28 Dec 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('29 Dec 2020 00:00:00 GMT')},
         ]
       },
       {
         receiver: '0xF55D5df4fa26c454a5635B4697C2Acf92f55cfD8',  // Testing - Account 4
         portions: [
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('27 Nov 2020 00:00:00 GMT')},
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('28 Nov 2020 00:00:00 GMT')},
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('29 Nov 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('27 Dec 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('28 Dec 2020 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('29 Dec 2020 00:00:00 GMT')},
         ]
       },
     ],
   },
   Aave: {
     referralCode: {
-      1: '0',
-      3: '0',
-      4: '0',
-      42: '0',
-      31337: '0',
+      1: '',
+      3: '',
+      4: '',
+      42: '',
+      31337: '',
     },
     v1: {
       dai: {
@@ -236,7 +248,8 @@ const presets = {
 
 module.exports = {
   txOverrides,
-  chainName,
+  chainNameById,
+  chainIdByName,
   saveDeploymentData,
   getContractAbi,
   getDeployData,

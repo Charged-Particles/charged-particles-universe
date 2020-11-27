@@ -3,7 +3,7 @@ const { ethers, upgrades, getNamedAccounts, deployments } = require('@nomiclabs/
 const _ = require('lodash');
 
 const {
-  chainName,
+  chainNameById,
   getDeployData,
   getContractAbi,
   getTxGasCost,
@@ -26,7 +26,7 @@ async function main() {
   log('Charged Particles: Mint Ion Tokens ');
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-  log('  Using Network: ', chainName(network.config.chainId));
+  log('  Using Network: ', chainNameById(network.config.chainId));
   log('  Using Accounts:');
   log('  - Deployer:    ', deployer);
   log('  - Owner:       ', owner);

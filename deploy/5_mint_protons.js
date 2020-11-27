@@ -1,12 +1,13 @@
 const {
-  chainName,
+  chainNameById,
+  chainIdByName,
   getDeployData,
   log,
 } = require("../js-utils/deploy-helpers");
 
 const _ = require('lodash');
 
-const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZUzTfddYk56W39okxjf3UrZZRUs3dK33DCRaLbARdRGb';
+const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
 
 module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;
@@ -14,16 +15,18 @@ module.exports = async (hre) => {
     const network = await hre.network;
     const alchemyTimeout = 1;
 
+    const chainId = chainIdByName(network.name);
+
     const protonCreator = await ethers.provider.getSigner(user1);
 
-    const ddProton = getDeployData('Proton', network.config.chainId);
+    const ddProton = getDeployData('Proton', chainId);
 
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles: Mint Ion Tokens ');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-    log('  Using Network: ', chainName(network.config.chainId));
+    log('  Using Network: ', chainNameById(chainId));
     log('  Using Accounts:');
     log('  - Creator:     ', user1);
     log('  - Receiver 1:  ', user2);
