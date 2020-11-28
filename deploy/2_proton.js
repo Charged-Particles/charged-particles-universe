@@ -1,5 +1,6 @@
 const {
-  chainName,
+  chainNameById,
+  chainIdByName,
   saveDeploymentData,
   getContractAbi,
   getDeployData,
@@ -14,13 +15,15 @@ module.exports = async (hre) => {
     const alchemyTimeout = 1;
     const deployData = {};
 
-    const ddChargedParticles = getDeployData('ChargedParticles', network.config.chainId);
+    const chainId = chainIdByName(network.name);
+
+    const ddChargedParticles = getDeployData('ChargedParticles', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles NFT: Proton - Contract Initialization');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-    log('  Using Network: ', chainName(network.config.chainId));
+    log('  Using Network: ', chainNameById(chainId));
     log('  Using Accounts:');
     log('  - Deployer:    ', deployer);
     log('  - Owner:       ', protocolOwner);
@@ -51,7 +54,7 @@ module.exports = async (hre) => {
     log('  - Proton:      ', proton.address);
     log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
 
-    saveDeploymentData(network.config.chainId, deployData);
+    saveDeploymentData(chainId, deployData);
     log('\n  Contract Deployment Data saved to "deployed" directory.');
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');

@@ -1,5 +1,6 @@
 const {
-  chainName,
+  chainNameById,
+  chainIdByName,
   saveDeploymentData,
   getContractAbi,
   getDeployData,
@@ -16,13 +17,15 @@ module.exports = async (hre) => {
     const alchemyTimeout = 1;
     const deployData = {};
 
-    const ddUniverse = getDeployData('Universe', network.config.chainId);
+    const chainId = chainIdByName(network.name);
+
+    const ddUniverse = getDeployData('Universe', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles FT: Ion - Contract Initialization');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-    log('  Using Network: ', chainName(network.config.chainId));
+    log('  Using Network: ', chainNameById(chainId));
     log('  Using Accounts:');
     log('  - Deployer:    ', deployer);
     log('  - Owner:       ', protocolOwner);
@@ -53,7 +56,7 @@ module.exports = async (hre) => {
     let assetTokenMultiplier;
     for (let i = 0; i < presets.Ion.rewardsForAssetTokens.length; i++) {
         assetTokenId = presets.Ion.rewardsForAssetTokens[i].assetTokenId;
-        assetTokenAddress = _.get(presets, assetTokenId, {})[network.config.chainId];
+        assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
         assetTokenMultiplier = presets.Ion.rewardsForAssetTokens[i].multiplier;
 
         log('  - Setting Rewards Multiplier for Asset Token: ', assetTokenAddress, ' to: ', assetTokenMultiplier)(alchemyTimeout);
@@ -65,7 +68,7 @@ module.exports = async (hre) => {
     log('  - Ion:         ', ion.address);
     log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ion.deployTransaction }));
 
-    saveDeploymentData(network.config.chainId, deployData);
+    saveDeploymentData(chainId, deployData);
     log('\n  Contract Deployment Data saved to "deployed" directory.');
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');

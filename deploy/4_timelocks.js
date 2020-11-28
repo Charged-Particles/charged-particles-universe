@@ -1,5 +1,6 @@
 const {
-  chainName,
+  chainNameById,
+  chainIdByName,
   saveDeploymentData,
   getContractAbi,
   getDeployData,
@@ -21,13 +22,15 @@ module.exports = async (hre) => {
         IonTimelocks: []
     };
 
-    const ddIon = getDeployData('Ion', network.config.chainId);
+    const chainId = chainIdByName(network.name);
+
+    const ddIon = getDeployData('Ion', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles: Ion Token Timelocks ');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-    log('  Using Network: ', chainName(network.config.chainId));
+    log('  Using Network: ', chainNameById(chainId));
     log('  Using Accounts:');
     log('  - Deployer:    ', deployer);
     log('  - Owner:       ', protocolOwner);
@@ -103,7 +106,7 @@ module.exports = async (hre) => {
 
     log('\n  Contract Deployments & Ion Minting Complete!');
 
-    saveDeploymentData(network.config.chainId, deployData);
+    saveDeploymentData(chainId, deployData);
     log('\n  Contract Deployment Data saved to "deployed" directory.');
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');

@@ -1,5 +1,6 @@
 const {
-  chainName,
+  chainNameById,
+  chainIdByName,
   saveDeploymentData,
   getContractAbi,
   getTxGasCost,
@@ -14,11 +15,13 @@ module.exports = async (hre) => {
     const alchemyTimeout = 1;
     const deployData = {};
 
+    const chainId = chainIdByName(network.name);
+
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Initialization');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-    log('  Using Network: ', chainName(network.config.chainId));
+    log('  Using Network: ', chainNameById(chainId));
     log('  Using Accounts:');
     log('  - Deployer:          ', deployer);
     log('  - Owner:             ', protocolOwner);
@@ -65,7 +68,7 @@ module.exports = async (hre) => {
     log('  - ChargedParticles: ', chargedParticles.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedParticles.deployTransaction }));
 
-    saveDeploymentData(network.config.chainId, deployData);
+    saveDeploymentData(chainId, deployData);
     log('\n  Contract Deployment Data saved to "deployed" directory.');
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');

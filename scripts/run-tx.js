@@ -3,7 +3,7 @@ const { ethers, getNamedAccounts } = require('@nomiclabs/buidler');
 const _ = require('lodash');
 
 const {
-  chainName,
+  chainNameById,
   getDeployData,
 } = require('../js-utils/deploy-helpers');
 
@@ -23,7 +23,7 @@ async function main() {
   log('Charged Particles: Execute Transaction');
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-  log('  Using Network: ', chainName(network.config.chainId));
+  log('  Using Network: ', chainNameById(network.config.chainId));
   log('  Using Accounts:');
   log('  - Deployer:    ', deployer);
   log('  - Owner:       ', owner);
