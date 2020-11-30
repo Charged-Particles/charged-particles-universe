@@ -26,21 +26,27 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 import "../interfaces/IChargedParticles.sol";
 
 contract Proton is ERC721, Ownable {
+  using SafeMath for uint256;
   using Counters for Counters.Counter;
 
   event ChargedParticlesSet(address indexed chargedParticles);
+  event MintFeeSet(uint256 fee);
+  event FeesWithdrawn(address indexed receiver, uint256 amount);
 
   IChargedParticles internal _chargedParticles;
 
   Counters.Counter internal _tokenIds;
 
   mapping (uint256 => address) internal _tokenCreator;
+
+  uint256 public mintFee;
 
 
   /***********************************|
@@ -69,19 +75,15 @@ contract Proton is ERC721, Ownable {
     bool burnToRelease
   )
     public
+    payable
+    requireMintFee
     returns (uint256 newTokenId)
   {
     newTokenId = createProton(creator, receiver, tokenMetaUri, annuityPercent, burnToRelease);
 
-    _collectAssetToken(_msgSender(), assetToken, assetAmount);
+    chargedParticle(newTokenId, liquidityProviderId, assetToken, assetAmount);
 
-    _chargedParticles.energizeParticle(
-      address(this),
-      newTokenId,
-      liquidityProviderId,
-      assetToken,
-      assetAmount
-    );
+    _refundOverpayment();
   }
 
   function createProton(
@@ -92,6 +94,8 @@ contract Proton is ERC721, Ownable {
     bool burnToRelease
   )
     public
+    payable
+    requireMintFee
     returns (uint256 newTokenId)
   {
     require(address(_chargedParticles) != address(0x0), "Proton: charged particles not set");
@@ -111,6 +115,27 @@ contract Proton is ERC721, Ownable {
       annuityPercent,
       burnToRelease
     );
+
+    _refundOverpayment();
+  }
+
+  function chargedParticle(
+    uint256 tokenId,
+    string calldata liquidityProviderId,
+    address assetToken,
+    uint256 assetAmount
+  )
+    public
+  {
+    _collectAssetToken(_msgSender(), assetToken, assetAmount);
+
+    _chargedParticles.energizeParticle(
+      address(this),
+      tokenId,
+      liquidityProviderId,
+      assetToken,
+      assetAmount
+    );
   }
 
 
@@ -126,6 +151,18 @@ contract Proton is ERC721, Ownable {
     emit ChargedParticlesSet(chargedParticles);
   }
 
+  function setMintFee(uint256 newMintFee) external onlyOwner {
+    mintFee = newMintFee;
+    emit MintFeeSet(newMintFee);
+  }
+
+  function withdrawFees(address payable receiver) external onlyOwner {
+    uint256 amount = address(this).balance;
+    if (amount > 0) {
+      receiver.transfer(amount);
+      emit FeesWithdrawn(receiver, amount);
+    }
+  }
 
   /***********************************|
   |         Private Functions         |
@@ -141,5 +178,17 @@ contract Proton is ERC721, Ownable {
     require(assetAmount <= _userAssetBalance, "Proton: INSUFF_ASSETS");
     // Be sure to Approve this Contract to transfer your Asset Token
     require(IERC20(assetToken).transferFrom(from, address(this), assetAmount), "Proton: TRANSFER_FAILED");
+  }
+
+  function _refundOverpayment() internal {
+    uint256 overage = msg.value.sub(mintFee);
+    if (overage > 0) {
+      _msgSender().transfer(overage);
+    }
+  }
+
+  modifier requireMintFee() {
+    require(msg.value >= mintFee, "Proton: INSUFF_FEE");
+    _;
   }
 }

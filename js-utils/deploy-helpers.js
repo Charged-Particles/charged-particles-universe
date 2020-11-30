@@ -97,6 +97,9 @@ const presets = {
       deposit: 50, // 0.5%
     }
   },
+  Proton: {
+    mintFee: toWei('0.001')
+  },
   Ion: {
     rewardsForAssetTokens: [
       {assetTokenId: 'Aave.v1.dai', multiplier: '5000'}, // DAI
