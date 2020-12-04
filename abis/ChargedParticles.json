@@ -5,6 +5,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "depositFeeLimit",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "depositFee",
         "type": "uint256"
       }
@@ -451,19 +457,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "depositFee",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -804,30 +797,6 @@
       }
     ],
     "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "assetAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "getTotalFeeForDeposit",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1192,12 +1161,17 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "fee",
-        "type": "uint256"
+        "internalType": "uint256[]",
+        "name": "limits",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "fees",
+        "type": "uint256[]"
       }
     ],
-    "name": "setDepositFee",
+    "name": "setDepositFees",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

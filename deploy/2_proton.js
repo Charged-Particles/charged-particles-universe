@@ -48,7 +48,7 @@ module.exports = async (hre) => {
     log('  - Registering ChargedParticles with Proton...')(alchemyTimeout);
     await proton.setChargedParticles(ddChargedParticles.address);
 
-    log('  - Setting Proton Mint Fee:', mintFee.toString(10))(alchemyTimeout);
+    log('  - Setting Proton Mint Fee:', mintFee.toString())(alchemyTimeout);
     await proton.setMintFee(mintFee);
 
     log('  - Registering Proton with ChargedParticles...')(alchemyTimeout);

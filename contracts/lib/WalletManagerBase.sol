@@ -85,17 +85,6 @@ abstract contract WalletManagerBase is Ownable, IWalletManager {
   |__________________________________*/
 
   /**
-    * @dev Collects the Required Asset Token from the users wallet
-    */
-  function _collectAssetToken(address _from, address _assetToken, uint256 _assetAmount) internal {
-    IERC20 assetToken = IERC20(_assetToken);
-    uint256 userAssetBalance = assetToken.balanceOf(_from);
-    require(_assetAmount <= userAssetBalance, "AaveWalletManager: INSUFF_FUNDS");
-    // Be sure to Approve this Contract to transfer your Asset Token
-    require(assetToken.transferFrom(_from, address(this), _assetAmount), "AaveWalletManager: TRANSFER_FAILED");
-  }
-
-  /**
     * @dev Creates Contracts from a Template via Cloning
     * see: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1167.md
     */

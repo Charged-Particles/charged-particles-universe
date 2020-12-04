@@ -75,10 +75,12 @@ contract AaveBridgeV2 is Ownable, IAaveBridge {
     address aTokenAddress = _getReserveInterestToken(assetToken);
     require(_isReserveActive(assetToken), "AaveBridgeV2: INVALID_ASSET");
 
+    IERC20 token = IERC20(assetToken);
     IATokenV2 aToken = IATokenV2(aTokenAddress);
 
-    _collectToken(msg.sender, assetToken, assetAmount);
-    IERC20(assetToken).approve(address(lendingPool), assetAmount);
+    if (token.allowance(address(this), address(lendingPool)) < assetAmount) {
+      token.approve(address(lendingPool), uint256(-1));
+    }
 
     // Deposit Assets into Aave
     uint256 preBalance = aToken.balanceOf(self);
@@ -120,14 +122,6 @@ contract AaveBridgeV2 is Ownable, IAaveBridge {
   function withdrawErc20(address payable receiver, address token, uint256 amount) external onlyOwner {
     require(receiver != address(0x0), "AaveBridgeV1: INVALID_RECEIVER");
     _sendToken(receiver, token, amount);
-  }
-
-
-  /**
-    * @dev Collects the Required Asset Token from the users wallet
-    */
-  function _collectToken(address from, address token, uint256 amount) internal {
-    require(IERC20(token).transferFrom(from, address(this), amount), "AaveBridgeV2: COLLECT_FAILED");
   }
 
   function _sendToken(address to, address token, uint256 amount) internal {

@@ -8,6 +8,8 @@ const {
   presets,
 } = require("../js-utils/deploy-helpers");
 
+const _ = require('lodash');
+
 module.exports = async (hre) => {
     const { ethers, upgrades, getNamedAccounts } = hre;
     const { deployer, protocolOwner, trustedForwarder } = await getNamedAccounts();
@@ -55,7 +57,9 @@ module.exports = async (hre) => {
     await chargedParticles.setUniverse(universe.address);
 
     log('  - Setting Deposit Fee...')(alchemyTimeout);
-    await chargedParticles.setDepositFee(presets.ChargedParticles.fees.deposit);
+    const depositFees = _.map(presets.ChargedParticles.fees, 'fee');
+    const depositLimits = _.map(presets.ChargedParticles.fees, 'limit');
+    await chargedParticles.setDepositFees(depositLimits, depositFees);
 
     // log(`  Transferring Contract Ownership to '${owner}'...`)(alchemyTimeout);
     // await universe.transferOwnership(owner);

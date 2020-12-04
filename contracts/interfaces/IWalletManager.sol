@@ -30,7 +30,7 @@ pragma solidity >=0.6.0;
 interface IWalletManager {
 
   event NewSmartWallet(uint256 indexed uuid, address indexed smartWallet, address indexed creator, uint256 annuityPct);
-  event WalletEnergized(uint256 indexed uuid, address indexed assetToken, uint256 assetAmount, uint256 yieldTokensAmount);
+  event WalletEnergized(uint256 indexed uuid, address indexed assetToken, uint256 assetAmount, uint256 depositFee, uint256 yieldTokensAmount);
   event WalletDischarged(uint256 indexed uuid, address indexed assetToken, uint256 creatorAmount, uint256 receiverAmount);
   event WalletReleased(uint256 indexed uuid, address indexed receiver, address indexed assetToken, uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount);
   event WalletRewarded(uint256 indexed uuid, address indexed receiver, address indexed rewardsToken, uint256 rewardsAmount);
@@ -45,11 +45,12 @@ interface IWalletManager {
   function getInterest(uint256 uuid, address assetToken) external returns (uint256 creatorInterest, uint256 ownerInterest);
   function getRewards(uint256 uuid, address rewardToken) external returns (uint256);
 
-  function energize(uint256 uuid, address assetToken, uint256 assetAmount, address creator, uint256 annuityPct) external returns (uint256 yieldTokensAmount);
+  function energize(uint256 uuid, address assetToken, uint256 assetAmount, uint256 depositFee) external returns (uint256 yieldTokensAmount);
   function discharge(address receiver, uint256 uuid, address assetToken) external returns (uint256 creatorAmount, uint256 receiverAmount);
   function dischargeAmount(address receiver, uint256 uuid, address assetToken, uint256 assetAmount) external returns (uint256 creatorAmount, uint256 receiverAmount);
   function release(address receiver, uint256 uuid, address assetToken) external returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount);
   function withdrawRewards(address receiver, uint256 uuid, address rewardsToken, uint256 rewardsAmount) external returns (uint256 amount);
   function withdrawEther(uint256 _uuid, address payable receiver, uint256 amount) external;
   function executeForAccount(uint256 uuid, address contractAddress, uint256 ethValue, bytes memory encodedParams) external returns (bytes memory);
+  function getWalletAddressById(uint256 _uuid, address creator, uint256 annuityPct) external returns (address);
 }
