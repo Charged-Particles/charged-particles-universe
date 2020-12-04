@@ -93,9 +93,23 @@ const getTxGasCost = ({deployTransaction}) => {
 
 const presets = {
   ChargedParticles: {
-    fees: {
-      deposit: 50, // 0.5%
-    }
+    fees: [
+      {
+        fee: 30,       // 0.3%
+        limit: 10000,  // Deposits >= $10,000 = 0.3% Fee
+      },
+      {
+        fee: 40,       // 0.4%
+        limit: 5000,   // Deposits >= $5,000 = 0.4% Fee
+      },
+      {
+        fee: 50,       // 0.5%
+        limit: 0,      // Deposits < $5,000 = 0.5% Fee
+      },
+    ]
+  },
+  Proton: {
+    mintFee: toWei('0.001')
   },
   Ion: {
     rewardsForAssetTokens: [

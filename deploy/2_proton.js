@@ -6,6 +6,7 @@ const {
   getDeployData,
   getTxGasCost,
   log,
+  presets,
 } = require("../js-utils/deploy-helpers");
 
 module.exports = async (hre) => {
@@ -16,6 +17,7 @@ module.exports = async (hre) => {
     const deployData = {};
 
     const chainId = chainIdByName(network.name);
+    const mintFee = presets.Proton.mintFee;
 
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
 
@@ -45,6 +47,9 @@ module.exports = async (hre) => {
 
     log('  - Registering ChargedParticles with Proton...')(alchemyTimeout);
     await proton.setChargedParticles(ddChargedParticles.address);
+
+    log('  - Setting Proton Mint Fee:', mintFee.toString())(alchemyTimeout);
+    await proton.setMintFee(mintFee);
 
     log('  - Registering Proton with ChargedParticles...')(alchemyTimeout);
     await chargedParticles.updateWhitelist(proton.address, true);

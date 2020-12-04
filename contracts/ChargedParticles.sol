@@ -89,7 +89,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   //    When the particle reaches 100% "Mass" or more it can be "Released" (or burned) to reclaim the underlying
   //    asset + interest.  Since the "Mass" will be back to 100%, "Releasing" will yield at least 100%
   //    of the underlying asset back to the owner (plus any interest accrued, the "charge").
-  uint256 public depositFee;
+  uint256[] internal tieredDepositFeeLimits;
+  uint256[] internal tieredDepositFee;
 
   // Contract => Asset Token => Deposit Fees earned for Contract Owner (incudes this contract)
   mapping (address => mapping(address => uint256)) public depositFeesEarned;
@@ -287,25 +288,6 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   }
 
   /**
-    * @notice Calculates the Total Fee to be paid for a specific deposit amount
-    * @param contractAddress      The Address to the Contract of the Token
-    * @param assetAmount  The Amount of Assets to calculate Fees on
-    * @return  The total amount of protocol fees plus the amount of external token contract fees
-    */
-  function getTotalFeeForDeposit(
-    address contractAddress,
-    uint256 assetAmount
-  )
-    external
-    override
-    view
-    returns (uint256)
-  {
-    (uint256 protocolFee, uint256 externalFee) = _getFeesForDeposit(contractAddress, assetAmount);
-    return protocolFee.add(externalFee);
-  }
-
-  /**
     * @notice Gets the Amount of Asset Tokens that have been Deposited into the Particle
     *    representing the Mass of the Particle.
     * @param contractAddress  The Address to the External Contract of the Token
@@ -494,8 +476,9 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     depositFeesEarned[contractAddress][assetToken] = 0;
 
     // Deposit Asset Token into LP (reverts on fail)
-    IERC20(assetToken).approve(address(lpWalletMgr), unstoredFees);
-    amountStored = lpWalletMgr.energize(ownerUuid, assetToken, unstoredFees, address(0x0), 0);
+    address wallet = lpWalletMgr.getWalletAddressById(ownerUuid, address(0x0), 0);
+    IERC20(assetToken).transfer(wallet, unstoredFees);
+    amountStored = lpWalletMgr.energize(ownerUuid, assetToken, unstoredFees, 0);
   }
 
   /**
@@ -606,28 +589,21 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     returns (uint256 yieldTokensAmount)
   {
     require(isWhitelistedExternalContract(contractAddress), "ChargedParticles: Invalid Token Contract");
-    _validateDeposit(contractAddress, tokenId, liquidityProviderId, assetToken, assetAmount);
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-
-    // Get Wallet-Manager for LP
-    IWalletManager lpWalletMgr = _lpWalletManager[liquidityProviderId];
+    _validateDeposit(contractAddress, tokenUuid, liquidityProviderId, assetToken, assetAmount);
 
     // Transfer ERC20 Token from Caller to Contract (reverts on fail)
     _collectAssetToken(_msgSender(), assetToken, assetAmount);
 
-    uint256 amountForDeposit = _collectDepositFees(contractAddress, assetToken, assetAmount);
-    (address creator, uint256 annuityPct) = _getCreatorAnnuity(contractAddress, tokenId);
+    // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
+    yieldTokensAmount = _depositIntoWalletManager(contractAddress, tokenId, tokenUuid, liquidityProviderId, assetToken, assetAmount);
 
-    // Deposit Asset Token into LP (reverts on fail)
-    IERC20(assetToken).approve(address(lpWalletMgr), amountForDeposit);
-    yieldTokensAmount = lpWalletMgr.energize(tokenUuid, assetToken, amountForDeposit, creator, annuityPct);
-
+    // Signal to Universe Controller
     if (address(_universe) != address(0)) {
       _universe.onEnergize(contractAddress, tokenId, liquidityProviderId, assetToken, assetAmount);
     }
   }
-
 
   /***********************************|
   |        Discharge Particles        |
@@ -668,6 +644,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
 
     (creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].discharge(receiver, tokenUuid, assetToken);
 
+    // Signal to Universe Controller
     if (address(_universe) != address(0)) {
       _universe.onDischarge(contractAddress, tokenId, liquidityProviderId, assetToken, creatorAmount, receiverAmount);
     }
@@ -710,6 +687,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
 
     (creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].dischargeAmount(receiver, tokenUuid, assetToken, assetAmount);
 
+    // Signal to Universe Controller
     if (address(_universe) != address(0)) {
       _universe.onDischarge(contractAddress, tokenId, liquidityProviderId, assetToken, creatorAmount, receiverAmount);
     }
@@ -769,6 +747,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     uint256 principalAmount;
     (principalAmount, creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].release(receiver, tokenUuid, assetToken);
 
+    // Signal to Universe Controller
     if (address(_universe) != address(0)) {
       _universe.onRelease(contractAddress, tokenId, liquidityProviderId, assetToken, principalAmount, creatorAmount, receiverAmount);
     }
@@ -809,6 +788,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     uint256 principalAmount;
     (principalAmount, creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].release(receiver, tokenUuid, assetToken);
 
+    // Signal to Universe Controller
     if (address(_universe) != address(0)) {
       _universe.onRelease(contractAddress, tokenId, liquidityProviderId, assetToken, principalAmount, creatorAmount, receiverAmount);
     }
@@ -830,9 +810,21 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   /**
     * @dev Setup the Base Deposit Fee for the Escrow
     */
-  function setDepositFee(uint256 fee) external onlyOwner {
-    depositFee = fee;
-    emit DepositFeeSet(fee);
+  function setDepositFees(uint256[] calldata limits, uint256[] calldata fees) external onlyOwner {
+    require(limits.length == fees.length, "ChargedParticles: ARRAY_LEN_MISMATCH");
+
+    delete tieredDepositFee;
+    delete tieredDepositFeeLimits;
+
+    for (uint i = 0; i < limits.length; i++) {
+      uint256 limit = limits[i];
+      uint256 fee = fees[i];
+
+      tieredDepositFee.push(fee);
+      tieredDepositFeeLimits.push(limit);
+
+      emit DepositFeeSet(limit, fee);
+    }
   }
 
   /**
@@ -930,8 +922,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     (uint256 protocolFee, uint256 externalFee) = _getFeesForDeposit(contractAddress, assetAmount);
     depositFeesEarned[address(this)][assetToken] = protocolFee;
     depositFeesEarned[contractAddress][assetToken] = externalFee;
-
-    return assetAmount.sub(protocolFee.add(externalFee));
+    return protocolFee.add(externalFee);
   }
 
   function isValidExternalContract(address contractAddress) internal view returns (bool) {
@@ -980,7 +971,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
 
   function _validateDeposit(
     address contractAddress,
-    uint256 tokenId,
+    uint256 tokenUuid,
     string calldata liquidityProviderId,
     address assetToken,
     uint256 assetAmount
@@ -988,7 +979,6 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     internal
   {
     IWalletManager lpWalletMgr = _lpWalletManager[liquidityProviderId];
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     uint256 existingBalance = lpWalletMgr.getPrincipal(tokenUuid, assetToken);
     uint256 newBalance = assetAmount.add(existingBalance);
 
@@ -1004,6 +994,30 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     if (_nftAssetDepositMax[contractAddress] > 0) {
         require(newBalance <= _nftAssetDepositMax[contractAddress], "ChargedParticles: EXCESS_DEPOSIT");
     }
+  }
+
+  function _depositIntoWalletManager(
+    address contractAddress,
+    uint256 tokenId,
+    uint256 tokenUuid,
+    string calldata liquidityProviderId,
+    address assetToken,
+    uint256 assetAmount
+  )
+    internal
+    returns (uint256)
+  {
+    // Get Wallet-Manager for LP
+    IWalletManager lpWalletMgr = _lpWalletManager[liquidityProviderId];
+
+    uint256 totalFees = _collectDepositFees(contractAddress, assetToken, assetAmount);
+    uint256 amountForDeposit = assetAmount.sub(totalFees);
+    (address creator, uint256 annuityPct) = _getCreatorAnnuity(contractAddress, tokenId, tokenUuid);
+
+    // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
+    address wallet = lpWalletMgr.getWalletAddressById(tokenUuid, creator, annuityPct);
+    IERC20(assetToken).transfer(wallet, amountForDeposit);
+    return lpWalletMgr.energize(tokenUuid, assetToken, amountForDeposit, totalFees);
   }
 
   /**
@@ -1022,6 +1036,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     view
     returns (uint256 protocolFee, uint256 externalFee)
   {
+    uint256 depositFee = _getTieredDepositFee(assetAmount);
     if (depositFee > 0) {
         protocolFee = assetAmount.mul(depositFee).div(PERCENTAGE_SCALE);
     }
@@ -1032,17 +1047,25 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     }
   }
 
+  function _getTieredDepositFee(uint256 assetAmount) internal view returns (uint256) {
+    for (uint i = 0; i < tieredDepositFeeLimits.length; i++) {
+      if (assetAmount >= tieredDepositFeeLimits[i]) {
+        return tieredDepositFee[i];
+      }
+    }
+    return tieredDepositFee[tieredDepositFee.length - 1];
+  }
+
   function _getCreatorAnnuity(
     address contractAddress,
-    uint256 tokenId
+    uint256 tokenId,
+    uint256 tokenUuid
   )
     internal
     view
     returns (address creator, uint256 annuityPct)
   {
-    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
-    creator = tokenInterface.creatorOf(tokenId);
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    creator = IERC721Chargeable(contractAddress).creatorOf(tokenId);
     annuityPct = _creatorAnnuityPercent[tokenUuid];
   }
 

@@ -112,36 +112,20 @@ contract AaveWalletManager is WalletManagerBase {
     uint256 _uuid,
     address _assetToken,
     uint256 _assetAmount,
-    address creator,
-    uint256 annuityPct
+    uint256 _depositFee
   )
     external
     override
+    onlyController
     returns (uint256 yieldTokensAmount)
   {
     address wallet = _wallets[_uuid];
 
-    // Create Smart-Wallet if none exists
-    if (wallet == address(0x0)) {
-      wallet = _createWallet();
-      _wallets[_uuid] = wallet;
-
-      if (creator != address(0x0)) {
-        AaveSmartWallet(wallet).setNftCreator(creator, annuityPct);
-      }
-
-      emit NewSmartWallet(_uuid, wallet, creator, annuityPct);
-    }
-
-    // Collect Asset Token (reverts on fail)
-    _collectAssetToken(_msgSender(), _assetToken, _assetAmount);
-
     // Deposit into Smart-Wallet
-    IERC20(_assetToken).approve(wallet, _assetAmount);
     yieldTokensAmount = AaveSmartWallet(wallet).deposit(_assetToken, _assetAmount, _referralCode);
 
     // Log Event
-    emit WalletEnergized(_uuid, _assetToken, _assetAmount, yieldTokensAmount);
+    emit WalletEnergized(_uuid, _assetToken, _assetAmount, _depositFee, yieldTokensAmount);
   }
 
   function discharge(
@@ -252,6 +236,33 @@ contract AaveWalletManager is WalletManagerBase {
   {
     address wallet = _wallets[_uuid];
     return AaveSmartWallet(wallet).executeForAccount(contractAddress, ethValue, encodedParams);
+  }
+
+  function getWalletAddressById(
+    uint256 _uuid,
+    address creator,
+    uint256 annuityPct
+  )
+    external
+    override
+    onlyController
+    returns (address)
+  {
+    address wallet = _wallets[_uuid];
+
+    // Create Smart-Wallet if none exists
+    if (wallet == address(0x0)) {
+      wallet = _createWallet();
+      _wallets[_uuid] = wallet;
+
+      if (creator != address(0x0)) {
+        AaveSmartWallet(wallet).setNftCreator(creator, annuityPct);
+      }
+
+      emit NewSmartWallet(_uuid, wallet, creator, annuityPct);
+    }
+
+    return wallet;
   }
 
   // function migrateToAaveV2(

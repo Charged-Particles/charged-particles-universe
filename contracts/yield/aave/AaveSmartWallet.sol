@@ -179,12 +179,9 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
     internal
     returns (uint256)
   {
-    // Collect Asset Token (reverts on fail)
-    _collectToken(_walletManager, assetToken, assetAmount);
-    _trackAssetToken(assetToken);
-
     // Deposit Assets into Aave (reverts on fail)
-    IERC20(assetToken).approve(address(_bridge), assetAmount);
+    _trackAssetToken(assetToken);
+    _sendToken(address(_bridge), assetToken, assetAmount);
     uint256 aTokensAmount = _bridge.deposit(assetToken, assetAmount, referralCode);
 
     // Track Principal
@@ -287,10 +284,6 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
 
     // Owner Portion
     ownerInterest = interest.sub(creatorInterest);
-  }
-
-  function _collectToken(address from, address token, uint256 amount) internal {
-    require(IERC20(token).transferFrom(from, address(this), amount), "AaveSmartWallet: COLLECT_FAILED");
   }
 
   function _sendToken(address to, address token, uint256 amount) internal {

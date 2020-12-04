@@ -84,13 +84,13 @@ module.exports = async (hre) => {
     log('  - Setting Charged Particles as Controller...')(alchemyTimeout);
     await aaveWalletManager.setController(ddChargedParticles.address);
 
-    if (lendingPoolProviderV1.length > 0) {
-      log('  - Setting Aave Bridge to V1...')(alchemyTimeout);
-      await aaveWalletManager.setAaveBridge(aaveBridgeV1.address);
+    if (lendingPoolProviderV2.length > 0) {
+      log('  - Setting Aave Bridge to V2...')(alchemyTimeout);
+      await aaveWalletManager.setAaveBridge(aaveBridgeV2.address);
     } else {
-      if (lendingPoolProviderV2.length > 0) {
-        log('  - Setting Aave Bridge to V2...')(alchemyTimeout);
-        await aaveWalletManager.setAaveBridge(aaveBridgeV2.address);
+      if (lendingPoolProviderV1.length > 0) {
+        log('  - Setting Aave Bridge to V1...')(alchemyTimeout);
+        await aaveWalletManager.setAaveBridge(aaveBridgeV1.address);
       } else {
         log('  - NO Aave Bridge Available!!!');
       }

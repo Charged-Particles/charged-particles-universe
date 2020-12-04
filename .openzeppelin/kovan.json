@@ -2,8 +2,8 @@
   "manifestVersion": "3.1",
   "impls": {
     "cece7b17cc37142477005083daa3487d75521e86991a8acd8dd0c70376d6ee75": {
-      "address": "0x2378918CfBf71f4F772cF1317b9C86Aa66Cd753E",
-      "txHash": "0x9679a9ac5a1da4515057123c6f59d16b4a5c18510d33026dc0d5b10b745019d7",
+      "address": "0x497027b339C7EE9dF2271e5B0159E810027e0f91",
+      "txHash": "0x7790d04aa8f1e85a25f7db75bb2f9d2f499cbe100da5ebabbb874fec676c23ba",
       "layout": {
         "storage": [
           {
@@ -77,9 +77,9 @@
         }
       }
     },
-    "4fcff84cd0b25dd3a7ac18d53b144e6d3f51bb47450cf71e9956732fd9251b77": {
-      "address": "0xCc055D8B2C2757F860AC9c2dC2f3755102EDD983",
-      "txHash": "0x1ff0416bfa656f20f2841fe8074e07cf44ee706ae371ff31dd929ec1c948b652",
+    "812850204431685f3eac59bf6df81f38382715f76ba8f7584a05feadc298cec7": {
+      "address": "0xB6689316cd2A1DbEf57fb201937fF1bAd283a4b1",
+      "txHash": "0x13a53437465f707a5c13d85b1c7dbadb6a423ea8eb42379c3822e144bcc851d7",
       "layout": {
         "storage": [
           {
@@ -133,7 +133,7 @@
           {
             "contract": "ChargedParticles",
             "label": "_universe",
-            "type": "t_contract(IUniverse)8769",
+            "type": "t_contract(IUniverse)8864",
             "src": "contracts/ChargedParticles.sol:73"
           },
           {
@@ -145,7 +145,7 @@
           {
             "contract": "ChargedParticles",
             "label": "_lpWalletManager",
-            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)8981)",
+            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)9087)",
             "src": "contracts/ChargedParticles.sol:75"
           },
           {
@@ -156,104 +156,110 @@
           },
           {
             "contract": "ChargedParticles",
-            "label": "depositFee",
-            "type": "t_uint256",
+            "label": "tieredDepositFeeLimits",
+            "type": "t_array(t_uint256)dyn_storage",
             "src": "contracts/ChargedParticles.sol:92"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "tieredDepositFee",
+            "type": "t_array(t_uint256)dyn_storage",
+            "src": "contracts/ChargedParticles.sol:93"
           },
           {
             "contract": "ChargedParticles",
             "label": "depositFeesEarned",
             "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
-            "src": "contracts/ChargedParticles.sol:95"
+            "src": "contracts/ChargedParticles.sol:96"
           },
           {
             "contract": "ChargedParticles",
             "label": "_nftLiquidityProvider",
             "type": "t_mapping(t_address,t_string_storage)",
-            "src": "contracts/ChargedParticles.sol:101"
+            "src": "contracts/ChargedParticles.sol:102"
           },
           {
             "contract": "ChargedParticles",
             "label": "_nftAssetDepositFee",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:102"
+            "src": "contracts/ChargedParticles.sol:103"
           },
           {
             "contract": "ChargedParticles",
             "label": "_nftAssetDepositMin",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:103"
+            "src": "contracts/ChargedParticles.sol:104"
           },
           {
             "contract": "ChargedParticles",
             "label": "_nftAssetDepositMax",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:104"
+            "src": "contracts/ChargedParticles.sol:105"
           },
           {
             "contract": "ChargedParticles",
             "label": "_creatorAnnuityPercent",
             "type": "t_mapping(t_uint256,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:108"
+            "src": "contracts/ChargedParticles.sol:109"
           },
           {
             "contract": "ChargedParticles",
             "label": "_creatorBurnToRelease",
             "type": "t_mapping(t_uint256,t_bool)",
-            "src": "contracts/ChargedParticles.sol:109"
+            "src": "contracts/ChargedParticles.sol:110"
           },
           {
             "contract": "ChargedParticles",
             "label": "_dischargeApproval",
             "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
-            "src": "contracts/ChargedParticles.sol:112"
+            "src": "contracts/ChargedParticles.sol:113"
           },
           {
             "contract": "ChargedParticles",
             "label": "_releaseApproval",
             "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
-            "src": "contracts/ChargedParticles.sol:113"
+            "src": "contracts/ChargedParticles.sol:114"
           },
           {
             "contract": "ChargedParticles",
             "label": "_timelockApproval",
             "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
-            "src": "contracts/ChargedParticles.sol:114"
+            "src": "contracts/ChargedParticles.sol:115"
           },
           {
             "contract": "ChargedParticles",
             "label": "_dischargeTimelock",
             "type": "t_mapping(t_uint256,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:116"
+            "src": "contracts/ChargedParticles.sol:117"
           },
           {
             "contract": "ChargedParticles",
             "label": "_releaseTimelock",
             "type": "t_mapping(t_uint256,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:117"
+            "src": "contracts/ChargedParticles.sol:118"
           },
           {
             "contract": "ChargedParticles",
             "label": "_assetToBeReleasedBy",
             "type": "t_mapping(t_uint256,t_address)",
-            "src": "contracts/ChargedParticles.sol:118"
+            "src": "contracts/ChargedParticles.sol:119"
           }
         ],
         "types": {
-          "t_contract(IUniverse)8769": {
+          "t_contract(IUniverse)8864": {
             "label": "contract IUniverse"
           },
           "t_array(t_string_storage)dyn_storage": {
             "label": "string[]"
           },
-          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)8981)": {
+          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)9087)": {
             "label": "mapping(string => contract IWalletManager)"
           },
           "t_mapping(t_address,t_bool)": {
             "label": "mapping(address => bool)"
           },
-          "t_uint256": {
-            "label": "uint256"
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]"
           },
           "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
             "label": "mapping(address => mapping(address => uint256))"
@@ -293,7 +299,7 @@
     }
   },
   "admin": {
-    "address": "0xcCC8B2EA059C248F9c83f3C4A5069D32C449f00B",
-    "txHash": "0x384555181f2cfc57f262a6dfc1bb5f95aab55e5d46cd42676bf1896db1c0bc7d"
+    "address": "0xEE99F7fC577905870e1048Ca250F8B9351a2F075",
+    "txHash": "0x6a70c2d9fd40296c785b98f84925cedcc93974eedf263c3386496d3904b95428"
   }
 }

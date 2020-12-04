@@ -48,7 +48,6 @@ interface IChargedParticles {
   function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
 
   function getFeesForDeposit(address contractAddress, uint256 assetAmount) external view returns (uint256 protocolFee, uint256 externalFee);
-  function getTotalFeeForDeposit(address contractAddress, uint256 assetAmount) external view returns (uint256);
 
   function baseParticleMass(address contractAddress, uint256 tokenId, string calldata liquidityProviderId, address assetToken) external returns (uint256);
   function currentParticleCharge(address contractAddress, uint256 tokenId, string calldata liquidityProviderId, address assetToken) external returns (uint256);
@@ -162,6 +161,7 @@ interface IChargedParticles {
     address indexed universeAddress
   );
   event DepositFeeSet(
+    uint256 depositFeeLimit,
     uint256 depositFee
   );
   event LiquidityProviderRegistered(
