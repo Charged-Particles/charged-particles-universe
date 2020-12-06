@@ -129,6 +129,8 @@ contract Proton is ERC721, Ownable {
   {
     _collectAssetToken(_msgSender(), assetToken, assetAmount);
 
+    IERC20(assetToken).approve(address(_chargedParticles), assetAmount);
+
     _chargedParticles.energizeParticle(
       address(this),
       tokenId,

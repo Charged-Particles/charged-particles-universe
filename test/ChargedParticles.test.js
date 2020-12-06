@@ -1,4 +1,4 @@
-const { presets, getDeployData, toWei } = require('../js-utils/deploy-helpers');
+const { presets, getDeployData, toWei, toBN } = require('../js-utils/deploy-helpers');
 const { expect } = require('chai');
 const { ethers, network } = require('hardhat');
 const daiABI = require('./abis/dai');
@@ -17,13 +17,26 @@ describe("Charged Particles", () => {
   let annuityPct;
   let burnToRelease;
 
-  beforeEach(async () => {
-    await hre.network.provider.request({
-      method: "hardhat_impersonateAccount",
-      params: [daiMaster]}
-    );
+  let daiSigner;
+  let user1;
+  let user2;
+  let protonCreator;
+  let dischargeBeneficiary;
 
-    const daiSigner = ethers.provider.getSigner(daiMaster);
+  beforeEach(async () => {
+    await network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [daiMaster]
+    });
+
+    daiSigner = ethers.provider.getSigner(daiMaster);
+    user1 = (await getNamedAccounts()).user1;
+    user2 = (await getNamedAccounts()).user2;
+    protonCreator = ethers.provider.getSigner(user1);
+    dischargeBeneficiary = ethers.provider.getSigner(user2);
+
+    annuityPct = '1000'; // 10%
+    burnToRelease = false;
 
     const Universe = await ethers.getContractFactory('Universe');
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
@@ -32,7 +45,7 @@ describe("Charged Particles", () => {
     const Ion = await ethers.getContractFactory('Ion');
     const IonTimelock = await ethers.getContractFactory('IonTimelock');
 
-    dai = await (new ethers.Contract(presets.Aave.v1.dai['31337'], daiABI, daiSigner)).deployed();
+    dai = new ethers.Contract(presets.Aave.v1.dai['31337'], daiABI, daiSigner);
     universe = Universe.attach(getDeployData('Universe', network.config.chainId).address);
     chargedParticles = ChargedParticles.attach(getDeployData('ChargedParticles', network.config.chainId).address);
     aaveWalletManager = AaveWalletManager.attach(getDeployData('AaveWalletManager', network.config.chainId).address);
@@ -43,10 +56,10 @@ describe("Charged Particles", () => {
   });
 
   afterEach(async () => {
-    await hre.network.provider.request({
+    await network.provider.request({
       method: "hardhat_stopImpersonatingAccount",
-      params: [daiMaster]}
-    );
+      params: [daiMaster]
+    });
   });
 
   it("should deploy with the liquidity provider set to 'Aave'", async () => {
@@ -55,22 +68,8 @@ describe("Charged Particles", () => {
 
   it("can succesfully energize and discharge", async () => {
 
-    await hre.network.provider.request({
-      method: "hardhat_impersonateAccount",
-      params: [proton.address]}
-    );
-
-    const { user1, user2 } = await getNamedAccounts();
-    const protonCreator = ethers.provider.getSigner(user1);
-    const dischargeBeneficiary = ethers.provider.getSigner(user2);
-    const protonSigner = ethers.provider.getSigner(proton.address);
-
-    annuityPct = '1000'; // 10%
-    burnToRelease = false;
-
-    await dai.transfer(user1, toWei('10').toHexString());
+    await dai.transfer(user1, toWei('10'));
     await dai.connect(protonCreator)['approve(address,uint256)'](proton.address, toWei('10'));
-    await dai.connect(protonSigner)['approve(address,uint256)'](chargedParticles.address, toWei('10'));
 
     const energizedParticleId = await proton.connect(protonCreator).callStatic.createChargedParticle(
       user1,
@@ -78,7 +77,7 @@ describe("Charged Particles", () => {
       TEST_NFT_TOKEN_URI,
       'aave',
       presets.Aave.v1.dai['31337'],
-      toWei('10').toHexString(),
+      toWei('10'),
       annuityPct,
       burnToRelease,
       {
@@ -91,7 +90,7 @@ describe("Charged Particles", () => {
       TEST_NFT_TOKEN_URI,
       'aave',
       presets.Aave.v1.dai['31337'],
-      toWei('10').toHexString(),
+      toWei('10'),
       annuityPct,
       burnToRelease,
       {
@@ -109,10 +108,86 @@ describe("Charged Particles", () => {
 
     expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
 
-    await hre.network.provider.request({
-      method: "hardhat_stopImpersonatingAccount",
-      params: [proton.address]}
+  });
+
+  it("can discharge only after timelock expired", async () => {
+    await dai.transfer(user1, toWei('10'));
+    await dai.connect(protonCreator)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    const user2BalanceBefore = await dai.balanceOf(user2);
+
+    const energizedParticleId = await proton.connect(protonCreator).callStatic.createChargedParticle(
+      user1,
+      user2,
+      TEST_NFT_TOKEN_URI,
+      'aave',
+      presets.Aave.v1.dai['31337'],
+      toWei('10'),
+      annuityPct,
+      burnToRelease,
+      {
+        value: presets.Proton.mintFee.toString()
+      }
     );
+    await proton.connect(protonCreator).createChargedParticle(
+      user1,
+      user2,
+      TEST_NFT_TOKEN_URI,
+      'aave',
+      presets.Aave.v1.dai['31337'],
+      toWei('10'),
+      annuityPct,
+      burnToRelease,
+      {
+        value: presets.Proton.mintFee.toString()
+      }
+    );
+
+    const blockNumberBefore = toBN(await network.provider.request({
+      method: "eth_blockNumber",
+      params: []
+    }));
+
+    const blockNumberTimelock = blockNumberBefore.add(toBN('10'));
+
+    await chargedParticles.connect(dischargeBeneficiary).setDischargeTimelock(
+      proton.address,
+      energizedParticleId,
+      blockNumberTimelock
+    );
+
+    let blockNumberAfter = toBN(await network.provider.request({
+      method: "eth_blockNumber",
+      params: []
+    }));
+
+    expect(blockNumberAfter).to.be.below(blockNumberTimelock);
+
+    await expect(chargedParticles.connect(dischargeBeneficiary).dischargeParticle(
+      user2,
+      proton.address,
+      energizedParticleId,
+      'aave',
+      presets.Aave.v1.dai['31337']
+    )).to.be.revertedWith("ChargedParticles: TOKEN_TIMELOCKED");
+
+    while(blockNumberAfter.lt(blockNumberTimelock)) {
+      await network.provider.request({
+        method: "evm_mine",
+        params: []
+      });
+      blockNumberAfter = blockNumberAfter.add(toBN('1'));
+    }
+
+    await chargedParticles.connect(dischargeBeneficiary).dischargeParticle(
+      user2,
+      proton.address,
+      energizedParticleId,
+      'aave',
+      presets.Aave.v1.dai['31337']
+    );
+
+    expect((await dai.balanceOf(user2)).sub(user2BalanceBefore)).to.be.above(toWei('0'));
   });
 
 });
