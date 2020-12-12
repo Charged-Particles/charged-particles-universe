@@ -140,6 +140,38 @@ contract Proton is ERC721, Ownable {
     );
   }
 
+  function releaseParticle(
+    address receiver,
+    uint256 tokenId,
+    string calldata liquidityProviderId,
+    address assetToken
+  )
+    external
+    onlyTokenOwnerOrApproved(tokenId)
+    returns (uint256 creatorAmount, uint256 receiverAmount)
+  {
+    address self = address(this);
+    (creatorAmount, receiverAmount) = _chargedParticles.releaseParticle(
+      receiver,
+      self,
+      tokenId,
+      liquidityProviderId,
+      assetToken
+    );
+
+    if (creatorAmount == uint256(-1) && receiverAmount == 0) {
+      // Release requires burn
+      _burn(tokenId);
+
+      (creatorAmount, receiverAmount) = _chargedParticles.finalizeRelease(
+        receiver,
+        self,
+        tokenId,
+        liquidityProviderId,
+        assetToken
+      );
+    }
+  }
 
   /***********************************|
   |          Only Admin/DAO           |
@@ -191,6 +223,11 @@ contract Proton is ERC721, Ownable {
 
   modifier requireMintFee() {
     require(msg.value >= mintFee, "Proton: INSUFF_FEE");
+    _;
+  }
+
+  modifier onlyTokenOwnerOrApproved(uint256 tokenId) {
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "Proton: not owner nor approved");
     _;
   }
 }

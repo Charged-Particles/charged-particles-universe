@@ -740,7 +740,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     // Validate Token Burn before Release
     if (_creatorBurnToRelease[tokenUuid]) {
         _assetToBeReleasedBy[tokenUuid] = _msgSender();
-        return (0, 0); // Need to call "finalizeRelease" next, in order to prove token-burn
+        return (uint256(-1), 0); // Need to call "finalizeRelease" next, in order to prove token-burn
     }
 
     // Release Particle to Receiver
@@ -882,7 +882,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   function _isApprovedForDischarge(address contractAddress, uint256 tokenId, address account) internal view returns (bool) {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    return tokenOwner == account || _dischargeApproval[tokenUuid][tokenOwner] == account;
+    return contractAddress == account || tokenOwner == account || _dischargeApproval[tokenUuid][tokenOwner] == account;
   }
 
   /**
@@ -895,7 +895,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   function _isApprovedForRelease(address contractAddress, uint256 tokenId, address account) internal view returns (bool) {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    return tokenOwner == account || _releaseApproval[tokenUuid][tokenOwner] == account;
+    return contractAddress == account || tokenOwner == account || _releaseApproval[tokenUuid][tokenOwner] == account;
   }
 
   /**
@@ -908,7 +908,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   function _isApprovedForTimelock(address contractAddress, uint256 tokenId, address account) internal view returns (bool) {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    return tokenOwner == account || _timelockApproval[tokenUuid][tokenOwner] == account;
+    return contractAddress == account || tokenOwner == account || _timelockApproval[tokenUuid][tokenOwner] == account;
   }
 
   function _collectDepositFees(
