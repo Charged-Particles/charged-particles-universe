@@ -1,7 +1,9 @@
-const { presets, getDeployData, toWei, toBN } = require('../js-utils/deploy-helpers');
-const { expect } = require('chai');
 const { ethers, network } = require('hardhat');
+const { expect } = require('chai');
+const { presets, getDeployData, toWei, toBN } = require('../js-utils/deploy-helpers');
+const { getNetworkBlockNumber, setNetworkAfterBlockNumber } = require('./helpers/network')(network);
 const daiABI = require('./abis/dai');
+
 const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
 const daiMaster = '0x9eb7f2591ed42dee9315b6e2aaf21ba85ea69f8c';
 
@@ -143,12 +145,7 @@ describe("Charged Particles", () => {
       }
     );
 
-    const blockNumberBefore = toBN(await network.provider.request({
-      method: "eth_blockNumber",
-      params: []
-    }));
-
-    const blockNumberTimelock = blockNumberBefore.add(toBN('10'));
+    const blockNumberTimelock = (await getNetworkBlockNumber()).add(toBN('10'));
 
     await chargedParticles.connect(dischargeBeneficiary).setDischargeTimelock(
       proton.address,
@@ -156,12 +153,7 @@ describe("Charged Particles", () => {
       blockNumberTimelock
     );
 
-    let blockNumberAfter = toBN(await network.provider.request({
-      method: "eth_blockNumber",
-      params: []
-    }));
-
-    expect(blockNumberAfter).to.be.below(blockNumberTimelock);
+    expect(await getNetworkBlockNumber()).to.be.below(blockNumberTimelock);
 
     await expect(chargedParticles.connect(dischargeBeneficiary).dischargeParticle(
       user2,
@@ -171,13 +163,7 @@ describe("Charged Particles", () => {
       presets.Aave.v1.dai['31337']
     )).to.be.revertedWith("ChargedParticles: TOKEN_TIMELOCKED");
 
-    while(blockNumberAfter.lt(blockNumberTimelock)) {
-      await network.provider.request({
-        method: "evm_mine",
-        params: []
-      });
-      blockNumberAfter = blockNumberAfter.add(toBN('1'));
-    }
+    await setNetworkAfterBlockNumber(blockNumberTimelock);
 
     await chargedParticles.connect(dischargeBeneficiary).dischargeParticle(
       user2,
