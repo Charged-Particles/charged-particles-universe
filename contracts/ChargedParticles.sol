@@ -417,6 +417,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     onlyTokenCreator(contractAddress, tokenId, creator, _msgSender())
   {
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    require(annuityPercent <= PERCENTAGE_SCALE, "ChargedParticles: INVALID_PCT");
 
     // Update Configs for External Token Creator
     _creatorAnnuityPercent[tokenUuid] = annuityPercent;

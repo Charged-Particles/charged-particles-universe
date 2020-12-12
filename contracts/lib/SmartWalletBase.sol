@@ -24,12 +24,14 @@
 pragma solidity >=0.6.0;
 
 import "../interfaces/ISmartWallet.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 /**
  * @notice ERC20-Token Smart-Wallet Bridge to Bloom
  * @dev Non-upgradeable Contract
  */
 abstract contract SmartWalletBase is ISmartWallet {
+  using Address for address payable;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
 
@@ -76,7 +78,7 @@ abstract contract SmartWalletBase is ISmartWallet {
 
   function withdrawEther(address payable receiver, uint256 amount) external virtual override onlyWalletManager {
     require(receiver != address(0x0), "SmartWalletBase: INVALID_RECEIVER");
-    receiver.transfer(amount);
+    receiver.sendValue(amount);
   }
 
   function executeForAccount(
