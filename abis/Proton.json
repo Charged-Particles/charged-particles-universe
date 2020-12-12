@@ -147,6 +147,49 @@
         "type": "uint256"
       },
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "oldOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "salePrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "creatorRoyalties",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProtonSold",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
         "indexed": false,
         "internalType": "uint256",
         "name": "salePrice",
@@ -179,6 +222,19 @@
       }
     ],
     "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "universe",
+        "type": "address"
+      }
+    ],
+    "name": "UniverseSet",
     "type": "event"
   },
   {
@@ -664,6 +720,19 @@
       }
     ],
     "name": "setSalePrice",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "universe",
+        "type": "address"
+      }
+    ],
+    "name": "setUniverse",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

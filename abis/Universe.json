@@ -205,6 +205,49 @@
         "type": "uint256"
       },
       {
+        "internalType": "address",
+        "name": "oldOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "salePrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "creatorRoyalties",
+        "type": "uint256"
+      }
+    ],
+    "name": "onProtonSale",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
         "internalType": "string",
         "name": "",
         "type": "string"

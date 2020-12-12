@@ -60,4 +60,14 @@ interface IUniverse {
     uint256 creatorAmount,
     uint256 receiverAmount
   ) external;
+
+  function onProtonSale(
+    address contractAddress,
+    uint256 tokenId,
+    address oldOwner,
+    address newOwner,
+    uint256 salePrice,
+    address creator,
+    uint256 creatorRoyalties
+  ) external;
 }

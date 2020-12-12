@@ -32,6 +32,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+import "../interfaces/IUniverse.sol";
 import "../interfaces/IChargedParticles.sol";
 
 contract Proton is ERC721, Ownable, ReentrancyGuard {
@@ -42,12 +43,15 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
   uint256 constant internal MAX_ROYALTIES = 5e3;      // 5000   (50%)
 
+  event UniverseSet(address indexed universe);
   event ChargedParticlesSet(address indexed chargedParticles);
   event MintFeeSet(uint256 fee);
   event SalePriceSet(uint256 indexed tokenId, uint256 salePrice);
   event CreatorRoyaltiesSet(uint256 indexed tokenId, uint256 royaltiesPct);
+  event ProtonSold(uint256 indexed tokenId, address indexed oldOwner, address indexed newOwner, uint256 salePrice, address creator, uint256 creatorRoyalties);
   event FeesWithdrawn(address indexed receiver, uint256 amount);
 
+  IUniverse internal _universe;
   IChargedParticles internal _chargedParticles;
 
   Counters.Counter internal _tokenIds;
@@ -200,6 +204,14 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
   /**
     * @dev Setup the ChargedParticles Interface
     */
+  function setUniverse(address universe) external onlyOwner {
+    _universe = IUniverse(universe);
+    emit UniverseSet(universe);
+  }
+
+  /**
+    * @dev Setup the ChargedParticles Interface
+    */
   function setChargedParticles(address chargedParticles) external onlyOwner {
     _chargedParticles = IChargedParticles(chargedParticles);
     emit ChargedParticlesSet(chargedParticles);
@@ -329,7 +341,6 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     }
   }
 
-
   function _buyProton(uint256 tokenId)
     internal
     returns (bool)
@@ -342,6 +353,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     uint256 creatorAmount;
 
     // Creator Royalties
+    address creator = _tokenCreator[tokenId];
     uint256 royaltiesPct = _tokenCreatorRoyaltiesPct[tokenId];
     uint256 lastSellPrice = _tokenLastSellPrice[tokenId];
     if (royaltiesPct > 0 && lastSellPrice > 0 && salePrice > lastSellPrice) {
@@ -351,29 +363,26 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     _tokenLastSellPrice[tokenId] = salePrice;
 
     // Transfer Token
-    address prevTokenOwner = ownerOf(tokenId);
-    _transfer(prevTokenOwner, _msgSender(), tokenId);
+    address oldOwner = ownerOf(tokenId);
+    address newOwner = _msgSender();
+    _transfer(oldOwner, newOwner, tokenId);
 
     // Transfer Payment
-    payable(prevTokenOwner).sendValue(ownerAmount);
+    payable(oldOwner).sendValue(ownerAmount);
     if (creatorAmount > 0) {
-      payable(_tokenCreator[tokenId]).sendValue(creatorAmount);
+      payable(creator).sendValue(creatorAmount);
     }
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onProtonSale(address(this), tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
+    }
+
+    emit ProtonSold(tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
 
     _refundOverpayment();
     return true;
   }
-
-
-
-
-
-
-
-
-
-
-
 
   /**
     * @dev Collects the Required Asset Token from the users wallet
