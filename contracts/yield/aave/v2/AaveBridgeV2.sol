@@ -28,6 +28,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/SafeCast.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 import "./IATokenV2.sol";
 import "./ILendingPoolV2.sol";
@@ -38,6 +39,7 @@ import "../../../interfaces/IAaveBridge.sol";
 contract AaveBridgeV2 is Ownable, IAaveBridge {
   using SafeMath for uint256;
   using SafeCast for uint256;
+  using Address for address payable;
   using ReserveLogic for ReserveLogic.ReserveData;
 
   ILendingPoolAddressesProviderV2 public provider;
@@ -116,7 +118,7 @@ contract AaveBridgeV2 is Ownable, IAaveBridge {
 
   function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
     require(receiver != address(0x0), "AaveBridgeV1: INVALID_RECEIVER");
-    receiver.transfer(amount);
+    receiver.sendValue(amount);
   }
 
   function withdrawErc20(address payable receiver, address token, uint256 amount) external onlyOwner {
