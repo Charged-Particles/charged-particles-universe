@@ -95,16 +95,16 @@ const presets = {
   ChargedParticles: {
     fees: [
       {
-        fee: 30,       // 0.3%
-        limit: 10000,  // Deposits >= $10,000 = 0.3% Fee
+        fee: 30,
+        limit: toWei('10000'),  // Deposits >= $10,000 = 0.3% Fee
       },
       {
-        fee: 40,       // 0.4%
-        limit: 5000,   // Deposits >= $5,000 = 0.4% Fee
+        fee: 40,
+        limit: toWei('5000'),   // Deposits >= $5,000 = 0.4% Fee
       },
       {
-        fee: 50,       // 0.5%
-        limit: 0,      // Deposits < $5,000 = 0.5% Fee
+        fee: 50,
+        limit: '0',             // Deposits < $5,000 = 0.5% Fee
       },
     ]
   },
