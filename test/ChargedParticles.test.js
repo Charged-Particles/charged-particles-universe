@@ -68,7 +68,7 @@ describe("Charged Particles", () => {
     expect(await chargedParticles.isLiquidityProviderEnabled('aave')).to.equal(true);
   });
 
-  it("can succesfully energize and discharge", async () => {
+  it("can succesfully energize and release proton", async () => {
 
     await dai.transfer(user1, toWei('10'));
     await dai.connect(protonCreator)['approve(address,uint256)'](proton.address, toWei('10'));
@@ -100,9 +100,8 @@ describe("Charged Particles", () => {
       }
     );
 
-    await chargedParticles.connect(dischargeBeneficiary).releaseParticle(
+    await proton.connect(dischargeBeneficiary).releaseParticle(
       user2,
-      proton.address,
       energizedParticleId,
       'aave',
       presets.Aave.v1.dai['31337']
