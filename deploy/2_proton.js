@@ -19,6 +19,7 @@ module.exports = async (hre) => {
     const chainId = chainIdByName(network.name);
     const mintFee = presets.Proton.mintFee;
 
+    const ddUniverse = getDeployData('Universe', chainId);
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
@@ -44,6 +45,9 @@ module.exports = async (hre) => {
       address: proton.address,
       deployTransaction: proton.deployTransaction,
     }
+
+    log('  - Registering Universe with Proton...')(alchemyTimeout);
+    await proton.setUniverse(ddUniverse.address);
 
     log('  - Registering ChargedParticles with Proton...')(alchemyTimeout);
     await proton.setChargedParticles(ddChargedParticles.address);

@@ -29,22 +29,37 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+import "../interfaces/IUniverse.sol";
 import "../interfaces/IChargedParticles.sol";
 
-contract Proton is ERC721, Ownable {
+contract Proton is ERC721, Ownable, ReentrancyGuard {
   using SafeMath for uint256;
+  using Address for address payable;
   using Counters for Counters.Counter;
 
+  uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
+  uint256 constant internal MAX_ROYALTIES = 5e3;      // 5000   (50%)
+
+  event UniverseSet(address indexed universe);
   event ChargedParticlesSet(address indexed chargedParticles);
   event MintFeeSet(uint256 fee);
+  event SalePriceSet(uint256 indexed tokenId, uint256 salePrice);
+  event CreatorRoyaltiesSet(uint256 indexed tokenId, uint256 royaltiesPct);
+  event ProtonSold(uint256 indexed tokenId, address indexed oldOwner, address indexed newOwner, uint256 salePrice, address creator, uint256 creatorRoyalties);
   event FeesWithdrawn(address indexed receiver, uint256 amount);
 
+  IUniverse internal _universe;
   IChargedParticles internal _chargedParticles;
 
   Counters.Counter internal _tokenIds;
 
   mapping (uint256 => address) internal _tokenCreator;
+  mapping (uint256 => uint256) internal _tokenCreatorRoyaltiesPct;
+  mapping (uint256 => uint256) internal _tokenSalePrice;
+  mapping (uint256 => uint256) internal _tokenLastSellPrice;
 
   uint256 public mintFee;
 
@@ -76,14 +91,20 @@ contract Proton is ERC721, Ownable {
   )
     public
     payable
+    nonReentrant
     requireMintFee
     returns (uint256 newTokenId)
   {
-    newTokenId = createProton(creator, receiver, tokenMetaUri, annuityPercent, burnToRelease);
-
-    chargedParticle(newTokenId, liquidityProviderId, assetToken, assetAmount);
-
-    _refundOverpayment();
+    return _createChargedParticle(
+      creator,
+      receiver,
+      tokenMetaUri,
+      liquidityProviderId,
+      assetToken,
+      assetAmount,
+      annuityPercent,
+      burnToRelease
+    );
   }
 
   function createProton(
@@ -95,7 +116,155 @@ contract Proton is ERC721, Ownable {
   )
     public
     payable
+    nonReentrant
     requireMintFee
+    returns (uint256 newTokenId)
+  {
+    return _createProton(
+      creator,
+      receiver,
+      tokenMetaUri,
+      annuityPercent,
+      burnToRelease
+    );
+  }
+
+  function chargeParticle(
+    uint256 tokenId,
+    string calldata liquidityProviderId,
+    address assetToken,
+    uint256 assetAmount
+  )
+    public
+    nonReentrant
+  {
+    _chargeParticle(
+      tokenId,
+      liquidityProviderId,
+      assetToken,
+      assetAmount
+    );
+  }
+
+  function releaseParticle(
+    address receiver,
+    uint256 tokenId,
+    string calldata liquidityProviderId,
+    address assetToken
+  )
+    external
+    onlyTokenOwnerOrApproved(tokenId)
+    returns (uint256 creatorAmount, uint256 receiverAmount)
+  {
+    return _releaseParticle(
+      receiver,
+      tokenId,
+      liquidityProviderId,
+      assetToken
+    );
+  }
+
+  function buyProton(uint256 tokenId)
+    external
+    payable
+    nonReentrant
+    returns (bool)
+  {
+    return _buyProton(tokenId);
+  }
+
+
+  /***********************************|
+  |     Only Token Creator/Owner      |
+  |__________________________________*/
+
+  function setSalePrice(uint256 tokenId, uint256 salePrice)
+    external
+    onlyTokenOwnerOrApproved(tokenId)
+  {
+    _tokenSalePrice[tokenId] = salePrice;
+    emit SalePriceSet(tokenId, salePrice);
+  }
+
+  function setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct)
+    external
+    onlyTokenCreator(tokenId)
+    onlyTokenOwnerOrApproved(tokenId)
+  {
+    require(royaltiesPct <= MAX_ROYALTIES, "Proton: INVALID_PCT");
+    _tokenCreatorRoyaltiesPct[tokenId] = royaltiesPct;
+    emit CreatorRoyaltiesSet(tokenId, royaltiesPct);
+  }
+
+
+  /***********************************|
+  |          Only Admin/DAO           |
+  |__________________________________*/
+
+  /**
+    * @dev Setup the ChargedParticles Interface
+    */
+  function setUniverse(address universe) external onlyOwner {
+    _universe = IUniverse(universe);
+    emit UniverseSet(universe);
+  }
+
+  /**
+    * @dev Setup the ChargedParticles Interface
+    */
+  function setChargedParticles(address chargedParticles) external onlyOwner {
+    _chargedParticles = IChargedParticles(chargedParticles);
+    emit ChargedParticlesSet(chargedParticles);
+  }
+
+  function setMintFee(uint256 newMintFee) external onlyOwner {
+    mintFee = newMintFee;
+    emit MintFeeSet(newMintFee);
+  }
+
+  function withdrawFees(address payable receiver) external onlyOwner {
+    uint256 amount = address(this).balance;
+    if (amount > 0) {
+      receiver.sendValue(amount);
+      emit FeesWithdrawn(receiver, amount);
+    }
+  }
+
+  /***********************************|
+  |         Private Functions         |
+  |__________________________________*/
+
+
+
+
+  function _createChargedParticle(
+    address creator,
+    address receiver,
+    string memory tokenMetaUri,
+    string calldata liquidityProviderId,
+    address assetToken,
+    uint256 assetAmount,
+    uint256 annuityPercent,
+    bool burnToRelease
+  )
+    internal
+    returns (uint256 newTokenId)
+  {
+    newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent, burnToRelease);
+
+    _chargeParticle(newTokenId, liquidityProviderId, assetToken, assetAmount);
+
+    _refundOverpayment();
+  }
+
+  function _createProton(
+    address creator,
+    address receiver,
+    string memory tokenMetaUri,
+    uint256 annuityPercent,
+    bool burnToRelease
+  )
+    internal
     returns (uint256 newTokenId)
   {
     require(address(_chargedParticles) != address(0x0), "Proton: charged particles not set");
@@ -119,13 +288,13 @@ contract Proton is ERC721, Ownable {
     _refundOverpayment();
   }
 
-  function chargedParticle(
+  function _chargeParticle(
     uint256 tokenId,
     string calldata liquidityProviderId,
     address assetToken,
     uint256 assetAmount
   )
-    public
+    internal
   {
     _collectAssetToken(_msgSender(), assetToken, assetAmount);
 
@@ -140,14 +309,13 @@ contract Proton is ERC721, Ownable {
     );
   }
 
-  function releaseParticle(
+  function _releaseParticle(
     address receiver,
     uint256 tokenId,
     string calldata liquidityProviderId,
     address assetToken
   )
-    external
-    onlyTokenOwnerOrApproved(tokenId)
+    internal
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
     address self = address(this);
@@ -173,34 +341,48 @@ contract Proton is ERC721, Ownable {
     }
   }
 
-  /***********************************|
-  |          Only Admin/DAO           |
-  |__________________________________*/
+  function _buyProton(uint256 tokenId)
+    internal
+    returns (bool)
+  {
+    uint256 salePrice = _tokenSalePrice[tokenId];
+    require(salePrice > 0, "Proton: TOKEN_NOT_FOR_SALE");
+    require(msg.value >= salePrice, "Proton: INSUFF_PAYMENT");
 
-  /**
-    * @dev Setup the ChargedParticles Interface
-    */
-  function setChargedParticles(address chargedParticles) external onlyOwner {
-    _chargedParticles = IChargedParticles(chargedParticles);
-    emit ChargedParticlesSet(chargedParticles);
-  }
+    uint256 ownerAmount = salePrice;
+    uint256 creatorAmount;
 
-  function setMintFee(uint256 newMintFee) external onlyOwner {
-    mintFee = newMintFee;
-    emit MintFeeSet(newMintFee);
-  }
-
-  function withdrawFees(address payable receiver) external onlyOwner {
-    uint256 amount = address(this).balance;
-    if (amount > 0) {
-      receiver.transfer(amount);
-      emit FeesWithdrawn(receiver, amount);
+    // Creator Royalties
+    address creator = _tokenCreator[tokenId];
+    uint256 royaltiesPct = _tokenCreatorRoyaltiesPct[tokenId];
+    uint256 lastSellPrice = _tokenLastSellPrice[tokenId];
+    if (royaltiesPct > 0 && lastSellPrice > 0 && salePrice > lastSellPrice) {
+      creatorAmount = (salePrice - lastSellPrice).mul(royaltiesPct).div(PERCENTAGE_SCALE);
+      ownerAmount = ownerAmount.sub(creatorAmount);
     }
-  }
+    _tokenLastSellPrice[tokenId] = salePrice;
 
-  /***********************************|
-  |         Private Functions         |
-  |__________________________________*/
+    // Transfer Token
+    address oldOwner = ownerOf(tokenId);
+    address newOwner = _msgSender();
+    _transfer(oldOwner, newOwner, tokenId);
+
+    // Transfer Payment
+    payable(oldOwner).sendValue(ownerAmount);
+    if (creatorAmount > 0) {
+      payable(creator).sendValue(creatorAmount);
+    }
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onProtonSale(address(this), tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
+    }
+
+    emit ProtonSold(tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
+
+    _refundOverpayment();
+    return true;
+  }
 
   /**
     * @dev Collects the Required Asset Token from the users wallet
@@ -217,8 +399,13 @@ contract Proton is ERC721, Ownable {
   function _refundOverpayment() internal {
     uint256 overage = msg.value.sub(mintFee);
     if (overage > 0) {
-      _msgSender().transfer(overage);
+      payable(_msgSender()).sendValue(overage);
     }
+  }
+
+  function _transfer(address from, address to, uint256 tokenId) internal override {
+    super._transfer(from, to, tokenId);
+    _tokenSalePrice[tokenId] = 0;
   }
 
   modifier requireMintFee() {
@@ -227,7 +414,12 @@ contract Proton is ERC721, Ownable {
   }
 
   modifier onlyTokenOwnerOrApproved(uint256 tokenId) {
-    require(_isApprovedOrOwner(_msgSender(), tokenId), "Proton: not owner nor approved");
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "Proton: NOT_OWNER_OR_OPERATOR");
+    _;
+  }
+
+  modifier onlyTokenCreator(uint256 tokenId) {
+    require(_tokenCreator[tokenId] == _msgSender(), "Proton: NOT_CREATOR");
     _;
   }
 }
