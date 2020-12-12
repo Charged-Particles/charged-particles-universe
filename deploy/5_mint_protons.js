@@ -3,6 +3,8 @@ const {
   chainIdByName,
   getDeployData,
   log,
+  presets,
+  toWei,
 } = require("../js-utils/deploy-helpers");
 
 const _ = require('lodash');
@@ -49,7 +51,7 @@ module.exports = async (hre) => {
     burnToRelease = false;
     await proton
       .connect(protonCreator)
-      .createProton(creator, receiver, TEST_NFT_TOKEN_URI, annuityPct, burnToRelease);
+      .createProton(creator, receiver, TEST_NFT_TOKEN_URI, annuityPct, burnToRelease, { value: presets.Proton.mintFee.toString() });
 
 
     log(`  - Minting Proton to [user3: ${user3}]...`)(alchemyTimeout);
@@ -59,7 +61,7 @@ module.exports = async (hre) => {
     burnToRelease = true;
     await proton
       .connect(protonCreator)
-      .createProton(creator, receiver, TEST_NFT_TOKEN_URI, annuityPct, burnToRelease);
+      .createProton(creator, receiver, TEST_NFT_TOKEN_URI, annuityPct, burnToRelease, { value: presets.Proton.mintFee.toString() });
 
 
 
