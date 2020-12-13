@@ -23,13 +23,13 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 
 import "./interfaces/IUniverse.sol";
 
@@ -38,10 +38,10 @@ import "./interfaces/IUniverse.sol";
  * @notice Charged Particles Universe Contract
  * @dev Upgradeable Contract
  */
-contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
-  using SafeMath for uint256;
-  using Address for address;
-  using SafeERC20 for IERC20;
+contract Universe is IUniverse, Initializable, OwnableUpgradeable {
+  using SafeMathUpgradeable for uint256;
+  using AddressUpgradeable for address;
+  using SafeERC20Upgradeable for IERC20Upgradeable;
 
   // The ChargedParticles Contract Address
   address public chargedParticles;
@@ -49,7 +49,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
   uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
 
   // ION Token Rewards
-  IERC20 public ionToken;
+  IERC20Upgradeable public ionToken;
   //   Asset Token => Reward Multiplier
   mapping (address => uint256) internal ionRewardsMultiplier;
 
@@ -95,7 +95,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
   {
     // Reward ION tokens
     if (ionRewardsMultiplier[assetToken] > 0 && receiverAmount > 0) {
-      address receiver = IERC721(contractAddress).ownerOf(tokenId);
+      address receiver = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
       _rewardIonTokens(receiver, assetToken, receiverAmount);
     }
   }
@@ -116,7 +116,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
     // Reward ION tokens
     uint256 interestAmount = receiverAmount.sub(principalAmount);
     if (ionRewardsMultiplier[assetToken] > 0 && interestAmount > 0) {
-      address receiver = IERC721(contractAddress).ownerOf(tokenId);
+      address receiver = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
       _rewardIonTokens(receiver, assetToken, interestAmount);
     }
   }
@@ -162,7 +162,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeSafe {
     onlyOwner
     onlyValidContractAddress(_ionToken)
   {
-    ionToken = IERC20(_ionToken);
+    ionToken = IERC20Upgradeable(_ionToken);
     emit IonTokenSet(_ionToken);
   }
 
