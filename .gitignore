@@ -30,3 +30,4 @@ coverage.json
 coverageEnv
 artifacts
 test-results.xml
+yarn-error.log

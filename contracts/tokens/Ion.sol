@@ -23,14 +23,14 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "erc20permit/contracts/ERC20Permit.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "../interfaces/IUniverse.sol";
 import "../interfaces/IIonTimelock.sol";
 
 
-contract Ion is ERC20, Ownable {
+contract Ion is ERC20Permit, Ownable {
 
   event LockApproval(address indexed owner, address indexed operator, uint256 amount);
 
@@ -54,7 +54,7 @@ contract Ion is ERC20, Ownable {
   |          Initialization           |
   |__________________________________*/
 
-  constructor() public ERC20("Charged Particles - ION", "ION") {}
+  constructor() public ERC20Permit("Charged Particles - ION", "ION") {}
 
 
   /***********************************|
