@@ -990,6 +990,11 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-3.3.0.tgz#a536c6ff107d21319490e6cb699e555a3edcf6ea"
   integrity sha512-kJeNuKauR4xH52Yo3GdXXAOW4CWyWdm7VXcJFe63G8TRb45ISSnkt/gXwUa8zzEYqokQrwNZYoH/iGYfUlp6wA==
 
+"@openzeppelin/contracts@3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-3.1.0.tgz#bcea457ef89069fbe5a617f50b25b6a8272895d5"
+  integrity sha512-dVXDnUKxrAKLzPdCRkz+N8qsVkK1XxJ6kk3zuI6zaQmcKxN7CkizoDP7lXxcs/Mi2I0mxceTRjJBqlzFffLJrQ==
+
 "@openzeppelin/contracts@^3.2.0":
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-3.3.0.tgz#ffdb693c5c349fc33bba420248dd3ac0a2d7c408"
@@ -4238,6 +4243,13 @@ env-paths@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/env-paths/-/env-paths-2.2.0.tgz#cdca557dc009152917d6166e2febe1f039685e43"
   integrity sha512-6u0VYSCo/OW6IoD5WCLLy9JUGARbamfSavcNXry/eu8aHVFei6CD3Sw+VGX5alea1i9pgPHW0mbu6Xj0uBh7gA==
+
+erc20permit@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/erc20permit/-/erc20permit-0.0.4.tgz#f994213b1e1eceecb9dcf6eaf198ecbf0fb2b233"
+  integrity sha512-I2KW1wU3Hzz/ytoZxhRfbsz+VPFORHCM4KcgtbhAG6nrQEolaer4MgOFB+4pFu45QIZiUeJP3XxfMFVOfO7Z8g==
+  dependencies:
+    "@openzeppelin/contracts" "3.1.0"
 
 errno@~0.1.1:
   version "0.1.7"

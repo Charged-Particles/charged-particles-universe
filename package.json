@@ -58,5 +58,7 @@
     "solidity-coverage": "^0.7.4",
     "solidity-docgen": "^0.5.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "erc20permit": "^0.0.4"
+  }
 }

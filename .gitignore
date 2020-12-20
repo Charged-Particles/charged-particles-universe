@@ -30,4 +30,4 @@ coverage.json
 coverageEnv
 artifacts
 test-results.xml
-.openzeppelin/unknown-31337.json
+yarn-error.log
