@@ -1,4 +1,5 @@
 const {
+  deployments,
   ethers,
   network,
   upgrades,
@@ -6,16 +7,6 @@ const {
   getNamedAccounts,
   getChainId,
 } = require('hardhat');
-
-// This can lead to multiple issues, see: https://hardhat.org/guides/waffle-testing.html#adapting-the-tests
-// const {
-//   solidity,
-//   deployContract
-// } = require('ethereum-waffle');
-
-// const {
-//   deployContract
-// } = waffle;
 
 const {
   getDeployData,
@@ -31,12 +22,7 @@ const {
 
 const callAndReturn = require('./helpers/callAndReturn');
 
-const chai = require('chai');
-// // chai.use(solidity);
-const { expect } = chai;
-
-
-const ERC20Mintable = require('../build/contracts/contracts/test/ERC20Mintable.sol/ERC20Mintable.json');
+const { expect } = require('chai');
 
 const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
 
@@ -95,10 +81,6 @@ describe("Charged Particles", () => {
 
     // With Forked Mainnet
     dai = new ethers.Contract(presets.Aave.v1.dai['31337'], daiABI, daiSigner);
-
-    // Without Forked Mainnet
-    // dai = await deployContract(deployer, ERC20Mintable, ['Test Dai', 'DAI']);
-
 
     // Connect to Internal Contracts
     const Universe = await ethers.getContractFactory('Universe');
