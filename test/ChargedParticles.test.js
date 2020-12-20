@@ -1,15 +1,21 @@
 const {
   ethers,
-  upgrades,
   network,
+  upgrades,
+  waffle,
   getNamedAccounts,
   getChainId,
 } = require('hardhat');
 
-const {
-  solidity,
-  deployContract
-} = require('ethereum-waffle');
+// This can lead to multiple issues, see: https://hardhat.org/guides/waffle-testing.html#adapting-the-tests
+// const {
+//   solidity,
+//   deployContract
+// } = require('ethereum-waffle');
+
+// const {
+//   deployContract
+// } = waffle;
 
 const {
   getDeployData,
@@ -26,7 +32,7 @@ const {
 const callAndReturn = require('./helpers/callAndReturn');
 
 const chai = require('chai');
-chai.use(solidity);
+// // chai.use(solidity);
 const { expect } = chai;
 
 
@@ -34,8 +40,8 @@ const ERC20Mintable = require('../build/contracts/contracts/test/ERC20Mintable.s
 
 const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
 
-// const daiABI = require('./abis/dai');
-// const daiMaster = '0x9eb7f2591ed42dee9315b6e2aaf21ba85ea69f8c';
+const daiABI = require('./abis/dai');
+const daiMaster = '0x9eb7f2591ed42dee9315b6e2aaf21ba85ea69f8c';
 
 
 
@@ -71,14 +77,14 @@ describe("Charged Particles", () => {
     chainId = await getChainId(); // chainIdByName(network.name);
 
     // With Forked Mainnet
-    // await network.provider.request({
-    //   method: "hardhat_impersonateAccount",
-    //   params: [daiMaster]
-    // });
+    await network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [daiMaster]
+    });
 
     [deployer] = await ethers.getSigners();
 
-    // daiSigner = ethers.provider.getSigner(daiMaster);
+    daiSigner = ethers.provider.getSigner(daiMaster);
     const namedAccts = (await getNamedAccounts());
     trustedForwarder = namedAccts.trustedForwarder;
 
@@ -88,10 +94,10 @@ describe("Charged Particles", () => {
     signer2 = ethers.provider.getSigner(user2);
 
     // With Forked Mainnet
-    // dai = new ethers.Contract(presets.Aave.v1.dai['31337'], daiABI, daiSigner);
+    dai = new ethers.Contract(presets.Aave.v1.dai['31337'], daiABI, daiSigner);
 
     // Without Forked Mainnet
-    dai = await deployContract(deployer, ERC20Mintable, ['Test Dai', 'DAI']);
+    // dai = await deployContract(deployer, ERC20Mintable, ['Test Dai', 'DAI']);
 
 
     // Connect to Internal Contracts
@@ -113,111 +119,101 @@ describe("Charged Particles", () => {
 
   afterEach(async () => {
     // With Forked Mainnet
-    // await network.provider.request({
-    //   method: "hardhat_stopImpersonatingAccount",
-    //   params: [daiMaster]
-    // });
+    await network.provider.request({
+      method: "hardhat_stopImpersonatingAccount",
+      params: [daiMaster]
+    });
   });
 
   it('should deploy with the liquidity provider set to "Aave"', async () => {
     expect(await chargedParticles.isLiquidityProviderEnabled('aave')).to.equal(true);
   });
 
-  // it("can succesfully energize and release proton", async () => {
+  it("can succesfully energize and release proton", async () => {
 
-  //   await dai.transfer(user1, toWei('10'));
-  //   await dai.connect(protonCreator)['approve(address,uint256)'](proton.address, toWei('10'));
+    await dai.transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
 
-  //   const energizedParticleId = await callAndReturn({
-  //     contractInstance: proton,
-  //     contractMethod: 'createChargedParticle',
-  //     contractCaller: protonCreator,
-  //     contractParams: [
-  //       user1,                        // creator
-  //       user2,                        // receiver
-  //       TEST_NFT_TOKEN_URI,           // tokenMetaUri
-  //       'aave',                       // liquidityProviderId
-  //       presets.Aave.v1.dai['31337'], // assetToken
-  //       toWei('10'),                  // assetAmount
-  //       annuityPct,                   // annuityPercent
-  //       burnToRelease,                // burnToRelease
-  //     ],
-  //     callValue: presets.Proton.mintFee.toString(),
-  //   });
+    const energizedParticleId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'aave',                       // liquidityProviderId
+        presets.Aave.v1.dai['31337'], // assetToken
+        toWei('10'),                  // assetAmount
+        annuityPct,                   // annuityPercent
+        burnToRelease,                // burnToRelease
+      ],
+      callValue: presets.Proton.mintFee.toString(),
+    });
 
-  //   await proton.connect(user2).releaseParticle(
-  //     dischargeBeneficiary,
-  //     energizedParticleId,
-  //     'aave',
-  //     presets.Aave.v1.dai['31337']
-  //   );
+    await proton.connect(signer2).releaseParticle(
+      user2,
+      energizedParticleId,
+      'aave',
+      presets.Aave.v1.dai['31337']
+    );
 
-  //   expect(await dai.balanceOf(dischargeBeneficiary)).to.be.above(toWei('9.9'));
+    expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
 
-  // });
+  });
 
-  // it("can discharge only after timelock expired", async () => {
-  //   await dai.transfer(user1, toWei('10'));
-  //   await dai.connect(protonCreator)['approve(address,uint256)'](proton.address, toWei('10'));
+  it("can discharge only after timelock expired", async () => {
+    await dai.transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
 
-  //   const user2BalanceBefore = await dai.balanceOf(user2);
+    const user2BalanceBefore = await dai.balanceOf(user2);
 
-  //   const energizedParticleId = await proton.connect(protonCreator).callStatic.createChargedParticle(
-  //     user1,
-  //     user2,
-  //     TEST_NFT_TOKEN_URI,
-  //     'aave',
-  //     presets.Aave.v1.dai['31337'],
-  //     toWei('10'),
-  //     annuityPct,
-  //     burnToRelease,
-  //     {
-  //       value: presets.Proton.mintFee.toString()
-  //     }
-  //   );
-  //   await proton.connect(protonCreator).createChargedParticle(
-  //     user1,
-  //     user2,
-  //     TEST_NFT_TOKEN_URI,
-  //     'aave',
-  //     presets.Aave.v1.dai['31337'],
-  //     toWei('10'),
-  //     annuityPct,
-  //     burnToRelease,
-  //     {
-  //       value: presets.Proton.mintFee.toString()
-  //     }
-  //   );
+    const energizedParticleId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,
+        user2,
+        TEST_NFT_TOKEN_URI,
+        'aave',
+        presets.Aave.v1.dai['31337'],
+        toWei('10'),
+        annuityPct,
+        burnToRelease,
+      ],
+      callValue: presets.Proton.mintFee.toString()
+    });
 
-  //   const blockNumberTimelock = (await getNetworkBlockNumber()).add(toBN('10'));
+    const blockNumberTimelock = (await getNetworkBlockNumber()).add(toBN('10'));
 
-  //   await chargedParticles.connect(dischargeBeneficiary).setDischargeTimelock(
-  //     proton.address,
-  //     energizedParticleId,
-  //     blockNumberTimelock
-  //   );
+    await chargedParticles.connect(signer2).setDischargeTimelock(
+      proton.address,
+      energizedParticleId,
+      blockNumberTimelock
+    );
 
-  //   expect(await getNetworkBlockNumber()).to.be.below(blockNumberTimelock);
+    expect(await getNetworkBlockNumber()).to.be.below(blockNumberTimelock);
 
-  //   await expect(chargedParticles.connect(dischargeBeneficiary).dischargeParticle(
-  //     user2,
-  //     proton.address,
-  //     energizedParticleId,
-  //     'aave',
-  //     presets.Aave.v1.dai['31337']
-  //   )).to.be.revertedWith("ChargedParticles: TOKEN_TIMELOCKED");
+    await expect(chargedParticles.connect(signer2).dischargeParticle(
+      user2,
+      proton.address,
+      energizedParticleId,
+      'aave',
+      presets.Aave.v1.dai['31337']
+    )).to.be.revertedWith("ChargedParticles: TOKEN_TIMELOCKED");
 
-  //   await setNetworkAfterBlockNumber(blockNumberTimelock);
+    await setNetworkAfterBlockNumber(blockNumberTimelock);
 
-  //   await chargedParticles.connect(dischargeBeneficiary).dischargeParticle(
-  //     user2,
-  //     proton.address,
-  //     energizedParticleId,
-  //     'aave',
-  //     presets.Aave.v1.dai['31337']
-  //   );
+    await chargedParticles.connect(signer2).dischargeParticle(
+      user2,
+      proton.address,
+      energizedParticleId,
+      'aave',
+      presets.Aave.v1.dai['31337']
+    );
 
-  //   expect((await dai.balanceOf(user2)).sub(user2BalanceBefore)).to.be.above(toWei('0'));
-  // });
+    expect((await dai.balanceOf(user2)).sub(user2BalanceBefore)).to.be.above(toWei('0'));
+  });
 
 });

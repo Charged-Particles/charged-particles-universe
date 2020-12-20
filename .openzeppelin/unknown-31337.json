@@ -1,0 +1,308 @@
+{
+  "manifestVersion": "3.1",
+  "impls": {
+    "22b48bc9022885df5ccea61e34f6a26e6f63aa311aff834c2ba96702c9626847": {
+      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "txHash": "0xa5e5177ce1335cb9dfb58c2725b1ef677f90e21e9d59548a0e67f04572aff566",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:24"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:29"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/GSN/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "Universe",
+            "label": "chargedParticles",
+            "type": "t_address",
+            "src": "contracts/Universe.sol:49"
+          },
+          {
+            "contract": "Universe",
+            "label": "ionToken",
+            "type": "t_contract(IERC20Upgradeable)1237",
+            "src": "contracts/Universe.sol:54"
+          },
+          {
+            "contract": "Universe",
+            "label": "ionRewardsMultiplier",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/Universe.sol:56"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address"
+          },
+          "t_contract(IERC20Upgradeable)1237": {
+            "label": "contract IERC20Upgradeable"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "2ba1d32287ce24da9db0e03dc3aa8ebd99a5adf40b9fbeaae445ddded2211bab": {
+      "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      "txHash": "0xe9358b80b1a664de9f9060acc57eaa625071a9eeb8f498e7b1ee2d5da30eba8b",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:24"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:29"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/GSN/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "BaseRelayRecipient",
+            "label": "trustedForwarder",
+            "type": "t_address",
+            "src": "@opengsn/gsn/contracts/BaseRelayRecipient.sol:16"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_universe",
+            "type": "t_contract(IUniverse)14622",
+            "src": "contracts/ChargedParticles.sol:75"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_liquidityProviders",
+            "type": "t_array(t_string_storage)dyn_storage",
+            "src": "contracts/ChargedParticles.sol:76"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_lpWalletManager",
+            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)14845)",
+            "src": "contracts/ChargedParticles.sol:77"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "whitelisted",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts/ChargedParticles.sol:80"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "tieredDepositFeeLimits",
+            "type": "t_array(t_uint256)dyn_storage",
+            "src": "contracts/ChargedParticles.sol:94"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "tieredDepositFee",
+            "type": "t_array(t_uint256)dyn_storage",
+            "src": "contracts/ChargedParticles.sol:95"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "depositFeesEarned",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "contracts/ChargedParticles.sol:98"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_nftLiquidityProvider",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "src": "contracts/ChargedParticles.sol:104"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_nftAssetDepositFee",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/ChargedParticles.sol:105"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_nftAssetDepositMin",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/ChargedParticles.sol:106"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_nftAssetDepositMax",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/ChargedParticles.sol:107"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_creatorAnnuityPercent",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedParticles.sol:111"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_creatorBurnToRelease",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "src": "contracts/ChargedParticles.sol:112"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_dischargeApproval",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
+            "src": "contracts/ChargedParticles.sol:115"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_releaseApproval",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
+            "src": "contracts/ChargedParticles.sol:116"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_timelockApproval",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
+            "src": "contracts/ChargedParticles.sol:117"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_dischargeTimelock",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedParticles.sol:119"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_releaseTimelock",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedParticles.sol:120"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_assetToBeReleasedBy",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "contracts/ChargedParticles.sol:121"
+          }
+        ],
+        "types": {
+          "t_contract(IUniverse)14622": {
+            "label": "contract IUniverse"
+          },
+          "t_array(t_string_storage)dyn_storage": {
+            "label": "string[]"
+          },
+          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)14845)": {
+            "label": "mapping(string => contract IWalletManager)"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))"
+          },
+          "t_mapping(t_address,t_string_storage)": {
+            "label": "mapping(address => string)"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_address))": {
+            "label": "mapping(uint256 => mapping(address => address))"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    }
+  },
+  "admin": {
+    "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "txHash": "0x1d3be9cd8d2b19cd5a8bf3e460ef8f0b05f72fafcebb2e32f492fcdf36e2eff6"
+  }
+}

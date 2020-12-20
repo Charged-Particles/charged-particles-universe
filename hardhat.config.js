@@ -66,12 +66,12 @@ module.exports = {
         hardhat: {
             blockGasLimit: 200000000,
             allowUnlimitedContractSize: true,
-            // gasPrice: 8e9,
-            // forking: {
-            //     url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-            //     blockNumber: 11320000,
-            //     timeout: 1000000
-            // },
+            gasPrice: 8e9,
+            forking: {
+                url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+                blockNumber: 11320000,
+                timeout: 1000000
+            },
         },
         coverage: {
             url: 'http://127.0.0.1:8555',
