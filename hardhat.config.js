@@ -1,4 +1,7 @@
-const {TASK_COMPILE_GET_COMPILER_INPUT} = require('hardhat/builtin-tasks/task-names');
+const {
+  TASK_TEST,
+  TASK_COMPILE_GET_COMPILER_INPUT
+} = require('hardhat/builtin-tasks/task-names');
 
 require('dotenv').config();
 
@@ -8,35 +11,53 @@ require('@nomiclabs/hardhat-ethers');
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-gas-reporter');
 require('hardhat-abi-exporter');
-// Not available (yet!) in hardhat, they are working on it
-// require('solidity-coverage');
+require('solidity-coverage');
 require('hardhat-deploy');
 require('hardhat-deploy-ethers');
 
 // This must occur after hardhat-deploy!
 task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
   const input = await runSuper();
-  input.settings.metadata.useLiteralContent = false;
+  input.settings.metadata.useLiteralContent = process.env.USE_LITERAL_CONTENT != 'false';
+  console.log(`useLiteralContent: ${input.settings.metadata.useLiteralContent}`);
   return input;
 });
+
+// Task to run deployment fixtures before tests without the need of "--deploy-fixture"
+//  - Required to get fixtures deployed before running Coverage Reports
+task(
+  TASK_TEST,
+  "Runs the coverage report",
+  async (args, hre, runSuper) => {
+    await hre.run('compile');
+    await hre.deployments.fixture();
+    return runSuper({...args, noCompile: true});
+  }
+);
+
 
 const mnemonic = {
   testnet: `${process.env.TESTNET_MNEMONIC}`.replace(/_/g, ' '),
   mainnet: `${process.env.MAINNET_MNEMONIC}`.replace(/_/g, ' '),
 };
 
+const optimizerDisabled = process.env.OPTIMIZER_DISABLED
+
 module.exports = {
     solidity: {
         version: '0.6.12',
         settings: {
             optimizer: {
-                enabled: true,
+                enabled: !optimizerDisabled,
                 runs: 200
             }
         },
         evmVersion: 'istanbul'
     },
     paths: {
+        sources: "./contracts",
+        tests: "./test",
+        cache: "./cache",
         artifacts: './build/contracts',
         deploy: './deploy',
         deployments: './deployments'
@@ -45,12 +66,12 @@ module.exports = {
         hardhat: {
             blockGasLimit: 200000000,
             allowUnlimitedContractSize: true,
-            gasPrice: 8e9,
-            forking: {
-                url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-                blockNumber: 11320000,
-                timeout: 1000000
-            },
+            // gasPrice: 8e9,
+            // forking: {
+            //     url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+            //     blockNumber: 11320000,
+            //     timeout: 1000000
+            // },
         },
         coverage: {
             url: 'http://127.0.0.1:8555',

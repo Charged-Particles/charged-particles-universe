@@ -23,14 +23,14 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/introspection/IERC165.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/introspection/IERC165Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 
 import "./interfaces/IERC721Chargeable.sol";
 import "./interfaces/IUniverse.sol";
@@ -44,8 +44,8 @@ import "./lib/RelayRecipient.sol";
  * @notice Charged Particles Contract
  * @dev Upgradeable Contract
  */
-contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, RelayRecipient, IERC721Receiver {
-  using SafeMath for uint256;
+contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeable, ReentrancyGuardUpgradeable, RelayRecipient, IERC721ReceiverUpgradeable {
+  using SafeMathUpgradeable for uint256;
 
   //
   // Particle Terminology
@@ -160,7 +160,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
   }
 
   function onERC721Received(address, address, uint256, bytes calldata) external override returns (bytes4) {
-    return IERC721Receiver(0).onERC721Received.selector;
+    return IERC721ReceiverUpgradeable(0).onERC721Received.selector;
   }
 
   /**
@@ -478,7 +478,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
 
     // Deposit Asset Token into LP (reverts on fail)
     address wallet = lpWalletMgr.getWalletAddressById(ownerUuid, address(0x0), 0);
-    IERC20(assetToken).transfer(wallet, unstoredFees);
+    IERC20Upgradeable(assetToken).transfer(wallet, unstoredFees);
     amountStored = lpWalletMgr.energize(ownerUuid, assetToken, unstoredFees, 0);
   }
 
@@ -511,7 +511,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     (,, uint256 receiverAmount) = lpWalletMgr.release(receiver, ownerUuid, assetToken);
     amount = receiverAmount.add(unstoredFees);
 
-    require(IERC20(assetToken).transfer(receiver, unstoredFees), "ChargedParticles: WITHDRAW_TRANSFER_FAILED");
+    require(IERC20Upgradeable(assetToken).transfer(receiver, unstoredFees), "ChargedParticles: WITHDRAW_TRANSFER_FAILED");
 
     emit FeesWithdrawn(contractAddress, receiver, liquidityProviderId, assetToken, amount);
   }
@@ -928,7 +928,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
 
   function isValidExternalContract(address contractAddress) internal view returns (bool) {
     // Check Token Interface to ensure compliance
-    IERC165 tokenInterface = IERC165(contractAddress);
+    IERC165Upgradeable tokenInterface = IERC165Upgradeable(contractAddress);
     bool _is721 = tokenInterface.supportsInterface(INTERFACE_SIGNATURE_ERC721);
     bool _is1155 = tokenInterface.supportsInterface(INTERFACE_SIGNATURE_ERC1155);
     return (_is721 || _is1155);
@@ -1017,7 +1017,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
 
     // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
     address wallet = lpWalletMgr.getWalletAddressById(tokenUuid, creator, annuityPct);
-    IERC20(assetToken).transfer(wallet, amountForDeposit);
+    IERC20Upgradeable(assetToken).transfer(wallet, amountForDeposit);
     return lpWalletMgr.energize(tokenUuid, assetToken, amountForDeposit, totalFees);
   }
 
@@ -1077,10 +1077,10 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     * @param tokenAmount  The amount of tokens to collect
     */
   function _collectAssetToken(address from, address tokenAddress, uint256 tokenAmount) internal {
-    uint256 userBalance = IERC20(tokenAddress).balanceOf(from);
+    uint256 userBalance = IERC20Upgradeable(tokenAddress).balanceOf(from);
     require(tokenAmount <= userBalance, "ChargedParticles: INSUFF_ASSETS");
     // Be sure to Approve this Contract to transfer your Token(s)
-    require(IERC20(tokenAddress).transferFrom(from, address(this), tokenAmount), "ChargedParticles: TRANSFER_FAILED");
+    require(IERC20Upgradeable(tokenAddress).transferFrom(from, address(this), tokenAmount), "ChargedParticles: TRANSFER_FAILED");
   }
 
   /**
@@ -1151,7 +1151,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     internal
     view
     virtual
-    override(BaseRelayRecipient, ContextUpgradeSafe)
+    override(BaseRelayRecipient, ContextUpgradeable)
     returns (address payable)
   {
     return BaseRelayRecipient._msgSender();
@@ -1161,7 +1161,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeSaf
     internal
     view
     virtual
-    override(BaseRelayRecipient, ContextUpgradeSafe)
+    override(BaseRelayRecipient, ContextUpgradeable)
     returns (bytes memory)
   {
     return BaseRelayRecipient._msgData();
