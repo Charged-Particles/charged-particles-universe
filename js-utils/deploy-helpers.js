@@ -24,6 +24,7 @@ const chainIdByName = (chainName) => {
     case 'rinkeby': return 4
     case 'kovan': return 42
     case 'hardhat': return 31337
+    case 'coverage': return 31337
     default: return 0
   }
 };
@@ -77,7 +78,7 @@ const getContractAbi = (contractName) => {
   return contractJson;
 };
 
-const getDeployData = (contractName, chainId) => {
+const getDeployData = (contractName, chainId = 31337) => {
   const network = chainNameById(chainId).toLowerCase();
   const deployPath = path.join(__dirname, '..', 'deployments', network);
   const filename = `${deployPath}/${contractName}.json`;
@@ -155,7 +156,7 @@ const presets = {
         3: '0x1c8756FD2B28e9426CDBDcC7E3c4d64fa9A54728', // ropsten
         4: '', // rinkeby
         42: '0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5', // kovan
-        31337: '0x24a42fD28C976A61Df5D00D0599C34c4f90748c8', // Hardhat - Forked Mainnet
+        31337: '', // Hardhat - Forked Mainnet
       }
     },
     v2: {

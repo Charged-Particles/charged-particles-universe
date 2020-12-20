@@ -25,7 +25,7 @@ module.exports = async (hre) => {
 
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-    log('Charged Particles: Mint Ion Tokens ');
+    log('Charged Particles: Mint Proton Tokens ');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
     log('  Using Network: ', chainNameById(chainId));
