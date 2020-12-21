@@ -109,7 +109,7 @@ interface IChargedParticles {
   ) external;
 
   /***********************************|
-  |          Particle Charge          |
+  |        Particle Mechanics         |
   |__________________________________*/
 
   function energizeParticle(
@@ -152,6 +152,12 @@ interface IChargedParticles {
       string calldata liquidityProviderId,
       address assetToken
   ) external returns (uint256 creatorAmount, uint256 receiverAmount);
+
+  function buyParticle(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId
+  ) external payable returns (bool);
 
   /***********************************|
   |          Particle Events          |

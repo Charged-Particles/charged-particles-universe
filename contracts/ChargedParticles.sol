@@ -795,6 +795,49 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     }
   }
 
+  /***********************************|
+  |           Buy Particles           |
+  |__________________________________*/
+
+/**
+ * @dev Buy particle
+ */
+  function buyParticle(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId
+  )
+    external
+    override
+    payable
+    returns (bool)
+  {
+    (, uint256 salePrice, ,) = IERC721Chargeable(contractAddress).tradeConfig(tokenId);
+    require(salePrice > 0, "Proton: TOKEN_NOT_FOR_SALE");
+    require(msg.value >= salePrice, "Proton: INSUFF_PAYMENT");
+
+    (uint256 creatorAmount, uint256 ownerAmount) = _getTradeAmounts(contractAddress, tokenId);
+
+    IERC721Chargeable(contractAddress).setTokenLastSellPrice(tokenId, salePrice);
+
+    // Transfer Token
+    address oldOwner = IERC721Chargeable(contractAddress).ownerOf(tokenId);
+    IERC721Chargeable(contractAddress).transfer(oldOwner, receiver, tokenId);
+
+    // Transfer Payment
+    address creator = IERC721Chargeable(contractAddress).creatorOf(tokenId);
+    payable(oldOwner).transfer(ownerAmount);
+    if (creatorAmount > 0) {
+      payable(creator).transfer(creatorAmount);
+    }
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onProtonSale(contractAddress, tokenId, oldOwner, receiver, salePrice, creator, creatorAmount);
+    }
+
+    return true;
+  }
 
   /***********************************|
   |          Only Admin/DAO           |
@@ -1145,6 +1188,23 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   {
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     return _lpWalletManager[liquidityProviderId].getRewards(tokenUuid, assetToken);
+  }
+
+  // buyParticle() has stack too deep, needed to remove local vars
+  function _getTradeAmounts(
+    address contractAddress,
+    uint256 tokenId
+  ) internal
+    returns (uint256 creatorAmount, uint256 ownerAmount)
+  {
+    (uint256 royaltiesPct, uint256 salePrice, uint256 lastSellPrice, uint256 pctScale) = IERC721Chargeable(contractAddress).tradeConfig(tokenId);
+    // Creator Royalties
+    ownerAmount = salePrice;
+    creatorAmount = 0;
+    if (royaltiesPct > 0 && lastSellPrice > 0 && salePrice > lastSellPrice) {
+      creatorAmount = (salePrice - lastSellPrice).mul(royaltiesPct).div(pctScale);
+      ownerAmount = ownerAmount.sub(creatorAmount);
+    }
   }
 
   function _msgSender()

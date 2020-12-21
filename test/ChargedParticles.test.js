@@ -1,9 +1,6 @@
 const {
-  deployments,
   ethers,
   network,
-  upgrades,
-  waffle,
   getNamedAccounts,
   getChainId,
 } = require('hardhat');
@@ -56,8 +53,10 @@ describe("Charged Particles", () => {
   // let daiSigner;
   let user1;
   let user2;
+  let user3;
   let signer1;
   let signer2;
+  let signer3;
 
   beforeEach(async () => {
     chainId = await getChainId(); // chainIdByName(network.name);
@@ -76,8 +75,10 @@ describe("Charged Particles", () => {
 
     user1 = namedAccts.user1;
     user2 = namedAccts.user2;
+    user3 = namedAccts.user3;
     signer1 = ethers.provider.getSigner(user1);
     signer2 = ethers.provider.getSigner(user2);
+    signer3 = ethers.provider.getSigner(user3);
 
     // With Forked Mainnet
     dai = new ethers.Contract(presets.Aave.v1.dai['31337'], daiABI, daiSigner);
@@ -196,6 +197,47 @@ describe("Charged Particles", () => {
     );
 
     expect((await dai.balanceOf(user2)).sub(user2BalanceBefore)).to.be.above(toWei('0'));
+  });
+
+  it("creator receieves royalties, old owner receives the sale price and the new owner receives the token", async () => {
+    await dai.transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    const energizedParticleId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,
+        user1,
+        TEST_NFT_TOKEN_URI,
+        'aave',
+        presets.Aave.v1.dai['31337'],
+        toWei('10'),
+        annuityPct,
+        burnToRelease,
+      ],
+      callValue: presets.Proton.mintFee.toString()
+    });
+
+    await proton.connect(signer1).setSalePrice(energizedParticleId, toWei('0.1'));
+    await proton.connect(signer1).setRoyaltiesPct(energizedParticleId, 500); // royaltyPct = 5%
+    const user1Balance1 = await ethers.provider.getBalance(user1);
+    await proton.connect(signer2).buyProton(energizedParticleId, { value: toWei('0.1') })
+    const user1Balance2 = await ethers.provider.getBalance(user1);
+
+    expect(user1Balance2.sub(user1Balance1)).to.be.equal(toWei('0.1'));
+    expect(await proton.ownerOf(energizedParticleId)).to.be.equal(user2);
+
+    await proton.connect(signer2).setSalePrice(energizedParticleId, toWei('1'));
+    const user2Balance1 = await ethers.provider.getBalance(user2);
+    await proton.connect(signer3).buyProton(energizedParticleId, { value: toWei('1') })
+    const user1Balance3 = await ethers.provider.getBalance(user1);
+    const user2Balance2 = await ethers.provider.getBalance(user2);
+
+    expect(user2Balance2.sub(user2Balance1)).to.be.equal(toWei('0.955'));
+    expect(user1Balance3.sub(user1Balance2)).to.be.equal(toWei('0.045'));
+    expect(await proton.ownerOf(energizedParticleId)).to.be.equal(user3);
   });
 
 });

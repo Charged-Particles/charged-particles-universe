@@ -48,7 +48,6 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
   event MintFeeSet(uint256 fee);
   event SalePriceSet(uint256 indexed tokenId, uint256 salePrice);
   event CreatorRoyaltiesSet(uint256 indexed tokenId, uint256 royaltiesPct);
-  event ProtonSold(uint256 indexed tokenId, address indexed oldOwner, address indexed newOwner, uint256 salePrice, address creator, uint256 creatorRoyalties);
   event FeesWithdrawn(address indexed receiver, uint256 amount);
 
   IUniverse internal _universe;
@@ -77,6 +76,18 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
 
   function creatorOf(uint256 tokenId) public view returns (address) {
     return _tokenCreator[tokenId];
+  }
+
+  function tradeConfig(uint256 tokenId) public view returns (uint256, uint256, uint256, uint256) {
+    return (_tokenCreatorRoyaltiesPct[tokenId], _tokenSalePrice[tokenId], _tokenLastSellPrice[tokenId], PERCENTAGE_SCALE);
+  }
+
+  function setTokenLastSellPrice(uint256 tokenId, uint256 salePrice) public onlyChargedParticles {
+    _tokenLastSellPrice[tokenId] = salePrice;
+  }
+
+  function transfer(address from, address to, uint256 tokenId) public onlyChargedParticles {
+    _transfer(from, to, tokenId);
   }
 
   function createChargedParticle(
@@ -345,43 +356,12 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     internal
     returns (bool)
   {
-    uint256 salePrice = _tokenSalePrice[tokenId];
-    require(salePrice > 0, "Proton: TOKEN_NOT_FOR_SALE");
-    require(msg.value >= salePrice, "Proton: INSUFF_PAYMENT");
-
-    uint256 ownerAmount = salePrice;
-    uint256 creatorAmount;
-
-    // Creator Royalties
-    address creator = _tokenCreator[tokenId];
-    uint256 royaltiesPct = _tokenCreatorRoyaltiesPct[tokenId];
-    uint256 lastSellPrice = _tokenLastSellPrice[tokenId];
-    if (royaltiesPct > 0 && lastSellPrice > 0 && salePrice > lastSellPrice) {
-      creatorAmount = (salePrice - lastSellPrice).mul(royaltiesPct).div(PERCENTAGE_SCALE);
-      ownerAmount = ownerAmount.sub(creatorAmount);
-    }
-    _tokenLastSellPrice[tokenId] = salePrice;
-
-    // Transfer Token
-    address oldOwner = ownerOf(tokenId);
-    address newOwner = _msgSender();
-    _transfer(oldOwner, newOwner, tokenId);
-
-    // Transfer Payment
-    payable(oldOwner).sendValue(ownerAmount);
-    if (creatorAmount > 0) {
-      payable(creator).sendValue(creatorAmount);
-    }
-
-    // Signal to Universe Controller
-    if (address(_universe) != address(0)) {
-      _universe.onProtonSale(address(this), tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
-    }
-
-    emit ProtonSold(tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
-
-    _refundOverpayment();
-    return true;
+    bool success = _chargedParticles.buyParticle{value: msg.value}(
+      _msgSender(),
+      address(this),
+      tokenId
+    );
+    return success;
   }
 
   /**
@@ -420,6 +400,11 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
 
   modifier onlyTokenCreator(uint256 tokenId) {
     require(_tokenCreator[tokenId] == _msgSender(), "Proton: NOT_CREATOR");
+    _;
+  }
+
+  modifier onlyChargedParticles() {
+    require(address(_chargedParticles) == _msgSender(), "Proton: only charged particles");
     _;
   }
 }
