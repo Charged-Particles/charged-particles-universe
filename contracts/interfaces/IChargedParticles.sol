@@ -79,20 +79,12 @@ interface IChargedParticles {
 
   function getCollectedFees(
     address contractAddress,
-    string calldata liquidityProviderId,
     address assetToken
-  ) external returns (uint256 balance, uint256 interestAccrued);
-
-  function storeCollectedFees(
-    address contractAddress,
-    string calldata liquidityProviderId,
-    address assetToken
-  ) external returns (uint256 amountStored);
+  ) external returns (uint256);
 
   function withdrawContractFees(
     address contractAddress,
     address receiver,
-    string calldata liquidityProviderId,
     address assetToken
   ) external returns (uint256 amount);
 
@@ -215,7 +207,6 @@ interface IChargedParticles {
   event FeesWithdrawn(
     address indexed contractAddress,
     address indexed receiver,
-    string liquidityProviderId,
     address assetToken,
     uint256 amount
   );

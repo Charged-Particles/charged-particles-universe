@@ -23,7 +23,6 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/proxy/Initializable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -35,7 +34,7 @@ import "../../lib/SmartWalletBase.sol";
  * @notice ERC20-Token Smart-Wallet Bridge
  * @dev Non-upgradeable Contract
  */
-contract AaveSmartWallet is SmartWalletBase, Initializable {
+contract AaveSmartWallet is SmartWalletBase {
   using SafeMath for uint256;
   using SafeCast for uint256;
 
@@ -55,7 +54,6 @@ contract AaveSmartWallet is SmartWalletBase, Initializable {
     address aaveBridge
   )
     public
-    initializer
   {
     SmartWalletBase.initializeBase();
     _bridge = IAaveBridge(aaveBridge);

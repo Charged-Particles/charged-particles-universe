@@ -84,6 +84,10 @@ abstract contract WalletManagerBase is Ownable, IWalletManager {
   |         Private Functions         |
   |__________________________________*/
 
+  function _getTokenUUID(address contractAddress, uint256 tokenId) internal pure returns (uint256) {
+    return uint256(keccak256(abi.encodePacked(contractAddress, tokenId)));
+  }
+
   /**
     * @dev Creates Contracts from a Template via Cloning
     * see: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1167.md
