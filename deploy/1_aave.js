@@ -3,7 +3,6 @@ const {
   chainIdByName,
   saveDeploymentData,
   getContractAbi,
-  getDeployData,
   getTxGasCost,
   log,
   presets,
@@ -18,15 +17,12 @@ module.exports = async (hre) => {
 
     const chainId = chainIdByName(network.name);
 
-    const ddChargedParticles = getDeployData('ChargedParticles', chainId);
-
     const lendingPoolProviderV1 = presets.Aave.v1.lendingPoolProvider[chainId];
     const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
-    const referralCode = presets.Aave.referralCode[chainId];
 
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-    log('Charged Particles LP: Aave - Contract Initialization');
+    log('Charged Particles LP: Aave - Contract Deployment');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
     log('  Using Network: ', chainNameById(chainId));
@@ -34,10 +30,6 @@ module.exports = async (hre) => {
     log('  - Deployer:    ', deployer);
     log('  - Owner:       ', protocolOwner);
     log(' ');
-
-    log('  Loading ChargedParticles from: ', ddChargedParticles.address);
-    const ChargedParticles = await hre.ethers.getContractFactory('ChargedParticles');
-    const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
     log('\n  Deploying AaveWalletManager...')(alchemyTimeout);
     const AaveWalletManager = await hre.ethers.getContractFactory('AaveWalletManager');
@@ -80,32 +72,6 @@ module.exports = async (hre) => {
         deployTransaction: aaveBridgeV2.deployTransaction,
       }
     }
-
-    log('  - Setting Charged Particles as Controller...')(alchemyTimeout);
-    await aaveWalletManager.setController(ddChargedParticles.address);
-
-    if (lendingPoolProviderV2.length > 0) {
-      log('  - Setting Aave Bridge to V2...')(alchemyTimeout);
-      await aaveWalletManager.setAaveBridge(aaveBridgeV2.address);
-    } else {
-      if (lendingPoolProviderV1.length > 0) {
-        log('  - Setting Aave Bridge to V1...')(alchemyTimeout);
-        await aaveWalletManager.setAaveBridge(aaveBridgeV1.address);
-      } else {
-        log('  - NO Aave Bridge Available!!!');
-      }
-    }
-
-    if (referralCode.length > 0) {
-      log('  - Setting Referral Code...')(alchemyTimeout);
-      await aaveWalletManager.setReferralCode(referralCode);
-    }
-
-    log('  - Registering LP with ChargedParticles...')(alchemyTimeout);
-    await chargedParticles.registerLiquidityProvider('aave', aaveWalletManager.address);
-
-    // log(`  Transferring Contract Ownership to '${owner}'...`)(alchemyTimeout);
-    // await aaveWalletManager.transferOwnership(owner);
 
     // Display Contract Addresses
     log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
