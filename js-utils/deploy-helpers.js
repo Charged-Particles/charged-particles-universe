@@ -14,29 +14,29 @@ const txOverrides = (options = {}) => ({gasLimit: 15000000, ...options});
 
 const log = (...args) => {
   console.log(...args);
-  return (delay = 0) => (delay && sleep(delay))
-}
+  return (delay = 0) => (delay && sleep(delay));
+};
 
 const chainIdByName = (chainName) => {
   switch (_.toLower(chainName)) {
-    case 'mainnet': return 1
-    case 'ropsten': return 3
-    case 'rinkeby': return 4
-    case 'kovan': return 42
-    case 'hardhat': return 31337
-    case 'coverage': return 31337
-    default: return 0
+    case 'mainnet': return 1;
+    case 'ropsten': return 3;
+    case 'rinkeby': return 4;
+    case 'kovan': return 42;
+    case 'hardhat': return 31337;
+    case 'coverage': return 31337;
+    default: return 0;
   }
 };
 
 const chainNameById = (chainId) => {
   switch (parseInt(chainId, 10)) {
-    case 1: return 'Mainnet'
-    case 3: return 'Ropsten'
-    case 4: return 'Rinkeby'
-    case 42: return 'Kovan'
-    case 31337: return 'Hardhat'
-    default: return 'Unknown'
+    case 1: return 'Mainnet';
+    case 3: return 'Ropsten';
+    case 4: return 'Rinkeby';
+    case 42: return 'Kovan';
+    case 31337: return 'Hardhat';
+    default: return 'Unknown';
   }
 };
 
@@ -110,7 +110,7 @@ const presets = {
     ]
   },
   Proton: {
-    mintFee: toWei('0.001')
+    mintFee: '0' // toWei('0.001')
   },
   Ion: {
     rewardsForAssetTokens: [

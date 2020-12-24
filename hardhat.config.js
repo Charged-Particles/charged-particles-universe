@@ -104,8 +104,8 @@ module.exports = {
         },
         kovan: {
             url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            gasPrice: 22e9,
-            blockGasLimit: 200000000,
+            gasPrice: 2e9,
+            blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
