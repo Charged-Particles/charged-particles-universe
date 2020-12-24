@@ -878,8 +878,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     returns (uint256)
   {
     (uint256 protocolFee, uint256 externalFee) = _getFeesForDeposit(contractAddress, assetAmount);
-    depositFeesEarned[address(this)][assetToken] = protocolFee;
-    depositFeesEarned[contractAddress][assetToken] = externalFee;
+    depositFeesEarned[address(this)][assetToken] = depositFeesEarned[address(this)][assetToken].add(protocolFee);
+    depositFeesEarned[contractAddress][assetToken] = depositFeesEarned[contractAddress][assetToken].add(externalFee);
     return protocolFee.add(externalFee);
   }
 
