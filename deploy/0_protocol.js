@@ -5,7 +5,6 @@ const {
   getContractAbi,
   getTxGasCost,
   log,
-  presets,
 } = require("../js-utils/deploy-helpers");
 
 const _ = require('lodash');
@@ -20,7 +19,7 @@ module.exports = async (hre) => {
     const chainId = chainIdByName(network.name);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-    log('Charged Particles Protocol - Contract Initialization');
+    log('Charged Particles Protocol - Contract Deployment');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
     log('  Using Network: ', chainNameById(chainId));
@@ -49,21 +48,6 @@ module.exports = async (hre) => {
       address: chargedParticles.address,
       deployTransaction: chargedParticles.deployTransaction,
     }
-
-    log('  - Registering ChargedParticles with Universe...')(alchemyTimeout);
-    await universe.setChargedParticles(chargedParticles.address);
-
-    log('  - Registering Universe with ChargedParticles...')(alchemyTimeout);
-    await chargedParticles.setUniverse(universe.address);
-
-    log('  - Setting Deposit Fee...')(alchemyTimeout);
-    const depositFees = _.map(presets.ChargedParticles.fees, 'fee');
-    const depositLimits = _.map(presets.ChargedParticles.fees, 'limit');
-    await chargedParticles.setDepositFees(depositLimits, depositFees);
-
-    // log(`  Transferring Contract Ownership to '${owner}'...`)(alchemyTimeout);
-    // await universe.transferOwnership(owner);
-    // await chargedParticles.transferOwnership(owner);
 
     // Display Contract Addresses
     log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);

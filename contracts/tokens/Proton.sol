@@ -83,7 +83,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     address creator,
     address receiver,
     string memory tokenMetaUri,
-    string calldata liquidityProviderId,
+    string memory liquidityProviderId,
     address assetToken,
     uint256 assetAmount,
     uint256 annuityPercent,
@@ -95,7 +95,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     requireMintFee
     returns (uint256 newTokenId)
   {
-    return _createChargedParticle(
+    newTokenId = _createChargedParticle(
       creator,
       receiver,
       tokenMetaUri,
@@ -105,6 +105,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
       annuityPercent,
       burnToRelease
     );
+    _refundOverpayment();
   }
 
   function createProton(
@@ -120,18 +121,19 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     requireMintFee
     returns (uint256 newTokenId)
   {
-    return _createProton(
+    newTokenId = _createProton(
       creator,
       receiver,
       tokenMetaUri,
       annuityPercent,
       burnToRelease
     );
+    _refundOverpayment();
   }
 
   function chargeParticle(
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string memory liquidityProviderId,
     address assetToken,
     uint256 assetAmount
   )
@@ -241,7 +243,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     address creator,
     address receiver,
     string memory tokenMetaUri,
-    string calldata liquidityProviderId,
+    string memory liquidityProviderId,
     address assetToken,
     uint256 assetAmount,
     uint256 annuityPercent,
@@ -253,8 +255,6 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent, burnToRelease);
 
     _chargeParticle(newTokenId, liquidityProviderId, assetToken, assetAmount);
-
-    _refundOverpayment();
   }
 
   function _createProton(
@@ -284,13 +284,11 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
       annuityPercent,
       burnToRelease
     );
-
-    _refundOverpayment();
   }
 
   function _chargeParticle(
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string memory liquidityProviderId,
     address assetToken,
     uint256 assetAmount
   )
@@ -397,9 +395,11 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
   }
 
   function _refundOverpayment() internal {
-    uint256 overage = msg.value.sub(mintFee);
-    if (overage > 0) {
-      payable(_msgSender()).sendValue(overage);
+    if (msg.value > mintFee) {
+      uint256 overage = msg.value.sub(mintFee);
+      if (overage > 0) {
+        payable(_msgSender()).sendValue(overage);
+      }
     }
   }
 

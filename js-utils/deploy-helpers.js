@@ -14,29 +14,29 @@ const txOverrides = (options = {}) => ({gasLimit: 15000000, ...options});
 
 const log = (...args) => {
   console.log(...args);
-  return (delay = 0) => (delay && sleep(delay))
-}
+  return (delay = 0) => (delay && sleep(delay));
+};
 
 const chainIdByName = (chainName) => {
   switch (_.toLower(chainName)) {
-    case 'mainnet': return 1
-    case 'ropsten': return 3
-    case 'rinkeby': return 4
-    case 'kovan': return 42
-    case 'hardhat': return 31337
-    case 'coverage': return 31337
-    default: return 0
+    case 'mainnet': return 1;
+    case 'ropsten': return 3;
+    case 'rinkeby': return 4;
+    case 'kovan': return 42;
+    case 'hardhat': return 31337;
+    case 'coverage': return 31337;
+    default: return 0;
   }
 };
 
 const chainNameById = (chainId) => {
   switch (parseInt(chainId, 10)) {
-    case 1: return 'Mainnet'
-    case 3: return 'Ropsten'
-    case 4: return 'Rinkeby'
-    case 42: return 'Kovan'
-    case 31337: return 'Hardhat'
-    default: return 'Unknown'
+    case 1: return 'Mainnet';
+    case 3: return 'Ropsten';
+    case 4: return 'Rinkeby';
+    case 42: return 'Kovan';
+    case 31337: return 'Hardhat';
+    default: return 'Unknown';
   }
 };
 
@@ -110,7 +110,7 @@ const presets = {
     ]
   },
   Proton: {
-    mintFee: toWei('0.001')
+    mintFee: '0' // toWei('0.001')
   },
   Ion: {
     rewardsForAssetTokens: [
@@ -152,10 +152,10 @@ const presets = {
         31337: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // Hardhat - Forked Mainnet
       },
       lendingPoolProvider: {
-        1: '0x24a42fD28C976A61Df5D00D0599C34c4f90748c8', // mainnet
-        3: '0x1c8756FD2B28e9426CDBDcC7E3c4d64fa9A54728', // ropsten
+        1: '', // mainnet
+        3: '', // ropsten
         4: '', // rinkeby
-        42: '0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5', // kovan
+        42: '', // kovan
         31337: '', // Hardhat - Forked Mainnet
       }
     },
