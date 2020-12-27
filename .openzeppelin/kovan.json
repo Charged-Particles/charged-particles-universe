@@ -1,9 +1,9 @@
 {
   "manifestVersion": "3.1",
   "impls": {
-    "6dd472af5eda66c4213f810b399f3cf0e0760c76f3fb7a3aab2f1c45d6c722c8": {
-      "address": "0x3Dd44a107eCA17E091A826718Bebc0a94E0B518F",
-      "txHash": "0x8d3789105e65a6f1cd290f51fe0804aad0d59347253cadafa70b1fc3494842ed",
+    "986dd8828df13a1e2f9e586f2d93ef8a6f9abe77ec75ce8390a61dab6a0114c3": {
+      "address": "0x537E8f7c2a61Fa38cAC83D7BA965ED177Dbe5F1f",
+      "txHash": "0x33532328ff927e3541d1d159ce0088595b67464e5c84859cba37e9f744a1a1a2",
       "layout": {
         "storage": [
           {
@@ -77,9 +77,9 @@
         }
       }
     },
-    "6d77b6e50c1fdb69721d3f0b8c746cc1f1bcb0274bbeb7b2b9e7abb03170a610": {
-      "address": "0x75C0B630E2A2D3341Ca7D72641FD2B85343f451b",
-      "txHash": "0x44835f9469a724569da52b3112a21dcbeb48f35a0bc978f476b124df633f90fd",
+    "dbb8cb9d61f3f9ca3f1bc6d667db0f66c4b3a2dced85dd5e38fe7f078803f8b1": {
+      "address": "0x7896D612c2CDb678C8063904d64FB557Ddf4e538",
+      "txHash": "0xb3481b2b9d1de0482d3d61e09bfbac23ab451d813f0233afebb9502f9d3ce788",
       "layout": {
         "storage": [
           {
@@ -133,7 +133,7 @@
           {
             "contract": "ChargedParticles",
             "label": "_universe",
-            "type": "t_contract(IUniverse)11557",
+            "type": "t_contract(IUniverse)11572",
             "src": "contracts/ChargedParticles.sol:73"
           },
           {
@@ -145,7 +145,7 @@
           {
             "contract": "ChargedParticles",
             "label": "_lpWalletManager",
-            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)11818)",
+            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)11833)",
             "src": "contracts/ChargedParticles.sol:75"
           },
           {
@@ -246,13 +246,13 @@
           }
         ],
         "types": {
-          "t_contract(IUniverse)11557": {
+          "t_contract(IUniverse)11572": {
             "label": "contract IUniverse"
           },
           "t_array(t_string_storage)dyn_storage": {
             "label": "string[]"
           },
-          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)11818)": {
+          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)11833)": {
             "label": "mapping(string => contract IWalletManager)"
           },
           "t_mapping(t_address,t_bool)": {
@@ -302,7 +302,7 @@
     }
   },
   "admin": {
-    "address": "0x59Fd466d8E56701468BDc97C349a26fcC0d4b01E",
-    "txHash": "0x610f1d4f205bba0efe323b78a42944ec805195dd5dd450fe45b1e7079b269e3e"
+    "address": "0x561F8FD179afA63557CFfc8b18818a5243387312",
+    "txHash": "0x7298ed2b4a642e1db72d7998eca755ac11c659d1165effb48af3ea2d24ac93da"
   }
 }

@@ -132,7 +132,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   )
     external
     override
-    onlyChargedParticles
+    // onlyChargedParticles
   {
     // no-op
   }
