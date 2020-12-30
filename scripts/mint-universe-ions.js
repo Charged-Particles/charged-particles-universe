@@ -9,7 +9,7 @@ const {
   getTxGasCost,
   saveDeploymentData,
   presets,
-} = require('../js-utils/deploy-helpers');
+} = require('../js-helpers/deploy');
 
 
 async function main() {

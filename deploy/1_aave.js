@@ -7,7 +7,7 @@ const {
   getTxGasCost,
   log,
   presets,
-} = require("../js-utils/deploy-helpers");
+} = require("../js-helpers/deploy");
 
 module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;

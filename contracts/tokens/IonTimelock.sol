@@ -95,7 +95,7 @@ contract IonTimelock is IIonTimelock {
     }
 
     uint256 amountAvailable = token.balanceOf(address(this));
-    require(amount > amountAvailable, "IonTimelock: INSUFF_FUNDS");
+    require(amount <= amountAvailable, "IonTimelock: INSUFF_FUNDS");
     token.safeTransfer(receiver, amount);
   }
 }

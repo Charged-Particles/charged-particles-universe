@@ -10,16 +10,17 @@ const {
   toWei,
   toBN,
   presets
-} = require('../js-utils/deploy-helpers');
+} = require('../js-helpers/deploy');
 
 const {
+  callAndReturn,
   getNetworkBlockNumber,
-  setNetworkAfterBlockNumber
-} = require('./helpers/network')(network);
-
-const callAndReturn = require('./helpers/callAndReturn');
+  setNetworkAfterBlockNumber,
+  setNetworkAfterTimestamp
+} = require('../js-helpers/test')(network);
 
 const { expect } = require('chai');
+const { max } = require('lodash');
 
 const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
 
@@ -97,7 +98,7 @@ describe("Charged Particles", () => {
     proton = Proton.attach(getDeployData('Proton', chainId).address);
     ion = Ion.attach(getDeployData('Ion', chainId).address);
     timelocks = Object.values(getDeployData('IonTimelocks', chainId))
-      .map(async ionTimelock => (IonTimelock.attach(ionTimelock.address)));
+      .map(ionTimelock => (IonTimelock.attach(ionTimelock.address)));
   });
 
   afterEach(async () => {
@@ -238,6 +239,33 @@ describe("Charged Particles", () => {
     expect(user2Balance2.sub(user2Balance1)).to.be.equal(toWei('0.955'));
     expect(user1Balance3.sub(user1Balance2)).to.be.equal(toWei('0.045'));
     expect(await proton.ownerOf(energizedParticleId)).to.be.equal(user3);
+  });
+
+  it(`iontimelocks succesfully release ions to receivers
+      and locked ions cannot be transferred before release block 
+      and can succesfully be transferred after release block`, async () => {
+    const receivers = await Promise.all(timelocks.map(async timelock => await timelock.receiver()));
+
+    const balancesBefore = await Promise.all(receivers.map(async receiver => await ion.balanceOf(receiver)));
+
+    const releaseTimes = await Promise.all(timelocks.map(async timelock => await timelock.nextReleaseTime()));
+
+    await Promise.all(timelocks.map(async timelock => {
+      await expect(timelock.release()).to.not.emit(timelock, 'PortionReleased');
+    }));
+
+    const maxReleaseTime = max(releaseTimes);
+
+    await setNetworkAfterTimestamp(Number(maxReleaseTime.toString()));
+
+    await Promise.all(timelocks.map(async timelock => {
+      await expect(timelock.release()).to.emit(timelock, 'PortionReleased');
+    }));
+
+    await Promise.all(receivers.map(async (receiver, i) => {
+      expect(await ion.balanceOf(receiver)).to.be.above(balancesBefore[i]);
+    }));
+
   });
 
 });
