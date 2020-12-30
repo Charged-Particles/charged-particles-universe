@@ -55,6 +55,13 @@ module.exports = async (hre) => {
         lendingPoolProvider: lendingPoolProviderV1,
         deployTransaction: aaveBridgeV1.deployTransaction,
       }
+    } else {
+      deployData['AaveBridgeV1'] = {
+        abi: [],
+        address: 0x0,
+        lendingPoolProvider: 0x0,
+        deployTransaction: {},
+      }
     }
 
     let AaveBridgeV2;
@@ -70,6 +77,13 @@ module.exports = async (hre) => {
         address: aaveBridgeV2.address,
         lendingPoolProvider: lendingPoolProviderV2,
         deployTransaction: aaveBridgeV2.deployTransaction,
+      }
+    } else {
+      deployData['AaveBridgeV2'] = {
+        abi: [],
+        address: 0x0,
+        lendingPoolProvider: 0x0,
+        deployTransaction: {},
       }
     }
 

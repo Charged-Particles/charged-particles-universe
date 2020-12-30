@@ -105,7 +105,6 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
       annuityPercent,
       burnToRelease
     );
-    _refundOverpayment();
   }
 
   function createProton(
@@ -128,7 +127,6 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
       annuityPercent,
       burnToRelease
     );
-    _refundOverpayment();
   }
 
   function chargeParticle(

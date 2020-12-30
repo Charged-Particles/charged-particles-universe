@@ -1,9 +1,9 @@
 {
   "manifestVersion": "3.1",
   "impls": {
-    "25777e9b8b1762abc539ce9ba4e86f40568d2783be4f08c86c2698d12aedbefe": {
+    "2e925c758da1a0ce54ba9133faf2da3da6d4f352b6ba7840455c121e04657983": {
       "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-      "txHash": "0x2b5c62e3196b035953c17fb99b03148250d92101c7bdff4ff849b681ec57fc17",
+      "txHash": "0xf203ff9314992d068af2f2642b1a02be25194c93692c2a849c0708540949c2c0",
       "layout": {
         "storage": [
           {
@@ -77,9 +77,9 @@
         }
       }
     },
-    "df9bb7b68fa03494afa5e42951ff82615ccd028135acdcfe111c6e64e983ebab": {
+    "c7217b60158624a8afa905bfbffe3f4cd1885a176c517a464f6992ad680aa0d7": {
       "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
-      "txHash": "0x5ad01ece8bc5e34288dc86468216658c51697982d58ca2523df188217ba57cd2",
+      "txHash": "0x870300f5295d0c45654a3e51fcfbcb14ad188c771eaa9269decc853b24c8a1e0",
       "layout": {
         "storage": [
           {
@@ -133,7 +133,7 @@
           {
             "contract": "ChargedParticles",
             "label": "_universe",
-            "type": "t_contract(IUniverse)14671",
+            "type": "t_contract(IUniverse)14305",
             "src": "contracts/ChargedParticles.sol:75"
           },
           {
@@ -145,7 +145,7 @@
           {
             "contract": "ChargedParticles",
             "label": "_lpWalletManager",
-            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)14894)",
+            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)14566)",
             "src": "contracts/ChargedParticles.sol:77"
           },
           {
@@ -246,13 +246,13 @@
           }
         ],
         "types": {
-          "t_contract(IUniverse)14671": {
+          "t_contract(IUniverse)14305": {
             "label": "contract IUniverse"
           },
           "t_array(t_string_storage)dyn_storage": {
             "label": "string[]"
           },
-          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)14894)": {
+          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)14566)": {
             "label": "mapping(string => contract IWalletManager)"
           },
           "t_mapping(t_address,t_bool)": {

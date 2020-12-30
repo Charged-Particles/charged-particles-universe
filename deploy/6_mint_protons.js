@@ -2,10 +2,8 @@ const {
   chainNameById,
   chainIdByName,
   getDeployData,
-  getContractAbi,
   log,
   presets,
-  toWei,
 } = require("../js-helpers/deploy");
 
 const _ = require('lodash');
@@ -24,11 +22,6 @@ module.exports = async (hre) => {
 
     const ddProton = getDeployData('Proton', chainId);
 
-    const daiAddress = presets.Aave.v2.dai[chainId];
-    const daiAbi = getContractAbi('ERC20');
-    const dai = new ethers.Contract(daiAddress, daiAbi, protonCreator);
-
-
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles: Mint Proton Tokens ');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
@@ -46,8 +39,6 @@ module.exports = async (hre) => {
 
     let creator;
     let receiver;
-    let assetToken;
-    let assetAmount;
     let annuityPct;
     let burnToRelease;
 
@@ -70,30 +61,19 @@ module.exports = async (hre) => {
 
     creator = user1;
     receiver = user3;
-    assetToken = daiAddress;
-    assetAmount = toWei('1.0');
     annuityPct = '1500'; // 15%
     burnToRelease = true;
 
-    log(`  - Approving Charged Particles to transfer DAI from [user1: ${user1}]...`)(alchemyTimeout);
-    await dai.approve(ddProton.address, assetAmount);
-
-    log(`  - Minting Charged Particle to [user3: ${user3}]...`)(alchemyTimeout);
+    log(`  - Minting Proton to [user3: ${user3}]...`)(alchemyTimeout);
     await proton
       .connect(protonCreator)
-      .createChargedParticle(
+      .createProton(
         creator,
         receiver,
         TEST_NFT_TOKEN_URI,
-        'aave',
-        assetToken,
-        assetAmount,
         annuityPct,
         burnToRelease,
-        {
-          value: presets.Proton.mintFee,
-          gasLimit: 12487794
-        }
+        { value: presets.Proton.mintFee }
       );
 
 
