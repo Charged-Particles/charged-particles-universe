@@ -49,6 +49,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
   event SalePriceSet(uint256 indexed tokenId, uint256 salePrice);
   event CreatorRoyaltiesSet(uint256 indexed tokenId, uint256 royaltiesPct);
   event FeesWithdrawn(address indexed receiver, uint256 amount);
+  event ProtonSold(uint256 indexed tokenId, address indexed oldOwner, address indexed newOwner, uint256 salePrice, address creator, uint256 creatorRoyalties);
 
   IUniverse internal _universe;
   IChargedParticles internal _chargedParticles;
@@ -76,18 +77,6 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
 
   function creatorOf(uint256 tokenId) public view returns (address) {
     return _tokenCreator[tokenId];
-  }
-
-  function tradeConfig(uint256 tokenId) public view returns (uint256, uint256, uint256, uint256) {
-    return (_tokenCreatorRoyaltiesPct[tokenId], _tokenSalePrice[tokenId], _tokenLastSellPrice[tokenId], PERCENTAGE_SCALE);
-  }
-
-  function setTokenLastSellPrice(uint256 tokenId, uint256 salePrice) public onlyChargedParticles {
-    _tokenLastSellPrice[tokenId] = salePrice;
-  }
-
-  function transfer(address from, address to, uint256 tokenId) public onlyChargedParticles {
-    _transfer(from, to, tokenId);
   }
 
   function createChargedParticle(
@@ -184,7 +173,6 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     return _buyProton(tokenId);
   }
 
-
   /***********************************|
   |     Only Token Creator/Owner      |
   |__________________________________*/
@@ -262,10 +250,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     returns (uint256 newTokenId)
   {
     newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent, burnToRelease);
-
     _chargeParticle(newTokenId, liquidityProviderId, assetToken, assetAmount);
-
-    _refundOverpayment();
   }
 
   function _createProton(
@@ -296,7 +281,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
       burnToRelease
     );
 
-    _refundOverpayment();
+    _refundOverpayment(mintFee);
   }
 
   function _chargeParticle(
@@ -356,12 +341,43 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     internal
     returns (bool)
   {
-    bool success = _chargedParticles.buyParticle{value: msg.value}(
-      _msgSender(),
-      address(this),
-      tokenId
-    );
-    return success;
+    uint256 salePrice = _tokenSalePrice[tokenId];
+    require(salePrice > 0, "Proton: TOKEN_NOT_FOR_SALE");
+    require(msg.value >= salePrice, "Proton: INSUFF_PAYMENT");
+
+    uint256 ownerAmount = salePrice;
+    uint256 creatorAmount;
+
+    // Creator Royalties
+    address creator = _tokenCreator[tokenId];
+    uint256 royaltiesPct = _tokenCreatorRoyaltiesPct[tokenId];
+    uint256 lastSellPrice = _tokenLastSellPrice[tokenId];
+    if (royaltiesPct > 0 && lastSellPrice > 0 && salePrice > lastSellPrice) {
+      creatorAmount = (salePrice - lastSellPrice).mul(royaltiesPct).div(PERCENTAGE_SCALE);
+      ownerAmount = ownerAmount.sub(creatorAmount);
+    }
+    _tokenLastSellPrice[tokenId] = salePrice;
+
+    // Transfer Token
+    address oldOwner = ownerOf(tokenId);
+    address newOwner = _msgSender();
+    _transfer(oldOwner, newOwner, tokenId);
+
+    // Transfer Payment
+    payable(oldOwner).sendValue(ownerAmount);
+    if (creatorAmount > 0) {
+      payable(creator).sendValue(creatorAmount);
+    }
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onProtonSale(address(this), tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
+    }
+
+    emit ProtonSold(tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
+
+    _refundOverpayment(salePrice);
+    return true;
   }
 
   /**
@@ -376,8 +392,8 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     require(IERC20(assetToken).transferFrom(from, address(this), assetAmount), "Proton: TRANSFER_FAILED");
   }
 
-  function _refundOverpayment() internal {
-    uint256 overage = msg.value.sub(mintFee);
+  function _refundOverpayment(uint256 threshold) internal {
+    uint256 overage = msg.value.sub(threshold);
     if (overage > 0) {
       payable(_msgSender()).sendValue(overage);
     }
@@ -400,11 +416,6 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
 
   modifier onlyTokenCreator(uint256 tokenId) {
     require(_tokenCreator[tokenId] == _msgSender(), "Proton: NOT_CREATOR");
-    _;
-  }
-
-  modifier onlyChargedParticles() {
-    require(address(_chargedParticles) == _msgSender(), "Proton: only charged particles");
     _;
   }
 }

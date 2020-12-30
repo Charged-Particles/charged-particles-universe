@@ -27,8 +27,5 @@ interface IERC721Chargeable {
     function owner() external view returns (address);
     function ownerOf(uint256 tokenId) external view returns (address);
     function creatorOf(uint256 tokenId) external view returns (address);
-    function tradeConfig(uint256 tokenId) external view returns (uint256, uint256, uint256, uint256);
     function isApprovedForAll(address tokenOwner, address operator) external view returns (bool);
-    function transfer(address oldOwner, address newOwner, uint256 tokenId) external;
-    function setTokenLastSellPrice(uint256 tokenId, uint256 salePrice) external;
 }
