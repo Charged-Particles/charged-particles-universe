@@ -35,8 +35,14 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": true,
         "internalType": "uint256",
-        "name": "uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
@@ -46,7 +52,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address",
         "name": "creator",
         "type": "address"
@@ -98,8 +104,14 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": true,
         "internalType": "uint256",
-        "name": "uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
@@ -129,8 +141,14 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": true,
         "internalType": "uint256",
-        "name": "uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
@@ -166,8 +184,14 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": true,
         "internalType": "uint256",
-        "name": "uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
@@ -177,7 +201,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address",
         "name": "assetToken",
         "type": "address"
@@ -209,8 +233,14 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": true,
         "internalType": "uint256",
-        "name": "uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
@@ -220,7 +250,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address",
         "name": "rewardsToken",
         "type": "address"
@@ -284,17 +314,22 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_receiver",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "contractAddress",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "_assetToken",
+        "name": "assetToken",
         "type": "address"
       }
     ],
@@ -318,22 +353,27 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_receiver",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "contractAddress",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "_assetToken",
+        "name": "assetToken",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_assetAmount",
+        "name": "assetAmount",
         "type": "uint256"
       }
     ],
@@ -356,23 +396,28 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_uuid",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
-        "name": "_assetToken",
+        "name": "contractAddress",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_assetAmount",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "assetAmount",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "_depositFee",
+        "name": "depositFee",
         "type": "uint256"
       }
     ],
@@ -390,13 +435,18 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "contractAddress",
+        "name": "externalAddress",
         "type": "address"
       },
       {
@@ -424,13 +474,18 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "_assetToken",
+        "name": "assetToken",
         "type": "address"
       }
     ],
@@ -453,13 +508,18 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "_assetToken",
+        "name": "assetToken",
         "type": "address"
       }
     ],
@@ -477,13 +537,18 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "_assetToken",
+        "name": "assetToken",
         "type": "address"
       }
     ],
@@ -501,8 +566,13 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
@@ -525,13 +595,18 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "_assetToken",
+        "name": "assetToken",
         "type": "address"
       }
     ],
@@ -549,8 +624,13 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
@@ -591,13 +671,18 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "_assetToken",
+        "name": "assetToken",
         "type": "address"
       }
     ],
@@ -629,17 +714,22 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_receiver",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "contractAddress",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "_assetToken",
+        "name": "assetToken",
         "type": "address"
       }
     ],
@@ -746,12 +836,12 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_rewardsToken",
+        "name": "rewardsToken",
         "type": "address"
       },
       {
         "internalType": "bool",
-        "name": "_state",
+        "name": "state",
         "type": "bool"
       }
     ],
@@ -776,8 +866,13 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
@@ -800,22 +895,27 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_receiver",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "contractAddress",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_uuid",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "_rewardsToken",
+        "name": "rewardsToken",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_rewardsAmount",
+        "name": "rewardsAmount",
         "type": "uint256"
       }
     ],

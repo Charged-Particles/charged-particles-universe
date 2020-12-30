@@ -3,10 +3,8 @@ const {
   chainIdByName,
   saveDeploymentData,
   getContractAbi,
-  getDeployData,
   getTxGasCost,
-  log,
-  presets,
+  log
 } = require("../js-helpers/deploy");
 
 module.exports = async (hre) => {
@@ -17,13 +15,9 @@ module.exports = async (hre) => {
     const deployData = {};
 
     const chainId = chainIdByName(network.name);
-    const mintFee = presets.Proton.mintFee;
-
-    const ddUniverse = getDeployData('Universe', chainId);
-    const ddChargedParticles = getDeployData('ChargedParticles', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-    log('Charged Particles NFT: Proton - Contract Initialization');
+    log('Charged Particles NFT: Proton - Contract Deployment');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
     log('  Using Network: ', chainNameById(chainId));
@@ -31,10 +25,6 @@ module.exports = async (hre) => {
     log('  - Deployer:    ', deployer);
     log('  - Owner:       ', protocolOwner);
     log(' ');
-
-    log('  Loading ChargedParticles from: ', ddChargedParticles.address);
-    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
-    const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
     log('\n  Deploying Proton NFT...')(alchemyTimeout);
     const Proton = await ethers.getContractFactory('Proton');
@@ -45,18 +35,6 @@ module.exports = async (hre) => {
       address: proton.address,
       deployTransaction: proton.deployTransaction,
     }
-
-    log('  - Registering Universe with Proton...')(alchemyTimeout);
-    await proton.setUniverse(ddUniverse.address);
-
-    log('  - Registering ChargedParticles with Proton...')(alchemyTimeout);
-    await proton.setChargedParticles(ddChargedParticles.address);
-
-    log('  - Setting Proton Mint Fee:', mintFee.toString())(alchemyTimeout);
-    await proton.setMintFee(mintFee);
-
-    log('  - Registering Proton with ChargedParticles...')(alchemyTimeout);
-    await chargedParticles.updateWhitelist(proton.address, true);
 
     // Display Contract Addresses
     log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);

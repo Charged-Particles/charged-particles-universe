@@ -66,12 +66,6 @@
       },
       {
         "indexed": false,
-        "internalType": "string",
-        "name": "liquidityProviderId",
-        "type": "string"
-      },
-      {
-        "indexed": false,
         "internalType": "address",
         "name": "assetToken",
         "type": "address"
@@ -677,11 +671,6 @@
         "type": "address"
       },
       {
-        "internalType": "string",
-        "name": "liquidityProviderId",
-        "type": "string"
-      },
-      {
         "internalType": "address",
         "name": "assetToken",
         "type": "address"
@@ -691,12 +680,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "balance",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "interestAccrued",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -1373,35 +1357,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "liquidityProviderId",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      }
-    ],
-    "name": "storeCollectedFees",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "amountStored",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "newOwner",
         "type": "address"
       }
@@ -1485,11 +1440,6 @@
         "internalType": "address",
         "name": "receiver",
         "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "liquidityProviderId",
-        "type": "string"
       },
       {
         "internalType": "address",

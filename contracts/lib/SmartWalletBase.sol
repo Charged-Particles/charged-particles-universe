@@ -52,6 +52,7 @@ abstract contract SmartWalletBase is ISmartWallet {
   |__________________________________*/
 
   function initializeBase() public {
+    require(_walletManager == address(0x0), "SmartWalletBase: ALREADY_INIT");
     _walletManager = msg.sender;
   }
 
