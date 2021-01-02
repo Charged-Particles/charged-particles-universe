@@ -32,19 +32,6 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "c__0x800ce7ed",
-        "type": "bytes32"
-      }
-    ],
-    "name": "c_0x800ce7ed",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "assetToken",
         "type": "address"

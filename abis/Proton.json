@@ -309,47 +309,6 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "c__0x310abab3",
-        "type": "bytes32"
-      }
-    ],
-    "name": "c_0x310abab3",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "liquidityProviderId",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "assetAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "chargeParticle",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "creator",
         "type": "address"
@@ -383,11 +342,6 @@
         "internalType": "uint256",
         "name": "annuityPercent",
         "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "burnToRelease",
-        "type": "bool"
       }
     ],
     "name": "createChargedParticle",
@@ -422,11 +376,6 @@
         "internalType": "uint256",
         "name": "annuityPercent",
         "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "burnToRelease",
-        "type": "bool"
       }
     ],
     "name": "createProton",
@@ -473,6 +422,63 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getCreatorRoyalties",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getLastSellPrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getSalePrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -558,45 +564,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "liquidityProviderId",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      }
-    ],
-    "name": "releaseParticle",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "creatorAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "receiverAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
