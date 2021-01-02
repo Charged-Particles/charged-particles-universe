@@ -25,7 +25,7 @@ const { max } = require('lodash');
 const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
 
 const daiABI = require('./abis/dai');
-const daiMaster = '0x9eb7f2591ed42dee9315b6e2aaf21ba85ea69f8c';
+const daiMaster = '0x47ac0Fb4F2D84898e4D9E7b4DaB3C24507a6D503';
 
 
 
@@ -34,6 +34,7 @@ describe("Charged Particles", () => {
 
   // External contracts
   let dai;
+  let daiAddress;
 
   // Internal contracts
   let universe;
@@ -45,11 +46,9 @@ describe("Charged Particles", () => {
 
   // Settings
   let annuityPct = '1000';  // 10%
-  let burnToRelease = false;
 
   // Accounts
   let trustedForwarder;
-  let deployer;
 
   // let daiSigner;
   let user1;
@@ -68,8 +67,7 @@ describe("Charged Particles", () => {
       params: [daiMaster]
     });
 
-    [deployer] = await ethers.getSigners();
-
+    daiAddress = presets.Aave.v2.dai[chainId];
     daiSigner = ethers.provider.getSigner(daiMaster);
     const namedAccts = (await getNamedAccounts());
     trustedForwarder = namedAccts.trustedForwarder;
@@ -82,7 +80,7 @@ describe("Charged Particles", () => {
     signer3 = ethers.provider.getSigner(user3);
 
     // With Forked Mainnet
-    dai = new ethers.Contract(presets.Aave.v1.dai['31337'], daiABI, daiSigner);
+    dai = new ethers.Contract(daiAddress, daiABI, daiSigner);
 
     // Connect to Internal Contracts
     const Universe = await ethers.getContractFactory('Universe');
@@ -127,19 +125,18 @@ describe("Charged Particles", () => {
         user2,                        // receiver
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
         'aave',                       // liquidityProviderId
-        presets.Aave.v1.dai['31337'], // assetToken
+        daiAddress, // assetToken
         toWei('10'),                  // assetAmount
         annuityPct,                   // annuityPercent
-        burnToRelease,                // burnToRelease
       ],
-      callValue: presets.Proton.mintFee.toString(),
+      callValue: presets.Proton.mintFee,
     });
 
     await proton.connect(signer2).releaseParticle(
       user2,
       energizedParticleId,
       'aave',
-      presets.Aave.v1.dai['31337']
+      daiAddress
     );
 
     expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
@@ -161,12 +158,11 @@ describe("Charged Particles", () => {
         user2,
         TEST_NFT_TOKEN_URI,
         'aave',
-        presets.Aave.v1.dai['31337'],
+        daiAddress,
         toWei('10'),
         annuityPct,
-        burnToRelease,
       ],
-      callValue: presets.Proton.mintFee.toString()
+      callValue: presets.Proton.mintFee
     });
 
     const blockNumberTimelock = (await getNetworkBlockNumber()).add(toBN('10'));
@@ -184,7 +180,7 @@ describe("Charged Particles", () => {
       proton.address,
       energizedParticleId,
       'aave',
-      presets.Aave.v1.dai['31337']
+      daiAddress
     )).to.be.revertedWith("ChargedParticles: TOKEN_TIMELOCKED");
 
     await setNetworkAfterBlockNumber(blockNumberTimelock);
@@ -194,7 +190,7 @@ describe("Charged Particles", () => {
       proton.address,
       energizedParticleId,
       'aave',
-      presets.Aave.v1.dai['31337']
+      daiAddress
     );
 
     expect((await dai.balanceOf(user2)).sub(user2BalanceBefore)).to.be.above(toWei('0'));
@@ -213,12 +209,11 @@ describe("Charged Particles", () => {
         user1,
         TEST_NFT_TOKEN_URI,
         'aave',
-        presets.Aave.v1.dai['31337'],
+        daiAddress,
         toWei('10'),
         annuityPct,
-        burnToRelease,
       ],
-      callValue: presets.Proton.mintFee.toString()
+      callValue: presets.Proton.mintFee
     });
 
     await proton.connect(signer1).setSalePrice(energizedParticleId, toWei('0.1'));

@@ -120,8 +120,7 @@ contract AaveWalletManager is WalletManagerBase {
     address contractAddress,
     uint256 tokenId,
     address assetToken,
-    uint256 assetAmount,
-    uint256 depositFee
+    uint256 assetAmount
   )
     external
     override
@@ -135,7 +134,7 @@ contract AaveWalletManager is WalletManagerBase {
     yieldTokensAmount = AaveSmartWallet(wallet).deposit(assetToken, assetAmount, _referralCode);
 
     // Log Event
-    emit WalletEnergized(contractAddress, tokenId, assetToken, assetAmount, depositFee, yieldTokensAmount);
+    emit WalletEnergized(contractAddress, tokenId, assetToken, assetAmount, yieldTokensAmount);
   }
 
   function discharge(

@@ -30,7 +30,7 @@ pragma solidity >=0.6.0;
 interface IWalletManager {
 
   event NewSmartWallet(address indexed contractAddress, uint256 indexed tokenId, address indexed smartWallet, address creator, uint256 annuityPct);
-  event WalletEnergized(address indexed contractAddress, uint256 indexed tokenId, address indexed assetToken, uint256 assetAmount, uint256 depositFee, uint256 yieldTokensAmount);
+  event WalletEnergized(address indexed contractAddress, uint256 indexed tokenId, address indexed assetToken, uint256 assetAmount, uint256 yieldTokensAmount);
   event WalletDischarged(address indexed contractAddress, uint256 indexed tokenId, address indexed assetToken, uint256 creatorAmount, uint256 receiverAmount);
   event WalletReleased(address indexed contractAddress, uint256 indexed tokenId, address indexed receiver, address assetToken, uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount);
   event WalletRewarded(address indexed contractAddress, uint256 indexed tokenId, address indexed receiver, address rewardsToken, uint256 rewardsAmount);
@@ -45,7 +45,7 @@ interface IWalletManager {
   function getInterest(address contractAddress, uint256 tokenId, address assetToken) external returns (uint256 creatorInterest, uint256 ownerInterest);
   function getRewards(address contractAddress, uint256 tokenId, address rewardToken) external returns (uint256);
 
-  function energize(address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount, uint256 depositFee) external returns (uint256 yieldTokensAmount);
+  function energize(address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount) external returns (uint256 yieldTokensAmount);
   function discharge(address receiver, address contractAddress, uint256 tokenId, address assetToken) external returns (uint256 creatorAmount, uint256 receiverAmount);
   function dischargeAmount(address receiver, address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount) external returns (uint256 creatorAmount, uint256 receiverAmount);
   function release(address receiver, address contractAddress, uint256 tokenId, address assetToken) external returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount);

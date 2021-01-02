@@ -93,28 +93,12 @@ const getTxGasCost = ({deployTransaction}) => {
 
 
 const presets = {
-  ChargedParticles: {
-    fees: [
-      {
-        fee: 30,
-        limit: toWei('10000'),  // Deposits >= $10,000 = 0.3% Fee
-      },
-      {
-        fee: 40,
-        limit: toWei('5000'),   // Deposits >= $5,000 = 0.4% Fee
-      },
-      {
-        fee: 50,
-        limit: '0',             // Deposits < $5,000 = 0.5% Fee
-      },
-    ]
-  },
   Proton: {
-    mintFee: '0' // toWei('0.001')
+    mintFee: toWei('0')
   },
   Ion: {
     rewardsForAssetTokens: [
-      {assetTokenId: 'Aave.v1.dai', multiplier: '5000'}, // DAI
+      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI
     ],
     timelocks: [
       {
@@ -145,34 +129,34 @@ const presets = {
     },
     v1: {
       dai: {
+        1: '', // mainnet
+        3: '', // ropsten
+        4: '', // rinkeby
+        42: '', // kovan
+        31337: '', // Hardhat - Forked Mainnet
+      },
+      lendingPoolProvider: {
+        1: '', // mainnet
+        3: '', // ropsten
+        4: '', // rinkeby
+        42: '', // kovan
+        31337: '', // Hardhat - Forked Mainnet
+      }
+    },
+    v2: {
+      dai: {
         1: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // mainnet
-        3: '0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108', // ropsten
+        3: '', // ropsten
         4: '', // rinkeby
         42: '0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD', // kovan
         31337: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // Hardhat - Forked Mainnet
       },
       lendingPoolProvider: {
-        1: '', // mainnet
-        3: '', // ropsten
-        4: '', // rinkeby
-        42: '0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5', // kovan
-        31337: '0x24a42fD28C976A61Df5D00D0599C34c4f90748c8', // Hardhat - Forked Mainnet
-      }
-    },
-    v2: {
-      dai: {
-        1: '', // mainnet
-        3: '', // ropsten
-        4: '', // rinkeby
-        42: '0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD', // kovan
-        31337: '', // Hardhat - Forked Mainnet
-      },
-      lendingPoolProvider: {
-        1: '', // mainnet
+        1: '0xb53c1a33016b2dc2ff3653530bff1848a515c8c5', // mainnet
         3: '', // ropsten
         4: '', // rinkeby
         42: '0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b', // kovan
-        31337: '', // Hardhat - Forked Mainnet
+        31337: '0xb53c1a33016b2dc2ff3653530bff1848a515c8c5', // Hardhat - Forked Mainnet
       }
     }
   }
@@ -195,7 +179,6 @@ const presets = {
 //     - setChargedParticles
 //  - ChargedParticles
 //     - setUniverse
-//     - setDepositFee
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Step 2  -  scripts/deploy-aave.js

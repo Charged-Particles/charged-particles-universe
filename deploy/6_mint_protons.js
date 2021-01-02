@@ -12,13 +12,13 @@ const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31b
 
 module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;
-    const { user1, user2, user3 } = await getNamedAccounts();
+    const { initialMinter } = await getNamedAccounts();
     const network = await hre.network;
     const alchemyTimeout = 1;
 
     const chainId = chainIdByName(network.name);
 
-    const protonCreator = await ethers.provider.getSigner(user1);
+    const protonCreator = await ethers.provider.getSigner(initialMinter);
 
     const ddProton = getDeployData('Proton', chainId);
 
@@ -28,58 +28,44 @@ module.exports = async (hre) => {
 
     log('  Using Network: ', chainNameById(chainId));
     log('  Using Accounts:');
-    log('  - Creator:     ', user1);
-    log('  - Receiver 1:  ', user2);
-    log('  - Receiver 2:  ', user3);
+    log('  - Creator:     ', initialMinter);
     log(' ');
 
     log('  Loading Proton from: ', ddProton.address);
     const Proton = await ethers.getContractFactory('Proton');
     const proton = await Proton.attach(ddProton.address);
 
-    let creator;
-    let receiver;
     let annuityPct;
-    let burnToRelease;
 
-    log(`  - Minting Proton to [user2: ${user2}]...`)(alchemyTimeout);
-    creator = user1;
-    receiver = user2;
+    log(`  - Minting Proton 1...`)(alchemyTimeout);
     annuityPct = '1000'; // 10%
-    burnToRelease = false;
     await proton
       .connect(protonCreator)
       .createProton(
-        creator,
-        receiver,
+        initialMinter,
+        initialMinter,
         TEST_NFT_TOKEN_URI,
         annuityPct,
-        burnToRelease,
         { value: presets.Proton.mintFee }
       );
 
 
-    creator = user1;
-    receiver = user3;
+    log(`  - Minting Proton 2...`)(alchemyTimeout);
     annuityPct = '1500'; // 15%
-    burnToRelease = true;
-
-    log(`  - Minting Proton to [user3: ${user3}]...`)(alchemyTimeout);
     await proton
       .connect(protonCreator)
       .createProton(
-        creator,
-        receiver,
+        initialMinter,
+        initialMinter,
         TEST_NFT_TOKEN_URI,
         annuityPct,
-        burnToRelease,
         { value: presets.Proton.mintFee }
       );
 
 
 
     log('\n  Proton Minting Complete!');
-    log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
+    log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
 module.exports.tags = ['mint-protons']

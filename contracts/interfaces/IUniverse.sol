@@ -31,6 +31,7 @@ interface IUniverse {
 
   event ChargedParticlesSet(address indexed chargedParticles);
   event IonTokenSet(address indexed ionToken);
+  event ProtonTokenSet(address indexed protonToken);
   event IonRewardsMultiplierSet(address indexed assetToken, uint256 multiplier);
   event RewardIssued(address indexed receiver, address rewardToken, uint256 rewardAmount);
 

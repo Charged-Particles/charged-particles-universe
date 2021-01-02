@@ -12,8 +12,8 @@ require('@openzeppelin/hardhat-upgrades');
 require('hardhat-gas-reporter');
 require('hardhat-abi-exporter');
 require('solidity-coverage');
-require('hardhat-deploy');
 require('hardhat-deploy-ethers');
+require('hardhat-deploy');
 
 // This must occur after hardhat-deploy!
 task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
@@ -69,9 +69,14 @@ module.exports = {
             gasPrice: 8e9,
             forking: {
                 url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-                blockNumber: 11320000,
+                blockNumber: 11400000,  // MUST be after Aave V2 was deployed
                 timeout: 1000000
             },
+            // accounts: {
+            //     mnemonic: mnemonic.mainnet,
+            //     initialIndex: 0,
+            //     count: 10,
+            // }
         },
         localhost: {
             url: 'http://127.0.0.1:8545',
@@ -140,14 +145,17 @@ module.exports = {
         protocolOwner: {
           default: 1,
         },
+        initialMinter: {
+          default: 2,
+        },
         user1: {
-          default: 2
+          default: 3,
         },
         user2: {
-          default: 3
+          default: 4,
         },
         user3: {
-          default: 4
+          default: 5,
         },
         trustedForwarder: {
           default: 7, // Account 8
