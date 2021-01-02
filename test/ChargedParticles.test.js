@@ -244,9 +244,7 @@ describe("Charged Particles", () => {
     expect(await proton.ownerOf(energizedParticleId)).to.be.equal(user3);
   });
 
-  it(`iontimelocks succesfully release ions to receivers
-      and locked ions cannot be transferred before release block 
-      and can succesfully be transferred after release block`, async () => {
+  it("iontimelocks succesfully release ions to receivers", async () => {
     const receivers = await Promise.all(timelocks.map(async timelock => await timelock.receiver()));
 
     const balancesBefore = await Promise.all(receivers.map(async receiver => await ion.balanceOf(receiver)));
@@ -269,6 +267,37 @@ describe("Charged Particles", () => {
       expect(await ion.balanceOf(receiver)).to.be.above(balancesBefore[i]);
     }));
 
+  });
+
+  it("ions can only be transferred after locking block", async () => {
+    const blocks = 10;
+    const receivers = await Promise.all(timelocks.map(async timelock => await timelock.receiver()));
+    const maxReleaseTime = max(await Promise.all(timelocks.map(async timelock => await timelock.nextReleaseTime())));
+    await setNetworkAfterTimestamp(Number(maxReleaseTime.toString()));
+    await Promise.all(timelocks.map(async timelock => {
+      await timelock.release();
+    }));
+    user1 = receivers[0];
+    user2 = receivers[1];
+    signer1 = ethers.provider.getSigner(user1);
+    signer2 = ethers.provider.getSigner(user2);
+
+    await expect(ion.connect(signer2).lock(user1, await ion.balanceOf(user1), blocks)).to.be.revertedWith("ION: lock amount exceeds allowance");
+
+    await ion.connect(signer1).increaseLockAllowance(user2, await ion.balanceOf(user1));
+
+    await ion.connect(signer2).lock(user1, await ion.balanceOf(user1), blocks);
+
+    await expect(ion.connect(signer1).transfer(user3, await ion.balanceOf(user1))).to.be.revertedWith("ION: exceeds locked amount");
+
+    await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + blocks);
+
+    const balance1Before = await ion.balanceOf(user1);
+    const balance3Before = await ion.balanceOf(user3);
+
+    await ion.connect(signer1).transfer(user3, balance1Before);
+
+    expect(await ion.balanceOf(user3)).to.be.equal(balance3Before.add(balance1Before));
   });
 
 });
