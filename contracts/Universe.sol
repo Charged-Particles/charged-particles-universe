@@ -32,6 +32,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 
 import "./interfaces/IUniverse.sol";
+import "./interfaces/IChargedParticles.sol";
 
 
 /**
@@ -132,7 +133,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   )
     external
     override
-    // onlyChargedParticles
+    onlyProton
   {
     // no-op
   }
@@ -214,6 +215,11 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   /// @dev Throws if called by any account other than the Charged Particles contract
   modifier onlyChargedParticles() {
     require(chargedParticles == msg.sender, "Universe: only charged particles");
+    _;
+  }
+
+  modifier onlyProton() {
+    require(IChargedParticles(chargedParticles).isWhitelistedExternalContract(msg.sender), "Universe: only proton");
     _;
   }
 }

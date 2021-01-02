@@ -89,6 +89,19 @@
     "type": "event"
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "c__0x0a29244e",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x0a29244e",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "chargedParticles",
     "outputs": [

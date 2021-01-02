@@ -4,8 +4,8 @@ const {
   saveDeploymentData,
   getContractAbi,
   getTxGasCost,
-  log,
-} = require("../js-utils/deploy-helpers");
+  log
+} = require("../js-helpers/deploy");
 
 module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;

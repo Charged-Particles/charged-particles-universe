@@ -236,6 +236,15 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   }
 
   /**
+    * @notice Checks if a contract is whitelisted as particle-like
+    * @param contractAddress The address of the contract to check
+    * @return True if the contract is whitelisted
+    */
+  function isWhitelistedExternalContract(address contractAddress) public override view returns (bool) {
+    return whitelisted[contractAddress];
+  }
+
+  /**
     * @notice Checks if an account is allowed to Discharge a specific Token
     * @param contractAddress The Address to the Contract of the Token
     * @param tokenId The ID of the Token
@@ -752,7 +761,6 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     }
   }
 
-
   /***********************************|
   |          Only Admin/DAO           |
   |__________________________________*/
@@ -894,10 +902,6 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   function isExternalTokenBurned(address contractAddress, uint256 tokenId) internal view returns (bool) {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     return (tokenOwner == address(0x0));
-  }
-
-  function isWhitelistedExternalContract(address contractAddress) internal view returns (bool) {
-    return whitelisted[contractAddress];
   }
 
   /**

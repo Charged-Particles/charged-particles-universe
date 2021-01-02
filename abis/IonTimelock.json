@@ -78,6 +78,19 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "c__0x7bb395db",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x7bb395db",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "nextReleaseAmount",
     "outputs": [

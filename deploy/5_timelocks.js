@@ -9,7 +9,7 @@ const {
   presets,
   toEth,
   toBN,
-} = require("../js-utils/deploy-helpers");
+} = require("../js-helpers/deploy");
 
 const _ = require('lodash');
 

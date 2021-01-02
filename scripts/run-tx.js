@@ -5,7 +5,7 @@ const _ = require('lodash');
 const {
   chainNameById,
   getDeployData,
-} = require('../js-utils/deploy-helpers');
+} = require('../js-helpers/deploy');
 
 
 async function main() {

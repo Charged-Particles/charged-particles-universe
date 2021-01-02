@@ -43,6 +43,7 @@ interface IChargedParticles {
   function setDischargeApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setReleaseApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setTimelockApproval(address contractAddress, uint256 tokenId, address operator) external;
+  function isWhitelistedExternalContract(address contractAddress) external view returns (bool);
   function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
   function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
   function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
@@ -101,7 +102,7 @@ interface IChargedParticles {
   ) external;
 
   /***********************************|
-  |          Particle Charge          |
+  |        Particle Mechanics         |
   |__________________________________*/
 
   function energizeParticle(

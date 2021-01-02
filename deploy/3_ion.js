@@ -4,8 +4,8 @@ const {
   saveDeploymentData,
   getContractAbi,
   getTxGasCost,
-  log,
-} = require("../js-utils/deploy-helpers");
+  log
+} = require("../js-helpers/deploy");
 const _ = require('lodash');
 
 module.exports = async (hre) => {
