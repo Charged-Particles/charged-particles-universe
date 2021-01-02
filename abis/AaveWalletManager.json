@@ -281,6 +281,32 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32",
+        "name": "c__0x1c752825",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x1c752825",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "c__0x2eef2365",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x2eef2365",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "receiver",
         "type": "address"

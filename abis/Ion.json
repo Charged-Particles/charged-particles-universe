@@ -216,6 +216,19 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "c__0x79af16ea",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x79af16ea",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "cap",
     "outputs": [

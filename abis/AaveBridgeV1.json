@@ -32,6 +32,19 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32",
+        "name": "c__0xb5a51971",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0xb5a51971",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "assetToken",
         "type": "address"
