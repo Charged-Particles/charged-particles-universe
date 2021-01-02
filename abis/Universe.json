@@ -69,6 +69,19 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "protonToken",
+        "type": "address"
+      }
+    ],
+    "name": "ProtonTokenSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "receiver",
         "type": "address"
       },
@@ -306,6 +319,19 @@
   },
   {
     "inputs": [],
+    "name": "proton",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "renounceOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -351,6 +377,19 @@
       }
     ],
     "name": "setIonToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protonToken",
+        "type": "address"
+      }
+    ],
+    "name": "setProtonToken",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
