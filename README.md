@@ -104,7 +104,7 @@ Join our community, share ideas and help support the project in anyway you want!
   Deploy (all): yarn deploy
   Deploy (only protocol): yarn deploy --tags protocol
   Deploy (only protocol and aave): yarn deploy --tags protocol,aave
-  Deploy (only protocol and aave on network ropsten): yarn deploy --tags protocol,aave --network ropsten
+  Deploy (only protocol and aave on network ropsten): yarn deploy --network kovan --tags protocol,aave,proton,ion
 
 Deployed contract details go in deployments/{networkName}/{contractName}.json
 
