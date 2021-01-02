@@ -1,9 +1,9 @@
 {
   "manifestVersion": "3.1",
   "impls": {
-    "2e925c758da1a0ce54ba9133faf2da3da6d4f352b6ba7840455c121e04657983": {
+    "3975f02ff2081aef65fa6a15c4f607a4ff3a3d0b00decd30e8676080c20e8cd8": {
       "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-      "txHash": "0xf203ff9314992d068af2f2642b1a02be25194c93692c2a849c0708540949c2c0",
+      "txHash": "0xb5ef9a80788bf99fcb6bcdf00822839987bed6434f94f51f49d8b81f1d15fb82",
       "layout": {
         "storage": [
           {
@@ -44,15 +44,21 @@
           },
           {
             "contract": "Universe",
+            "label": "proton",
+            "type": "t_address",
+            "src": "contracts/Universe.sol:51"
+          },
+          {
+            "contract": "Universe",
             "label": "ionToken",
             "type": "t_contract(IERC20Upgradeable)1237",
-            "src": "contracts/Universe.sol:55"
+            "src": "contracts/Universe.sol:56"
           },
           {
             "contract": "Universe",
             "label": "ionRewardsMultiplier",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/Universe.sol:57"
+            "src": "contracts/Universe.sol:58"
           }
         ],
         "types": {
@@ -77,9 +83,9 @@
         }
       }
     },
-    "c7217b60158624a8afa905bfbffe3f4cd1885a176c517a464f6992ad680aa0d7": {
+    "96d71bd9a3a95f432006cf75ca87ecf8516e3d0e598e9a286b8df91cc014d3ca": {
       "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
-      "txHash": "0x870300f5295d0c45654a3e51fcfbcb14ad188c771eaa9269decc853b24c8a1e0",
+      "txHash": "0xda19423103434aecae0ec9da9028206c682d514f6f8a96ca604a5c8b69df2744",
       "layout": {
         "storage": [
           {
@@ -133,136 +139,94 @@
           {
             "contract": "ChargedParticles",
             "label": "_universe",
-            "type": "t_contract(IUniverse)14305",
-            "src": "contracts/ChargedParticles.sol:75"
+            "type": "t_contract(IUniverse)13182",
+            "src": "contracts/ChargedParticles.sol:72"
           },
           {
             "contract": "ChargedParticles",
             "label": "_liquidityProviders",
             "type": "t_array(t_string_storage)dyn_storage",
-            "src": "contracts/ChargedParticles.sol:76"
+            "src": "contracts/ChargedParticles.sol:73"
           },
           {
             "contract": "ChargedParticles",
             "label": "_lpWalletManager",
-            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)14566)",
-            "src": "contracts/ChargedParticles.sol:77"
+            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)13439)",
+            "src": "contracts/ChargedParticles.sol:74"
           },
           {
             "contract": "ChargedParticles",
             "label": "whitelisted",
             "type": "t_mapping(t_address,t_bool)",
-            "src": "contracts/ChargedParticles.sol:80"
-          },
-          {
-            "contract": "ChargedParticles",
-            "label": "tieredDepositFeeLimits",
-            "type": "t_array(t_uint256)dyn_storage",
-            "src": "contracts/ChargedParticles.sol:94"
-          },
-          {
-            "contract": "ChargedParticles",
-            "label": "tieredDepositFee",
-            "type": "t_array(t_uint256)dyn_storage",
-            "src": "contracts/ChargedParticles.sol:95"
-          },
-          {
-            "contract": "ChargedParticles",
-            "label": "depositFeesEarned",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
-            "src": "contracts/ChargedParticles.sol:98"
+            "src": "contracts/ChargedParticles.sol:77"
           },
           {
             "contract": "ChargedParticles",
             "label": "_nftLiquidityProvider",
             "type": "t_mapping(t_address,t_string_storage)",
-            "src": "contracts/ChargedParticles.sol:104"
-          },
-          {
-            "contract": "ChargedParticles",
-            "label": "_nftAssetDepositFee",
-            "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:105"
+            "src": "contracts/ChargedParticles.sol:83"
           },
           {
             "contract": "ChargedParticles",
             "label": "_nftAssetDepositMin",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:106"
+            "src": "contracts/ChargedParticles.sol:84"
           },
           {
             "contract": "ChargedParticles",
             "label": "_nftAssetDepositMax",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:107"
+            "src": "contracts/ChargedParticles.sol:85"
           },
           {
             "contract": "ChargedParticles",
             "label": "_creatorAnnuityPercent",
             "type": "t_mapping(t_uint256,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:111"
-          },
-          {
-            "contract": "ChargedParticles",
-            "label": "_creatorBurnToRelease",
-            "type": "t_mapping(t_uint256,t_bool)",
-            "src": "contracts/ChargedParticles.sol:112"
+            "src": "contracts/ChargedParticles.sol:89"
           },
           {
             "contract": "ChargedParticles",
             "label": "_dischargeApproval",
             "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
-            "src": "contracts/ChargedParticles.sol:115"
+            "src": "contracts/ChargedParticles.sol:92"
           },
           {
             "contract": "ChargedParticles",
             "label": "_releaseApproval",
             "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
-            "src": "contracts/ChargedParticles.sol:116"
+            "src": "contracts/ChargedParticles.sol:93"
           },
           {
             "contract": "ChargedParticles",
             "label": "_timelockApproval",
             "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
-            "src": "contracts/ChargedParticles.sol:117"
+            "src": "contracts/ChargedParticles.sol:94"
           },
           {
             "contract": "ChargedParticles",
             "label": "_dischargeTimelock",
             "type": "t_mapping(t_uint256,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:119"
+            "src": "contracts/ChargedParticles.sol:96"
           },
           {
             "contract": "ChargedParticles",
             "label": "_releaseTimelock",
             "type": "t_mapping(t_uint256,t_uint256)",
-            "src": "contracts/ChargedParticles.sol:120"
-          },
-          {
-            "contract": "ChargedParticles",
-            "label": "_assetToBeReleasedBy",
-            "type": "t_mapping(t_uint256,t_address)",
-            "src": "contracts/ChargedParticles.sol:121"
+            "src": "contracts/ChargedParticles.sol:97"
           }
         ],
         "types": {
-          "t_contract(IUniverse)14305": {
+          "t_contract(IUniverse)13182": {
             "label": "contract IUniverse"
           },
           "t_array(t_string_storage)dyn_storage": {
             "label": "string[]"
           },
-          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)14566)": {
+          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)13439)": {
             "label": "mapping(string => contract IWalletManager)"
           },
           "t_mapping(t_address,t_bool)": {
             "label": "mapping(address => bool)"
-          },
-          "t_array(t_uint256)dyn_storage": {
-            "label": "uint256[]"
-          },
-          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
-            "label": "mapping(address => mapping(address => uint256))"
           },
           "t_mapping(t_address,t_string_storage)": {
             "label": "mapping(address => string)"
@@ -273,14 +237,8 @@
           "t_mapping(t_uint256,t_uint256)": {
             "label": "mapping(uint256 => uint256)"
           },
-          "t_mapping(t_uint256,t_bool)": {
-            "label": "mapping(uint256 => bool)"
-          },
           "t_mapping(t_uint256,t_mapping(t_address,t_address))": {
             "label": "mapping(uint256 => mapping(address => address))"
-          },
-          "t_mapping(t_uint256,t_address)": {
-            "label": "mapping(uint256 => address)"
           },
           "t_address": {
             "label": "address"

@@ -166,12 +166,6 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "depositFee",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
         "name": "yieldTokensAmount",
         "type": "uint256"
       }
@@ -413,11 +407,6 @@
       {
         "internalType": "uint256",
         "name": "assetAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "depositFee",
         "type": "uint256"
       }
     ],

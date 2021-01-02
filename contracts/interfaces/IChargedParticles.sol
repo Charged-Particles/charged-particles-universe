@@ -43,12 +43,10 @@ interface IChargedParticles {
   function setDischargeApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setReleaseApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setTimelockApproval(address contractAddress, uint256 tokenId, address operator) external;
-  function isWhitelistedExternalContract(address contractAddress) external view returns (bool);
+  
   function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
   function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
   function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
-
-  function getFeesForDeposit(address contractAddress, uint256 assetAmount) external view returns (uint256 protocolFee, uint256 externalFee);
 
   function baseParticleMass(address contractAddress, uint256 tokenId, string calldata liquidityProviderId, address assetToken) external returns (uint256);
   function currentParticleCharge(address contractAddress, uint256 tokenId, string calldata liquidityProviderId, address assetToken) external returns (uint256);
@@ -65,7 +63,6 @@ interface IChargedParticles {
   function setExternalContractConfigs(
     address contractAddress,
     string calldata liquidityProvider,
-    uint256 assetDepositFee,
     uint256 assetDepositMin,
     uint256 assetDepositMax
   ) external;
@@ -74,20 +71,8 @@ interface IChargedParticles {
     address contractAddress,
     uint256 tokenId,
     address creator,
-    uint256 annuityPercent,
-    bool burnToRelease
+    uint256 annuityPercent
   ) external;
-
-  function getCollectedFees(
-    address contractAddress,
-    address assetToken
-  ) external returns (uint256);
-
-  function withdrawContractFees(
-    address contractAddress,
-    address receiver,
-    address assetToken
-  ) external returns (uint256 amount);
 
   function setDischargeTimelock(
     address contractAddress,
@@ -138,24 +123,12 @@ interface IChargedParticles {
       address assetToken
   ) external returns (uint256 creatorAmount, uint256 receiverAmount);
 
-  function finalizeRelease(
-      address receiver,
-      address contractAddress,
-      uint256 tokenId,
-      string calldata liquidityProviderId,
-      address assetToken
-  ) external returns (uint256 creatorAmount, uint256 receiverAmount);
-
   /***********************************|
   |          Particle Events          |
   |__________________________________*/
 
   event UniverseSet(
     address indexed universeAddress
-  );
-  event DepositFeeSet(
-    uint256 depositFeeLimit,
-    uint256 depositFee
   );
   event LiquidityProviderRegistered(
     string indexed liquidityProviderId,
@@ -164,7 +137,6 @@ interface IChargedParticles {
   event TokenContractConfigsSet(
     address indexed contractAddress,
     string indexed liquidityProvider,
-    uint256 assetDepositFee,
     uint256 assetDepositMin,
     uint256 assetDepositMax
   );
@@ -172,8 +144,7 @@ interface IChargedParticles {
     address indexed contractAddress,
     uint256 indexed tokenId,
     address indexed creatorAddress,
-    uint256 annuityPercent,
-    bool burnToRelease
+    uint256 annuityPercent
   );
   event DischargeApproval(
     address indexed contractAddress,
@@ -204,12 +175,6 @@ interface IChargedParticles {
     uint256 indexed tokenId,
     address indexed operator,
     uint256 unlockBlock
-  );
-  event FeesWithdrawn(
-    address indexed contractAddress,
-    address indexed receiver,
-    address assetToken,
-    uint256 amount
   );
   event UpdateContractWhitelist(
     address indexed contractAddress,

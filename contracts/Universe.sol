@@ -46,6 +46,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
 
   // The ChargedParticles Contract Address
   address public chargedParticles;
+  address public proton;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
 
@@ -167,6 +168,17 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
     emit IonTokenSet(_ionToken);
   }
 
+  function setProtonToken(
+    address _protonToken
+  )
+    external
+    onlyOwner
+    onlyValidContractAddress(_protonToken)
+  {
+    proton = _protonToken;
+    emit ProtonTokenSet(_protonToken);
+  }
+
   function setIonRewardsMultiplier(
     address assetToken,
     uint256 multiplier
@@ -218,8 +230,9 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
     _;
   }
 
+  /// @dev Throws if called by any account other than the Proton NFT contract
   modifier onlyProton() {
-    require(IChargedParticles(chargedParticles).isWhitelistedExternalContract(msg.sender), "Universe: only proton");
+    require(proton == msg.sender, "Universe: only proton");
     _;
   }
 }

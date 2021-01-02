@@ -79,6 +79,18 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     return _tokenCreator[tokenId];
   }
 
+  function getSalePrice(uint256 tokenId) public view returns (uint256) {
+    return _tokenSalePrice[tokenId];
+  }
+
+  function getLastSellPrice(uint256 tokenId) public view returns (uint256) {
+    return _tokenLastSellPrice[tokenId];
+  }
+
+  function getCreatorRoyalties(uint256 tokenId) public view returns (uint256) {
+    return _tokenCreatorRoyaltiesPct[tokenId];
+  }
+
   function createChargedParticle(
     address creator,
     address receiver,
@@ -86,8 +98,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     string memory liquidityProviderId,
     address assetToken,
     uint256 assetAmount,
-    uint256 annuityPercent,
-    bool burnToRelease
+    uint256 annuityPercent
   )
     public
     payable
@@ -102,8 +113,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
       liquidityProviderId,
       assetToken,
       assetAmount,
-      annuityPercent,
-      burnToRelease
+      annuityPercent
     );
   }
 
@@ -111,8 +121,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     address creator,
     address receiver,
     string memory tokenMetaUri,
-    uint256 annuityPercent,
-    bool burnToRelease
+    uint256 annuityPercent
   )
     public
     payable
@@ -124,43 +133,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
       creator,
       receiver,
       tokenMetaUri,
-      annuityPercent,
-      burnToRelease
-    );
-  }
-
-  function chargeParticle(
-    uint256 tokenId,
-    string memory liquidityProviderId,
-    address assetToken,
-    uint256 assetAmount
-  )
-    public
-    nonReentrant
-  {
-    _chargeParticle(
-      tokenId,
-      liquidityProviderId,
-      assetToken,
-      assetAmount
-    );
-  }
-
-  function releaseParticle(
-    address receiver,
-    uint256 tokenId,
-    string calldata liquidityProviderId,
-    address assetToken
-  )
-    external
-    onlyTokenOwnerOrApproved(tokenId)
-    returns (uint256 creatorAmount, uint256 receiverAmount)
-  {
-    return _releaseParticle(
-      receiver,
-      tokenId,
-      liquidityProviderId,
-      assetToken
+      annuityPercent
     );
   }
 
@@ -243,13 +216,13 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     string memory liquidityProviderId,
     address assetToken,
     uint256 assetAmount,
-    uint256 annuityPercent,
-    bool burnToRelease
+    uint256 annuityPercent
   )
     internal
     returns (uint256 newTokenId)
   {
-    newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent, burnToRelease);
+    newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent);
+
     _chargeParticle(newTokenId, liquidityProviderId, assetToken, assetAmount);
   }
 
@@ -257,8 +230,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     address creator,
     address receiver,
     string memory tokenMetaUri,
-    uint256 annuityPercent,
-    bool burnToRelease
+    uint256 annuityPercent
   )
     internal
     returns (uint256 newTokenId)
@@ -277,8 +249,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
       address(this),
       newTokenId,
       creator,
-      annuityPercent,
-      burnToRelease
+      annuityPercent
     );
 
     _refundOverpayment(mintFee);
@@ -303,38 +274,6 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
       assetToken,
       assetAmount
     );
-  }
-
-  function _releaseParticle(
-    address receiver,
-    uint256 tokenId,
-    string calldata liquidityProviderId,
-    address assetToken
-  )
-    internal
-    returns (uint256 creatorAmount, uint256 receiverAmount)
-  {
-    address self = address(this);
-    (creatorAmount, receiverAmount) = _chargedParticles.releaseParticle(
-      receiver,
-      self,
-      tokenId,
-      liquidityProviderId,
-      assetToken
-    );
-
-    if (creatorAmount == uint256(-1) && receiverAmount == 0) {
-      // Release requires burn
-      _burn(tokenId);
-
-      (creatorAmount, receiverAmount) = _chargedParticles.finalizeRelease(
-        receiver,
-        self,
-        tokenId,
-        liquidityProviderId,
-        assetToken
-      );
-    }
   }
 
   function _buyProton(uint256 tokenId)

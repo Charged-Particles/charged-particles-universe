@@ -74,11 +74,6 @@ module.exports = async (hre) => {
     log('  - ChargedParticles: Registering Universe')(alchemyTimeout);
     await chargedParticles.setUniverse(ddUniverse.address);
 
-    // log('  - ChargedParticles: Setting Deposit Fee')(alchemyTimeout);
-    // const depositFees = _.map(presets.ChargedParticles.fees, 'fee');
-    // const depositLimits = _.map(presets.ChargedParticles.fees, 'limit');
-    // await chargedParticles.setDepositFees(depositLimits, depositFees);
-
     // log(`  - ChargedParticles: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     // await chargedParticles.transferOwnership(owner);
 
@@ -129,6 +124,9 @@ module.exports = async (hre) => {
 
     log('  - ChargedParticles: Registering Proton')(alchemyTimeout);
     await chargedParticles.updateWhitelist(ddProton.address, true);
+
+    log('  - Universe: Registering Proton')(alchemyTimeout);
+    await universe.setProtonToken(ddProton.address);
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
