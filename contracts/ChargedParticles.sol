@@ -60,7 +60,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   //   Release                - Withdraw the Underlying Asset & Accrued Interest of a Token leaving the Particle with No Mass
   //
 
-  uint256 constant internal PERCENTAGE_SCALE = 1e4;       // 10000  (100%)
+  uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
+  uint256 constant internal MAX_ANNUITIES = 5e3;      // 5000   (50%)
 
   // Interface Signatures
   bytes4 constant internal INTERFACE_SIGNATURE_ERC721 = 0x80ac58cd;
@@ -348,7 +349,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     onlyTokenCreator(contractAddress, tokenId, creator, _msgSender())
   {
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    require(annuityPercent <= PERCENTAGE_SCALE, "ChargedParticles: INVALID_PCT");
+    require(annuityPercent <= MAX_ANNUITIES, "ChargedParticles: INVALID_PCT");
 
     // Update Configs for External Token Creator
     _creatorAnnuityPercent[tokenUuid] = annuityPercent;

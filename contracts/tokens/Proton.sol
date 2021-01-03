@@ -24,7 +24,7 @@
 pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "../lib/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -117,6 +117,27 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     );
   }
 
+  function createBasicProton(
+    address creator,
+    address receiver,
+    string memory tokenMetaUri
+  )
+    public
+    payable
+    nonReentrant
+    requireMintFee
+    returns (uint256 newTokenId)
+  {
+    newTokenId = _createProton(
+      creator,
+      receiver,
+      tokenMetaUri,
+      0, // annuityPercent,
+      0, // royaltiesPercent
+      0  // salePrice
+    );
+  }
+
   function createProton(
     address creator,
     address receiver,
@@ -133,7 +154,33 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
       creator,
       receiver,
       tokenMetaUri,
-      annuityPercent
+      annuityPercent,
+      0, // royaltiesPercent
+      0  // salePrice
+    );
+  }
+
+  function createProtonForSale(
+    address creator,
+    address receiver,
+    string memory tokenMetaUri,
+    uint256 annuityPercent,
+    uint256 royaltiesPercent,
+    uint256 salePrice
+  )
+    public
+    payable
+    nonReentrant
+    requireMintFee
+    returns (uint256 newTokenId)
+  {
+    newTokenId = _createProton(
+      creator,
+      receiver,
+      tokenMetaUri,
+      annuityPercent,
+      royaltiesPercent,
+      salePrice
     );
   }
 
@@ -154,8 +201,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     external
     onlyTokenOwnerOrApproved(tokenId)
   {
-    _tokenSalePrice[tokenId] = salePrice;
-    emit SalePriceSet(tokenId, salePrice);
+    _setSalePrice(tokenId, salePrice);
   }
 
   function setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct)
@@ -163,9 +209,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     onlyTokenCreator(tokenId)
     onlyTokenOwnerOrApproved(tokenId)
   {
-    require(royaltiesPct <= MAX_ROYALTIES, "Proton: INVALID_PCT");
-    _tokenCreatorRoyaltiesPct[tokenId] = royaltiesPct;
-    emit CreatorRoyaltiesSet(tokenId, royaltiesPct);
+    _setRoyaltiesPct(tokenId, royaltiesPct);
   }
 
 
@@ -207,6 +251,21 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
   |__________________________________*/
 
 
+  function _setSalePrice(uint256 tokenId, uint256 salePrice)
+    internal
+  {
+    _tokenSalePrice[tokenId] = salePrice;
+    emit SalePriceSet(tokenId, salePrice);
+  }
+
+  function _setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct)
+    internal
+  {
+    require(royaltiesPct <= MAX_ROYALTIES, "Proton: INVALID_PCT");
+    _tokenCreatorRoyaltiesPct[tokenId] = royaltiesPct;
+    emit CreatorRoyaltiesSet(tokenId, royaltiesPct);
+  }
+
 
 
   function _createChargedParticle(
@@ -221,7 +280,9 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     internal
     returns (uint256 newTokenId)
   {
-    newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent);
+    require(address(_chargedParticles) != address(0x0), "Proton: charged particles not set");
+
+    newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent, 0, 0);
 
     _chargeParticle(newTokenId, liquidityProviderId, assetToken, assetAmount);
   }
@@ -230,27 +291,37 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     address creator,
     address receiver,
     string memory tokenMetaUri,
-    uint256 annuityPercent
+    uint256 annuityPercent,
+    uint256 royaltiesPercent,
+    uint256 salePrice
   )
     internal
     returns (uint256 newTokenId)
   {
-    require(address(_chargedParticles) != address(0x0), "Proton: charged particles not set");
-
     _tokenIds.increment();
 
     newTokenId = _tokenIds.current();
-    _safeMint(receiver, newTokenId);
+    _safeMint(receiver, newTokenId, "");
     _tokenCreator[newTokenId] = creator;
 
     _setTokenURI(newTokenId, tokenMetaUri);
+    
+    if (royaltiesPercent > 0) {
+      _setRoyaltiesPct(newTokenId, royaltiesPercent);
+    }
 
-    _chargedParticles.setCreatorConfigs(
-      address(this),
-      newTokenId,
-      creator,
-      annuityPercent
-    );
+    if (salePrice > 0) {
+      _setSalePrice(newTokenId, salePrice);
+    }
+
+    if (annuityPercent > 0) {
+      _chargedParticles.setCreatorConfigs(
+        address(this),
+        newTokenId,
+        creator,
+        annuityPercent
+      );
+    }
 
     _refundOverpayment(mintFee);
   }
@@ -339,8 +410,8 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
   }
 
   function _transfer(address from, address to, uint256 tokenId) internal override {
-    super._transfer(from, to, tokenId);
     _tokenSalePrice[tokenId] = 0;
+    super._transfer(from, to, tokenId);
   }
 
   modifier requireMintFee() {
