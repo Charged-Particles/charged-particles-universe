@@ -323,19 +323,6 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "c__0x41d511ab",
-        "type": "bytes32"
-      }
-    ],
-    "name": "c_0x41d511ab",
-    "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "contractAddress",
         "type": "address"

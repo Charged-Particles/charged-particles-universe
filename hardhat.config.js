@@ -74,8 +74,8 @@ module.exports = {
             },
         },
         kovan: {
-            // url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+            url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
+            // url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
             gasPrice: 12e9,
             blockGasLimit: 12487794,
             accounts: {

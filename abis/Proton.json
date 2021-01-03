@@ -230,6 +230,31 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "tokenIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "TransferBatch",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "universe",
         "type": "address"
       }
@@ -275,19 +300,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "baseURI",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -309,14 +321,30 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "c__0x310abab3",
-        "type": "bytes32"
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "tokenMetaUri",
+        "type": "string"
       }
     ],
-    "name": "c_0x310abab3",
-    "outputs": [],
-    "stateMutability": "pure",
+    "name": "createBasicProton",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "newTokenId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -392,6 +420,50 @@
       }
     ],
     "name": "createProton",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "newTokenId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "tokenMetaUri",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "annuityPercent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "royaltiesPercent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "salePrice",
+        "type": "uint256"
+      }
+    ],
+    "name": "createProtonForSale",
     "outputs": [
       {
         "internalType": "uint256",

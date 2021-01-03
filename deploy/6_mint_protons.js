@@ -8,13 +8,19 @@ const {
 
 const _ = require('lodash');
 
-const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
+const SingularityCollection = [
+  'https://ipfs.io/ipfs/QmeRwFM49onX5PU7bXkPfhSDjeNgJFia2tf9namogFdYzR',
+  'https://ipfs.io/ipfs/QmZPt3MxyDqkXytY3oMDZpCo4urmWiq6RQ7V6FokRbgzFQ',
+  'https://ipfs.io/ipfs/Qme8yCknGa9WJUJ1cJ27Y9XjrYC92MHs2YzN1ZS8RuHuff',
+  'https://ipfs.io/ipfs/QmQM7k2dcw282KY5dUcJ6AH7QvvXKQfz523VTb1t7BE2ey',
+  'https://ipfs.io/ipfs/QmVR8Psao1JNutTrkBf5rZtTcbqoitDVm94UXUWSnMggK3',
+];
 
 module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;
     const { initialMinter } = await getNamedAccounts();
     const network = await hre.network;
-    const alchemyTimeout = 1;
+    const alchemyTimeout = 3;
 
     const chainId = chainIdByName(network.name);
 
@@ -35,27 +41,17 @@ module.exports = async (hre) => {
     const Proton = await ethers.getContractFactory('Proton');
     const proton = await Proton.attach(ddProton.address);
 
-    log(`  - Minting Proton 1...`)(alchemyTimeout);
-    await proton
-      .connect(protonCreator)
-      .createBasicProton(
-        initialMinter,
-        initialMinter,
-        TEST_NFT_TOKEN_URI,
-        { value: presets.Proton.mintFee }
-      );
-
-
-    log(`  - Minting Proton 2...`)(alchemyTimeout);
-    await proton
-      .connect(protonCreator)
-      .createBasicProton(
-        initialMinter,
-        initialMinter,
-        TEST_NFT_TOKEN_URI,
-        { value: presets.Proton.mintFee }
-      );
-
+    for (let i = 0; i < SingularityCollection.length; i++) {
+      log(`  - Minting Proton ${i+1}...`)(alchemyTimeout);
+      await proton
+        .connect(protonCreator)
+        .createBasicProton(
+          initialMinter,
+          initialMinter,
+          SingularityCollection[i],
+          { value: presets.Proton.mintFee }
+        );
+    }
 
 
     log('\n  Proton Minting Complete!');
