@@ -35,30 +35,24 @@ module.exports = async (hre) => {
     const Proton = await ethers.getContractFactory('Proton');
     const proton = await Proton.attach(ddProton.address);
 
-    let annuityPct;
-
     log(`  - Minting Proton 1...`)(alchemyTimeout);
-    annuityPct = '1000'; // 10%
     await proton
       .connect(protonCreator)
-      .createProton(
+      .createBasicProton(
         initialMinter,
         initialMinter,
         TEST_NFT_TOKEN_URI,
-        annuityPct,
         { value: presets.Proton.mintFee }
       );
 
 
     log(`  - Minting Proton 2...`)(alchemyTimeout);
-    annuityPct = '1500'; // 15%
     await proton
       .connect(protonCreator)
-      .createProton(
+      .createBasicProton(
         initialMinter,
         initialMinter,
         TEST_NFT_TOKEN_URI,
-        annuityPct,
         { value: presets.Proton.mintFee }
       );
 

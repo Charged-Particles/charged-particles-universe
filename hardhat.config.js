@@ -72,39 +72,11 @@ module.exports = {
                 blockNumber: 11400000,  // MUST be after Aave V2 was deployed
                 timeout: 1000000
             },
-            // accounts: {
-            //     mnemonic: mnemonic.mainnet,
-            //     initialIndex: 0,
-            //     count: 10,
-            // }
-        },
-        localhost: {
-            url: 'http://127.0.0.1:8545',
-            blockGasLimit: 200000000
-        },
-        rinkeby: {
-            url: `https://rinkeby.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            gasPrice: 12e9,
-            blockGasLimit: 200000000,
-            accounts: {
-                mnemonic: mnemonic.testnet,
-                initialIndex: 0,
-                count: 10,
-            }
-        },
-        ropsten: {
-            url: `https://ropsten.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            gasPrice: 32e9,
-            // blockGasLimit: 200000000,
-            accounts: {
-                mnemonic: mnemonic.testnet,
-                initialIndex: 0,
-                count: 10,
-            }
         },
         kovan: {
-            url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            gasPrice: 2e9,
+            // url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
+            url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+            gasPrice: 12e9,
             blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.testnet,
