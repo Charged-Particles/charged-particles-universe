@@ -98,7 +98,32 @@
         "type": "uint256"
       }
     ],
-    "name": "RewardIssued",
+    "name": "RewardClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "rewardToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rewardAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardEarned",
     "type": "event"
   },
   {
@@ -112,6 +137,25 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "claimIonTokens",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "ionReward",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -158,7 +202,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "creatorAmount",
         "type": "uint256"
       },
       {
@@ -168,6 +212,44 @@
       }
     ],
     "name": "onDischarge",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "receiverAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "onDischargeForCreator",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -277,7 +359,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "creatorAmount",
         "type": "uint256"
       },
       {
