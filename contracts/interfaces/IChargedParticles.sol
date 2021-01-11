@@ -115,6 +115,15 @@ interface IChargedParticles {
       uint256 assetAmount
   ) external returns (uint256 creatorAmount, uint256 receiverAmount);
 
+  function dischargeParticleForCreator(
+      address receiver,
+      address contractAddress,
+      uint256 tokenId,
+      string calldata liquidityProviderId,
+      address assetToken,
+      uint256 assetAmount
+  ) external returns (uint256 receiverAmount);
+
   function releaseParticle(
       address receiver,
       address contractAddress,

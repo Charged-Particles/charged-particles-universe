@@ -35,10 +35,11 @@ abstract contract SmartWalletBase is ISmartWallet {
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
 
+  address internal _walletManager;
+
   address internal nftCreator;
   uint256 internal nftCreatorAnnuityPct;
-
-  address internal _walletManager;
+  uint256 internal nftCreatorAmountDischarged;
 
   // List of Asset Tokens held in Wallet
   address[] internal _assetTokens;
