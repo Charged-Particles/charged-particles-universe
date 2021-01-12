@@ -32,7 +32,7 @@ contract GenericSmartWallet is SmartWalletBase {
   }
 
   function isReserveActive(address assetToken)
-    public
+    external
     override
     view
     returns (bool)
@@ -41,7 +41,7 @@ contract GenericSmartWallet is SmartWalletBase {
   }
 
   function getReserveInterestToken(address assetToken)
-    public
+    external
     override
     view
     returns (address)
@@ -50,7 +50,7 @@ contract GenericSmartWallet is SmartWalletBase {
   }
 
   function getPrincipal(address assetToken)
-    public
+    external
     override
     returns (uint256)
   {
@@ -58,7 +58,7 @@ contract GenericSmartWallet is SmartWalletBase {
   }
 
   function getInterest(address /* assetToken */)
-    public
+    external
     override
     returns (uint256 creatorInterest, uint256 ownerInterest)
   {
@@ -66,23 +66,23 @@ contract GenericSmartWallet is SmartWalletBase {
   }
 
   function getTotal(address assetToken)
-    public
+    external
     override
     returns (uint256)
   {
     return _getPrincipal(assetToken);
   }
 
-  function getRewards(address /* assetToken */)
-    public
+  function getRewards(address assetToken)
+    external
     override
     returns (uint256)
   {
-    return 0;
+    return IERC20(assetToken).balanceOf(address(this));
   }
 
   function deposit(address assetToken, uint256 assetAmount, uint256 /* referralCode */)
-    public
+    external
     override
     returns (uint256)
   {
@@ -92,31 +92,46 @@ contract GenericSmartWallet is SmartWalletBase {
   }
 
   function withdraw(address receiver, address assetToken)
-    public
+    external
     override
-    returns (uint256 /* creatorAmount */, uint256 /* receiverAmount */)
+    returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    IERC20(assetToken).transfer(receiver, _getPrincipal(assetToken));
+    creatorAmount = 0;
+    receiverAmount = _getPrincipal(assetToken);
+    // Track Principal
+    _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].sub(receiverAmount);
+    IERC20(assetToken).transfer(receiver, receiverAmount);
   }
 
   function withdrawAmount(address receiver, address assetToken, uint256 assetAmount)
-    public
+    external
     override
-    returns (uint256 /* creatorAmount */, uint256 /* receiverAmount */)
+    returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    uint256 walletAmount = _getPrincipal(assetToken);
-    if (walletAmount < assetAmount) {
-      assetAmount = walletAmount;
+    creatorAmount = 0;
+    receiverAmount = _getPrincipal(assetToken);
+    if (receiverAmount >= assetAmount) {
+      receiverAmount = assetAmount;
     }
-    IERC20(assetToken).transfer(receiver, walletAmount);
+    // Track Principal
+    _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].sub(receiverAmount);
+    IERC20(assetToken).transfer(receiver, receiverAmount);
   }
 
-  function withdrawRewards(address /* receiver */, address /* rewardsToken */, uint256 /* rewardsAmount */)
-    public
+  function withdrawRewards(address receiver, address rewardsTokenAddress, uint256 rewardsAmount)
+    external
     override
     returns (uint256)
   {
-    return 0;
+    address self = address(this);
+    IERC20 rewardsToken = IERC20(rewardsTokenAddress);
+
+    uint256 walletBalance = rewardsToken.balanceOf(self);
+    require(walletBalance >= rewardsAmount, "AaveSmartWallet: INSUFF_BALANCE");
+
+    // Transfer Rewards to Receiver
+    require(rewardsToken.transfer(receiver, rewardsAmount), "AaveSmartWallet: REWARDS_TRANSFER_FAILED");
+    return rewardsAmount;
   }
 
   /***********************************|
