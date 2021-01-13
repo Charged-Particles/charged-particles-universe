@@ -88,30 +88,6 @@ contract AaveSmartWallet is SmartWalletBase {
     return IERC20(rewardToken).balanceOf(address(this));
   }
 
-  // function migrateToAaveV2(address assetToken)
-  //   external
-  //   onlyWalletManager
-  //   returns (uint256 amountMigrated, uint256 creatorAmount)
-  // {
-  //   require(!enableAaveV2, "AaveSmartWallet: ALREADY_ON_V2");
-
-  //   // Migrate all deposits for asset from V1
-  //   uint256 walletPrincipal = _getPrincipal(assetToken);
-  //   (uint256 creatorInterest, uint256 ownerInterest) = _getInterest(assetToken);
-  //   uint256 amountToMigrate = walletPrincipal.add(ownerInterest);
-  //   creatorAmount = creatorInterest;
-
-  //   _withdrawFromV1(address(this), assetToken, creatorAmount, amountToMigrate);
-  //   amountMigrated = _depositIntoV2(assetToken, amountToMigrate);
-
-  //   // Track Principal
-  //   // _assetPrincipalBalance[assetToken] = walletPrincipal;
-
-  //   // Switch to Aave V2
-  //   enableAaveV2 = true;
-  // }
-
-
   function deposit(
     address assetToken,
     uint256 assetAmount,
@@ -150,6 +126,19 @@ contract AaveSmartWallet is SmartWalletBase {
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
     return _withdraw(receiver, assetToken, assetAmount);
+  }
+
+  function withdrawAmountForCreator(
+    address receiver,
+    address assetToken,
+    uint256 assetAmount
+  )
+    external
+    override
+    onlyWalletManager
+    returns (uint256 receiverAmount)
+  {
+    return _withdrawForCreator(receiver, assetToken, assetAmount);
   }
 
   function withdrawRewards(
@@ -202,8 +191,20 @@ contract AaveSmartWallet is SmartWalletBase {
 
     // Withdraw from Interest only
     if (assetAmount < ownerInterest) {
-      uint256 ratio = assetAmount.mul(RAY).div(ownerInterest);
-      creatorAmount = creatorInterest.mul(ratio).div(RAY);
+      if (creatorInterest > 0) {
+        uint256 ratio = assetAmount.mul(RAY).div(ownerInterest);
+        creatorAmount = creatorInterest.add(nftCreatorAmountDischarged).mul(ratio).div(RAY);
+
+        if (creatorAmount <= nftCreatorAmountDischarged) {
+          nftCreatorAmountDischarged = nftCreatorAmountDischarged.sub(creatorAmount);
+          creatorAmount = 0;
+        } 
+        
+        else {
+          creatorAmount = creatorAmount.sub(nftCreatorAmountDischarged);
+          nftCreatorAmountDischarged = 0;
+        }
+      }
       receiverAmount = assetAmount;
     }
 
@@ -216,6 +217,7 @@ contract AaveSmartWallet is SmartWalletBase {
 
       creatorAmount = creatorInterest;
       receiverAmount = ownerInterest.add(fromPrincipal);
+      nftCreatorAmountDischarged = 0;
 
       // Track Principal
       _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].sub(fromPrincipal);
@@ -232,6 +234,30 @@ contract AaveSmartWallet is SmartWalletBase {
 
     // Withdraw Assets for Receiver
     _bridge.withdraw(receiver, assetToken, receiverAmount);
+  }
+
+  function _withdrawForCreator(
+    address receiver,
+    address assetToken,
+    uint256 assetAmount
+  )
+    internal
+    returns (uint256 receiverAmount)
+  {
+    (uint256 creatorInterest,) = _getInterest(assetToken);
+    if (creatorInterest == 0) { return 0; } 
+    if (assetAmount > creatorInterest) {
+      assetAmount = creatorInterest;
+    }
+
+    nftCreatorAmountDischarged = nftCreatorAmountDischarged.add(assetAmount);
+
+    // Send aTokens to Bridge
+    address aTokenAddress = _bridge.getReserveInterestToken(assetToken);
+    _sendToken(address(_bridge), aTokenAddress, assetAmount);
+
+    // Withdraw Assets for Receiver on behalf of Creator
+    _bridge.withdraw(receiver, assetToken, assetAmount);
   }
 
   function _withdrawRewards(
@@ -269,14 +295,19 @@ contract AaveSmartWallet is SmartWalletBase {
     // Creator Royalties
     if (nftCreatorAnnuityPct > 0) {
 
-      // Interest too small to calculate percentage; split evenly
+      // Interest too small to calculate percentage;
       if (interest <= PERCENTAGE_SCALE) {
-        creatorInterest = interest.div(2);
+        // creatorInterest = interest.div(2); // split evenly?
+        creatorInterest = 0; // All to owner
       }
 
       // Calculate percentage for Creator
       else {
-        creatorInterest = interest.mul(nftCreatorAnnuityPct).div(PERCENTAGE_SCALE);
+        creatorInterest = interest
+          .add(nftCreatorAmountDischarged)
+          .mul(nftCreatorAnnuityPct)
+          .div(PERCENTAGE_SCALE)
+          .sub(nftCreatorAmountDischarged);
       }
     }
 

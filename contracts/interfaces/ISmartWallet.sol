@@ -44,6 +44,7 @@ interface ISmartWallet {
   function deposit(address assetToken, uint256 assetAmount, uint256 referralCode) external returns (uint256);
   function withdraw(address receiver, address assetToken) external returns (uint256 creatorAmount, uint256 receiverAmount);
   function withdrawAmount(address receiver, address assetToken, uint256 assetAmount) external returns (uint256 creatorAmount, uint256 receiverAmount);
+  function withdrawAmountForCreator(address receiver, address assetToken, uint256 assetAmount) external returns (uint256 receiverAmount);
   function withdrawRewards(address receiver, address rewardsToken, uint256 rewardsAmount) external returns (uint256);
   function withdrawEther(address payable receiver, uint256 amount) external;
   function executeForAccount(address contractAddress, uint256 ethValue, bytes memory encodedParams) external returns (bytes memory);

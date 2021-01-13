@@ -33,7 +33,8 @@ interface IUniverse {
   event IonTokenSet(address indexed ionToken);
   event ProtonTokenSet(address indexed protonToken);
   event IonRewardsMultiplierSet(address indexed assetToken, uint256 multiplier);
-  event RewardIssued(address indexed receiver, address rewardToken, uint256 rewardAmount);
+  event RewardEarned(address indexed receiver, address rewardToken, uint256 rewardAmount);
+  event RewardClaimed(address indexed receiver, address rewardToken, uint256 rewardAmount);
 
   function onEnergize(
     address contractAddress,
@@ -49,6 +50,15 @@ interface IUniverse {
     string calldata liquidityProviderId,
     address assetToken,
     uint256 creatorAmount,
+    uint256 receiverAmount
+  ) external;
+
+  function onDischargeForCreator(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata liquidityProviderId,
+    address creator,
+    address assetToken,
     uint256 receiverAmount
   ) external;
 

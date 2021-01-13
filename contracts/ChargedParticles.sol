@@ -532,6 +532,47 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     }
   }
 
+  /// @notice Allows the Creator of the Token to collect or transfer a their portion of the interest (if any)
+  ///         generated from the token without removing the underlying Asset that is held within the token.
+  /// @param receiver             The Address to Receive the Discharged Asset Tokens
+  /// @param contractAddress      The Address to the Contract of the Token to Discharge
+  /// @param tokenId              The ID of the Token to Discharge
+  /// @param liquidityProviderId  The Asset-Pair to Discharge from the Token
+  /// @param assetToken           The Address of the Asset Token being used
+  /// @param assetAmount          The specific amount of Asset Token to Discharge from the Token
+  /// @return receiverAmount      Amount of Asset Token discharged to the Receiver
+  function dischargeParticleForCreator(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata liquidityProviderId,
+    address assetToken,
+    uint256 assetAmount
+  )
+    external
+    override
+    lpEnabled(liquidityProviderId)
+    nonReentrant
+    returns (uint256 receiverAmount)
+  {
+    address sender = _msgSender();
+    require(_isTokenCreator(contractAddress, tokenId, sender, sender), "ChargedParticles: NOT_TOKEN_CREATOR");
+
+    receiverAmount = _lpWalletManager[liquidityProviderId].dischargeAmountForCreator(
+      receiver, 
+      contractAddress, 
+      tokenId, 
+      sender,
+      assetToken, 
+      assetAmount
+    );
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onDischargeForCreator(contractAddress, tokenId, liquidityProviderId, sender, assetToken, receiverAmount);
+    }
+  }
+
 
   /***********************************|
   |         Release Particles         |

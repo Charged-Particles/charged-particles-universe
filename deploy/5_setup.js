@@ -12,9 +12,9 @@ module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;
     const { deployer, protocolOwner, trustedForwarder } = await getNamedAccounts();
     const network = await hre.network;
-    const alchemyTimeout = 3;
 
     const chainId = chainIdByName(network.name);
+    const alchemyTimeout = chainId === 31337 ? 0 : 5;
 
     const lendingPoolProviderV1 = presets.Aave.v1.lendingPoolProvider[chainId];
     const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
@@ -65,21 +65,22 @@ module.exports = async (hre) => {
     const Ion = await ethers.getContractFactory('Ion');
     const ion = await Ion.attach(ddIon.address);
 
+    let txCount = 1;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Charged Particles & Universe
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    log('\n  - Universe: Registering ChargedParticles')(alchemyTimeout);
+    log(`\n  - [TX-${txCount++}] Universe: Registering ChargedParticles`)(alchemyTimeout);
     await universe.setChargedParticles(ddChargedParticles.address);
 
-    // log(`  - Universe: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    // log(`  - [TX-${txCount++}] Universe: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     // await universe.transferOwnership(owner);
 
-    log('  - ChargedParticles: Registering Universe')(alchemyTimeout);
+    log(`  - [TX-${txCount++}] ChargedParticles: Registering Universe`)(alchemyTimeout);
     await chargedParticles.setUniverse(ddUniverse.address);
 
-    // log(`  - ChargedParticles: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    // log(`  - [TX-${txCount++}] ChargedParticles: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     // await chargedParticles.transferOwnership(owner);
 
 
@@ -87,30 +88,30 @@ module.exports = async (hre) => {
     // Setup Aave Wallet Manager
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    log('  - AaveWalletManager: Setting Charged Particles as Controller')(alchemyTimeout);
+    log(`  - [TX-${txCount++}] AaveWalletManager: Setting Charged Particles as Controller`)(alchemyTimeout);
     await aaveWalletManager.setController(ddChargedParticles.address);
 
     if (lendingPoolProviderV2.length > 0) {
-      log('  - AaveWalletManager: Setting Aave Bridge to V2')(alchemyTimeout);
+      log(`  - [TX-${txCount++}] AaveWalletManager: Setting Aave Bridge to V2`)(alchemyTimeout);
       await aaveWalletManager.setAaveBridge(ddAaveBridgeV2.address);
     } else {
       if (lendingPoolProviderV1.length > 0) {
-        log('  - AaveWalletManager: Setting Aave Bridge to V1')(alchemyTimeout);
+        log(`  - [TX-${txCount++}] AaveWalletManager: Setting Aave Bridge to V1`)(alchemyTimeout);
         await aaveWalletManager.setAaveBridge(ddAaveBridgeV1.address);
       } else {
-        log('  - AaveWalletManager: NO Aave Bridge Available!!!');
+        log(`  - AaveWalletManager: NO Aave Bridge Available!!!`);
       }
     }
 
     if (referralCode.length > 0) {
-      log('  - AaveWalletManager: Setting Referral Code')(alchemyTimeout);
+      log(`  - [TX-${txCount++}] AaveWalletManager: Setting Referral Code`)(alchemyTimeout);
       await aaveWalletManager.setReferralCode(referralCode);
     }
 
-    log('  - AaveWalletManager: Registering Aave as LP with ChargedParticles')(alchemyTimeout);
+    log(`  - [TX-${txCount++}] AaveWalletManager: Registering Aave as LP with ChargedParticles`)(alchemyTimeout);
     await chargedParticles.registerLiquidityProvider('aave', ddAaveWalletManager.address);
 
-    // log(`  - AaveWalletManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    // log(`  - [TX-${txCount++}] AaveWalletManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     // await aaveWalletManager.transferOwnership(owner);
 
 
@@ -129,19 +130,19 @@ module.exports = async (hre) => {
     // Setup Proton
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    log('  - Proton: Registering Universe')(alchemyTimeout);
+    log(`  - [TX-${txCount++}] Proton: Registering Universe`)(alchemyTimeout);
     await proton.setUniverse(ddUniverse.address);
 
-    log('  - Proton: Registering ChargedParticles')(alchemyTimeout);
+    log(`  - [TX-${txCount++}] Proton: Registering ChargedParticles`)(alchemyTimeout);
     await proton.setChargedParticles(ddChargedParticles.address);
 
-    log('  - Proton: Setting Mint Fee:', mintFee.toString())(alchemyTimeout);
+    log(`  - [TX-${txCount++}] Proton: Setting Mint Fee:`, mintFee.toString())(alchemyTimeout);
     await proton.setMintFee(mintFee);
 
-    log('  - ChargedParticles: Registering Proton')(alchemyTimeout);
+    log(`  - [TX-${txCount++}] ChargedParticles: Registering Proton`)(alchemyTimeout);
     await chargedParticles.updateWhitelist(ddProton.address, true);
 
-    log('  - Universe: Registering Proton')(alchemyTimeout);
+    log(`  - [TX-${txCount++}] Universe: Registering Proton`)(alchemyTimeout);
     await universe.setProtonToken(ddProton.address);
 
 
@@ -149,10 +150,10 @@ module.exports = async (hre) => {
     // Setup Ion
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    log('  - Ion: Registering Universe')(alchemyTimeout);
+    log(`  - [TX-${txCount++}] Ion: Registering Universe`)(alchemyTimeout);
     await ion.setUniverse(ddUniverse.address);
 
-    log('  - Universe: Registering Ion')(alchemyTimeout);
+    log(`  - [TX-${txCount++}] Universe: Registering Ion`)(alchemyTimeout);
     await universe.setIonToken(ddIon.address);
 
     let assetTokenId;
@@ -163,12 +164,12 @@ module.exports = async (hre) => {
         assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
         assetTokenMultiplier = presets.Ion.rewardsForAssetTokens[i].multiplier;
 
-        log('  - Universe: Setting Ion Rewards Multiplier for Asset Token: ', assetTokenAddress, ' to: ', assetTokenMultiplier)(alchemyTimeout);
+        log(`  - [TX-${txCount++}] Universe: Setting Ion Rewards Multiplier for Asset Token: `, assetTokenAddress, ` to: `, assetTokenMultiplier)(alchemyTimeout);
         await universe.setIonRewardsMultiplier(assetTokenAddress, assetTokenMultiplier);
     }
 
 
-    log('\n  Contract Initialization Complete!')(alchemyTimeout);
+    log(`\n  Contract Initialization Complete!`)(alchemyTimeout);
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };
 
