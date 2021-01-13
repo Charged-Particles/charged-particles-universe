@@ -38,6 +38,7 @@ describe("Charged Particles", () => {
   let universe;
   let chargedParticles;
   let aaveWalletManager;
+  let genericWalletManager;
   let proton;
   let ion;
   let timelocks;
@@ -87,6 +88,7 @@ describe("Charged Particles", () => {
     const Universe = await ethers.getContractFactory('Universe');
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
+    const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const Proton = await ethers.getContractFactory('Proton');
     const Ion = await ethers.getContractFactory('Ion');
     const IonTimelock = await ethers.getContractFactory('IonTimelock');
@@ -94,6 +96,7 @@ describe("Charged Particles", () => {
     universe = Universe.attach(getDeployData('Universe', chainId).address);
     chargedParticles = ChargedParticles.attach(getDeployData('ChargedParticles', chainId).address);
     aaveWalletManager = AaveWalletManager.attach(getDeployData('AaveWalletManager', chainId).address);
+    genericWalletManager = GenericWalletManager.attach(getDeployData('GenericWalletManager', chainId).address);
     proton = Proton.attach(getDeployData('Proton', chainId).address);
     ion = Ion.attach(getDeployData('Ion', chainId).address);
     timelocks = Object.values(getDeployData('IonTimelocks', chainId))
@@ -108,8 +111,9 @@ describe("Charged Particles", () => {
     });
   });
 
-  it('should deploy with the liquidity provider set to "Aave"', async () => {
+  it('charged particles should have enabled "aave" and "generic" as liquidity providers', async () => {
     expect(await chargedParticles.isLiquidityProviderEnabled('aave')).to.equal(true);
+    expect(await chargedParticles.isLiquidityProviderEnabled('generic')).to.equal(true);
   });
 
   it("can succesfully energize and release proton", async () => {
@@ -298,6 +302,41 @@ describe("Charged Particles", () => {
     await ion.connect(signer1).transfer(user3, balance1Before);
 
     expect(await ion.balanceOf(user3)).to.be.equal(balance3Before.add(balance1Before));
+  });
+
+  it("generic smart wallet and manager succesfully hold erc20 tokens", async () => {
+    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+    
+    await dai.connect(daiSigner).transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    const user2BalanceBefore = await dai.balanceOf(user2);
+
+    const energizedParticleId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'generic',                       // liquidityProviderId
+        daiAddress, // assetToken
+        toWei('10'),                  // assetAmount
+        annuityPct,                   // annuityPercent
+      ],
+      callValue: presets.Proton.mintFee,
+    });
+
+    await chargedParticles.connect(signer2).releaseParticle(
+      user2,
+      proton.address,
+      energizedParticleId,
+      'generic',
+      daiAddress
+    );
+
+    expect((await dai.balanceOf(user2)).sub(user2BalanceBefore)).to.be.equal(toWei('10'));
   });
 
 });
