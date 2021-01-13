@@ -26,6 +26,7 @@ module.exports = async (hre) => {
     const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
     const ddAaveBridgeV1 = getDeployData('AaveBridgeV1', chainId);
     const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
+    const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddIon = getDeployData('Ion', chainId);
 
@@ -51,6 +52,10 @@ module.exports = async (hre) => {
     log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
     const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
+
+    log('  Loading GenericWalletManager from: ', ddGenericWalletManager.address);
+    const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
+    const genericWalletManager = await GenericWalletManager.attach(ddGenericWalletManager.address);
 
     log('  Loading Proton from: ', ddProton.address);
     const Proton = await ethers.getContractFactory('Proton');
@@ -108,6 +113,17 @@ module.exports = async (hre) => {
 
     // log(`  - [TX-${txCount++}] AaveWalletManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     // await aaveWalletManager.transferOwnership(owner);
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Setup Generic Wallet Manager
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    log('  - GenericWalletManager: Setting Charged Particles as Controller')(alchemyTimeout);
+    await genericWalletManager.setController(ddChargedParticles.address);
+
+    log('  - GenericWalletManager: Registering Generic as LP with ChargedParticles')(alchemyTimeout);
+    await chargedParticles.registerLiquidityProvider('generic', ddGenericWalletManager.address);
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

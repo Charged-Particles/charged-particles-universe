@@ -103,6 +103,7 @@ module.exports = {
         'AaveWalletManager',
         'AaveBridgeV1',
         'AaveBridgeV2',
+        'GenericWalletManager',
         'Ion',
         'IonTimelock',
         'Proton',
