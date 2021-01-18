@@ -83,6 +83,15 @@ module.exports = async (hre) => {
     // log(`  - [TX-${txCount++}] ChargedParticles: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     // await chargedParticles.transferOwnership(owner);
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Setup Generic Wallet Manager
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    log(`  - [TX-${txCount++}] GenericWalletManager: Setting Charged Particles as Controller`)(alchemyTimeout);
+    await genericWalletManager.setController(ddChargedParticles.address);
+
+    log(`  - [TX-${txCount++}] GenericWalletManager: Registering Generic as LP with ChargedParticles`)(alchemyTimeout);
+    await chargedParticles.registerLiquidityProvider('generic', ddGenericWalletManager.address);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Aave Wallet Manager
@@ -113,18 +122,6 @@ module.exports = async (hre) => {
 
     // log(`  - [TX-${txCount++}] AaveWalletManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     // await aaveWalletManager.transferOwnership(owner);
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Setup Generic Wallet Manager
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    log('  - GenericWalletManager: Setting Charged Particles as Controller')(alchemyTimeout);
-    await genericWalletManager.setController(ddChargedParticles.address);
-
-    log('  - GenericWalletManager: Registering Generic as LP with ChargedParticles')(alchemyTimeout);
-    await chargedParticles.registerLiquidityProvider('generic', ddGenericWalletManager.address);
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Proton
