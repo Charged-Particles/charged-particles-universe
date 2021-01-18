@@ -3,12 +3,14 @@
   "contracts": {
     "Universe": "Universe",
     "ChargedParticles": "ChargedParticles",
-    "AaveWalletManager": "AaveWalletManager",
+    "GenericWalletManager": "GenericWalletManager",
+    "AaveWalltManager": "AaveWalletManager",
     "AaveBridgeV1": "AaveBridgeV1",
     "AaveBridgeV2": "AaveBridgeV2",
     "Ion": "Ion",
     "IonTimelock": "IonTimelock",
-    "Proton": "Proton"
+    "Proton": "Proton",
+    "Photon": "Photon"
   },
   "dependencies": {
   },

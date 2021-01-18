@@ -100,13 +100,14 @@ module.exports = {
       only: [
         'Universe',
         'ChargedParticles',
+        'GenericWalletManager',
         'AaveWalletManager',
         'AaveBridgeV1',
         'AaveBridgeV2',
-        'GenericWalletManager',
         'Ion',
         'IonTimelock',
         'Proton',
+        'Photon',
         'ERC20',
         'ERC721'
       ],

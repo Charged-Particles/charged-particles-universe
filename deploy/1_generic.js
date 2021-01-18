@@ -12,10 +12,10 @@ module.exports = async (hre) => {
     const { getNamedAccounts } = hre;
     const { deployer, protocolOwner } = await getNamedAccounts();
     const network = await hre.network;
-    const alchemyTimeout = 1;
     const deployData = {};
 
     const chainId = chainIdByName(network.name);
+    const alchemyTimeout = chainId === 31337 ? 0 : 1;
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles LP: Generic - Contract Deployment');
@@ -40,7 +40,7 @@ module.exports = async (hre) => {
     // Display Contract Addresses
     log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
     log('  - GenericWalletManager:  ', genericWalletManager.address);
-    log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
+    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
 
     saveDeploymentData(chainId, deployData);
     log('\n  Contract Deployment Data saved to "deployed" directory.');

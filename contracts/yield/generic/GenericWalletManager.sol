@@ -127,7 +127,12 @@ contract GenericWalletManager is WalletManagerBase {
     emit WalletEnergized(contractAddress, tokenId, assetToken, assetAmount, yieldTokensAmount);
   }
 
-  function discharge(address /* receiver */, address /* contractAddress */, uint256 /* tokenId */, address /* assetToken */)
+  function discharge(
+    address /* receiver */,
+    address /* contractAddress */,
+    uint256 /* tokenId */,
+    address /* assetToken */
+  )
     public
     override
     onlyController
@@ -136,13 +141,35 @@ contract GenericWalletManager is WalletManagerBase {
     return (0, 0);
   }
 
-  function dischargeAmount(address /* receiver */, address /* contractAddress */, uint256 /* tokenId */, address /* assetToken */, uint256 /* assetAmount */)
+  function dischargeAmount(
+    address /* receiver */,
+    address /* contractAddress */,
+    uint256 /* tokenId */,
+    address /* assetToken */,
+    uint256 /* assetAmount */
+  )
     public
     override
     onlyController
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
     return (0, 0);
+  }
+
+  function dischargeAmountForCreator(
+    address /* receiver */,
+    address /* contractAddress */,
+    uint256 /* tokenId */,
+    address /* creator */,
+    address /* assetToken */,
+    uint256 /* assetAmount */
+  )
+    external
+    override
+    onlyController
+    returns (uint256 receiverAmount)
+  {
+    return 0;
   }
 
   function release(address receiver, address contractAddress, uint256 tokenId, address assetToken)

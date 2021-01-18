@@ -272,6 +272,58 @@
           }
         }
       }
+    },
+    "b86c62055eae6b716f6d6467b1a13a454edaff7570b785d89558cf280e26ac06": {
+      "address": "0xd03EC3764FC8b7C9017eE3a58EF78A2B2fd5Aa1d",
+      "txHash": "0xab8723694d7548b1a809fc77f15fbc612abb5949560aedc8997c8c6cd0fe9d73",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:24"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:29"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/GSN/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "BaseRelayRecipient",
+            "label": "trustedForwarder",
+            "type": "t_address",
+            "src": "@opengsn/gsn/contracts/BaseRelayRecipient.sol:16"
+          },
+          {
+            "contract": "Photon",
+            "label": "_photonURIs",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "src": "contracts/tokens/Photon.sol:40"
+          }
+        ],
+        "types": {
+          "t_mapping(t_address,t_string_storage)": {
+            "label": "mapping(address => string)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
     }
   },
   "admin": {
