@@ -89,6 +89,7 @@ contract GenericSmartWallet is SmartWalletBase {
     // Track Principal
     _trackAssetToken(assetToken);
     _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].add(assetAmount);
+    return 0;
   }
 
   function withdraw(address receiver, address assetToken)
