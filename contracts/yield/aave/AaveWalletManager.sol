@@ -188,6 +188,33 @@ contract AaveWalletManager is WalletManagerBase {
     emit WalletDischarged(contractAddress, tokenId, assetToken, creatorAmount, receiverAmount);
   }
 
+  function dischargeAmountForCreator(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    address creator,
+    address assetToken,
+    uint256 assetAmount
+  )
+    external
+    override
+    onlyController
+    returns (uint256 receiverAmount)
+  {
+    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    address wallet = _wallets[uuid];
+    require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
+
+    (uint256 creatorInterest,) = AaveSmartWallet(wallet).getInterest(assetToken);
+    require(assetAmount > 0 && creatorInterest >= assetAmount, "AaveWalletManager: INSUFF_CHARGE");
+
+    // Discharge a portion of the interest
+    receiverAmount = AaveSmartWallet(wallet).withdrawAmountForCreator(receiver, assetToken, assetAmount);
+
+    // Log Event
+    emit WalletDischargedForCreator(contractAddress, tokenId, assetToken, creator, receiverAmount);
+  }
+
   function release(
     address receiver,
     address contractAddress,

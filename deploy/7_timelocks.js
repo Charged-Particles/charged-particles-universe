@@ -17,12 +17,12 @@ module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;
     const { deployer, protocolOwner } = await getNamedAccounts();
     const network = await hre.network;
-    const alchemyTimeout = 1;
     const deployData = {
         IonTimelocks: []
     };
 
     const chainId = chainIdByName(network.name);
+    const alchemyTimeout = chainId === 31337 ? 0 : 1;
 
     const ddIon = getDeployData('Ion', chainId);
 

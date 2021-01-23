@@ -49,11 +49,17 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   address public proton;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
+  uint256 constant internal ION_MAX_SUPPLY = 1e8;    // 100,000,000
+  uint256 internal ionRewardsEarned;
 
   // ION Token Rewards
   IERC20Upgradeable public ionToken;
+
   //   Asset Token => Reward Multiplier
   mapping (address => uint256) internal ionRewardsMultiplier;
+
+  //       Account => Claimable ION Rewards
+  mapping (address => uint256) internal ionRewards;
 
 
   /***********************************|
@@ -62,6 +68,20 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
 
   function initialize() public initializer {
     __Ownable_init();
+  }
+
+
+  /***********************************|
+  |         Public Functions          |
+  |__________________________________*/
+
+  function claimIonTokens(uint256 amount) public returns (uint256 ionReward) {
+    require(ionRewards[msg.sender] > 0, "Universe: INSUFF_BALANCE");
+
+    uint256 balance = ionToken.balanceOf(address(this));
+    require(balance > 0, "Universe: INSUFF_SUPPLY");
+
+    return _claimIonTokens(msg.sender, amount);
   }
 
 
@@ -88,7 +108,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
     uint256 tokenId,
     string calldata,
     address assetToken,
-    uint256,
+    uint256 creatorAmount,
     uint256 receiverAmount
   )
     external
@@ -97,8 +117,27 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   {
     // Reward ION tokens
     if (ionRewardsMultiplier[assetToken] > 0 && receiverAmount > 0) {
-      address receiver = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
-      _rewardIonTokens(receiver, assetToken, receiverAmount);
+      address ionReceiver = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
+      _rewardIonTokens(ionReceiver, assetToken, creatorAmount.add(receiverAmount));
+    }
+  }
+
+  function onDischargeForCreator(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata,
+    address,
+    address assetToken,
+    uint256 receiverAmount
+  )
+    external
+    override
+    onlyChargedParticles
+  {
+    // Reward ION tokens
+    if (ionRewardsMultiplier[assetToken] > 0 && receiverAmount > 0) {
+      address ionReceiver = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
+      _rewardIonTokens(ionReceiver, assetToken, receiverAmount);
     }
   }
 
@@ -108,7 +147,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
     string calldata,
     address assetToken,
     uint256 principalAmount,
-    uint256,
+    uint256 creatorAmount,
     uint256 receiverAmount
   )
     external
@@ -116,7 +155,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
     onlyChargedParticles
   {
     // Reward ION tokens
-    uint256 interestAmount = receiverAmount.sub(principalAmount);
+    uint256 interestAmount = creatorAmount.add(receiverAmount).sub(principalAmount);
     if (ionRewardsMultiplier[assetToken] > 0 && interestAmount > 0) {
       address receiver = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
       _rewardIonTokens(receiver, assetToken, interestAmount);
@@ -198,19 +237,36 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
 
   function _rewardIonTokens(address receiver, address assetToken, uint256 baseAmount) internal {
     if (address(ionToken) == address(0x0) || receiver == address(0x0)) { return; }
+    if (ionRewardsEarned == ION_MAX_SUPPLY) { return; }
 
     // Calculate rewards multiplier
-    uint256 balance = ionToken.balanceOf(address(this));
-    if (balance == 0) { return; }
-
     uint256 amount = baseAmount.mul(ionRewardsMultiplier[assetToken]).div(PERCENTAGE_SCALE);
+    if (ionRewardsEarned.add(amount) > ION_MAX_SUPPLY) {
+      amount = ION_MAX_SUPPLY.sub(ionRewardsEarned);
+    }
+    ionRewardsEarned = ionRewardsEarned.add(amount);
+    ionRewards[receiver] = ionRewards[receiver].add(amount);
+
+    emit RewardEarned(receiver, address(ionToken), amount);
+  }
+
+  function _claimIonTokens(address account, uint256 amount) internal returns (uint256) {
+    uint256 amountEarned = ionRewards[account];
+    if (amount > amountEarned) {
+      amount = amountEarned;
+    }
+
+    uint256 balance = ionToken.balanceOf(address(this));
     if (amount > balance) {
       amount = balance;
     }
 
-    ionToken.safeTransfer(receiver, amount);
+    ionRewards[account] = ionRewards[account].sub(amount);
 
-    emit RewardIssued(receiver, address(ionToken), amount);
+    ionToken.safeTransfer(account, amount);
+
+    emit RewardClaimed(account, address(ionToken), amount);
+    return amount;
   }
 
 

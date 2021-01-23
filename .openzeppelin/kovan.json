@@ -1,9 +1,9 @@
 {
   "manifestVersion": "3.1",
   "impls": {
-    "121ef38df9032acfcf8eec573cccfc120549fc55bc2909a69b627cd7419a2a14": {
-      "address": "0x38F8C462136361eE65EDCc6946B69bb321Ea0663",
-      "txHash": "0xa2495de478b8ccc8b7093e9452e25930a17a0c5a317e263574116926832ce5a1",
+    "e3405dc5baa6430a5d115c2d947b3a6fb8cdff8a030ffe681216885fbd9b35c8": {
+      "address": "0x1203259ed84563acE34C3b7Bc6f1bEEea15ce5FE",
+      "txHash": "0x952d672a176097a40b8975efd5a91bae6e4e4c451764a9af458f7003ce1c4a1a",
       "layout": {
         "storage": [
           {
@@ -50,20 +50,35 @@
           },
           {
             "contract": "Universe",
+            "label": "ionRewardsEarned",
+            "type": "t_uint256",
+            "src": "contracts/Universe.sol:53"
+          },
+          {
+            "contract": "Universe",
             "label": "ionToken",
             "type": "t_contract(IERC20Upgradeable)1237",
-            "src": "contracts/Universe.sol:54"
+            "src": "contracts/Universe.sol:56"
           },
           {
             "contract": "Universe",
             "label": "ionRewardsMultiplier",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/Universe.sol:56"
+            "src": "contracts/Universe.sol:59"
+          },
+          {
+            "contract": "Universe",
+            "label": "ionRewards",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/Universe.sol:62"
           }
         ],
         "types": {
           "t_address": {
             "label": "address"
+          },
+          "t_uint256": {
+            "label": "uint256"
           },
           "t_contract(IERC20Upgradeable)1237": {
             "label": "contract IERC20Upgradeable"
@@ -83,9 +98,9 @@
         }
       }
     },
-    "f67531c8ee0d7f51e2e52770662622461e1896726d1f5fc9405e3527a5dca64e": {
-      "address": "0xCbfDd0b5d4a5B64165beDE8e6c1F4b9d680f27Ba",
-      "txHash": "0x6b265307f6a65a63cb8b6e525ff27c575f91d2e39fa733cc3dc6974939b71a02",
+    "eadd9a464be3030e60080e486f213116dc16d62f3e70f1ff5b0edf3d9e40f2f7": {
+      "address": "0x4ce55373a570992dF16245aC43A96d9038f4bF92",
+      "txHash": "0xe4159e9c227d61292c5f213ce42e155279b16ae371202573b464b3205523a102",
       "layout": {
         "storage": [
           {
@@ -139,7 +154,7 @@
           {
             "contract": "ChargedParticles",
             "label": "_universe",
-            "type": "t_contract(IUniverse)10070",
+            "type": "t_contract(IUniverse)10378",
             "src": "contracts/ChargedParticles.sol:71"
           },
           {
@@ -151,7 +166,7 @@
           {
             "contract": "ChargedParticles",
             "label": "_lpWalletManager",
-            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)10327)",
+            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)10664)",
             "src": "contracts/ChargedParticles.sol:73"
           },
           {
@@ -216,13 +231,13 @@
           }
         ],
         "types": {
-          "t_contract(IUniverse)10070": {
+          "t_contract(IUniverse)10378": {
             "label": "contract IUniverse"
           },
           "t_array(t_string_storage)dyn_storage": {
             "label": "string[]"
           },
-          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)10327)": {
+          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)10664)": {
             "label": "mapping(string => contract IWalletManager)"
           },
           "t_mapping(t_address,t_bool)": {
@@ -257,10 +272,62 @@
           }
         }
       }
+    },
+    "b86c62055eae6b716f6d6467b1a13a454edaff7570b785d89558cf280e26ac06": {
+      "address": "0x39Fd0bf16176b3AB944730CA18D40A85D394d365",
+      "txHash": "0x68c0e2b6262c509a1799a9f1c27edb39774c6345bded2900477e9b1d3c1cbb79",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:24"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:29"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/GSN/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "BaseRelayRecipient",
+            "label": "trustedForwarder",
+            "type": "t_address",
+            "src": "@opengsn/gsn/contracts/BaseRelayRecipient.sol:16"
+          },
+          {
+            "contract": "Photon",
+            "label": "_photonURIs",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "src": "contracts/tokens/Photon.sol:40"
+          }
+        ],
+        "types": {
+          "t_mapping(t_address,t_string_storage)": {
+            "label": "mapping(address => string)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
     }
   },
   "admin": {
-    "address": "0x9504187E185418eF0d4E51bEAA6811FbA5D055c8",
-    "txHash": "0x23ff92beedd46112daaa0745c2e9a44d8816b6cd259cfa798f4b8606e8b9982b"
+    "address": "0x2792e21a0370c582B97F5314b3f2070bA6019F4a",
+    "txHash": "0xd1fe41ffc1f99248d9423c84a668939115926882f744195590f7e61ec9a28f7e"
   }
 }

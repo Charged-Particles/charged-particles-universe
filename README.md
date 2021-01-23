@@ -1,10 +1,10 @@
-## Charged Particles Universe - Solidity Contracts v0.1.0
+## Charged Particles Universe - Solidity Contracts v0.1.1
 
 [![Discord](https://badgen.net/badge/definft/Charged%20Particles?icon=discord&label=discord)](https://discord.gg/Syh3gjz)
 [![Twitter Follow](https://badgen.net/twitter/follow/DeFiNFT?icon=twitter)](https://twitter.com/intent/follow?screen_name=DeFiNFT)
 [![built-with openzeppelin](https://img.shields.io/badge/built%20with-OpenZeppelin-3677FF)](https://docs.openzeppelin.com/)
 
-[![Coverage Status](https://coveralls.io/repos/github/Charged-Particles/ChargedParticlesEth/badge.svg?branch=master)](https://coveralls.io/github/Charged-Particles/charged-particles-universe?branch=main&v=v0.1.0)
+[![Coverage Status](https://coveralls.io/repos/github/Charged-Particles/ChargedParticlesEth/badge.svg?branch=master)](https://coveralls.io/github/Charged-Particles/charged-particles-universe?branch=main&v=v0.1.1)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Charged-Particles/charged-particles-universe)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/Charged-Particles/charged-particles-universe)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Charged-Particles/charged-particles-universe)
@@ -104,7 +104,7 @@ Join our community, share ideas and help support the project in anyway you want!
   Deploy (all): yarn deploy
   Deploy (only protocol): yarn deploy --tags protocol
   Deploy (only protocol and aave): yarn deploy --tags protocol,aave
-  Deploy (only protocol and aave on network ropsten): yarn deploy --network kovan --tags protocol,aave,proton,ion
+  Deploy (only protocol and aave on network ropsten): yarn deploy --network kovan --tags protocol,generic,aave,proton,photon,ion
 
 Deployed contract details go in deployments/{networkName}/{contractName}.json
 

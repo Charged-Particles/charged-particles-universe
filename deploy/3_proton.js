@@ -11,10 +11,10 @@ module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;
     const { deployer, protocolOwner } = await getNamedAccounts();
     const network = await hre.network;
-    const alchemyTimeout = 1;
     const deployData = {};
 
     const chainId = chainIdByName(network.name);
+    const alchemyTimeout = chainId === 31337 ? 0 : 1;
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles NFT: Proton - Contract Deployment');
