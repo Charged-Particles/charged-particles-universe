@@ -21,7 +21,7 @@
     "test": "yarn clean-test && hardhat test --show-stack-traces && yarn clean-test",
     "hint": "solhint \"contracts/**/*.sol\"",
     "etherscan-verify": "hardhat run ./scripts/verify.js --network",
-    "coverage": "yarn clean-test && hardhat --show-stack-traces coverage --temp coverage_build && yarn clean-test",
+    "coverage": "yarn clean-test && hardhat --show-stack-traces coverage --temp coverage_build && yarn clean-test && rm -rf abis",
     "gas": "REPORT_GAS=true hardhat test",
     "start": "hardhat node --port 8545",
     "deploy": "yarn clean-test && hardhat deploy",
