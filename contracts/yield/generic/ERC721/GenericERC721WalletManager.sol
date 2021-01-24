@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// GenericWalletManager.sol -- Charged Particles
+// GenericERC20WalletManager.sol -- Charged Particles
 
 pragma solidity 0.6.12;
 
@@ -145,6 +145,22 @@ contract GenericERC721WalletManager is WalletManagerBase {
     return (0, 0);
   }
 
+  function dischargeAmountForCreator(
+    address /* receiver */,
+    address /* contractAddress */,
+    uint256 /* tokenId */,
+    address /* creator */,
+    address /* assetToken */,
+    uint256 /* assetAmount */
+  )
+    external
+    override
+    onlyController
+    returns (uint256 receiverAmount)
+  {
+    return 0;
+  }
+
   function release(address receiver, address contractAddress, uint256 tokenId, address assetToken)
     public
     override
@@ -153,7 +169,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "GenericWalletManager: INVALID_TOKEN_ID");
+    require(wallet != address(0x0), "GenericERC20WalletManager: INVALID_TOKEN_ID");
 
     // Release Principal + Interest
     principalAmount = GenericERC721SmartWallet(wallet).getPrincipal(assetToken);
@@ -171,7 +187,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "genericWalletManager: INVALID_TOKEN_ID");
+    require(wallet != address(0x0), "GenericERC20WalletManager: INVALID_TOKEN_ID");
 
     // Withdraw Rewards to Receiver
     id = GenericERC721SmartWallet(wallet).withdrawRewards(receiver, rewardsToken, rewardsID);

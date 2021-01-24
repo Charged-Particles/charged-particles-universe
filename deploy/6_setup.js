@@ -23,7 +23,6 @@ module.exports = async (hre) => {
 
     const ddUniverse = getDeployData('Universe', chainId);
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
-    const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
     const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
     const ddAaveBridgeV1 = getDeployData('AaveBridgeV1', chainId);
     const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
@@ -51,10 +50,6 @@ module.exports = async (hre) => {
     log('  Loading Universe from: ', ddUniverse.address);
     const Universe = await ethers.getContractFactory('Universe');
     const universe = await Universe.attach(ddUniverse.address);
-
-    log('  Loading GenericWalletManager from: ', ddGenericWalletManager.address);
-    const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
-    const genericWalletManager = await GenericWalletManager.attach(ddGenericWalletManager.address);
 
     log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
@@ -98,15 +93,6 @@ module.exports = async (hre) => {
     // log(`  - [TX-${txCount++}] ChargedParticles: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     // await chargedParticles.transferOwnership(owner);
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Setup Generic Wallet Manager
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    log(`  - [TX-${txCount++}] GenericWalletManager: Setting Charged Particles as Controller`)(alchemyTimeout);
-    await genericWalletManager.setController(ddChargedParticles.address);
-
-    log(`  - [TX-${txCount++}] GenericWalletManager: Registering Generic as LP with ChargedParticles`)(alchemyTimeout);
-    await chargedParticles.registerLiquidityProvider('generic', ddGenericWalletManager.address);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Aave Wallet Manager
@@ -142,16 +128,16 @@ module.exports = async (hre) => {
     // Setup Generic Wallet Manager
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    log('  - GenericERC20WalletManager: Setting Charged Particles as Controller')(alchemyTimeout);
+    log('  - [TX-${txCount++}] GenericERC20WalletManager: Setting Charged Particles as Controller')(alchemyTimeout);
     await genericERC20WalletManager.setController(ddChargedParticles.address);
 
-    log('  - GenericERC20WalletManager: Registering Generic ERC20 as LP with ChargedParticles')(alchemyTimeout);
+    log('  - [TX-${txCount++}] GenericERC20WalletManager: Registering Generic ERC20 as LP with ChargedParticles')(alchemyTimeout);
     await chargedParticles.registerLiquidityProvider('genericERC20', ddGenericERC20WalletManager.address);
 
-    log('  - GenericERC721WalletManager: Setting Charged Particles as Controller')(alchemyTimeout);
+    log('  - [TX-${txCount++}] GenericERC721WalletManager: Setting Charged Particles as Controller')(alchemyTimeout);
     await genericERC721WalletManager.setController(ddChargedParticles.address);
 
-    log('  - GenericERC2721WalletManager: Registering Generic ERC721 as LP with ChargedParticles')(alchemyTimeout);
+    log('  - [TX-${txCount++}] GenericERC2721WalletManager: Registering Generic ERC721 as LP with ChargedParticles')(alchemyTimeout);
     await chargedParticles.registerLiquidityProvider('genericERC721', ddGenericERC721WalletManager.address);
 
 

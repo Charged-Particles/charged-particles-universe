@@ -94,6 +94,7 @@ contract GenericERC20SmartWallet is SmartWalletBase {
   function withdraw(address receiver, address assetToken)
     external
     override
+    onlyWalletManager
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
     creatorAmount = 0;
@@ -106,6 +107,7 @@ contract GenericERC20SmartWallet is SmartWalletBase {
   function withdrawAmount(address receiver, address assetToken, uint256 assetAmount)
     external
     override
+    onlyWalletManager
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
     creatorAmount = 0;
@@ -118,9 +120,23 @@ contract GenericERC20SmartWallet is SmartWalletBase {
     IERC20(assetToken).transfer(receiver, receiverAmount);
   }
 
+  function withdrawAmountForCreator(
+    address /* receiver */,
+    address /* assetToken */,
+    uint256 /* assetID */
+  )
+    external
+    override
+    onlyWalletManager
+    returns (uint256 receiverAmount)
+  {
+    return 0;
+  }
+
   function withdrawRewards(address receiver, address rewardsTokenAddress, uint256 rewardsAmount)
     external
     override
+    onlyWalletManager
     returns (uint256)
   {
     address self = address(this);
