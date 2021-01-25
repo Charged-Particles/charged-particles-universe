@@ -38,8 +38,8 @@ describe("Charged Particles", () => {
   let universe;
   let chargedParticles;
   let aaveWalletManager;
-  let genericERC20WalletManager;
-  let genericERC721WalletManager;
+  let genericWalletManager;
+  let genericBasketManager;
   let proton;
   let ion;
   let timelocks;
@@ -89,8 +89,8 @@ describe("Charged Particles", () => {
     const Universe = await ethers.getContractFactory('Universe');
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
-    const GenericERC20WalletManager = await ethers.getContractFactory('GenericERC20WalletManager');
-    const GenericERC721WalletManager = await ethers.getContractFactory('GenericERC721WalletManager');
+    const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
+    const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const Proton = await ethers.getContractFactory('Proton');
     const Ion = await ethers.getContractFactory('Ion');
     const IonTimelock = await ethers.getContractFactory('IonTimelock');
@@ -98,8 +98,8 @@ describe("Charged Particles", () => {
     universe = Universe.attach(getDeployData('Universe', chainId).address);
     chargedParticles = ChargedParticles.attach(getDeployData('ChargedParticles', chainId).address);
     aaveWalletManager = AaveWalletManager.attach(getDeployData('AaveWalletManager', chainId).address);
-    genericERC20WalletManager = GenericERC20WalletManager.attach(getDeployData('GenericERC20WalletManager', chainId).address);
-    genericERC721WalletManager = GenericERC721WalletManager.attach(getDeployData('GenericERC721WalletManager', chainId).address);
+    genericWalletManager = GenericWalletManager.attach(getDeployData('GenericWalletManager', chainId).address);
+    genericBasketManager = GenericBasketManager.attach(getDeployData('GenericBasketManager', chainId).address);
     proton = Proton.attach(getDeployData('Proton', chainId).address);
     ion = Ion.attach(getDeployData('Ion', chainId).address);
     timelocks = Object.values(getDeployData('IonTimelocks', chainId))
@@ -116,8 +116,8 @@ describe("Charged Particles", () => {
 
   it('charged particles should have enabled "aave" and "generic" as liquidity providers', async () => {
     expect(await chargedParticles.isLiquidityProviderEnabled('aave')).to.equal(true);
-    expect(await chargedParticles.isLiquidityProviderEnabled('genericERC20')).to.equal(true);
-    expect(await chargedParticles.isLiquidityProviderEnabled('genericERC721')).to.equal(true);
+    expect(await chargedParticles.isLiquidityProviderEnabled('generic')).to.equal(true);
+    expect(await chargedParticles.isNftBasketEnabled('generic')).to.equal(true);
   });
 
   it("can succesfully energize and release proton", async () => {
@@ -308,7 +308,7 @@ describe("Charged Particles", () => {
     expect(await ion.balanceOf(user3)).to.be.equal(balance3Before.add(balance1Before));
   });
 
-  it("genericERC20 smart wallet and manager succesfully hold erc20 tokens", async () => {
+  it("generic smart wallet and manager succesfully hold erc20 tokens", async () => {
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
@@ -324,7 +324,7 @@ describe("Charged Particles", () => {
         user1,                        // creator
         user2,                        // receiver
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
-        'genericERC20',               // liquidityProviderId
+        'generic',                    // liquidityProviderId
         daiAddress,                   // assetToken
         toWei('10'),                  // assetAmount
         annuityPct,                   // annuityPercent
@@ -336,7 +336,7 @@ describe("Charged Particles", () => {
       user2,
       proton.address,
       energizedParticleId,
-      'genericERC20',
+      'generic',
       daiAddress
     );
 
@@ -357,7 +357,7 @@ describe("Charged Particles", () => {
   //       user1,                        // creator
   //       user2,                        // receiver
   //       TEST_NFT_TOKEN_URI,           // tokenMetaUri
-  //       'genericERC20',               // liquidityProviderId
+  //       'generic',                    // liquidityProviderId
   //       daiAddress,                   // assetToken
   //       toWei('10'),                  // assetAmount
   //       annuityPct,                   // annuityPercent

@@ -25,21 +25,20 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/SafeCast.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../../../lib/SmartWalletBase.sol";
 
 
 /**
- * @notice Generic ERC721-Token Smart-Wallet Bridge
+ * @notice Generic ERC20-Token Smart-Wallet Bridge
  * @dev Non-upgradeable Contract
  */
-contract GenericERC721SmartWallet is SmartWalletBase {
+contract GenericSmartWallet is SmartWalletBase {
   using SafeMath for uint256;
   using SafeCast for uint256;
 
   // Asset Token => Principal Balance
-  mapping (address => uint256) internal _assetPrincipalCount;
-  mapping (uint256 => uint256) internal _assetPrincipalIDs;
+  mapping (address => uint256) internal _assetPrincipalBalance;
 
   /***********************************|
   |          Initialization           |
@@ -98,21 +97,20 @@ contract GenericERC721SmartWallet is SmartWalletBase {
     override
     returns (uint256)
   {
-    return IERC721(assetToken).balanceOf(address(this));
+    return IERC20(assetToken).balanceOf(address(this));
   }
 
-  function deposit(address assetToken, uint256 assetID, uint256 /* referralCode */)
+  function deposit(address assetToken, uint256 assetAmount, uint256 /* referralCode */)
     external
     override
     returns (uint256)
   {
     // Track Principal
     _trackAssetToken(assetToken);
-    _assetPrincipalIDs[_assetPrincipalCount[assetToken]] = assetID;
-    _assetPrincipalCount[assetToken] = _assetPrincipalCount[assetToken].add(1);
+    _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].add(assetAmount);
   }
 
-  function withdraw(address receiver, address assetToken)
+  function withdraw(address receiver, address /* creatorRedirect */, address assetToken)
     external
     override
     onlyWalletManager
@@ -121,13 +119,11 @@ contract GenericERC721SmartWallet is SmartWalletBase {
     creatorAmount = 0;
     receiverAmount = _getPrincipal(assetToken);
     // Track Principal
-    _assetPrincipalCount[assetToken] = 0;
-    for (uint256 i; i < receiverAmount; i++) {
-      IERC721(assetToken).safeTransferFrom(address(this), receiver, _assetPrincipalIDs[i]);
-    }
+    _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].sub(receiverAmount);
+    IERC20(assetToken).transfer(receiver, receiverAmount);
   }
 
-  function withdrawAmount(address receiver, address assetToken, uint256 assetID)
+  function withdrawAmount(address receiver, address /* creatorRedirect */, address assetToken, uint256 assetAmount)
     external
     override
     onlyWalletManager
@@ -135,16 +131,12 @@ contract GenericERC721SmartWallet is SmartWalletBase {
   {
     creatorAmount = 0;
     receiverAmount = _getPrincipal(assetToken);
-    uint256 receiverID = receiverAmount;
-    for (uint256 i; i < receiverAmount; i++) {
-      if (_assetPrincipalIDs[i] == assetID) {
-        receiverID = i;
-      }
+    if (receiverAmount >= assetAmount) {
+      receiverAmount = assetAmount;
     }
-    require(receiverID < receiverAmount, "GenericERC721SmartWallet: E-203");
     // Track Principal
-    _assetPrincipalCount[assetToken] = _assetPrincipalCount[assetToken].sub(1);
-    IERC721(assetToken).safeTransferFrom(address(this), receiver, assetID);
+    _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].sub(receiverAmount);
+    IERC20(assetToken).transfer(receiver, receiverAmount);
   }
 
   function withdrawAmountForCreator(
@@ -160,21 +152,21 @@ contract GenericERC721SmartWallet is SmartWalletBase {
     return 0;
   }
 
-  function withdrawRewards(address receiver, address rewardsTokenAddress, uint256 rewardsID)
+  function withdrawRewards(address receiver, address rewardsTokenAddress, uint256 rewardsAmount)
     external
     override
     onlyWalletManager
     returns (uint256)
   {
     address self = address(this);
-    IERC721 rewardsToken = IERC721(rewardsTokenAddress);
+    IERC20 rewardsToken = IERC20(rewardsTokenAddress);
 
-    address rewardsOwner = rewardsToken.ownerOf(rewardsID);
-    require(rewardsOwner == self, "GenericSmartWallet: E-203");
+    uint256 walletBalance = rewardsToken.balanceOf(self);
+    require(walletBalance >= rewardsAmount, "GenericSmartWallet: E-411");
 
     // Transfer Rewards to Receiver
-    rewardsToken.safeTransferFrom(self, receiver, rewardsID);
-    return rewardsID;
+    require(rewardsToken.transfer(receiver, rewardsAmount), "GenericSmartWallet: E-401");
+    return rewardsAmount;
   }
 
   /***********************************|
@@ -182,7 +174,7 @@ contract GenericERC721SmartWallet is SmartWalletBase {
   |__________________________________*/
 
   function _getPrincipal(address assetToken) internal view returns (uint256) {
-    return _assetPrincipalCount[assetToken];
+    return _assetPrincipalBalance[assetToken];
   }
 
 }

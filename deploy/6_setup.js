@@ -20,14 +20,15 @@ module.exports = async (hre) => {
     const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
     const referralCode = presets.Aave.referralCode[chainId];
     const mintFee = presets.Proton.mintFee;
+    const ionMaxSuppy = presets.Ion.maxSupply;
 
     const ddUniverse = getDeployData('Universe', chainId);
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
     const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
     const ddAaveBridgeV1 = getDeployData('AaveBridgeV1', chainId);
     const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
-    const ddGenericERC20WalletManager = getDeployData('GenericERC20WalletManager', chainId);
-    const ddGenericERC721WalletManager = getDeployData('GenericERC721WalletManager', chainId);
+    const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
+    const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddPhoton = getDeployData('Photon', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddIon = getDeployData('Ion', chainId);
@@ -55,13 +56,13 @@ module.exports = async (hre) => {
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
     const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
 
-    log('  Loading GenericERC20WalletManager from: ', ddGenericERC20WalletManager.address);
-    const GenericERC20WalletManager = await ethers.getContractFactory('GenericERC20WalletManager');
-    const genericERC20WalletManager = await GenericERC20WalletManager.attach(ddGenericERC20WalletManager.address);
+    log('  Loading GenericWalletManager from: ', ddGenericWalletManager.address);
+    const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
+    const genericWalletManager = await GenericWalletManager.attach(ddGenericWalletManager.address);
 
-    log('  Loading GenericERC721WalletManager from: ', ddGenericERC721WalletManager.address);
-    const GenericERC721WalletManager = await ethers.getContractFactory('GenericERC721WalletManager');
-    const genericERC721WalletManager = await GenericERC721WalletManager.attach(ddGenericERC721WalletManager.address);
+    log('  Loading GenericBasketManager from: ', ddGenericBasketManager.address);
+    const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
+    const genericBasketManager = await GenericBasketManager.attach(ddGenericBasketManager.address);
 
     log('  Loading Photon from: ', ddPhoton.address);
     const Photon = await ethers.getContractFactory('Photon');
@@ -124,21 +125,28 @@ module.exports = async (hre) => {
     // log(`  - [TX-${txCount++}] AaveWalletManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     // await aaveWalletManager.transferOwnership(owner);
 
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Setup Generic Wallet Manager
+    // Setup Generic Wallet Managers
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    log('  - [TX-${txCount++}] GenericERC20WalletManager: Setting Charged Particles as Controller')(alchemyTimeout);
-    await genericERC20WalletManager.setController(ddChargedParticles.address);
+    log(`  - [TX-${txCount++}] GenericWalletManager: Setting Charged Particles as Controller`)(alchemyTimeout);
+    await genericWalletManager.setController(ddChargedParticles.address);
 
-    log('  - [TX-${txCount++}] GenericERC20WalletManager: Registering Generic ERC20 as LP with ChargedParticles')(alchemyTimeout);
-    await chargedParticles.registerLiquidityProvider('genericERC20', ddGenericERC20WalletManager.address);
+    log(`  - [TX-${txCount++}] GenericWalletManager: Registering Generic Wallet Manager with ChargedParticles`)(alchemyTimeout);
+    await chargedParticles.registerLiquidityProvider('generic', ddGenericWalletManager.address);
 
-    log('  - [TX-${txCount++}] GenericERC721WalletManager: Setting Charged Particles as Controller')(alchemyTimeout);
-    await genericERC721WalletManager.setController(ddChargedParticles.address);
+    // log(`  - [TX-${txCount++}] GenericWalletManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    // await genericWalletManager.transferOwnership(owner);
 
-    log('  - [TX-${txCount++}] GenericERC2721WalletManager: Registering Generic ERC721 as LP with ChargedParticles')(alchemyTimeout);
-    await chargedParticles.registerLiquidityProvider('genericERC721', ddGenericERC721WalletManager.address);
+    log(`  - [TX-${txCount++}] GenericBasketManager: Setting Charged Particles as Controller`)(alchemyTimeout);
+    await genericBasketManager.setController(ddChargedParticles.address);
+
+    log(`  - [TX-${txCount++}] GenericBasketManager: Registering Generic Basket Manager with ChargedParticles`)(alchemyTimeout);
+    await chargedParticles.registerBasketManager('generic', ddGenericBasketManager.address);
+
+    // log(`  - [TX-${txCount++}] GenericBasketManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    // await genericBasketManager.transferOwnership(owner);
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -150,6 +158,9 @@ module.exports = async (hre) => {
 
     log(`  - [TX-${txCount++}] Proton: Registering ChargedParticles`)(alchemyTimeout);
     await proton.setChargedParticles(ddChargedParticles.address);
+
+    log(`  - [TX-${txCount++}] Proton: Registering Protocol Owner as Batch-Minter`)(alchemyTimeout);
+    await proton.updateBatchMinter(protocolOwner, true);
 
     log(`  - [TX-${txCount++}] Proton: Setting Mint Fee:`, mintFee.toString())(alchemyTimeout);
     await proton.setMintFee(mintFee);
@@ -169,7 +180,7 @@ module.exports = async (hre) => {
     await ion.setUniverse(ddUniverse.address);
 
     log(`  - [TX-${txCount++}] Universe: Registering Ion`)(alchemyTimeout);
-    await universe.setIonToken(ddIon.address);
+    await universe.setCation(ddIon.address, ionMaxSuppy);
 
     let assetTokenId;
     let assetTokenAddress;
@@ -179,8 +190,8 @@ module.exports = async (hre) => {
         assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
         assetTokenMultiplier = presets.Ion.rewardsForAssetTokens[i].multiplier;
 
-        log(`  - [TX-${txCount++}] Universe: Setting Ion Rewards Multiplier for Asset Token: `, assetTokenAddress, ` to: `, assetTokenMultiplier)(alchemyTimeout);
-        await universe.setIonRewardsMultiplier(assetTokenAddress, assetTokenMultiplier);
+        log(`  - [TX-${txCount++}] Universe: Setting ESA Multiplier for Asset Token: `, assetTokenAddress, ` to: `, assetTokenMultiplier)(alchemyTimeout);
+        await universe.setEsaMultiplier(assetTokenAddress, assetTokenMultiplier);
     }
 
 

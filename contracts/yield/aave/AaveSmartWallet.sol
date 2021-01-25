@@ -103,6 +103,7 @@ contract AaveSmartWallet is SmartWalletBase {
 
   function withdraw(
     address receiver,
+    address creatorRedirect,
     address assetToken
   )
     external
@@ -112,11 +113,12 @@ contract AaveSmartWallet is SmartWalletBase {
   {
     uint256 walletPrincipal = _getPrincipal(assetToken);
     (, uint256 ownerInterest) = _getInterest(assetToken);
-    return _withdraw(receiver, assetToken, walletPrincipal.add(ownerInterest));
+    return _withdraw(receiver, creatorRedirect, assetToken, walletPrincipal.add(ownerInterest));
   }
 
   function withdrawAmount(
     address receiver,
+    address creatorRedirect,
     address assetToken,
     uint256 assetAmount
   )
@@ -125,7 +127,7 @@ contract AaveSmartWallet is SmartWalletBase {
     onlyWalletManager
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    return _withdraw(receiver, assetToken, assetAmount);
+    return _withdraw(receiver, creatorRedirect, assetToken, assetAmount);
   }
 
   function withdrawAmountForCreator(
@@ -180,6 +182,7 @@ contract AaveSmartWallet is SmartWalletBase {
 
   function _withdraw(
     address receiver,
+    address creatorRedirect,
     address assetToken,
     uint256 assetAmount
   )
@@ -229,7 +232,8 @@ contract AaveSmartWallet is SmartWalletBase {
 
     // Withdraw Assets for Creator
     if (creatorAmount > 0) {
-      _bridge.withdraw(nftCreator, assetToken, creatorAmount);
+      address receivesForCreator = (creatorRedirect != address(0x0)) ? creatorRedirect : nftCreator;
+      _bridge.withdraw(receivesForCreator, assetToken, creatorAmount);
     }
 
     // Withdraw Assets for Receiver

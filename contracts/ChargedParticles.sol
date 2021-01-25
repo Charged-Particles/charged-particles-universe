@@ -36,6 +36,7 @@ import "./interfaces/IERC721Chargeable.sol";
 import "./interfaces/IUniverse.sol";
 import "./interfaces/IChargedParticles.sol";
 import "./interfaces/IWalletManager.sol";
+import "./interfaces/IBasketManager.sol";
 
 import "./lib/RelayRecipient.sol";
 
@@ -79,7 +80,7 @@ contract ChargedParticles is
   //
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
-  uint256 constant internal MAX_ANNUITIES = 5e3;      // 5000   (50%)
+  uint256 constant internal MAX_ANNUITIES = 1e4;      // 10000  (100%)
 
   // Interface Signatures
   bytes4 constant internal INTERFACE_SIGNATURE_ERC721 = 0x80ac58cd;
@@ -88,7 +89,9 @@ contract ChargedParticles is
   // Linked Contracts
   IUniverse internal _universe;
   string[] internal _liquidityProviders;
+  string[] internal _nftBaskets;
   mapping (string => IWalletManager) internal _lpWalletManager;
+  mapping (string => IBasketManager) internal _nftBasketManager;
 
   // Whitelisted External Token Contracts that are allowed to "Charge" tokens.
   mapping (address => bool) public whitelisted;
@@ -104,6 +107,7 @@ contract ChargedParticles is
   //
   // TokenUUID => Config for individual NFTs set by NFT Creator
   mapping (uint256 => uint256) internal _creatorAnnuityPercent;
+  mapping (uint256 => address) internal _creatorAnnuityRedirect;
 
   // TokenUUID => NFT Owner => NFT State
   mapping (uint256 => mapping (address => address)) internal _dischargeApproval;
@@ -133,6 +137,10 @@ contract ChargedParticles is
     return _isTokenCreator(contractAddress, tokenId, account);
   }
 
+  function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external override view returns (address) {
+    return _getCreatorAnnuitiesRedirect(contractAddress, tokenId);
+  }
+
   function isLiquidityProviderEnabled(string calldata liquidityProviderId) external override view returns (bool) {
     return _isLiquidityProviderEnabled(liquidityProviderId);
   }
@@ -148,6 +156,23 @@ contract ChargedParticles is
 
   function getWalletManager(string calldata liquidityProviderId) external override view returns (address) {
     return address(_lpWalletManager[liquidityProviderId]);
+  }
+
+  function isNftBasketEnabled(string calldata basketId) external override view returns (bool) {
+    return _isNftBasketEnabled(basketId);
+  }
+
+  function getNftBasketCount() external override view returns (uint) {
+    return _nftBaskets.length;
+  }
+
+  function getNftBasketByIndex(uint index) external override view returns (string memory) {
+    require(index >= 0 && index < _nftBaskets.length, "ChargedParticles: E-201");
+    return _nftBaskets[index];
+  }
+
+  function getBasketManager(string calldata basketId) external override view returns (address) {
+    return address(_nftBasketManager[basketId]);
   }
 
   function getTokenUUID(address contractAddress, uint256 tokenId) external override pure returns (uint256) {
@@ -394,6 +419,20 @@ contract ChargedParticles is
     );
   }
 
+  /// @notice Sets a Custom Receiver Address for the Creator Annuities
+  /// @param contractAddress  The Address to the Proton-based NFT to configure
+  /// @param tokenId          The token ID of the Proton-based NFT to configure
+  /// @param receiver         The receiver of the Creator interest-annuities
+  function setCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId, address receiver)
+    external
+    override
+  {
+    require(_isTokenCreator(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-104");
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    _creatorAnnuityRedirect[tokenUuid] = receiver;
+    emit TokenCreatorAnnuitiesRedirected(contractAddress, tokenId, receiver);
+  }
+
   /***********************************|
   |        Timelock Particles         |
   |__________________________________*/
@@ -523,7 +562,8 @@ contract ChargedParticles is
       require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: E-302");
     }
 
-    (creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].discharge(receiver, contractAddress, tokenId, assetToken);
+    address creatorRedirect = _creatorAnnuityRedirect[tokenUuid];
+    (creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].discharge(receiver, contractAddress, tokenId, assetToken, creatorRedirect);
 
     // Signal to Universe Controller
     if (address(_universe) != address(0)) {
@@ -564,7 +604,15 @@ contract ChargedParticles is
       require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: E-302");
     }
 
-    (creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].dischargeAmount(receiver, contractAddress, tokenId, assetToken, assetAmount);
+    address creatorRedirect = _creatorAnnuityRedirect[tokenUuid];
+    (creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].dischargeAmount(
+      receiver,
+      contractAddress,
+      tokenId,
+      assetToken,
+      assetAmount,
+      creatorRedirect
+    );
 
     // Signal to Universe Controller
     if (address(_universe) != address(0)) {
@@ -649,7 +697,14 @@ contract ChargedParticles is
 
     // Release Particle to Receiver
     uint256 principalAmount;
-    (principalAmount, creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].release(receiver, contractAddress, tokenId, assetToken);
+    address creatorRedirect = _creatorAnnuityRedirect[tokenUuid];
+    (principalAmount, creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].release(
+      receiver,
+      contractAddress,
+      tokenId,
+      assetToken,
+      creatorRedirect
+    );
 
     // Signal to Universe Controller
     if (address(_universe) != address(0)) {
@@ -679,6 +734,18 @@ contract ChargedParticles is
     emit LiquidityProviderRegistered(liquidityProviderId, walletManager);
   }
 
+  /// @dev Register Contracts as basket managers with a unique basket ID
+  function registerBasketManager(string calldata basketId, address basketManager) external onlyOwner {
+    // Validate basket manager
+    IBasketManager newBasketMgr = IBasketManager(basketManager);
+    require(newBasketMgr.isPaused() != true, "ChargedParticles: E-418");
+
+    // Register Basket ID
+    _nftBaskets.push(basketId);
+    _nftBasketManager[basketId] = newBasketMgr;
+    emit NftBasketRegistered(basketId, basketManager);
+  }
+
   /// @dev Update the list of NFT contracts that can be Charged
   function updateWhitelist(address contractAddress, bool state) external onlyOwner {
     whitelisted[contractAddress] = state;
@@ -693,6 +760,12 @@ contract ChargedParticles is
   |         Private Functions         |
   |__________________________________*/
 
+  /// @dev See {ChargedParticles-getCreatorAnnuitiesRedirect}.
+  function _getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) internal view returns (address) {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    return _creatorAnnuityRedirect[tokenUuid];
+  }
+
   /// @dev See {ChargedParticles-isLiquidityProviderEnabled}.
   function _isLiquidityProviderEnabled(string calldata liquidityProviderId) internal view returns (bool) {
     return (address(_lpWalletManager[liquidityProviderId]) != address(0x0));
@@ -701,6 +774,16 @@ contract ChargedParticles is
   /// @dev See {ChargedParticles-isLiquidityProviderPaused}.
   function _isLiquidityProviderPaused(string calldata liquidityProviderId) internal view returns (bool) {
     return _lpWalletManager[liquidityProviderId].isPaused();
+  }
+
+  /// @dev See {ChargedParticles-isNftBasketEnabled}.
+  function _isNftBasketEnabled(string calldata basketId) internal view returns (bool) {
+    return (address(_nftBasketManager[basketId]) != address(0x0));
+  }
+
+  /// @dev See {ChargedParticles-isNftBasketPaused}.
+  function _isNftBasketPaused(string calldata basketId) internal view returns (bool) {
+    return _nftBasketManager[basketId].isPaused();
   }
 
   /// @dev See {ChargedParticles-getTokenUUID}.

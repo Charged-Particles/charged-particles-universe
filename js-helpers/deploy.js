@@ -97,6 +97,7 @@ const presets = {
     mintFee: toWei('0')
   },
   Ion: {
+    maxSupply: toWei('100000000'), // 100 Million
     rewardsForAssetTokens: [
       {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI
     ],

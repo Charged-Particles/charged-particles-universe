@@ -81,3 +81,5 @@ Codes:
     E-422 - INVALID_PHOTON
     E-423 - INVALID_REWARD_TOKEN
     E-424 - INVALID_ASSET
+    E-425 - token already exists in basket
+    E-426 - token does not exist in basket

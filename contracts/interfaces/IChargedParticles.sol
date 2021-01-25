@@ -32,10 +32,18 @@ interface IChargedParticles {
   |             Public API            |
   |__________________________________*/
 
+  function isTokenCreator(address contractAddress, uint256 tokenId, address account) external view returns (bool);
+  function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external view returns (address);
+
   function isLiquidityProviderEnabled(string calldata liquidityProviderId) external view returns (bool);
   function getLiquidityProvidersCount() external view returns (uint);
   function getLiquidityProviderByIndex(uint index) external view returns (string memory);
   function getWalletManager(string calldata liquidityProviderId) external view returns (address);
+
+  function isNftBasketEnabled(string calldata basketId) external view returns (bool);
+  function getNftBasketCount() external view returns (uint);
+  function getNftBasketByIndex(uint index) external view returns (string memory);
+  function getBasketManager(string calldata basketId) external view returns (address);
 
   function getTokenUUID(address contractAddress, uint256 tokenId) external pure returns (uint256);
   function getOwnerUUID(string calldata liquidityProviderId, address owner) external pure returns (uint256);
@@ -58,7 +66,6 @@ interface IChargedParticles {
   |__________________________________*/
 
   function isContractOwner(address contractAddress, address account) external view returns (bool);
-  function isTokenCreator(address contractAddress, uint256 tokenId, address account) external view returns (bool);
 
   function setExternalContractConfigs(
     address contractAddress,
@@ -72,6 +79,12 @@ interface IChargedParticles {
     uint256 tokenId,
     address creator,
     uint256 annuityPercent
+  ) external;
+
+  function setCreatorAnnuitiesRedirect(
+    address contractAddress,
+    uint256 tokenId,
+    address receiver
   ) external;
 
   function setDischargeTimelock(
@@ -143,6 +156,10 @@ interface IChargedParticles {
     string indexed liquidityProviderId,
     address indexed walletManager
   );
+  event NftBasketRegistered(
+    string indexed basketId,
+    address indexed basketManager
+  );
   event TokenContractConfigsSet(
     address indexed contractAddress,
     string indexed liquidityProvider,
@@ -154,6 +171,11 @@ interface IChargedParticles {
     uint256 indexed tokenId,
     address indexed creatorAddress,
     uint256 annuityPercent
+  );
+  event TokenCreatorAnnuitiesRedirected(
+    address indexed contractAddress,
+    uint256 indexed tokenId,
+    address indexed redirectAddress
   );
   event DischargeApproval(
     address indexed contractAddress,

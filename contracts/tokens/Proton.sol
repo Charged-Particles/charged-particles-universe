@@ -44,7 +44,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
   using Counters for Counters.Counter;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
-  uint256 constant internal MAX_ROYALTIES = 5e3;      // 5000   (50%)
+  uint256 constant internal MAX_ROYALTIES = 8e3;      // 8000   (80%)
 
   event UniverseSet(address indexed universe);
   event ChargedParticlesSet(address indexed chargedParticles);

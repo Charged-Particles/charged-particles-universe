@@ -145,7 +145,8 @@ contract AaveWalletManager is WalletManagerBase {
     address receiver,
     address contractAddress,
     uint256 tokenId,
-    address assetToken
+    address assetToken,
+    address creatorRedirect
   )
     external
     override
@@ -160,7 +161,7 @@ contract AaveWalletManager is WalletManagerBase {
     require(ownerInterest > 0, "AaveWalletManager: E-412");
 
     // Discharge the full amount of interest
-    (creatorAmount, receiverAmount) = AaveSmartWallet(wallet).withdrawAmount(receiver, assetToken, ownerInterest);
+    (creatorAmount, receiverAmount) = AaveSmartWallet(wallet).withdrawAmount(receiver, creatorRedirect, assetToken, ownerInterest);
 
     // Log Event
     emit WalletDischarged(contractAddress, tokenId, assetToken, creatorAmount, receiverAmount);
@@ -171,7 +172,8 @@ contract AaveWalletManager is WalletManagerBase {
     address contractAddress,
     uint256 tokenId,
     address assetToken,
-    uint256 assetAmount
+    uint256 assetAmount,
+    address creatorRedirect
   )
     external
     override
@@ -186,7 +188,7 @@ contract AaveWalletManager is WalletManagerBase {
     require(assetAmount > 0 && ownerInterest >= assetAmount, "AaveWalletManager: E-412");
 
     // Discharge a portion of the interest
-    (creatorAmount, receiverAmount) = AaveSmartWallet(wallet).withdrawAmount(receiver, assetToken, assetAmount);
+    (creatorAmount, receiverAmount) = AaveSmartWallet(wallet).withdrawAmount(receiver, creatorRedirect, assetToken, assetAmount);
 
     // Log Event
     emit WalletDischarged(contractAddress, tokenId, assetToken, creatorAmount, receiverAmount);
@@ -223,7 +225,8 @@ contract AaveWalletManager is WalletManagerBase {
     address receiver,
     address contractAddress,
     uint256 tokenId,
-    address assetToken
+    address assetToken,
+    address creatorRedirect
   )
     external
     override
@@ -236,7 +239,7 @@ contract AaveWalletManager is WalletManagerBase {
 
     // Release Principal + Interest
     principalAmount = AaveSmartWallet(wallet).getPrincipal(assetToken);
-    (creatorAmount, receiverAmount) = AaveSmartWallet(wallet).withdraw(receiver, assetToken);
+    (creatorAmount, receiverAmount) = AaveSmartWallet(wallet).withdraw(receiver, creatorRedirect, assetToken);
 
     // Log Event
     emit WalletReleased(contractAddress, tokenId, receiver, assetToken, principalAmount, creatorAmount, receiverAmount);

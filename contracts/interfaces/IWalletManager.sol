@@ -48,10 +48,10 @@ interface IWalletManager {
   function getRewards(address contractAddress, uint256 tokenId, address rewardToken) external returns (uint256);
 
   function energize(address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount) external returns (uint256 yieldTokensAmount);
-  function discharge(address receiver, address contractAddress, uint256 tokenId, address assetToken) external returns (uint256 creatorAmount, uint256 receiverAmount);
-  function dischargeAmount(address receiver, address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount) external returns (uint256 creatorAmount, uint256 receiverAmount);
+  function discharge(address receiver, address contractAddress, uint256 tokenId, address assetToken, address creatorRedirect) external returns (uint256 creatorAmount, uint256 receiverAmount);
+  function dischargeAmount(address receiver, address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount, address creatorRedirect) external returns (uint256 creatorAmount, uint256 receiverAmount);
   function dischargeAmountForCreator(address receiver, address contractAddress, uint256 tokenId, address creator, address assetToken, uint256 assetAmount) external returns (uint256 receiverAmount);
-  function release(address receiver, address contractAddress, uint256 tokenId, address assetToken) external returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount);
+  function release(address receiver, address contractAddress, uint256 tokenId, address assetToken, address creatorRedirect) external returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount);
   function withdrawRewards(address receiver, address contractAddress, uint256 tokenId, address rewardsToken, uint256 rewardsAmount) external returns (uint256 amount);
   function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount) external;
   function executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes memory encodedParams) external returns (bytes memory);

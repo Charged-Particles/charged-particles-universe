@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// GenericERC20WalletManager.sol -- Part of the Charged Particles Protocol
+// GenericWalletManager.sol -- Part of the Charged Particles Protocol
 // Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,13 +25,13 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../../../lib/WalletManagerBase.sol";
-import "./GenericERC721SmartWallet.sol";
+import "./GenericSmartWallet.sol";
 
 /**
- * @notice Generic ERC721 Wallet Manager
+ * @notice Generic ERC20 Wallet Manager
  * @dev Non-upgradeable Contract
  */
-contract GenericERC721WalletManager is WalletManagerBase {
+contract GenericWalletManager is WalletManagerBase {
   using SafeMath for uint256;
 
   uint256 internal _referralCode;
@@ -41,7 +41,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
   |__________________________________*/
 
   constructor () public {
-    _walletTemplate = address(new GenericERC721SmartWallet());
+    _walletTemplate = address(new GenericSmartWallet());
   }
 
   /***********************************|
@@ -56,7 +56,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     if (_wallets[uuid] == address(0x0)) { return false; }
-    return GenericERC721SmartWallet(_wallets[uuid]).isReserveActive(assetToken);
+    return GenericSmartWallet(_wallets[uuid]).isReserveActive(assetToken);
   }
 
   function getReserveInterestToken(address contractAddress, uint256 tokenId, address assetToken)
@@ -67,7 +67,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     if (_wallets[uuid] == address(0x0)) { return address(0x0); }
-    return GenericERC721SmartWallet(_wallets[uuid]).getReserveInterestToken(assetToken);
+    return GenericSmartWallet(_wallets[uuid]).getReserveInterestToken(assetToken);
   }
 
   /**
@@ -83,7 +83,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     if (_wallets[uuid] == address(0x0)) { return 0; }
-    return GenericERC721SmartWallet(_wallets[uuid]).getTotal(assetToken);
+    return GenericSmartWallet(_wallets[uuid]).getTotal(assetToken);
   }
 
   /**
@@ -99,7 +99,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     if (_wallets[uuid] == address(0x0)) { return 0; }
-    return GenericERC721SmartWallet(_wallets[uuid]).getPrincipal(assetToken);
+    return GenericSmartWallet(_wallets[uuid]).getPrincipal(assetToken);
   }
 
   /**
@@ -116,7 +116,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     if (_wallets[uuid] != address(0x0)) {
-    return GenericERC721SmartWallet(_wallets[uuid]).getInterest(assetToken);
+    return GenericSmartWallet(_wallets[uuid]).getInterest(assetToken);
     }
   }
 
@@ -127,10 +127,10 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     if (_wallets[uuid] == address(0x0)) { return 0; }
-    return GenericERC721SmartWallet(_wallets[uuid]).getRewards(rewardToken);
+    return GenericSmartWallet(_wallets[uuid]).getRewards(rewardToken);
   }
 
-  function energize(address contractAddress, uint256 tokenId, address assetToken, uint256 assetID)
+  function energize(address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount)
     public
     override
     onlyController
@@ -140,13 +140,13 @@ contract GenericERC721WalletManager is WalletManagerBase {
     address wallet = _wallets[uuid];
 
     // Deposit into Smart-Wallet
-    yieldTokensAmount = GenericERC721SmartWallet(wallet).deposit(assetToken, assetID, _referralCode);
+    yieldTokensAmount = GenericSmartWallet(wallet).deposit(assetToken, assetAmount, _referralCode);
 
     // Log Event
-    emit WalletEnergized(contractAddress, tokenId, assetToken, assetID, yieldTokensAmount);
+    emit WalletEnergized(contractAddress, tokenId, assetToken, assetAmount, yieldTokensAmount);
   }
 
-  function discharge(address /* receiver */, address /* contractAddress */, uint256 /* tokenId */, address /* assetToken */)
+  function discharge(address /* receiver */, address /* contractAddress */, uint256 /* tokenId */, address /* assetToken */, address /* creatorRedirect */)
     public
     override
     onlyController
@@ -155,7 +155,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
     return (0, 0);
   }
 
-  function dischargeAmount(address /* receiver */, address /* contractAddress */, uint256 /* tokenId */, address /* assetToken */, uint256 /* assetAmount */)
+  function dischargeAmount(address /* receiver */, address /* contractAddress */, uint256 /* tokenId */, address /* assetToken */, uint256 /* assetAmount */, address /* creatorRedirect */)
     public
     override
     onlyController
@@ -180,7 +180,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
     return 0;
   }
 
-  function release(address receiver, address contractAddress, uint256 tokenId, address assetToken)
+  function release(address receiver, address contractAddress, uint256 tokenId, address assetToken, address creatorRedirect)
     public
     override
     onlyController
@@ -188,31 +188,31 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "GenericERC20WalletManager: E-403");
+    require(wallet != address(0x0), "GenericWalletManager: E-403");
 
     // Release Principal + Interest
-    principalAmount = GenericERC721SmartWallet(wallet).getPrincipal(assetToken);
-    (creatorAmount, receiverAmount) = GenericERC721SmartWallet(wallet).withdraw(receiver, assetToken);
+    principalAmount = GenericSmartWallet(wallet).getPrincipal(assetToken);
+    (creatorAmount, receiverAmount) = GenericSmartWallet(wallet).withdraw(receiver, creatorRedirect, assetToken);
 
     // Log Event
     emit WalletReleased(contractAddress, tokenId, receiver, assetToken, principalAmount, creatorAmount, receiverAmount);
   }
 
-  function withdrawRewards(address receiver, address contractAddress, uint256 tokenId, address rewardsToken, uint256 rewardsID)
+  function withdrawRewards(address receiver, address contractAddress, uint256 tokenId, address rewardsToken, uint256 rewardsAmount)
     public
     override
     onlyController
-    returns (uint256 id)
+    returns (uint256 amount)
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "GenericERC20WalletManager: E-403");
+    require(wallet != address(0x0), "genericERC20WalletManager: E-403");
 
     // Withdraw Rewards to Receiver
-    id = GenericERC721SmartWallet(wallet).withdrawRewards(receiver, rewardsToken, rewardsID);
+    amount = GenericSmartWallet(wallet).withdrawRewards(receiver, rewardsToken, rewardsAmount);
 
     // Log Event
-    emit WalletRewarded(contractAddress, tokenId, receiver, rewardsToken, id);
+    emit WalletRewarded(contractAddress, tokenId, receiver, rewardsToken, amount);
   }
 
   function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount)
@@ -222,7 +222,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    return GenericERC721SmartWallet(wallet).withdrawEther(receiver, amount);
+    return GenericSmartWallet(wallet).withdrawEther(receiver, amount);
   }
 
   function executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes memory encodedParams)
@@ -233,7 +233,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    return GenericERC721SmartWallet(wallet).executeForAccount(externalAddress, ethValue, encodedParams);
+    return GenericSmartWallet(wallet).executeForAccount(externalAddress, ethValue, encodedParams);
   }
 
   function getWalletAddressById(address contractAddress, uint256 tokenId, address creator, uint256 annuityPct)
@@ -251,7 +251,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
       _wallets[uuid] = wallet;
 
       if (creator != address(0x0)) {
-        GenericERC721SmartWallet(wallet).setNftCreator(creator, annuityPct);
+        GenericSmartWallet(wallet).setNftCreator(creator, annuityPct);
       }
 
       emit NewSmartWallet(contractAddress, tokenId, wallet, creator, annuityPct);
@@ -269,7 +269,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
     returns (address)
   {
     address newWallet = _createClone(_walletTemplate);
-    GenericERC721SmartWallet(newWallet).initialize();
+    GenericSmartWallet(newWallet).initialize();
     return newWallet;
   }
 
