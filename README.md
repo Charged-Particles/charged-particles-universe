@@ -104,7 +104,7 @@ Join our community, share ideas and help support the project in anyway you want!
   Deploy (all): yarn deploy
   Deploy (only protocol): yarn deploy --tags protocol
   Deploy (only protocol and aave): yarn deploy --tags protocol,aave
-  Deploy (only protocol and aave on network ropsten): yarn deploy --network kovan --tags protocol,generic,aave,proton,photon,ion
+  Deploy (only protocol and aave on network ropsten): yarn deploy --network kovan --tags protocol,generic,aave,proton,photon,cation
 
 Deployed contract details go in deployments/{networkName}/{contractName}.json
 
@@ -118,4 +118,4 @@ See package.json for more scripts
 
 _MIT License_
 
-Copyright (c) 2020 Rob Secord <robsecord.eth>
+Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>

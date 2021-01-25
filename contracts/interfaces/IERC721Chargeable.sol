@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-// IERC721Chargeable.sol -- Charged Particles
-// Copyright (c) 2019, 2020 Rob Secord <robsecord.eth>
+// IERC721Chargeable.sol -- Part of the Charged Particles Protocol
+// Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal

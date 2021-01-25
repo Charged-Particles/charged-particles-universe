@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-// IUniverse.sol -- Charged Particles
-// Copyright (c) 2019, 2020 Rob Secord <robsecord.eth>
+// IUniverse.sol -- Part of the Charged Particles Protocol
+// Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,18 +30,18 @@ pragma solidity >=0.6.0;
 interface IUniverse {
 
   event ChargedParticlesSet(address indexed chargedParticles);
-  event IonTokenSet(address indexed ionToken);
+  event CationSet(address indexed token, uint256 maxSupply);
   event ProtonTokenSet(address indexed protonToken);
-  event IonRewardsMultiplierSet(address indexed assetToken, uint256 multiplier);
-  event RewardEarned(address indexed receiver, address rewardToken, uint256 rewardAmount);
-  event RewardClaimed(address indexed receiver, address rewardToken, uint256 rewardAmount);
+  event EsaMultiplierSet(address indexed assetToken, uint256 multiplier);
+  event ElectrostaticAttraction(address indexed account, address cationSource, uint256 energy);
+  event MetallicBond(address indexed account, address cationSource, uint256 energy);
 
   function onEnergize(
     address contractAddress,
     uint256 tokenId,
     string calldata liquidityProviderId,
     address assetToken,
-    uint256 assetAmount
+    uint256 assetEnergy
   ) external;
 
   function onDischarge(
@@ -49,8 +49,8 @@ interface IUniverse {
     uint256 tokenId,
     string calldata liquidityProviderId,
     address assetToken,
-    uint256 creatorAmount,
-    uint256 receiverAmount
+    uint256 creatorEnergy,
+    uint256 receiverEnergy
   ) external;
 
   function onDischargeForCreator(
@@ -59,7 +59,7 @@ interface IUniverse {
     string calldata liquidityProviderId,
     address creator,
     address assetToken,
-    uint256 receiverAmount
+    uint256 receiverEnergy
   ) external;
 
   function onRelease(
@@ -67,9 +67,9 @@ interface IUniverse {
     uint256 tokenId,
     string calldata liquidityProviderId,
     address assetToken,
-    uint256 principalAmount,
-    uint256 creatorAmount,
-    uint256 receiverAmount
+    uint256 principalEnergy,
+    uint256 creatorEnergy,
+    uint256 receiverEnergy
   ) external;
 
   function onProtonSale(

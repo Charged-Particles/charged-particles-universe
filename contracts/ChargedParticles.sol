@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-// ChargedParticles.sol -- Charged Particles
-// Copyright (c) 2019, 2020 Rob Secord <robsecord.eth>
+// ChargedParticles.sol -- Part of the Charged Particles Protocol
+// Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -67,11 +67,15 @@ contract ChargedParticles is
   //   Release                - Withdraw the Underlying Asset & Accrued Interest of an NFT leaving the Particle with No Mass or Charge
   //
   //   Proton                 - NFTs minted from the Charged Particle Accelerator
-  //                            - A proton is a subatomic particle, symbol p or p⁺, with a positive electric charge of +1e elementary charge and a mass slightly less than that of a neutron.
+  //                            - A proton is a subatomic particle, symbol p or p⁺, with a positive electric charge of +1e elementary
+  //                              charge and a mass slightly less than that of a neutron.
   //   Photon                 - Membership Classification
-  //                            - The photon is a type of elementary particle. It is the quantum of the electromagnetic field including electromagnetic radiation such as light and radio waves, and the force carrier for the electromagnetic force. Photons are massless, so they always move at the speed of light in vacuum.
+  //                            - The photon is a type of elementary particle. It is the quantum of the electromagnetic field including
+  //                              electromagnetic radiation such as light and radio waves, and the force carrier for the electromagnetic force.
+  //                              Photons are massless, so they always move at the speed of light in vacuum.
   //   Ion                    - Platform Governance Token
-  //                            - A charged subatomic particle. An atom or group of atoms that carries a positive or negative electric charge as a result of having lost or gained one or more electrons.
+  //                            - A charged subatomic particle. An atom or group of atoms that carries a positive or negative electric charge
+  //                              as a result of having lost or gained one or more electrons.
   //
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)

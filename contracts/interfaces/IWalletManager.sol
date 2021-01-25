@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-// IWalletManager.sol -- Charged Particles
-// Copyright (c) 2019, 2020 Rob Secord <robsecord.eth>
+// IWalletManager.sol -- Part of the Charged Particles Protocol
+// Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ pragma solidity >=0.6.0;
 /**
  * @title Particle Wallet Manager interface
  * @dev The wallet-manager for underlying assets attached to Charged Particles
+ * @dev Manages the link between NFTs and their respective Smart-Wallets
  */
 interface IWalletManager {
 

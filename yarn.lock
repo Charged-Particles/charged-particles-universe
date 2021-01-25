@@ -1810,9 +1810,9 @@ abbrev@1.0.x:
   integrity sha1-kbR5JYinc4wl813W9jdSovh3YTU=
 
 abi-decoder@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/abi-decoder/-/abi-decoder-2.3.0.tgz#e56b4e7b45f9a612c8aa2c76655948e7bb2687b3"
-  integrity sha512-RZXG5mo1JhJjTBg/4NXlS8hyTr2fxiuFaz3UveRpoX9IIc3LPHmWz89dFqTHNQVbWi3VZqxSJqfUwWpb/mCHxA==
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/abi-decoder/-/abi-decoder-2.4.0.tgz#99f72337c614d6ac45a28dbc83c08b44eba48ad5"
+  integrity sha512-TOLU2q1HgYOjs1GKGtVzaqrYkar6I2fT9a80rzx6/9EJ/5crb4nCGuro0grZayixem93T7omrajYmLiMkYDLDA==
   dependencies:
     web3-eth-abi "^1.2.1"
     web3-utils "^1.2.1"
@@ -4273,7 +4273,12 @@ enquirer@^2.3.0, enquirer@^2.3.5:
   dependencies:
     ansi-colors "^4.1.1"
 
-entities@^2.0.0, entities@~2.1.0:
+entities@^2.0.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/entities/-/entities-2.2.0.tgz#098dc90ebb83d8dffa089d55256b351d34c4da55"
+  integrity sha512-p92if5Nz619I0w+akJrLZH0MX0Pb5DX39XOwQTtXSdQQOaYH03S1uIQp4mhOZtAXrxq4ViO67YTiLBo2638o9A==
+
+entities@~2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/entities/-/entities-2.1.0.tgz#992d3129cf7df6870b96c57858c249a120f8b8b5"
   integrity sha512-hCx1oky9PFrJ611mf0ifBLBRW8lUUVRlFolb5gWRfIELabBlbp9xZvrqZLZAs+NxFnbfQoeGd8wDkygjg7U85w==

@@ -45,7 +45,7 @@ module.exports = async (hre) => {
     let AaveBridgeV1Instance;
     let aaveBridgeV1;
     if (lendingPoolProviderV1.length > 0) {
-      log('\n  Deploying AaveBridgeV1...')(alchemyTimeout);
+      log('\n  Deploying AaveBridgeV1 with LP Provider: ', lendingPoolProviderV1)(alchemyTimeout);
       AaveBridgeV1 = await ethers.getContractFactory('AaveBridgeV1');
       AaveBridgeV1Instance = await AaveBridgeV1.deploy(lendingPoolProviderV1);
       aaveBridgeV1 = await AaveBridgeV1Instance.deployed();
@@ -68,7 +68,7 @@ module.exports = async (hre) => {
     let AaveBridgeV2Instance;
     let aaveBridgeV2;
     if (lendingPoolProviderV2.length > 0) {
-      log('\n  Deploying AaveBridgeV2...')(alchemyTimeout);
+      log('\n  Deploying AaveBridgeV2 with LP Provider: ', lendingPoolProviderV2)(alchemyTimeout);
       AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');
       AaveBridgeV2Instance = await AaveBridgeV2.deploy(lendingPoolProviderV2);
       aaveBridgeV2 = await AaveBridgeV2Instance.deployed();

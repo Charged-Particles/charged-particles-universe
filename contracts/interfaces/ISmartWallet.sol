@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-// ISmartWallet.sol -- Charged Particles
-// Copyright (c) 2019, 2020 Rob Secord <robsecord.eth>
+// ISmartWallet.sol -- Part of the Charged Particles Protocol
+// Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ pragma solidity >=0.6.0;
 
 /**
  * @title Charged Particles Smart Wallet
- * @dev ...
+ * @dev Manages holding and transferring assets of an NFT to a specific LP for Yield (if any),
  */
 interface ISmartWallet {
   function getAssetTokenCount() external view returns (uint256);

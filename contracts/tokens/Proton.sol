@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-// Proton.sol -- Charged Particles
-// Copyright (c) 2019, 2020 Rob Secord <robsecord.eth>
+// Proton.sol -- Part of the Charged Particles Protocol
+// Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,10 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "../interfaces/IUniverse.sol";
 import "../interfaces/IChargedParticles.sol";
 
-contract Proton is ERC721, Ownable, ReentrancyGuard {
+import "../lib/RelayRecipient.sol";
+
+
+contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
   using SafeMath for uint256;
   using Address for address payable;
   using Counters for Counters.Counter;
@@ -56,6 +59,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
 
   Counters.Counter internal _tokenIds;
 
+  mapping (address => bool) internal _approvedBatchMinters;
   mapping (uint256 => address) internal _tokenCreator;
   mapping (uint256 => uint256) internal _tokenCreatorRoyaltiesPct;
   mapping (uint256 => uint256) internal _tokenSalePrice;
@@ -100,7 +104,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     uint256 assetAmount,
     uint256 annuityPercent
   )
-    public
+    external
     payable
     nonReentrant
     requireMintFee
@@ -122,7 +126,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     address receiver,
     string memory tokenMetaUri
   )
-    public
+    external
     payable
     nonReentrant
     requireMintFee
@@ -144,7 +148,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     string memory tokenMetaUri,
     uint256 annuityPercent
   )
-    public
+    external
     payable
     nonReentrant
     requireMintFee
@@ -168,7 +172,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     uint256 royaltiesPercent,
     uint256 salePrice
   )
-    public
+    external
     payable
     nonReentrant
     requireMintFee
@@ -181,6 +185,26 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
       annuityPercent,
       royaltiesPercent,
       salePrice
+    );
+  }
+
+  function batchProtonsForSale(
+    address creator,
+    uint256 annuityPercent,
+    uint256 royaltiesPercent,
+    string[] calldata tokenMetaUris,
+    uint256[] calldata salePrices
+  )
+    external
+    payable
+    nonReentrant
+  {
+    _batchProtonsForSale(
+      creator,
+      annuityPercent,
+      royaltiesPercent,
+      tokenMetaUris,
+      salePrices
     );
   }
 
@@ -231,6 +255,14 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
   function setChargedParticles(address chargedParticles) external onlyOwner {
     _chargedParticles = IChargedParticles(chargedParticles);
     emit ChargedParticlesSet(chargedParticles);
+  }
+
+  function setTrustedForwarder(address _trustedForwarder) external onlyOwner {
+    trustedForwarder = _trustedForwarder;
+  }
+
+  function updateBatchMinter(address minter, bool state) external onlyOwner {
+    _approvedBatchMinters[minter] = state;
   }
 
   function setMintFee(uint256 newMintFee) external onlyOwner {
@@ -326,6 +358,49 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     _refundOverpayment(mintFee);
   }
 
+  function _batchProtonsForSale(
+    address creator,
+    uint256 annuityPercent,
+    uint256 royaltiesPercent,
+    string[] calldata tokenMetaUris,
+    uint256[] calldata salePrices
+  )
+    internal
+  {
+    require(_approvedBatchMinters[_msgSender()], "Proton: E-105");
+    require(tokenMetaUris.length == salePrices.length, "Proton: E-202");
+    address self = address(this);
+
+    uint256 count = tokenMetaUris.length;
+    for (uint256 i = 0; i < count; i++) {
+      _tokenIds.increment();
+      uint256 newTokenId = _tokenIds.current();
+
+      _safeMint(creator, newTokenId, "");
+      _tokenCreator[newTokenId] = creator;
+
+      _setTokenURI(newTokenId, tokenMetaUris[i]);
+
+      if (royaltiesPercent > 0) {
+        _setRoyaltiesPct(newTokenId, royaltiesPercent);
+      }
+
+      uint256 salePrice = salePrices[i];
+      if (salePrice > 0) {
+        _setSalePrice(newTokenId, salePrice);
+      }
+
+      if (annuityPercent > 0) {
+        _chargedParticles.setCreatorConfigs(
+          self,
+          newTokenId,
+          creator,
+          annuityPercent
+        );
+      }
+    }
+  }
+
   function _chargeParticle(
     uint256 tokenId,
     string memory liquidityProviderId,
@@ -412,6 +487,28 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
   function _transfer(address from, address to, uint256 tokenId) internal override {
     _tokenSalePrice[tokenId] = 0;
     super._transfer(from, to, tokenId);
+  }
+
+  /// @dev See {BaseRelayRecipient-_msgSender}.
+  function _msgSender()
+    internal
+    view
+    virtual
+    override(BaseRelayRecipient, Context)
+    returns (address payable)
+  {
+    return BaseRelayRecipient._msgSender();
+  }
+
+  /// @dev See {BaseRelayRecipient-_msgData}.
+  function _msgData()
+    internal
+    view
+    virtual
+    override(BaseRelayRecipient, Context)
+    returns (bytes memory)
+  {
+    return BaseRelayRecipient._msgData();
   }
 
   modifier requireMintFee() {

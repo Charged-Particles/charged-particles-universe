@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-// IChargedParticles.sol -- Charged Particles
-// Copyright (c) 2019, 2020 Rob Secord <robsecord.eth>
+// IChargedParticles.sol -- Part of the Charged Particles Protocol
+// Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ interface IChargedParticles {
   function setDischargeApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setReleaseApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setTimelockApproval(address contractAddress, uint256 tokenId, address operator) external;
-  
+
   function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
   function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
   function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external view returns (bool);

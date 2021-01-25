@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-// ChargedParticles.sol -- Charged Particles
-// Copyright (c) 2019, 2020 Rob Secord <robsecord.eth>
+// Universe.sol -- Part of the Charged Particles Protocol
+// Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,17 +49,19 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   address public proton;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
-  uint256 constant internal ION_MAX_SUPPLY = 1e8;    // 100,000,000
-  uint256 internal ionRewardsEarned;
 
-  // ION Token Rewards
-  IERC20Upgradeable public ionToken;
+  // Positive Charge
+  uint256 internal cationMaxSupply;
+  uint256 internal totalCationDischarged;
 
-  //   Asset Token => Reward Multiplier
-  mapping (address => uint256) internal ionRewardsMultiplier;
+  // Source of Positive Charge
+  IERC20Upgradeable public cationSource;
 
-  //       Account => Total Amount of Stable-coin Discharged
-  mapping (address => uint256) internal stableDischarge;
+  //   Asset Token => Electrostatic Attraction Multiplier
+  mapping (address => uint256) internal esaMultiplier;
+
+  //       Account => Electrostatic Attraction Levels
+  mapping (address => uint256) internal esaLevel;
 
 
   /***********************************|
@@ -75,13 +77,10 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   |         Public Functions          |
   |__________________________________*/
 
-  function claimIonTokens(uint256 amount) public returns (uint256 ionReward) {
-    require(stableDischarge[msg.sender] > 0, "Universe: E-411");
-
-    uint256 balance = ionToken.balanceOf(address(this));
-    require(balance > 0, "Universe: E-413");
-
-    return _claimIonTokens(msg.sender, amount);
+  function conductMetallicBond(uint256 amount) public returns (uint256 positiveEnergy) {
+    require(esaLevel[msg.sender] > 0, "Universe: E-411");
+    require(cationSource.balanceOf(address(this)) > 0, "Universe: E-413");
+    return _conductMetallicBond(msg.sender, amount);
   }
 
 
@@ -108,17 +107,16 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
     uint256 tokenId,
     string calldata,
     address assetToken,
-    uint256 creatorAmount,
-    uint256 receiverAmount
+    uint256 creatorEnergy,
+    uint256 receiverEnergy
   )
     external
     override
     onlyChargedParticles
   {
-    // Reward ION tokens
-    if (ionRewardsMultiplier[assetToken] > 0 && receiverAmount > 0) {
-      address ionReceiver = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
-      _rewardIonTokens(ionReceiver, assetToken, creatorAmount.add(receiverAmount));
+    if (esaMultiplier[assetToken] > 0 && receiverEnergy > 0) {
+      address nftOwner = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
+      _electrostaticAttraction(nftOwner, assetToken, creatorEnergy.add(receiverEnergy));
     }
   }
 
@@ -128,16 +126,15 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
     string calldata,
     address,
     address assetToken,
-    uint256 receiverAmount
+    uint256 receiverEnergy
   )
     external
     override
     onlyChargedParticles
   {
-    // Reward ION tokens
-    if (ionRewardsMultiplier[assetToken] > 0 && receiverAmount > 0) {
-      address ionReceiver = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
-      _rewardIonTokens(ionReceiver, assetToken, receiverAmount);
+    if (esaMultiplier[assetToken] > 0 && receiverEnergy > 0) {
+      address nftOwner = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
+      _electrostaticAttraction(nftOwner, assetToken, receiverEnergy);
     }
   }
 
@@ -147,18 +144,17 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
     string calldata,
     address assetToken,
     uint256 principalAmount,
-    uint256 creatorAmount,
-    uint256 receiverAmount
+    uint256 creatorEnergy,
+    uint256 receiverEnergy
   )
     external
     override
     onlyChargedParticles
   {
-    // Reward ION tokens
-    uint256 interestAmount = creatorAmount.add(receiverAmount).sub(principalAmount);
-    if (ionRewardsMultiplier[assetToken] > 0 && interestAmount > 0) {
-      address receiver = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
-      _rewardIonTokens(receiver, assetToken, interestAmount);
+    uint256 totalEnergy = creatorEnergy.add(receiverEnergy).sub(principalAmount);
+    if (esaMultiplier[assetToken] > 0 && totalEnergy > 0) {
+      address nftOwner = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
+      _electrostaticAttraction(nftOwner, assetToken, totalEnergy);
     }
   }
 
@@ -183,47 +179,49 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   |__________________________________*/
 
   function setChargedParticles(
-    address _chargedParticles
+    address controller
   )
     external
     onlyOwner
-    onlyValidContractAddress(_chargedParticles)
+    onlyValidContractAddress(controller)
   {
-    chargedParticles = _chargedParticles;
-    emit ChargedParticlesSet(_chargedParticles);
+    chargedParticles = controller;
+    emit ChargedParticlesSet(controller);
   }
 
-  function setIonToken(
-    address _ionToken
+  function setCation(
+    address token,
+    uint256 maxSupply
   )
     external
     onlyOwner
-    onlyValidContractAddress(_ionToken)
+    onlyValidContractAddress(token)
   {
-    ionToken = IERC20Upgradeable(_ionToken);
-    emit IonTokenSet(_ionToken);
+    cationSource = IERC20Upgradeable(token);
+    cationMaxSupply = maxSupply;
+    emit CationSet(token, maxSupply);
   }
 
   function setProtonToken(
-    address _protonToken
+    address token
   )
     external
     onlyOwner
-    onlyValidContractAddress(_protonToken)
+    onlyValidContractAddress(token)
   {
-    proton = _protonToken;
-    emit ProtonTokenSet(_protonToken);
+    proton = token;
+    emit ProtonTokenSet(token);
   }
 
-  function setIonRewardsMultiplier(
+  function setEsaMultiplier(
     address assetToken,
     uint256 multiplier
   )
     external
     onlyOwner
   {
-    ionRewardsMultiplier[assetToken] = multiplier;
-    emit IonRewardsMultiplierSet(assetToken, multiplier);
+    esaMultiplier[assetToken] = multiplier;
+    emit EsaMultiplierSet(assetToken, multiplier);
   }
 
 
@@ -231,40 +229,37 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   |         Private Functions         |
   |__________________________________*/
 
-  function _rewardIonTokens(address receiver, address assetToken, uint256 baseAmount) internal {
-    if (address(ionToken) == address(0x0) || receiver == address(0x0)) { return; }
-    if (ionRewardsEarned == ION_MAX_SUPPLY) { return; }
+  function _electrostaticAttraction(address receiver, address assetToken, uint256 baseAmount) internal {
+    if (address(cationSource) == address(0x0) || receiver == address(0x0)) { return; }
+    if (totalCationDischarged == cationMaxSupply) { return; }
 
-    // Calculate rewards multiplier
-    uint256 amount = baseAmount.mul(ionRewardsMultiplier[assetToken]).div(PERCENTAGE_SCALE);
-    if (ionRewardsEarned.add(amount) > ION_MAX_SUPPLY) {
-      amount = ION_MAX_SUPPLY.sub(ionRewardsEarned);
+    uint256 energy = baseAmount.mul(esaMultiplier[assetToken]).div(PERCENTAGE_SCALE);
+    if (totalCationDischarged.add(energy) > cationMaxSupply) {
+      energy = cationMaxSupply.sub(totalCationDischarged);
     }
-    ionRewardsEarned = ionRewardsEarned.add(amount);
-    stableDischarge[receiver] = stableDischarge[receiver].add(amount);
+    totalCationDischarged = totalCationDischarged.add(energy);
+    esaLevel[receiver] = esaLevel[receiver].add(energy);
 
-    emit RewardEarned(receiver, address(ionToken), amount);
+    emit ElectrostaticAttraction(receiver, address(cationSource), energy);
   }
 
-  function _claimIonTokens(address account, uint256 amount) internal returns (uint256) {
-    uint256 amountEarned = stableDischarge[account];
-    if (amount > amountEarned) {
-      amount = amountEarned;
+  function _conductMetallicBond(address account, uint256 energy) internal returns (uint256) {
+    uint256 electrostaticAttraction = esaLevel[account];
+    if (energy > electrostaticAttraction) {
+      energy = electrostaticAttraction;
     }
 
-    uint256 balance = ionToken.balanceOf(address(this));
-    if (amount > balance) {
-      amount = balance;
+    uint256 bondable = cationSource.balanceOf(address(this));
+    if (energy > bondable) {
+      energy = bondable;
     }
 
-    stableDischarge[account] = stableDischarge[account].sub(amount);
+    esaLevel[account] = esaLevel[account].sub(energy);
+    cationSource.safeTransfer(account, energy);
 
-    ionToken.safeTransfer(account, amount);
-
-    emit RewardClaimed(account, address(ionToken), amount);
-    return amount;
+    emit MetallicBond(account, address(cationSource), energy);
+    return energy;
   }
-
 
   /***********************************|
   |             Modifiers             |

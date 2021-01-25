@@ -18,7 +18,7 @@ module.exports = async (hre) => {
     const alchemyTimeout = chainId === 31337 ? 0 : 2;
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-    log('Charged Particles FT: Ion - Contract Deployment');
+    log('Charged Particles FT: Cation - Contract Deployment');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
     log('  Using Network: ', chainNameById(chainId));
@@ -48,4 +48,4 @@ module.exports = async (hre) => {
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
-module.exports.tags = ['ion']
+module.exports.tags = ['cation']
