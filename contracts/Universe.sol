@@ -58,8 +58,8 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   //   Asset Token => Reward Multiplier
   mapping (address => uint256) internal ionRewardsMultiplier;
 
-  //       Account => Claimable ION Rewards
-  mapping (address => uint256) internal ionRewards;
+  //       Account => Total Amount of Stable-coin Discharged
+  mapping (address => uint256) internal stableDischarge;
 
 
   /***********************************|
@@ -76,7 +76,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   |__________________________________*/
 
   function claimIonTokens(uint256 amount) public returns (uint256 ionReward) {
-    require(ionRewards[msg.sender] > 0, "Universe: INSUFF_BALANCE");
+    require(stableDischarge[msg.sender] > 0, "Universe: INSUFF_BALANCE");
 
     uint256 balance = ionToken.balanceOf(address(this));
     require(balance > 0, "Universe: INSUFF_SUPPLY");
@@ -182,9 +182,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   |          Only Admin/DAO           |
   |__________________________________*/
 
-  /**
-    * @dev Connects to the Charged Particles Controller
-    */
   function setChargedParticles(
     address _chargedParticles
   )
@@ -224,7 +221,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   )
     external
     onlyOwner
-    // onlyValidContractAddress(assetToken)
   {
     ionRewardsMultiplier[assetToken] = multiplier;
     emit IonRewardsMultiplierSet(assetToken, multiplier);
@@ -245,13 +241,13 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
       amount = ION_MAX_SUPPLY.sub(ionRewardsEarned);
     }
     ionRewardsEarned = ionRewardsEarned.add(amount);
-    ionRewards[receiver] = ionRewards[receiver].add(amount);
+    stableDischarge[receiver] = stableDischarge[receiver].add(amount);
 
     emit RewardEarned(receiver, address(ionToken), amount);
   }
 
   function _claimIonTokens(address account, uint256 amount) internal returns (uint256) {
-    uint256 amountEarned = ionRewards[account];
+    uint256 amountEarned = stableDischarge[account];
     if (amount > amountEarned) {
       amount = amountEarned;
     }
@@ -261,7 +257,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
       amount = balance;
     }
 
-    ionRewards[account] = ionRewards[account].sub(amount);
+    stableDischarge[account] = stableDischarge[account].sub(amount);
 
     ionToken.safeTransfer(account, amount);
 
