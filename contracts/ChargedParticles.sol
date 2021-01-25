@@ -44,20 +44,34 @@ import "./lib/RelayRecipient.sol";
  * @notice Charged Particles Contract
  * @dev Upgradeable Contract
  */
-contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeable, ReentrancyGuardUpgradeable, RelayRecipient, IERC721ReceiverUpgradeable {
+contract ChargedParticles is
+  IChargedParticles,
+  Initializable,
+  OwnableUpgradeable,
+  ReentrancyGuardUpgradeable,
+  RelayRecipient,
+  IERC721ReceiverUpgradeable
+{
   using SafeMathUpgradeable for uint256;
 
   //
   // Particle Terminology
   //
-  //   Particle               - Non-fungible Token
+  //   Particle               - Non-fungible Token (NFT)
   //   Mass                   - Underlying Asset of a Token (ex; DAI)
   //   Charge                 - Accrued Interest on the Underlying Asset of a Token
-  //   Charged Particle       - A Token that has a Mass and a Positive Charge
-  //   Neutral Particle       - A Token that has a Mass and No Charge
-  //   Energize / Recharge    - Deposit of an Underlying Asset into a Token
-  //   Discharge              - Withdraw the Accrued Interest of a Token leaving the Particle with its initial Mass
-  //   Release                - Withdraw the Underlying Asset & Accrued Interest of a Token leaving the Particle with No Mass
+  //   Charged Particle       - Any NFT that has a Mass and a Positive Charge
+  //   Neutral Particle       - Any NFT that has a Mass and No Charge
+  //   Energize / Recharge    - Deposit of an Underlying Asset into an NFT
+  //   Discharge              - Withdraw the Accrued Interest of an NFT leaving the Particle with its initial Mass
+  //   Release                - Withdraw the Underlying Asset & Accrued Interest of an NFT leaving the Particle with No Mass or Charge
+  //
+  //   Proton                 - NFTs minted from the Charged Particle Accelerator
+  //                            - A proton is a subatomic particle, symbol p or p⁺, with a positive electric charge of +1e elementary charge and a mass slightly less than that of a neutron.
+  //   Photon                 - Membership Classification
+  //                            - The photon is a type of elementary particle. It is the quantum of the electromagnetic field including electromagnetic radiation such as light and radio waves, and the force carrier for the electromagnetic force. Photons are massless, so they always move at the speed of light in vacuum.
+  //   Ion                    - Platform Governance Token
+  //                            - A charged subatomic particle. An atom or group of atoms that carries a positive or negative electric charge as a result of having lost or gained one or more electrons.
   //
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
@@ -110,6 +124,10 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   /***********************************|
   |         Public Functions          |
   |__________________________________*/
+
+  function isTokenCreator(address contractAddress, uint256 tokenId, address account) external override view returns (bool) {
+    return _isTokenCreator(contractAddress, tokenId, account);
+  }
 
   function isLiquidityProviderEnabled(string calldata liquidityProviderId) external override view returns (bool) {
     return _isLiquidityProviderEnabled(liquidityProviderId);
@@ -238,6 +256,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   /// @param contractAddress      The Address to the Contract of the Token
   /// @param tokenId              The ID of the Token
   /// @param liquidityProviderId  The Liquidity-Provider ID to check the Asset balance of
+  /// @param assetToken           The Address of the Asset Token to check
   /// @return The Amount of underlying Assets held within the Token
   function baseParticleMass(
     address contractAddress,
@@ -258,6 +277,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   /// @param contractAddress      The Address to the Contract of the Token
   /// @param tokenId              The ID of the Token
   /// @param liquidityProviderId  The Liquidity-Provider ID to check the Interest balance of
+  /// @param assetToken           The Address of the Asset Token to check
   /// @return The amount of interest the Token has generated (in Asset Token)
   function currentParticleCharge(
     address contractAddress,
@@ -278,6 +298,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   /// @param contractAddress      The Address to the Contract of the Token
   /// @param tokenId              The ID of the Token
   /// @param liquidityProviderId  The Liquidity-Provider ID to check the Kinetics balance of
+  /// @param assetToken           The Address of the Asset Token to check
   /// @return The amount of LP tokens that have been generated
   function currentParticleKinetics(
     address contractAddress,
@@ -310,10 +331,11 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     return _isContractOwner(contractAddress, account);
   }
 
-  function isTokenCreator(address contractAddress, uint256 tokenId, address account) external override view returns (bool) {
-    return _isTokenCreator(contractAddress, tokenId, account, _msgSender());
-  }
-
+  /// @notice Sets the Custom Configuration for External Contracts
+  /// @param contractAddress    The Address to the External Contract to configure
+  /// @param liquidityProvider  If set, will only allow deposits from this specific LP, otherwise any LP supported
+  /// @param assetDepositMin    If set, will define the minimum amount of Asset tokens the NFT may hold, otherwise any amount
+  /// @param assetDepositMax    If set, will define the maximum amount of Asset tokens the NFT may hold, otherwise any amount
   function setExternalContractConfigs(
     address contractAddress,
     string calldata liquidityProvider,
@@ -338,6 +360,11 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     );
   }
 
+  /// @notice Sets the Custom Configuration for Creators of Proton-based NFTs
+  /// @param contractAddress  The Address to the Proton-based NFT to configure
+  /// @param tokenId          The token ID of the Proton-based NFT to configure
+  /// @param creator          The creator of the Proton-based NFT
+  /// @param annuityPercent   The percentage of interest-annuities to reserve for the creator
   function setCreatorConfigs(
     address contractAddress,
     uint256 tokenId,
@@ -346,10 +373,11 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   )
     external
     override
-    onlyTokenCreator(contractAddress, tokenId, creator, _msgSender())
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    require(_isTokenContractOrCreator(contractAddress, tokenId, creator, _msgSender()), "ChargedParticles: NOT_TOKEN_CREATOR");
     require(annuityPercent <= MAX_ANNUITIES, "ChargedParticles: INVALID_PCT");
+
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
     // Update Configs for External Token Creator
     _creatorAnnuityPercent[tokenUuid] = annuityPercent;
@@ -366,6 +394,10 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   |        Timelock Particles         |
   |__________________________________*/
 
+  /// @notice Sets a Timelock on the ability to Discharge the Interest of a Particle
+  /// @param contractAddress  The Address to the NFT to Timelock
+  /// @param tokenId          The token ID of the NFT to Timelock
+  /// @param unlockBlock      The Ethereum Block-number to Timelock until (~15 seconds per block)
   function setDischargeTimelock(
     address contractAddress,
     uint256 tokenId,
@@ -383,6 +415,10 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     emit TokenDischargeTimelock(contractAddress, tokenId, _msgSender(), unlockBlock);
   }
 
+  /// @notice Sets a Timelock on the ability to Release the Assets of a Particle
+  /// @param contractAddress  The Address to the NFT to Timelock
+  /// @param tokenId          The token ID of the NFT to Timelock
+  /// @param unlockBlock      The Ethereum Block-number to Timelock until (~15 seconds per block)
   function setReleaseTimelock(
     address contractAddress,
     uint256 tokenId,
@@ -406,18 +442,18 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   |__________________________________*/
 
   /// @notice Fund Particle with Asset Token
-  ///    Must be called by the Owner providing the Asset
-  ///    Owner must Approve THIS contract as Operator of Asset
+  ///    Must be called by the account providing the Asset
+  ///    Account must Approve THIS contract as Operator of Asset
   ///
   /// NOTE: DO NOT Energize an ERC20 Token, as anyone who holds any amount
   ///       of the same ERC20 token could discharge or release the funds.
   ///       All holders of the ERC20 token would essentially be owners of the Charged Particle.
   ///
-  /// @param contractAddress The Address to the Contract of the Token to Energize
-  /// @param tokenId The ID of the Token to Energize
-  /// @param liquidityProviderId The Asset-Pair to Energize the Token with
-  /// @param assetToken The Address of the Asset Token being used
-  /// @param assetAmount The Amount of Asset Token to Energize the Token with
+  /// @param contractAddress      The Address to the Contract of the Token to Energize
+  /// @param tokenId              The ID of the Token to Energize
+  /// @param liquidityProviderId  The Asset-Pair to Energize the Token with
+  /// @param assetToken           The Address of the Asset Token being used
+  /// @param assetAmount          The Amount of Asset Token to Energize the Token with
   /// @return yieldTokensAmount The amount of Yield-bearing Tokens added to the escrow for the Token
   function energizeParticle(
     address contractAddress,
@@ -454,11 +490,11 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
 
   /// @notice Allows the owner or operator of the Token to collect or transfer the interest generated
   ///         from the token without removing the underlying Asset that is held within the token.
-  /// @param receiver         The Address to Receive the Discharged Asset Tokens
-  /// @param contractAddress  The Address to the Contract of the Token to Discharge
-  /// @param tokenId          The ID of the Token to Discharge
-  /// @param liquidityProviderId      The Asset-Pair to Discharge from the Token
-  /// @param assetToken The Address of the Asset Token being used
+  /// @param receiver             The Address to Receive the Discharged Asset Tokens
+  /// @param contractAddress      The Address to the Contract of the Token to Discharge
+  /// @param tokenId              The ID of the Token to Discharge
+  /// @param liquidityProviderId  The LP of the Assets to Discharge from the Token
+  /// @param assetToken           The Address of the Asset Token being discharged
   /// @return creatorAmount Amount of Asset Token discharged to the Creator
   /// @return receiverAmount Amount of Asset Token discharged to the Receiver
   function dischargeParticle(
@@ -493,12 +529,12 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
 
   /// @notice Allows the owner or operator of the Token to collect or transfer a specific amount the interest
   ///         generated from the token without removing the underlying Asset that is held within the token.
-  /// @param receiver         The Address to Receive the Discharged Asset Tokens
-  /// @param contractAddress  The Address to the Contract of the Token to Discharge
-  /// @param tokenId          The ID of the Token to Discharge
-  /// @param liquidityProviderId      The Asset-Pair to Discharge from the Token
-  /// @param assetToken The Address of the Asset Token being used
-  /// @param assetAmount      The specific amount of Asset Token to Discharge from the Token
+  /// @param receiver             The Address to Receive the Discharged Asset Tokens
+  /// @param contractAddress      The Address to the Contract of the Token to Discharge
+  /// @param tokenId              The ID of the Token to Discharge
+  /// @param liquidityProviderId  The LP of the Assets to Discharge from the Token
+  /// @param assetToken           The Address of the Asset Token being discharged
+  /// @param assetAmount          The specific amount of Asset Token to Discharge from the Token
   /// @return creatorAmount Amount of Asset Token discharged to the Creator
   /// @return receiverAmount Amount of Asset Token discharged to the Receiver
   function dischargeParticleAmount(
@@ -537,8 +573,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   /// @param receiver             The Address to Receive the Discharged Asset Tokens
   /// @param contractAddress      The Address to the Contract of the Token to Discharge
   /// @param tokenId              The ID of the Token to Discharge
-  /// @param liquidityProviderId  The Asset-Pair to Discharge from the Token
-  /// @param assetToken           The Address of the Asset Token being used
+  /// @param liquidityProviderId  The LP of the Assets to Discharge from the Token
+  /// @param assetToken           The Address of the Asset Token being discharged
   /// @param assetAmount          The specific amount of Asset Token to Discharge from the Token
   /// @return receiverAmount      Amount of Asset Token discharged to the Receiver
   function dischargeParticleForCreator(
@@ -556,14 +592,14 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     returns (uint256 receiverAmount)
   {
     address sender = _msgSender();
-    require(_isTokenCreator(contractAddress, tokenId, sender, sender), "ChargedParticles: NOT_TOKEN_CREATOR");
+    require(_isTokenCreator(contractAddress, tokenId, sender), "ChargedParticles: NOT_TOKEN_CREATOR");
 
     receiverAmount = _lpWalletManager[liquidityProviderId].dischargeAmountForCreator(
-      receiver, 
-      contractAddress, 
-      tokenId, 
+      receiver,
+      contractAddress,
+      tokenId,
       sender,
-      assetToken, 
+      assetToken,
       assetAmount
     );
 
@@ -578,11 +614,11 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   |         Release Particles         |
   |__________________________________*/
 
-  /// @notice Releases the Full amount of Asset + Interest held within the Particle by Asset-Pair
-  /// @param receiver         The Address to Receive the Released Asset Tokens
-  /// @param contractAddress  The Address to the Contract of the Token to Release
-  /// @param tokenId          The ID of the Token to Release
-  /// @param liquidityProviderId      The Asset-Pair to Release from the Token
+  /// @notice Releases the Full amount of Asset + Interest held within the Particle by LP of the Assets
+  /// @param receiver             The Address to Receive the Released Asset Tokens
+  /// @param contractAddress      The Address to the Contract of the Token to Release
+  /// @param tokenId              The ID of the Token to Release
+  /// @param liquidityProviderId  The LP of the Assets to Release from the Token
   /// @return creatorAmount Amount of Asset Token released to the Creator
   /// @return receiverAmount Amount of Asset Token released to the Receiver (includes principalAmount)
   function releaseParticle(
@@ -599,7 +635,6 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
     require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "ChargedParticles: INVALID_OPERATOR");
-    // require(_baseParticleMass(contractAddress, tokenId, liquidityProviderId, assetToken) > 0, "ChargedParticles: INSUFF_MASS");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
@@ -628,18 +663,19 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     emit UniverseSet(universe);
   }
 
-  /// @dev Register Contracts for Asset/Interest Pairs
+  /// @dev Register Contracts as wallet managers with a unique liquidity provider ID
   function registerLiquidityProvider(string calldata liquidityProviderId, address walletManager) external onlyOwner {
-    // Validate Escrow
+    // Validate wallet manager
     IWalletManager newWalletMgr = IWalletManager(walletManager);
     require(newWalletMgr.isPaused() != true, "ChargedParticles: INVALID_WALLET_MGR");
 
-    // Register Pair
+    // Register LP ID
     _liquidityProviders.push(liquidityProviderId);
     _lpWalletManager[liquidityProviderId] = newWalletMgr;
     emit LiquidityProviderRegistered(liquidityProviderId, walletManager);
   }
 
+  /// @dev Update the list of NFT contracts that can be Charged
   function updateWhitelist(address contractAddress, bool state) external onlyOwner {
     whitelisted[contractAddress] = state;
     emit UpdateContractWhitelist(contractAddress, state);
@@ -653,60 +689,56 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
   |         Private Functions         |
   |__________________________________*/
 
+  /// @dev See {ChargedParticles-isLiquidityProviderEnabled}.
   function _isLiquidityProviderEnabled(string calldata liquidityProviderId) internal view returns (bool) {
     return (address(_lpWalletManager[liquidityProviderId]) != address(0x0));
   }
 
+  /// @dev See {ChargedParticles-isLiquidityProviderPaused}.
   function _isLiquidityProviderPaused(string calldata liquidityProviderId) internal view returns (bool) {
     return _lpWalletManager[liquidityProviderId].isPaused();
   }
 
+  /// @dev See {ChargedParticles-getTokenUUID}.
   function _getTokenUUID(address contractAddress, uint256 tokenId) internal pure returns (uint256) {
     return uint256(keccak256(abi.encodePacked(contractAddress, tokenId)));
   }
 
+  /// @dev See {ChargedParticles-getOwnerUUID}.
   function _getOwnerUUID(string memory liquidityProviderId, address _owner) internal pure returns (uint256) {
     return uint256(keccak256(abi.encodePacked(liquidityProviderId, _owner)));
   }
 
+  /// @dev See {ChargedParticles-getTokenOwner}.
   function _getTokenOwner(address contractAddress, uint256 tokenId) internal view returns (address) {
     IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     return tokenInterface.ownerOf(tokenId);
   }
 
-  /// @notice Checks if an operator is allowed to Discharge a specific Token
-  /// @param contractAddress The Address to the Contract of the Token
-  /// @param tokenId The ID of the Token
-  /// @param operator The Address of the operator to check
-  /// @return True if the operator is Approved
+  /// @dev See {ChargedParticles-isApprovedForDischarge}.
   function _isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) internal view returns (bool) {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     return contractAddress == operator || tokenOwner == operator || _dischargeApproval[tokenUuid][tokenOwner] == operator;
   }
 
-  /// @notice Checks if an operator is allowed to Release a specific Token
-  /// @param contractAddress The Address to the Contract of the Token
-  /// @param tokenId The ID of the Token
-  /// @param operator The Address of the operator to check
-  /// @return True if the operator is Approved
+  /// @dev See {ChargedParticles-isApprovedForRelease}.
   function _isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) internal view returns (bool) {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     return contractAddress == operator || tokenOwner == operator || _releaseApproval[tokenUuid][tokenOwner] == operator;
   }
 
-  /// @notice Checks if an operator is allowed to Timelock a specific Token
-  /// @param contractAddress The Address to the Contract of the Token
-  /// @param tokenId The ID of the Token
-  /// @param operator The Address of the operator to check
-  /// @return True if the operator is Approved
+  /// @dev See {ChargedParticles-isApprovedForTimelock}.
   function _isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) internal view returns (bool) {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     return contractAddress == operator || tokenOwner == operator || _timelockApproval[tokenUuid][tokenOwner] == operator;
   }
 
+  /// @dev Checks if an External NFT contract follows standards
+  /// @param contractAddress  The Address to the Contract of the NFT
+  /// @return True if the contract follows current standards
   function isValidExternalContract(address contractAddress) internal view returns (bool) {
     // Check Token Interface to ensure compliance
     IERC165Upgradeable tokenInterface = IERC165Upgradeable(contractAddress);
@@ -715,38 +747,55 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     return (_is721 || _is1155);
   }
 
-  function isExternalTokenBurned(address contractAddress, uint256 tokenId) internal view returns (bool) {
-    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
-    return (tokenOwner == address(0x0));
-  }
-
-  /**
-    * @notice Checks if an Account is the Owner of a Contract
-    *    When Custom Contracts are registered, only the "owner" or operator of the Contract
-    *    is allowed to register them and define custom rules for how their tokens are "Charged".
-    *    Otherwise, any token can be "Charged" according to the default rules of Charged Particles.
-    * @param account   The Account to check if it is the Owner of the specified Contract
-    * @param contractAddress  The Address to the External Contract to check
-    * @return True if the _account is the Owner of the _contract
-    */
+  /// @dev Checks if an account is the Owner of an External NFT contract
+  /// @param contractAddress  The Address to the Contract of the NFT to check
+  /// @param account          The Address of the Account to check
+  /// @return True if the account owns the contract
   function _isContractOwner(address contractAddress, address account) internal view returns (bool) {
     address contractOwner = IERC721Chargeable(contractAddress).owner();
     return contractOwner != address(0x0) && contractOwner == account;
   }
 
-  function _isTokenCreator(address contractAddress, uint256 tokenId, address creator, address sender) internal view returns (bool) {
+  /// @dev Checks if an account is the Creator of a Proton-based NFT
+  /// @param contractAddress  The Address to the Contract of the Proton-based NFT to check
+  /// @param tokenId          The Token ID of the Proton-based NFT to check
+  /// @param sender           The Address of the Account to check
+  /// @return True if the account is the creator of the Proton-based NFT
+  function _isTokenCreator(address contractAddress, uint256 tokenId, address sender) internal view returns (bool) {
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
+    address tokenCreator = tokenInterface.creatorOf(tokenId);
+    return (sender == tokenCreator);
+  }
+
+  /// @dev Checks if an account is the Creator of a Proton-based NFT or the Contract itself
+  /// @param contractAddress  The Address to the Contract of the Proton-based NFT to check
+  /// @param tokenId          The Token ID of the Proton-based NFT to check
+  /// @param sender           The Address of the Account to check
+  /// @return True if the account is the creator of the Proton-based NFT or the Contract itself
+  function _isTokenContractOrCreator(address contractAddress, uint256 tokenId, address creator, address sender) internal view returns (bool) {
     IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenCreator = tokenInterface.creatorOf(tokenId);
     if (sender == contractAddress && creator == tokenCreator) { return true; }
     return (sender == tokenCreator);
   }
 
+  /// @dev Checks if an account is the Owner or Operator of an External NFT
+  /// @param contractAddress  The Address to the Contract of the External NFT to check
+  /// @param tokenId          The Token ID of the External NFT to check
+  /// @param sender           The Address of the Account to check
+  /// @return True if the account is the Owner or Operator of the External NFT
   function _isErc721OwnerOrOperator(address contractAddress, uint256 tokenId, address sender) internal view returns (bool) {
     IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenOwner = tokenInterface.ownerOf(tokenId);
     return (sender == tokenOwner || tokenInterface.isApprovedForAll(tokenOwner, sender));
   }
 
+  /// @dev Validates a Deposit according to the rules set by the Token Contract
+  /// @param contractAddress      The Address to the Contract of the External NFT to check
+  /// @param tokenId              The Token ID of the External NFT to check
+  /// @param liquidityProviderId  The LP of the Assets to Deposit
+  /// @param assetToken           The Address of the Asset Token to Deposit
+  /// @param assetAmount          The specific amount of Asset Token to Deposit
   function _validateDeposit(
     address contractAddress,
     uint256 tokenId,
@@ -774,6 +823,12 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     }
   }
 
+  /// @dev Deposit Asset Tokens into an NFT via the Wallet Manager
+  /// @param contractAddress      The Address to the Contract of the NFT
+  /// @param tokenId              The Token ID of the NFT
+  /// @param liquidityProviderId  The LP of the Assets to Deposit
+  /// @param assetToken           The Address of the Asset Token to Deposit
+  /// @param assetAmount          The specific amount of Asset Token to Deposit
   function _depositIntoWalletManager(
     address contractAddress,
     uint256 tokenId,
@@ -794,6 +849,11 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     return lpWalletMgr.energize(contractAddress, tokenId, assetToken, assetAmount);
   }
 
+  /// @dev Gets the amount of creator annuities reserved for the creator for the specified NFT
+  /// @param contractAddress The Address to the Contract of the NFT
+  /// @param tokenId         The Token ID of the NFT
+  /// @return creator The address of the creator
+  /// @return annuityPct The percentage amount of annuities reserved for the creator
   function _getCreatorAnnuity(
     address contractAddress,
     uint256 tokenId
@@ -818,12 +878,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     require(IERC20Upgradeable(tokenAddress).transferFrom(from, address(this), tokenAmount), "ChargedParticles: TRANSFER_FAILED");
   }
 
-  /// @dev Gets the Amount of Asset Tokens that have been Deposited into the Particle
-  ///    representing the Mass of the Particle.
-  /// @param contractAddress  The Address to the External Contract of the Token
-  /// @param tokenId          The ID of the Token within the External Contract
-  /// @param liquidityProviderId      The Asset-Pair ID to check the Asset balance of
-  /// @return  The Amount of underlying Assets held within the Token
+  /// @dev See {ChargedParticles-baseParticleMass}.
   function _baseParticleMass(
     address contractAddress,
     uint256 tokenId,
@@ -836,12 +891,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     return _lpWalletManager[liquidityProviderId].getPrincipal(contractAddress, tokenId, assetToken);
   }
 
-  /// @dev Gets the amount of Interest that the Particle has generated representing
-  ///    the Charge of the Particle
-  /// @param contractAddress  The Address to the External Contract of the Token
-  /// @param tokenId          The ID of the Token within the External Contract
-  /// @param liquidityProviderId      The Asset-Pair ID to check the Asset balance of
-  /// @return  The amount of interest the Token has generated (in Asset Token)
+  /// @dev See {ChargedParticles-currentParticleCharge}.
   function _currentParticleCharge(
     address contractAddress,
     uint256 tokenId,
@@ -855,12 +905,8 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     return ownerInterest;
   }
 
-  /// @dev Gets the amount of LP Rewards that the Particle has generated representing
-  ///    the Kinetics of the Particle
-  /// @param contractAddress  The Address to the External Contract of the Token
-  /// @param tokenId          The ID of the Token within the External Contract
-  /// @param liquidityProviderId      The Asset-Pair ID to check the Asset balance of
-  /// @return  The amount of LP rewards the Token has generated (in Asset Token)
+
+  /// @dev See {ChargedParticles-currentParticleKinetics}.
   function _currentParticleKinetics(
     address contractAddress,
     uint256 tokenId,
@@ -873,6 +919,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     return _lpWalletManager[liquidityProviderId].getRewards(contractAddress, tokenId, assetToken);
   }
 
+  /// @dev See {BaseRelayRecipient-_msgSender}.
   function _msgSender()
     internal
     view
@@ -883,6 +930,7 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
     return BaseRelayRecipient._msgSender();
   }
 
+  /// @dev See {BaseRelayRecipient-_msgData}.
   function _msgData()
     internal
     view
@@ -909,11 +957,6 @@ contract ChargedParticles is IChargedParticles, Initializable, OwnableUpgradeabl
 
   modifier onlyContractOwnerOrAdmin(address contractAddress, address sender) {
     require(sender == owner() || _isContractOwner(contractAddress, sender), "ChargedParticles: NOT_OWNER_OR_ADMIN");
-    _;
-  }
-
-  modifier onlyTokenCreator(address contractAddress, uint256 tokenId, address creator, address sender) {
-    require(_isTokenCreator(contractAddress, tokenId, creator, sender), "ChargedParticles: NOT_TOKEN_CREATOR");
     _;
   }
 
