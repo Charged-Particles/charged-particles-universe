@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: MIT
 
-// GenericSmartWallet.sol -- Charged Particles
+// GenericERC20SmartWallet.sol -- Charged Particles
 
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../../lib/SmartWalletBase.sol";
+import "../../../lib/SmartWalletBase.sol";
 
 
 /**
  * @notice Generic ERC20-Token Smart-Wallet Bridge
  * @dev Non-upgradeable Contract
  */
-contract GenericSmartWallet is SmartWalletBase {
+contract GenericERC20SmartWallet is SmartWalletBase {
   using SafeMath for uint256;
   using SafeCast for uint256;
 
@@ -89,12 +89,12 @@ contract GenericSmartWallet is SmartWalletBase {
     // Track Principal
     _trackAssetToken(assetToken);
     _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].add(assetAmount);
-    return 0;
   }
 
   function withdraw(address receiver, address assetToken)
     external
     override
+    onlyWalletManager
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
     creatorAmount = 0;
@@ -107,6 +107,7 @@ contract GenericSmartWallet is SmartWalletBase {
   function withdrawAmount(address receiver, address assetToken, uint256 assetAmount)
     external
     override
+    onlyWalletManager
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
     creatorAmount = 0;
@@ -120,9 +121,9 @@ contract GenericSmartWallet is SmartWalletBase {
   }
 
   function withdrawAmountForCreator(
-    address,
-    address,
-    uint256
+    address /* receiver */,
+    address /* assetToken */,
+    uint256 /* assetID */
   )
     external
     override
@@ -135,16 +136,17 @@ contract GenericSmartWallet is SmartWalletBase {
   function withdrawRewards(address receiver, address rewardsTokenAddress, uint256 rewardsAmount)
     external
     override
+    onlyWalletManager
     returns (uint256)
   {
     address self = address(this);
     IERC20 rewardsToken = IERC20(rewardsTokenAddress);
 
     uint256 walletBalance = rewardsToken.balanceOf(self);
-    require(walletBalance >= rewardsAmount, "AaveSmartWallet: INSUFF_BALANCE");
+    require(walletBalance >= rewardsAmount, "GenericSmartWallet: INSUFF_BALANCE");
 
     // Transfer Rewards to Receiver
-    require(rewardsToken.transfer(receiver, rewardsAmount), "AaveSmartWallet: REWARDS_TRANSFER_FAILED");
+    require(rewardsToken.transfer(receiver, rewardsAmount), "GenericSmartWallet: REWARDS_TRANSFER_FAILED");
     return rewardsAmount;
   }
 
@@ -157,3 +159,4 @@ contract GenericSmartWallet is SmartWalletBase {
   }
 
 }
+
