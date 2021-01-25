@@ -150,10 +150,10 @@ contract AaveWalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
+    require(wallet != address(0x0), "AaveWalletManager: E-403");
 
     (, uint256 ownerInterest) = AaveSmartWallet(wallet).getInterest(assetToken);
-    require(ownerInterest > 0, "AaveWalletManager: INSUFF_CHARGE");
+    require(ownerInterest > 0, "AaveWalletManager: E-412");
 
     // Discharge the full amount of interest
     (creatorAmount, receiverAmount) = AaveSmartWallet(wallet).withdrawAmount(receiver, assetToken, ownerInterest);
@@ -176,10 +176,10 @@ contract AaveWalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
+    require(wallet != address(0x0), "AaveWalletManager: E-403");
 
     (, uint256 ownerInterest) = AaveSmartWallet(wallet).getInterest(assetToken);
-    require(assetAmount > 0 && ownerInterest >= assetAmount, "AaveWalletManager: INSUFF_CHARGE");
+    require(assetAmount > 0 && ownerInterest >= assetAmount, "AaveWalletManager: E-412");
 
     // Discharge a portion of the interest
     (creatorAmount, receiverAmount) = AaveSmartWallet(wallet).withdrawAmount(receiver, assetToken, assetAmount);
@@ -203,10 +203,10 @@ contract AaveWalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
+    require(wallet != address(0x0), "AaveWalletManager: E-403");
 
     (uint256 creatorInterest,) = AaveSmartWallet(wallet).getInterest(assetToken);
-    require(assetAmount > 0 && creatorInterest >= assetAmount, "AaveWalletManager: INSUFF_CHARGE");
+    require(assetAmount > 0 && creatorInterest >= assetAmount, "AaveWalletManager: E-412");
 
     // Discharge a portion of the interest
     receiverAmount = AaveSmartWallet(wallet).withdrawAmountForCreator(receiver, assetToken, assetAmount);
@@ -228,7 +228,7 @@ contract AaveWalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
+    require(wallet != address(0x0), "AaveWalletManager: E-403");
 
     // Release Principal + Interest
     principalAmount = AaveSmartWallet(wallet).getPrincipal(assetToken);
@@ -252,8 +252,8 @@ contract AaveWalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "AaveWalletManager: INVALID_TOKEN_ID");
-    require(rewardsTokenWhitelist[rewardsToken], "AaveWalletManager: INVALID_REWARD_TOKEN");
+    require(wallet != address(0x0), "AaveWalletManager: E-403");
+    require(rewardsTokenWhitelist[rewardsToken], "AaveWalletManager: E-423");
 
     // Withdraw Rewards to Receiver
     amount = AaveSmartWallet(wallet).withdrawRewards(receiver, rewardsToken, rewardsAmount);
@@ -319,7 +319,7 @@ contract AaveWalletManager is WalletManagerBase {
   |__________________________________*/
 
   function setAaveBridge(address aaveBridge) external onlyOwner {
-    require(aaveBridge != address(0x0), "AaveWalletManager: INVALID_LP_BRIDGE");
+    require(aaveBridge != address(0x0), "AaveWalletManager: E-403");
     _aaveBridge = aaveBridge;
     emit AaveBridgeSet(aaveBridge);
   }

@@ -169,7 +169,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "GenericERC20WalletManager: INVALID_TOKEN_ID");
+    require(wallet != address(0x0), "GenericERC20WalletManager: E-403");
 
     // Release Principal + Interest
     principalAmount = GenericERC721SmartWallet(wallet).getPrincipal(assetToken);
@@ -187,7 +187,7 @@ contract GenericERC721WalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "GenericERC20WalletManager: INVALID_TOKEN_ID");
+    require(wallet != address(0x0), "GenericERC20WalletManager: E-403");
 
     // Withdraw Rewards to Receiver
     id = GenericERC721SmartWallet(wallet).withdrawRewards(receiver, rewardsToken, rewardsID);

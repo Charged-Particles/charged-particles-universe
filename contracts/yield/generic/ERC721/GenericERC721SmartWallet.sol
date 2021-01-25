@@ -122,7 +122,7 @@ contract GenericERC721SmartWallet is SmartWalletBase {
         receiverID = i;
       }
     }
-    require(receiverID < receiverAmount, "GenericERC721SmartWallet: TokenID not in posession of smart wallet.");
+    require(receiverID < receiverAmount, "GenericERC721SmartWallet: E-203");
     // Track Principal
     _assetPrincipalCount[assetToken] = _assetPrincipalCount[assetToken].sub(1);
     IERC721(assetToken).safeTransferFrom(address(this), receiver, assetID);
@@ -151,7 +151,7 @@ contract GenericERC721SmartWallet is SmartWalletBase {
     IERC721 rewardsToken = IERC721(rewardsTokenAddress);
 
     address rewardsOwner = rewardsToken.ownerOf(rewardsID);
-    require(rewardsOwner == self, "GenericSmartWallet: TokenID not in posession of smart wallet.");
+    require(rewardsOwner == self, "GenericSmartWallet: E-203");
 
     // Transfer Rewards to Receiver
     rewardsToken.safeTransferFrom(self, receiver, rewardsID);
@@ -167,4 +167,3 @@ contract GenericERC721SmartWallet is SmartWalletBase {
   }
 
 }
-

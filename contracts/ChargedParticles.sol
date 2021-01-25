@@ -138,7 +138,7 @@ contract ChargedParticles is
   }
 
   function getLiquidityProviderByIndex(uint index) external override view returns (string memory) {
-    require(index >= 0 && index < _liquidityProviders.length, "ChargedParticles: INVALID_INDEX");
+    require(index >= 0 && index < _liquidityProviders.length, "ChargedParticles: E-201");
     return _liquidityProviders[index];
   }
 
@@ -173,7 +173,7 @@ contract ChargedParticles is
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
-    require(operator != tokenOwner, "ChargedParticles: CANNOT_BE_SELF");
+    require(operator != tokenOwner, "ChargedParticles: E-106");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     _dischargeApproval[tokenUuid][tokenOwner] = operator;
@@ -195,7 +195,7 @@ contract ChargedParticles is
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
-    require(operator != tokenOwner, "ChargedParticles: CANNOT_BE_SELF");
+    require(operator != tokenOwner, "ChargedParticles: E-106");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     _releaseApproval[tokenUuid][tokenOwner] = operator;
@@ -217,7 +217,7 @@ contract ChargedParticles is
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
-    require(operator != tokenOwner, "ChargedParticles: CANNOT_BE_SELF");
+    require(operator != tokenOwner, "ChargedParticles: E-106");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     _timelockApproval[tokenUuid][tokenOwner] = operator;
@@ -374,8 +374,8 @@ contract ChargedParticles is
     external
     override
   {
-    require(_isTokenContractOrCreator(contractAddress, tokenId, creator, _msgSender()), "ChargedParticles: NOT_TOKEN_CREATOR");
-    require(annuityPercent <= MAX_ANNUITIES, "ChargedParticles: INVALID_PCT");
+    require(_isTokenContractOrCreator(contractAddress, tokenId, creator, _msgSender()), "ChargedParticles: E-104");
+    require(annuityPercent <= MAX_ANNUITIES, "ChargedParticles: E-421");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
@@ -407,8 +407,8 @@ contract ChargedParticles is
     override
   {
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "ChargedParticles: INVALID_OPERATOR");
-    require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: TOKEN_TIMELOCKED");
+    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
+    require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: E-302");
 
     _dischargeTimelock[tokenUuid] = unlockBlock;
 
@@ -428,8 +428,8 @@ contract ChargedParticles is
     override
   {
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "ChargedParticles: INVALID_OPERATOR");
-    require(block.number >= _releaseTimelock[tokenUuid], "ChargedParticles: TOKEN_TIMELOCKED");
+    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
+    require(block.number >= _releaseTimelock[tokenUuid], "ChargedParticles: E-302");
 
     _releaseTimelock[tokenUuid] = unlockBlock;
 
@@ -468,7 +468,7 @@ contract ChargedParticles is
     nonReentrant
     returns (uint256 yieldTokensAmount)
   {
-    require(whitelisted[contractAddress], "ChargedParticles: Invalid Token Contract");
+    require(whitelisted[contractAddress], "ChargedParticles: E-417");
 
     _validateDeposit(contractAddress, tokenId, liquidityProviderId, assetToken, assetAmount);
 
@@ -510,13 +510,13 @@ contract ChargedParticles is
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "ChargedParticles: INVALID_OPERATOR");
+    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
     // Validate Timelock
     if (_dischargeTimelock[tokenUuid] > 0) {
-      require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: TOKEN_TIMELOCKED");
+      require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: E-302");
     }
 
     (creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].discharge(receiver, contractAddress, tokenId, assetToken);
@@ -551,13 +551,13 @@ contract ChargedParticles is
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "ChargedParticles: INVALID_OPERATOR");
+    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
     // Validate Timelock
     if (_dischargeTimelock[tokenUuid] > 0) {
-      require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: TOKEN_TIMELOCKED");
+      require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: E-302");
     }
 
     (creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].dischargeAmount(receiver, contractAddress, tokenId, assetToken, assetAmount);
@@ -592,7 +592,7 @@ contract ChargedParticles is
     returns (uint256 receiverAmount)
   {
     address sender = _msgSender();
-    require(_isTokenCreator(contractAddress, tokenId, sender), "ChargedParticles: NOT_TOKEN_CREATOR");
+    require(_isTokenCreator(contractAddress, tokenId, sender), "ChargedParticles: E-104");
 
     receiverAmount = _lpWalletManager[liquidityProviderId].dischargeAmountForCreator(
       receiver,
@@ -634,13 +634,13 @@ contract ChargedParticles is
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "ChargedParticles: INVALID_OPERATOR");
+    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
     // Validate Timelock
     if (_releaseTimelock[tokenUuid] > 0) {
-      require(block.number >= _releaseTimelock[tokenUuid], "ChargedParticles: TOKEN_TIMELOCKED");
+      require(block.number >= _releaseTimelock[tokenUuid], "ChargedParticles: E-302");
     }
 
     // Release Particle to Receiver
@@ -667,7 +667,7 @@ contract ChargedParticles is
   function registerLiquidityProvider(string calldata liquidityProviderId, address walletManager) external onlyOwner {
     // Validate wallet manager
     IWalletManager newWalletMgr = IWalletManager(walletManager);
-    require(newWalletMgr.isPaused() != true, "ChargedParticles: INVALID_WALLET_MGR");
+    require(newWalletMgr.isPaused() != true, "ChargedParticles: E-418");
 
     // Register LP ID
     _liquidityProviders.push(liquidityProviderId);
@@ -811,15 +811,15 @@ contract ChargedParticles is
 
     // Valid LP?
     if (bytes(_nftLiquidityProvider[contractAddress]).length > 0) {
-        require(keccak256(abi.encodePacked(_nftLiquidityProvider[contractAddress])) == keccak256(abi.encodePacked(liquidityProviderId)), "ChargedParticles: INVALID_LP");
+        require(keccak256(abi.encodePacked(_nftLiquidityProvider[contractAddress])) == keccak256(abi.encodePacked(liquidityProviderId)), "ChargedParticles: E-419");
     }
 
     // Valid Amount for Deposit?
     if (_nftAssetDepositMin[contractAddress] > 0) {
-        require(newBalance >= _nftAssetDepositMin[contractAddress], "ChargedParticles: INSUFF_DEPOSIT");
+        require(newBalance >= _nftAssetDepositMin[contractAddress], "ChargedParticles: E-410");
     }
     if (_nftAssetDepositMax[contractAddress] > 0) {
-        require(newBalance <= _nftAssetDepositMax[contractAddress], "ChargedParticles: EXCESS_DEPOSIT");
+        require(newBalance <= _nftAssetDepositMax[contractAddress], "ChargedParticles: E-410");
     }
   }
 
@@ -873,9 +873,9 @@ contract ChargedParticles is
   /// @param tokenAmount  The amount of tokens to collect
   function _collectAssetToken(address from, address tokenAddress, uint256 tokenAmount) internal {
     uint256 userBalance = IERC20Upgradeable(tokenAddress).balanceOf(from);
-    require(tokenAmount <= userBalance, "ChargedParticles: INSUFF_ASSETS");
+    require(tokenAmount <= userBalance, "ChargedParticles: E-411");
     // Be sure to Approve this Contract to transfer your Token(s)
-    require(IERC20Upgradeable(tokenAddress).transferFrom(from, address(this), tokenAmount), "ChargedParticles: TRANSFER_FAILED");
+    require(IERC20Upgradeable(tokenAddress).transferFrom(from, address(this), tokenAmount), "ChargedParticles: E-401");
   }
 
   /// @dev See {ChargedParticles-baseParticleMass}.
@@ -946,32 +946,32 @@ contract ChargedParticles is
   |__________________________________*/
 
   modifier onlyValidExternalContract(address contractAddress) {
-    require(isValidExternalContract(contractAddress), "ChargedParticles: INVALID_INTERFACE");
+    require(isValidExternalContract(contractAddress), "ChargedParticles: E-420");
     _;
   }
 
   modifier onlyContractOwner(address contractAddress, address sender) {
-    require(_isContractOwner(contractAddress, sender), "ChargedParticles: NOT_OWNER");
+    require(_isContractOwner(contractAddress, sender), "ChargedParticles: E-102");
     _;
   }
 
   modifier onlyContractOwnerOrAdmin(address contractAddress, address sender) {
-    require(sender == owner() || _isContractOwner(contractAddress, sender), "ChargedParticles: NOT_OWNER_OR_ADMIN");
+    require(sender == owner() || _isContractOwner(contractAddress, sender), "ChargedParticles: E-103");
     _;
   }
 
   modifier onlyErc721OwnerOrOperator(address contractAddress, uint256 tokenId, address sender) {
-    require(_isErc721OwnerOrOperator(contractAddress, tokenId, sender), "ChargedParticles: NOT_TOKEN_OPERATOR");
+    require(_isErc721OwnerOrOperator(contractAddress, tokenId, sender), "ChargedParticles: E-105");
     _;
   }
 
   modifier lpEnabled(string calldata liquidityProviderId) {
-    require(_isLiquidityProviderEnabled(liquidityProviderId), "ChargedParticles: INVALID_LP");
+    require(_isLiquidityProviderEnabled(liquidityProviderId), "ChargedParticles: E-419");
     _;
   }
 
   modifier lpNotPaused(string calldata liquidityProviderId) {
-    require(!_isLiquidityProviderPaused(liquidityProviderId), "ChargedParticles: LP_PAUSED");
+    require(!_isLiquidityProviderPaused(liquidityProviderId), "ChargedParticles: E-101");
     _;
   }
 }

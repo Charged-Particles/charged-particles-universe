@@ -53,7 +53,7 @@ abstract contract SmartWalletBase is ISmartWallet {
   |__________________________________*/
 
   function initializeBase() public {
-    require(_walletManager == address(0x0), "SmartWalletBase: ALREADY_INIT");
+    require(_walletManager == address(0x0), "SmartWalletBase: E-002");
     _walletManager = msg.sender;
   }
 
@@ -79,7 +79,7 @@ abstract contract SmartWalletBase is ISmartWallet {
   }
 
   function withdrawEther(address payable receiver, uint256 amount) external virtual override onlyWalletManager {
-    require(receiver != address(0x0), "SmartWalletBase: INVALID_RECEIVER");
+    require(receiver != address(0x0), "SmartWalletBase: E-403");
     receiver.sendValue(amount);
   }
 
@@ -115,7 +115,7 @@ abstract contract SmartWalletBase is ISmartWallet {
 
   /// @dev Throws if called by any account other than the wallet manager
   modifier onlyWalletManager() {
-    require(_walletManager == msg.sender, "SmartWalletBase: ONLY_WALLET_MGR");
+    require(_walletManager == msg.sender, "SmartWalletBase: E-109");
     _;
   }
 }

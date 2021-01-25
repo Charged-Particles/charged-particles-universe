@@ -76,10 +76,10 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   |__________________________________*/
 
   function claimIonTokens(uint256 amount) public returns (uint256 ionReward) {
-    require(stableDischarge[msg.sender] > 0, "Universe: INSUFF_BALANCE");
+    require(stableDischarge[msg.sender] > 0, "Universe: E-411");
 
     uint256 balance = ionToken.balanceOf(address(this));
-    require(balance > 0, "Universe: INSUFF_SUPPLY");
+    require(balance > 0, "Universe: E-413");
 
     return _claimIonTokens(msg.sender, amount);
   }
@@ -272,19 +272,19 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
 
   /// @dev Throws if called by any non-account
   modifier onlyValidContractAddress(address account) {
-    require(account != address(0x0) && account.isContract(), "Universe: invalid address");
+    require(account != address(0x0) && account.isContract(), "Universe: E-417");
     _;
   }
 
   /// @dev Throws if called by any account other than the Charged Particles contract
   modifier onlyChargedParticles() {
-    require(chargedParticles == msg.sender, "Universe: only charged particles");
+    require(chargedParticles == msg.sender, "Universe: E-108");
     _;
   }
 
   /// @dev Throws if called by any account other than the Proton NFT contract
   modifier onlyProton() {
-    require(proton == msg.sender, "Universe: only proton");
+    require(proton == msg.sender, "Universe: E-110");
     _;
   }
 }

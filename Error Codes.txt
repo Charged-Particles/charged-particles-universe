@@ -1,0 +1,83 @@
+
+Categories:
+  0. General
+  1. Permission & Control
+  2. Find, Inequalities & Range
+  3. Availability & Time
+  4. Tokens, Funds & Finance
+
+
+
+Codes:
+
+  0. General
+    E-000 - Failure
+    E-001 - Success
+    E-002 - ALREADY_INIT
+
+  1. Permission & Control
+    E-100 - [--Unused--]
+    E-101 - PAUSED
+    E-102 - NOT_OWNER, transfer of token that is not own
+    E-103 - NOT_OWNER_OR_ADMIN
+    E-104 - NOT_TOKEN_CREATOR, NOT_CREATOR
+    E-105 - INVALID_OPERATOR, NOT_TOKEN_OPERATOR, NOT_OWNER_OR_OPERATOR, transfer caller is not owner nor approved, approve caller is not owner nor approved for all
+    E-106 - CANNOT_BE_SELF
+    E-107 - charged particles not set
+    E-108 - only charged particles, ONLY_CONTROLLER
+    E-109 - ONLY_WALLET_MGR
+    E-110 - only proton
+    E-111 - approval to current owner, approve to caller
+    E-112 -
+
+
+  2. Find, Inequalities & Range
+    E-200 - [--Unused--]
+    E-201 - INVALID_INDEX,
+    E-202 - array length mismatch
+    E-203 - TokenID not in posession of smart wallet.
+    E-204 -
+    E-205 -
+    E-206 -
+    E-207 -
+    E-208 -
+    E-209 -
+
+  3. Availability & Time
+    E-300 - [--Unused--]
+    E-301 - release time is before current time
+    E-302 - TOKEN_TIMELOCKED
+    E-303 -
+    E-304 -
+    E-305 -
+    E-306 -
+    E-307 -
+    E-308 -
+    E-309 -
+
+  4. Tokens, Funds & Finance
+    E-400 - [--Unused--]
+    E-401 - TRANSFER_FAILED, REWARDS_TRANSFER_FAILED, SEND_FAILED
+    E-402 - transfer to non ERC721Receiver implementer
+    E-403 - zero address, invalid token address, INVALID_TOKEN_ID, INVALID_LP_BRIDGE, INVALID_RECEIVER
+    E-404 - no universe
+    E-405 - nonexistent token
+    E-406 - add portions failed (MINT_FAILED)
+    E-407 - token already minted
+    E-408 - cap exceeded
+    E-409 - exceeds locked amount, decreased allowance below zero, lock amount exceeds allowance
+    E-410 - INSUFF_DEPOSIT, EXCESS_DEPOSIT
+    E-411 - INSUFF_ASSETS, INSUFF_BALANCE, insufficient balance, INSUFF_FUNDS
+    E-412 - INSUFF_CHARGE
+    E-413 - INSUFF_SUPPLY
+    E-414 - INSUFF_PAYMENT
+    E-415 - INSUFF_FEE
+    E-416 - TOKEN_NOT_FOR_SALE
+    E-417 - Invalid Token Contract, invalid address,
+    E-418 - INVALID_WALLET_MGR
+    E-419 - INVALID_LP
+    E-420 - INVALID_INTERFACE
+    E-421 - INVALID_PCT
+    E-422 - INVALID_PHOTON
+    E-423 - INVALID_REWARD_TOKEN
+    E-424 - INVALID_ASSET

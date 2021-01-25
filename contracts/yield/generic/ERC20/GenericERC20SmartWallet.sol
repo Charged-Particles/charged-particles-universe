@@ -143,10 +143,10 @@ contract GenericERC20SmartWallet is SmartWalletBase {
     IERC20 rewardsToken = IERC20(rewardsTokenAddress);
 
     uint256 walletBalance = rewardsToken.balanceOf(self);
-    require(walletBalance >= rewardsAmount, "GenericSmartWallet: INSUFF_BALANCE");
+    require(walletBalance >= rewardsAmount, "GenericSmartWallet: E-411");
 
     // Transfer Rewards to Receiver
-    require(rewardsToken.transfer(receiver, rewardsAmount), "GenericSmartWallet: REWARDS_TRANSFER_FAILED");
+    require(rewardsToken.transfer(receiver, rewardsAmount), "GenericSmartWallet: E-401");
     return rewardsAmount;
   }
 
@@ -159,4 +159,3 @@ contract GenericERC20SmartWallet is SmartWalletBase {
   }
 
 }
-

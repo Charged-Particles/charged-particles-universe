@@ -261,7 +261,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
   function _setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct)
     internal
   {
-    require(royaltiesPct <= MAX_ROYALTIES, "Proton: INVALID_PCT");
+    require(royaltiesPct <= MAX_ROYALTIES, "Proton: E-421");
     _tokenCreatorRoyaltiesPct[tokenId] = royaltiesPct;
     emit CreatorRoyaltiesSet(tokenId, royaltiesPct);
   }
@@ -280,7 +280,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     internal
     returns (uint256 newTokenId)
   {
-    require(address(_chargedParticles) != address(0x0), "Proton: charged particles not set");
+    require(address(_chargedParticles) != address(0x0), "Proton: E-107");
 
     newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent, 0, 0);
 
@@ -305,7 +305,7 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     _tokenCreator[newTokenId] = creator;
 
     _setTokenURI(newTokenId, tokenMetaUri);
-    
+
     if (royaltiesPercent > 0) {
       _setRoyaltiesPct(newTokenId, royaltiesPercent);
     }
@@ -352,8 +352,8 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     returns (bool)
   {
     uint256 salePrice = _tokenSalePrice[tokenId];
-    require(salePrice > 0, "Proton: TOKEN_NOT_FOR_SALE");
-    require(msg.value >= salePrice, "Proton: INSUFF_PAYMENT");
+    require(salePrice > 0, "Proton: E-416");
+    require(msg.value >= salePrice, "Proton: E-414");
 
     uint256 ownerAmount = salePrice;
     uint256 creatorAmount;
@@ -397,9 +397,9 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
     */
   function _collectAssetToken(address from, address assetToken, uint256 assetAmount) internal {
     uint256 _userAssetBalance = IERC20(assetToken).balanceOf(from);
-    require(assetAmount <= _userAssetBalance, "Proton: INSUFF_ASSETS");
+    require(assetAmount <= _userAssetBalance, "Proton: E-411");
     // Be sure to Approve this Contract to transfer your Asset Token
-    require(IERC20(assetToken).transferFrom(from, address(this), assetAmount), "Proton: TRANSFER_FAILED");
+    require(IERC20(assetToken).transferFrom(from, address(this), assetAmount), "Proton: E-401");
   }
 
   function _refundOverpayment(uint256 threshold) internal {
@@ -415,17 +415,17 @@ contract Proton is ERC721, Ownable, ReentrancyGuard {
   }
 
   modifier requireMintFee() {
-    require(msg.value >= mintFee, "Proton: INSUFF_FEE");
+    require(msg.value >= mintFee, "Proton: E-415");
     _;
   }
 
   modifier onlyTokenOwnerOrApproved(uint256 tokenId) {
-    require(_isApprovedOrOwner(_msgSender(), tokenId), "Proton: NOT_OWNER_OR_OPERATOR");
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "Proton: E-105");
     _;
   }
 
   modifier onlyTokenCreator(uint256 tokenId) {
-    require(_tokenCreator[tokenId] == _msgSender(), "Proton: NOT_CREATOR");
+    require(_tokenCreator[tokenId] == _msgSender(), "Proton: E-104");
     _;
   }
 }

@@ -56,13 +56,13 @@ contract Photon is Initializable, ContextUpgradeable, RelayRecipient {
     emit PhotonUpdated(photon, uri);
   }
 
-  function transfer(address newPhoton) external {
-    address photon = _msgSender();
-    require(bytes(_photonURIs[photon]).length > 0, "Photon: INVALID_PHOTON");
+  function transfer(address receiver) external {
+    address sender = _msgSender();
+    require(bytes(_photonURIs[sender]).length > 0, "Photon: E-422");
 
-    _photonURIs[newPhoton] = _photonURIs[photon];
-    delete _photonURIs[photon];
-    emit PhotonTransferred(photon, newPhoton, _photonURIs[newPhoton]);
+    _photonURIs[receiver] = _photonURIs[sender];
+    delete _photonURIs[sender];
+    emit PhotonTransferred(sender, receiver, _photonURIs[receiver]);
   }
 
 

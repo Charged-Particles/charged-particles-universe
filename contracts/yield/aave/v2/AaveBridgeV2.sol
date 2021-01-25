@@ -75,7 +75,7 @@ contract AaveBridgeV2 is Ownable, IAaveBridge {
   {
     address self = address(this);
     address aTokenAddress = _getReserveInterestToken(assetToken);
-    require(_isReserveActive(assetToken), "AaveBridgeV2: INVALID_ASSET");
+    require(_isReserveActive(assetToken), "AaveBridgeV2: E-424");
 
     IERC20 token = IERC20(assetToken);
     IATokenV2 aToken = IATokenV2(aTokenAddress);
@@ -106,7 +106,7 @@ contract AaveBridgeV2 is Ownable, IAaveBridge {
     override
   {
     address self = address(this);
-    require(_isReserveActive(assetToken), "AaveBridgeV2: INVALID_ASSET");
+    require(_isReserveActive(assetToken), "AaveBridgeV2: E-424");
 
     // Redeem aTokens for Asset Tokens
     lendingPool.withdraw(assetToken, assetAmount, self);
@@ -117,17 +117,17 @@ contract AaveBridgeV2 is Ownable, IAaveBridge {
 
 
   function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
-    require(receiver != address(0x0), "AaveBridgeV1: INVALID_RECEIVER");
+    require(receiver != address(0x0), "AaveBridgeV1: E-403");
     receiver.sendValue(amount);
   }
 
   function withdrawErc20(address payable receiver, address token, uint256 amount) external onlyOwner {
-    require(receiver != address(0x0), "AaveBridgeV1: INVALID_RECEIVER");
+    require(receiver != address(0x0), "AaveBridgeV1: E-403");
     _sendToken(receiver, token, amount);
   }
 
   function _sendToken(address to, address token, uint256 amount) internal {
-    require(IERC20(token).transfer(to, amount), "AaveBridgeV2: SEND_FAILED");
+    require(IERC20(token).transfer(to, amount), "AaveBridgeV2: E-401");
   }
 
   function _getReserveInterestToken(address assetToken) internal view returns (address aTokenAddress) {

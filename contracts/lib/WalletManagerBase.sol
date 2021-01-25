@@ -110,13 +110,13 @@ abstract contract WalletManagerBase is Ownable, IWalletManager {
 
   /// @dev Throws if called by any account other than the Controller contract
   modifier onlyController() {
-    require(_controller == msg.sender, "WalletManagerBase: ONLY_CONTROLLER");
+    require(_controller == msg.sender, "WalletManagerBase: E-108");
     _;
   }
 
   // Throws if called by any account other than the Charged Particles Escrow Controller.
   modifier whenNotPaused() {
-    require(_paused != true, "WalletManagerBase: PAUSED");
+    require(_paused != true, "WalletManagerBase: E-101");
     _;
   }
 

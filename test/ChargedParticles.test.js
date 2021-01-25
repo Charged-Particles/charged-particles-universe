@@ -123,7 +123,7 @@ describe("Charged Particles", () => {
   it("can succesfully energize and release proton", async () => {
 
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
-    
+
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
 
@@ -157,7 +157,7 @@ describe("Charged Particles", () => {
 
   it("can discharge only after timelock expired", async () => {
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
-    
+
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
 
@@ -195,7 +195,7 @@ describe("Charged Particles", () => {
       energizedParticleId,
       'aave',
       daiAddress
-    )).to.be.revertedWith("ChargedParticles: TOKEN_TIMELOCKED");
+    )).to.be.revertedWith("ChargedParticles: E-302");
 
     await setNetworkAfterBlockNumber(blockNumberTimelock);
 
@@ -212,7 +212,7 @@ describe("Charged Particles", () => {
 
   it("creator receieves royalties, old owner receives the sale price and the new owner receives the token", async () => {
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
-    
+
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
 
@@ -290,13 +290,13 @@ describe("Charged Particles", () => {
     signer1 = ethers.provider.getSigner(user1);
     signer2 = ethers.provider.getSigner(user2);
 
-    await expect(ion.connect(signer2).lock(user1, await ion.balanceOf(user1), blocks)).to.be.revertedWith("ION: lock amount exceeds allowance");
+    await expect(ion.connect(signer2).lock(user1, await ion.balanceOf(user1), blocks)).to.be.revertedWith("ION: E-409");
 
     await ion.connect(signer1).increaseLockAllowance(user2, await ion.balanceOf(user1));
 
     await ion.connect(signer2).lock(user1, await ion.balanceOf(user1), blocks);
 
-    await expect(ion.connect(signer1).transfer(user3, await ion.balanceOf(user1))).to.be.revertedWith("ION: exceeds locked amount");
+    await expect(ion.connect(signer1).transfer(user3, await ion.balanceOf(user1))).to.be.revertedWith("ION: E-409");
 
     await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + blocks);
 
@@ -310,7 +310,7 @@ describe("Charged Particles", () => {
 
   it("genericERC20 smart wallet and manager succesfully hold erc20 tokens", async () => {
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
-    
+
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
 
@@ -345,7 +345,7 @@ describe("Charged Particles", () => {
 
   // it("genericERC721 smart wallet and manager succesfully hold erc721 tokens", async () => {
   //   await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
-    
+
   //   await dai.connect(daiSigner).transfer(user1, toWei('10'));
   //   await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
 

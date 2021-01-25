@@ -17,15 +17,15 @@ contract IonTimelock is IIonTimelock {
 
 
   constructor (address _receiver, address _token) public {
-    require(_receiver != address(0x0), "IonTimelock: invalid receiver address");
-    require(_token != address(0x0), "IonTimelock: invalid token address");
+    require(_receiver != address(0x0), "IonTimelock: E-403");
+    require(_token != address(0x0), "IonTimelock: E-403");
 
     token = IERC20(_token);
     receiver = _receiver;
   }
 
   function addPortions(uint256[] memory amounts, uint256[] memory releaseTimes) public override returns (bool) {
-    require(amounts.length == releaseTimes.length, "IonTimelock: array length mismatch");
+    require(amounts.length == releaseTimes.length, "IonTimelock: E-202");
 
     uint256 totalAmount;
     for (uint i = 0; i < amounts.length; i++) {
@@ -33,7 +33,7 @@ contract IonTimelock is IIonTimelock {
       uint256 amount = amounts[i];
 
       // solhint-disable-next-line not-rely-on-time
-      require(releaseTime > block.timestamp, "IonTimelock: release time is before current time");
+      require(releaseTime > block.timestamp, "IonTimelock: E-301");
 
       portions.push(Portion({
         amount: amount,
@@ -45,7 +45,7 @@ contract IonTimelock is IIonTimelock {
     }
 
     uint256 amountAvailable = token.balanceOf(address(this));
-    require(amountAvailable >= totalAmount, "IonTimelock: insufficient balance");
+    require(amountAvailable >= totalAmount, "IonTimelock: E-411");
 
     emit PortionsAdded(amounts, releaseTimes);
     return true;
@@ -95,7 +95,7 @@ contract IonTimelock is IIonTimelock {
     }
 
     uint256 amountAvailable = token.balanceOf(address(this));
-    require(amount <= amountAvailable, "IonTimelock: INSUFF_FUNDS");
+    require(amount <= amountAvailable, "IonTimelock: E-411");
     token.safeTransfer(receiver, amount);
   }
 }

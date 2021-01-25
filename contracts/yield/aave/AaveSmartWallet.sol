@@ -198,8 +198,8 @@ contract AaveSmartWallet is SmartWalletBase {
         if (creatorAmount <= nftCreatorAmountDischarged) {
           nftCreatorAmountDischarged = nftCreatorAmountDischarged.sub(creatorAmount);
           creatorAmount = 0;
-        } 
-        
+        }
+
         else {
           creatorAmount = creatorAmount.sub(nftCreatorAmountDischarged);
           nftCreatorAmountDischarged = 0;
@@ -245,7 +245,7 @@ contract AaveSmartWallet is SmartWalletBase {
     returns (uint256 receiverAmount)
   {
     (uint256 creatorInterest,) = _getInterest(assetToken);
-    if (creatorInterest == 0) { return 0; } 
+    if (creatorInterest == 0) { return 0; }
     if (assetAmount > creatorInterest) {
       assetAmount = creatorInterest;
     }
@@ -272,10 +272,10 @@ contract AaveSmartWallet is SmartWalletBase {
     IERC20 rewardsToken = IERC20(rewardsTokenAddress);
 
     uint256 walletBalance = rewardsToken.balanceOf(self);
-    require(walletBalance >= rewardsAmount, "AaveSmartWallet: INSUFF_BALANCE");
+    require(walletBalance >= rewardsAmount, "AaveSmartWallet: E-411");
 
     // Transfer Rewards to Receiver
-    require(rewardsToken.transfer(receiver, rewardsAmount), "AaveSmartWallet: REWARDS_TRANSFER_FAILED");
+    require(rewardsToken.transfer(receiver, rewardsAmount), "AaveSmartWallet: E-401");
     return rewardsAmount;
   }
 
@@ -316,6 +316,6 @@ contract AaveSmartWallet is SmartWalletBase {
   }
 
   function _sendToken(address to, address token, uint256 amount) internal {
-    require(IERC20(token).transfer(to, amount), "AaveSmartWallet: SEND_FAILED");
+    require(IERC20(token).transfer(to, amount), "AaveSmartWallet: E-401");
   }
 }
