@@ -115,8 +115,8 @@ describe("Charged Particles", () => {
   });
 
   it('charged particles should have enabled "aave" and "generic" as liquidity providers', async () => {
-    expect(await chargedParticles.isLiquidityProviderEnabled('aave')).to.equal(true);
-    expect(await chargedParticles.isLiquidityProviderEnabled('generic')).to.equal(true);
+    expect(await chargedParticles.isWalletManagerEnabled('aave')).to.equal(true);
+    expect(await chargedParticles.isWalletManagerEnabled('generic')).to.equal(true);
     expect(await chargedParticles.isNftBasketEnabled('generic')).to.equal(true);
   });
 
@@ -134,6 +134,7 @@ describe("Charged Particles", () => {
       contractParams: [
         user1,                        // creator
         user2,                        // receiver
+        user3,                        // referrer
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
         'aave',                       // liquidityProviderId
         daiAddress, // assetToken
@@ -170,6 +171,7 @@ describe("Charged Particles", () => {
       contractParams: [
         user1,
         user2,
+        user3,                        // referrer
         TEST_NFT_TOKEN_URI,
         'aave',
         daiAddress,
@@ -223,6 +225,7 @@ describe("Charged Particles", () => {
       contractParams: [
         user1,
         user1,
+        user3,                        // referrer
         TEST_NFT_TOKEN_URI,
         'aave',
         daiAddress,
@@ -323,6 +326,7 @@ describe("Charged Particles", () => {
       contractParams: [
         user1,                        // creator
         user2,                        // receiver
+        user3,                        // referrer
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
         'generic',                    // liquidityProviderId
         daiAddress,                   // assetToken
@@ -356,6 +360,7 @@ describe("Charged Particles", () => {
   //     contractParams: [
   //       user1,                        // creator
   //       user2,                        // receiver
+  //       user3,                        // referrer
   //       TEST_NFT_TOKEN_URI,           // tokenMetaUri
   //       'generic',                    // liquidityProviderId
   //       daiAddress,                   // assetToken
@@ -372,6 +377,7 @@ describe("Charged Particles", () => {
   //     contractParams: [
   //       user2,                        // creator
   //       user3,                        // receiver
+  //       user1,                        // referrer
   //       TEST_NFT_TOKEN_URI,           // tokenMetaUri
   //       'genericERC721',              // liquidityProviderId
   //       proton.address,               // assetToken

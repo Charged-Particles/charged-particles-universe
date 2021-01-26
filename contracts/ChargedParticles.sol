@@ -88,9 +88,9 @@ contract ChargedParticles is
 
   // Linked Contracts
   IUniverse internal _universe;
-  string[] internal _liquidityProviders;
+  string[] internal _walletManagers;
   string[] internal _nftBaskets;
-  mapping (string => IWalletManager) internal _lpWalletManager;
+  mapping (string => IWalletManager) internal _ftWalletManager;
   mapping (string => IBasketManager) internal _nftBasketManager;
 
   // Whitelisted External Token Contracts that are allowed to "Charge" tokens.
@@ -141,21 +141,21 @@ contract ChargedParticles is
     return _getCreatorAnnuitiesRedirect(contractAddress, tokenId);
   }
 
-  function isLiquidityProviderEnabled(string calldata liquidityProviderId) external override view returns (bool) {
-    return _isLiquidityProviderEnabled(liquidityProviderId);
+  function isWalletManagerEnabled(string calldata walletManagerId) external override view returns (bool) {
+    return _isWalletManagerEnabled(walletManagerId);
   }
 
-  function getLiquidityProvidersCount() external override view returns (uint) {
-    return _liquidityProviders.length;
+  function getWalletManagerCount() external override view returns (uint) {
+    return _walletManagers.length;
   }
 
-  function getLiquidityProviderByIndex(uint index) external override view returns (string memory) {
-    require(index >= 0 && index < _liquidityProviders.length, "ChargedParticles: E-201");
-    return _liquidityProviders[index];
+  function getWalletManagerByIndex(uint index) external override view returns (string memory) {
+    require(index >= 0 && index < _walletManagers.length, "ChargedParticles: E-201");
+    return _walletManagers[index];
   }
 
-  function getWalletManager(string calldata liquidityProviderId) external override view returns (address) {
-    return address(_lpWalletManager[liquidityProviderId]);
+  function getWalletManager(string calldata walletManagerId) external override view returns (address) {
+    return address(_ftWalletManager[walletManagerId]);
   }
 
   function isNftBasketEnabled(string calldata basketId) external override view returns (bool) {
@@ -179,8 +179,8 @@ contract ChargedParticles is
     return _getTokenUUID(contractAddress, tokenId);
   }
 
-  function getOwnerUUID(string calldata liquidityProviderId, address ownerAddress) external override pure returns (uint256) {
-    return _getOwnerUUID(liquidityProviderId, ownerAddress);
+  function getOwnerUUID(string calldata walletManagerId, address ownerAddress) external override pure returns (uint256) {
+    return _getOwnerUUID(walletManagerId, ownerAddress);
   }
 
   function onERC721Received(address, address, uint256, bytes calldata) external override returns (bytes4) {
@@ -284,63 +284,500 @@ contract ChargedParticles is
   /// representing the Mass of the Particle.
   /// @param contractAddress      The Address to the Contract of the Token
   /// @param tokenId              The ID of the Token
-  /// @param liquidityProviderId  The Liquidity-Provider ID to check the Asset balance of
+  /// @param walletManagerId  The Liquidity-Provider ID to check the Asset balance of
   /// @param assetToken           The Address of the Asset Token to check
   /// @return The Amount of underlying Assets held within the Token
   function baseParticleMass(
     address contractAddress,
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string calldata walletManagerId,
     address assetToken
   )
     external
     override
-    lpEnabled(liquidityProviderId)
+    managerEnabled(walletManagerId)
     returns (uint256)
   {
-    return _baseParticleMass(contractAddress, tokenId, liquidityProviderId, assetToken);
+    return _baseParticleMass(contractAddress, tokenId, walletManagerId, assetToken);
   }
 
   /// @notice Gets the amount of Interest that the Particle has generated representing
   /// the Charge of the Particle
   /// @param contractAddress      The Address to the Contract of the Token
   /// @param tokenId              The ID of the Token
-  /// @param liquidityProviderId  The Liquidity-Provider ID to check the Interest balance of
+  /// @param walletManagerId  The Liquidity-Provider ID to check the Interest balance of
   /// @param assetToken           The Address of the Asset Token to check
   /// @return The amount of interest the Token has generated (in Asset Token)
   function currentParticleCharge(
     address contractAddress,
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string calldata walletManagerId,
     address assetToken
   )
     external
     override
-    lpEnabled(liquidityProviderId)
+    managerEnabled(walletManagerId)
     returns (uint256)
   {
-    return _currentParticleCharge(contractAddress, tokenId, liquidityProviderId, assetToken);
+    return _currentParticleCharge(contractAddress, tokenId, walletManagerId, assetToken);
   }
 
   /// @notice Gets the amount of LP Tokens that the Particle has generated representing
   /// the Kinetics of the Particle
   /// @param contractAddress      The Address to the Contract of the Token
   /// @param tokenId              The ID of the Token
-  /// @param liquidityProviderId  The Liquidity-Provider ID to check the Kinetics balance of
+  /// @param walletManagerId  The Liquidity-Provider ID to check the Kinetics balance of
   /// @param assetToken           The Address of the Asset Token to check
   /// @return The amount of LP tokens that have been generated
   function currentParticleKinetics(
     address contractAddress,
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string calldata walletManagerId,
     address assetToken
   )
     external
     override
-    lpEnabled(liquidityProviderId)
+    managerEnabled(walletManagerId)
     returns (uint256)
   {
-    return _currentParticleKinetics(contractAddress, tokenId, liquidityProviderId, assetToken);
+    return _currentParticleKinetics(contractAddress, tokenId, walletManagerId, assetToken);
+  }
+
+  /// @notice Gets the total amount of ERC721 Tokens that the Particle holds
+  /// @param contractAddress  The Address to the Contract of the Token
+  /// @param tokenId          The ID of the Token
+  /// @param basketManagerId  The ID of the BasketManager to check the token balance of
+  /// @return The total amount of ERC721 tokens that are held  within the Particle
+  function currentParticleCovalentBonds(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId
+  )
+    external
+    view
+    override
+    managerEnabled(basketManagerId)
+    returns (uint256)
+  {
+    return _currentParticleCovalentBonds(contractAddress, tokenId, basketManagerId);
+  }
+
+
+  /***********************************|
+  |        Timelock Particles         |
+  |__________________________________*/
+
+  /// @notice Sets a Timelock on the ability to Discharge the Interest of a Particle
+  /// @param contractAddress  The Address to the NFT to Timelock
+  /// @param tokenId          The token ID of the NFT to Timelock
+  /// @param unlockBlock      The Ethereum Block-number to Timelock until (~15 seconds per block)
+  function setDischargeTimelock(
+    address contractAddress,
+    uint256 tokenId,
+    uint256 unlockBlock
+  )
+    external
+    override
+  {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
+    require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: E-302");
+
+    _dischargeTimelock[tokenUuid] = unlockBlock;
+
+    emit TokenDischargeTimelock(contractAddress, tokenId, _msgSender(), unlockBlock);
+  }
+
+  /// @notice Sets a Timelock on the ability to Release the Assets of a Particle
+  /// @param contractAddress  The Address to the NFT to Timelock
+  /// @param tokenId          The token ID of the NFT to Timelock
+  /// @param unlockBlock      The Ethereum Block-number to Timelock until (~15 seconds per block)
+  function setReleaseTimelock(
+    address contractAddress,
+    uint256 tokenId,
+    uint256 unlockBlock
+  )
+    external
+    override
+  {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
+    require(block.number >= _releaseTimelock[tokenUuid], "ChargedParticles: E-302");
+
+    _releaseTimelock[tokenUuid] = unlockBlock;
+
+    emit TokenReleaseTimelock(contractAddress, tokenId, _msgSender(), unlockBlock);
+  }
+
+
+  /***********************************|
+  |        Energize Particles         |
+  |__________________________________*/
+
+  /// @notice Fund Particle with Asset Token
+  ///    Must be called by the account providing the Asset
+  ///    Account must Approve THIS contract as Operator of Asset
+  ///
+  /// NOTE: DO NOT Energize an ERC20 Token, as anyone who holds any amount
+  ///       of the same ERC20 token could discharge or release the funds.
+  ///       All holders of the ERC20 token would essentially be owners of the Charged Particle.
+  ///
+  /// @param contractAddress      The Address to the Contract of the Token to Energize
+  /// @param tokenId              The ID of the Token to Energize
+  /// @param walletManagerId  The Asset-Pair to Energize the Token with
+  /// @param assetToken           The Address of the Asset Token being used
+  /// @param assetAmount          The Amount of Asset Token to Energize the Token with
+  /// @return yieldTokensAmount The amount of Yield-bearing Tokens added to the escrow for the Token
+  function energizeParticle(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken,
+    uint256 assetAmount,
+    address referrer
+  )
+    external
+    override
+    managerEnabled(walletManagerId)
+    nonReentrant
+    returns (uint256 yieldTokensAmount)
+  {
+    require(whitelisted[contractAddress], "ChargedParticles: E-417");
+
+    _validateDeposit(contractAddress, tokenId, walletManagerId, assetToken, assetAmount);
+
+    // Transfer ERC20 Token from Caller to Contract (reverts on fail)
+    _collectAssetToken(_msgSender(), assetToken, assetAmount);
+
+    // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
+    yieldTokensAmount = _depositIntoWalletManager(contractAddress, tokenId, walletManagerId, assetToken, assetAmount);
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onEnergize(_msgSender(), referrer, contractAddress, tokenId, walletManagerId, assetToken, assetAmount);
+    }
+  }
+
+  /***********************************|
+  |        Discharge Particles        |
+  |__________________________________*/
+
+  /// @notice Allows the owner or operator of the Token to collect or transfer the interest generated
+  ///         from the token without removing the underlying Asset that is held within the token.
+  /// @param receiver             The Address to Receive the Discharged Asset Tokens
+  /// @param contractAddress      The Address to the Contract of the Token to Discharge
+  /// @param tokenId              The ID of the Token to Discharge
+  /// @param walletManagerId  The LP of the Assets to Discharge from the Token
+  /// @param assetToken           The Address of the Asset Token being discharged
+  /// @return creatorAmount Amount of Asset Token discharged to the Creator
+  /// @return receiverAmount Amount of Asset Token discharged to the Receiver
+  function dischargeParticle(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken
+  )
+    external
+    override
+    managerEnabled(walletManagerId)
+    nonReentrant
+    returns (uint256 creatorAmount, uint256 receiverAmount)
+  {
+    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
+
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+
+    // Validate Timelock
+    if (_dischargeTimelock[tokenUuid] > 0) {
+      require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: E-302");
+    }
+
+    address creatorRedirect = _creatorAnnuityRedirect[tokenUuid];
+    (creatorAmount, receiverAmount) = _ftWalletManager[walletManagerId].discharge(receiver, contractAddress, tokenId, assetToken, creatorRedirect);
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onDischarge(contractAddress, tokenId, walletManagerId, assetToken, creatorAmount, receiverAmount);
+    }
+  }
+
+  /// @notice Allows the owner or operator of the Token to collect or transfer a specific amount the interest
+  ///         generated from the token without removing the underlying Asset that is held within the token.
+  /// @param receiver             The Address to Receive the Discharged Asset Tokens
+  /// @param contractAddress      The Address to the Contract of the Token to Discharge
+  /// @param tokenId              The ID of the Token to Discharge
+  /// @param walletManagerId  The LP of the Assets to Discharge from the Token
+  /// @param assetToken           The Address of the Asset Token being discharged
+  /// @param assetAmount          The specific amount of Asset Token to Discharge from the Token
+  /// @return creatorAmount Amount of Asset Token discharged to the Creator
+  /// @return receiverAmount Amount of Asset Token discharged to the Receiver
+  function dischargeParticleAmount(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken,
+    uint256 assetAmount
+  )
+    external
+    override
+    managerEnabled(walletManagerId)
+    nonReentrant
+    returns (uint256 creatorAmount, uint256 receiverAmount)
+  {
+    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
+
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+
+    // Validate Timelock
+    if (_dischargeTimelock[tokenUuid] > 0) {
+      require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: E-302");
+    }
+
+    address creatorRedirect = _creatorAnnuityRedirect[tokenUuid];
+    (creatorAmount, receiverAmount) = _ftWalletManager[walletManagerId].dischargeAmount(
+      receiver,
+      contractAddress,
+      tokenId,
+      assetToken,
+      assetAmount,
+      creatorRedirect
+    );
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onDischarge(contractAddress, tokenId, walletManagerId, assetToken, creatorAmount, receiverAmount);
+    }
+  }
+
+  /// @notice Allows the Creator of the Token to collect or transfer a their portion of the interest (if any)
+  ///         generated from the token without removing the underlying Asset that is held within the token.
+  /// @param receiver             The Address to Receive the Discharged Asset Tokens
+  /// @param contractAddress      The Address to the Contract of the Token to Discharge
+  /// @param tokenId              The ID of the Token to Discharge
+  /// @param walletManagerId  The LP of the Assets to Discharge from the Token
+  /// @param assetToken           The Address of the Asset Token being discharged
+  /// @param assetAmount          The specific amount of Asset Token to Discharge from the Particle
+  /// @return receiverAmount      Amount of Asset Token discharged to the Receiver
+  function dischargeParticleForCreator(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken,
+    uint256 assetAmount
+  )
+    external
+    override
+    managerEnabled(walletManagerId)
+    nonReentrant
+    returns (uint256 receiverAmount)
+  {
+    address sender = _msgSender();
+    require(_isTokenCreator(contractAddress, tokenId, sender), "ChargedParticles: E-104");
+
+    receiverAmount = _ftWalletManager[walletManagerId].dischargeAmountForCreator(
+      receiver,
+      contractAddress,
+      tokenId,
+      sender,
+      assetToken,
+      assetAmount
+    );
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onDischargeForCreator(contractAddress, tokenId, walletManagerId, sender, assetToken, receiverAmount);
+    }
+  }
+
+
+  /***********************************|
+  |         Release Particles         |
+  |__________________________________*/
+
+  /// @notice Releases the Full amount of Asset + Interest held within the Particle by LP of the Assets
+  /// @param receiver             The Address to Receive the Released Asset Tokens
+  /// @param contractAddress      The Address to the Contract of the Token to Release
+  /// @param tokenId              The ID of the Token to Release
+  /// @param walletManagerId  The LP of the Assets to Release from the Token
+  /// @param assetToken           The Address of the Asset Token being released
+  /// @return creatorAmount Amount of Asset Token released to the Creator
+  /// @return receiverAmount Amount of Asset Token released to the Receiver (includes principalAmount)
+  function releaseParticle(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken
+  )
+    external
+    override
+    managerEnabled(walletManagerId)
+    nonReentrant
+    returns (uint256 creatorAmount, uint256 receiverAmount)
+  {
+    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
+
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+
+    // Validate Timelock
+    if (_releaseTimelock[tokenUuid] > 0) {
+      require(block.number >= _releaseTimelock[tokenUuid], "ChargedParticles: E-302");
+    }
+
+    // Release Particle to Receiver
+    uint256 principalAmount;
+    address creatorRedirect = _creatorAnnuityRedirect[tokenUuid];
+    (principalAmount, creatorAmount, receiverAmount) = _ftWalletManager[walletManagerId].release(
+      receiver,
+      contractAddress,
+      tokenId,
+      assetToken,
+      creatorRedirect
+    );
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onRelease(contractAddress, tokenId, walletManagerId, assetToken, principalAmount, creatorAmount, receiverAmount);
+    }
+  }
+
+  /// @notice Releases a partial amount of Asset + Interest held within the Particle by LP of the Assets
+  /// @param receiver             The Address to Receive the Released Asset Tokens
+  /// @param contractAddress      The Address to the Contract of the Token to Release
+  /// @param tokenId              The ID of the Token to Release
+  /// @param walletManagerId  The LP of the Assets to Release from the Token
+  /// @param assetToken           The Address of the Asset Token being released
+  /// @param assetAmount          The specific amount of Asset Token to Release from the Particle
+  /// @return creatorAmount Amount of Asset Token released to the Creator
+  /// @return receiverAmount Amount of Asset Token released to the Receiver (includes principalAmount)
+  function releaseParticleAmount(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken,
+    uint256 assetAmount
+  )
+    external
+    override
+    managerEnabled(walletManagerId)
+    nonReentrant
+    returns (uint256 creatorAmount, uint256 receiverAmount)
+  {
+    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
+
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+
+    // Validate Timelock
+    if (_releaseTimelock[tokenUuid] > 0) {
+      require(block.number >= _releaseTimelock[tokenUuid], "ChargedParticles: E-302");
+    }
+
+    // Release Particle to Receiver
+    uint256 principalAmount;
+    address creatorRedirect = _creatorAnnuityRedirect[tokenUuid];
+    (principalAmount, creatorAmount, receiverAmount) = _ftWalletManager[walletManagerId].releaseAmount(
+      receiver,
+      contractAddress,
+      tokenId,
+      assetToken,
+      assetAmount,
+      creatorRedirect
+    );
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onRelease(contractAddress, tokenId, walletManagerId, assetToken, principalAmount, creatorAmount, receiverAmount);
+    }
+  }
+
+
+  /***********************************|
+  |         Covalent Bonding          |
+  |__________________________________*/
+
+  /// @notice Deposit other NFT Assets into the Particle
+  ///    Must be called by the account providing the Asset
+  ///    Account must Approve THIS contract as Operator of Asset
+  ///
+  /// @param contractAddress      The Address to the Contract of the Token to Energize
+  /// @param tokenId              The ID of the Token to Energize
+  /// @param basketManagerId      The Basket to Deposit the NFT into
+  /// @param nftTokenAddress      The Address of the NFT Token being deposited
+  /// @param nftTokenId           The ID of the NFT Token being deposited
+  function covalentBond(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId,
+    address nftTokenAddress,
+    uint256 nftTokenId
+  )
+    external
+    override
+    managerEnabled(basketManagerId)
+    nonReentrant
+    returns (bool success)
+  {
+    require(whitelisted[contractAddress], "ChargedParticles: E-417");
+
+    // Transfer ERC721 Token from Caller to Contract (reverts on fail)
+    _collectNftToken(_msgSender(), nftTokenAddress, nftTokenId);
+
+    // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
+    success = _depositIntoBasketManager(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onCovalentBond(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
+    }
+  }
+
+  /// @notice Release NFT Assets from the Particle
+  /// @param receiver             The Address to Receive the Released Asset Tokens
+  /// @param contractAddress      The Address to the Contract of the Token to Energize
+  /// @param tokenId              The ID of the Token to Energize
+  /// @param basketManagerId      The Basket to Deposit the NFT into
+  /// @param nftTokenAddress      The Address of the NFT Token being deposited
+  /// @param nftTokenId           The ID of the NFT Token being deposited
+  function breakCovalentBond(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId,
+    address nftTokenAddress,
+    uint256 nftTokenId
+  )
+    external
+    override
+    managerEnabled(basketManagerId)
+    nonReentrant
+    returns (bool success)
+  {
+    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
+
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+
+    // Validate Timelock
+    if (_releaseTimelock[tokenUuid] > 0) {
+      require(block.number >= _releaseTimelock[tokenUuid], "ChargedParticles: E-302");
+    }
+
+    // Release Particle to Receiver
+    success = _nftBasketManager[basketManagerId].removeFromBasket(
+      receiver,
+      contractAddress,
+      tokenId,
+      nftTokenAddress,
+      nftTokenId
+    );
+
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onCovalentBreak(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
+    }
   }
 
 
@@ -433,284 +870,6 @@ contract ChargedParticles is
     emit TokenCreatorAnnuitiesRedirected(contractAddress, tokenId, receiver);
   }
 
-  /***********************************|
-  |        Timelock Particles         |
-  |__________________________________*/
-
-  /// @notice Sets a Timelock on the ability to Discharge the Interest of a Particle
-  /// @param contractAddress  The Address to the NFT to Timelock
-  /// @param tokenId          The token ID of the NFT to Timelock
-  /// @param unlockBlock      The Ethereum Block-number to Timelock until (~15 seconds per block)
-  function setDischargeTimelock(
-    address contractAddress,
-    uint256 tokenId,
-    uint256 unlockBlock
-  )
-    external
-    override
-  {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
-    require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: E-302");
-
-    _dischargeTimelock[tokenUuid] = unlockBlock;
-
-    emit TokenDischargeTimelock(contractAddress, tokenId, _msgSender(), unlockBlock);
-  }
-
-  /// @notice Sets a Timelock on the ability to Release the Assets of a Particle
-  /// @param contractAddress  The Address to the NFT to Timelock
-  /// @param tokenId          The token ID of the NFT to Timelock
-  /// @param unlockBlock      The Ethereum Block-number to Timelock until (~15 seconds per block)
-  function setReleaseTimelock(
-    address contractAddress,
-    uint256 tokenId,
-    uint256 unlockBlock
-  )
-    external
-    override
-  {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
-    require(block.number >= _releaseTimelock[tokenUuid], "ChargedParticles: E-302");
-
-    _releaseTimelock[tokenUuid] = unlockBlock;
-
-    emit TokenReleaseTimelock(contractAddress, tokenId, _msgSender(), unlockBlock);
-  }
-
-
-  /***********************************|
-  |        Energize Particles         |
-  |__________________________________*/
-
-  /// @notice Fund Particle with Asset Token
-  ///    Must be called by the account providing the Asset
-  ///    Account must Approve THIS contract as Operator of Asset
-  ///
-  /// NOTE: DO NOT Energize an ERC20 Token, as anyone who holds any amount
-  ///       of the same ERC20 token could discharge or release the funds.
-  ///       All holders of the ERC20 token would essentially be owners of the Charged Particle.
-  ///
-  /// @param contractAddress      The Address to the Contract of the Token to Energize
-  /// @param tokenId              The ID of the Token to Energize
-  /// @param liquidityProviderId  The Asset-Pair to Energize the Token with
-  /// @param assetToken           The Address of the Asset Token being used
-  /// @param assetAmount          The Amount of Asset Token to Energize the Token with
-  /// @return yieldTokensAmount The amount of Yield-bearing Tokens added to the escrow for the Token
-  function energizeParticle(
-    address contractAddress,
-    uint256 tokenId,
-    string calldata liquidityProviderId,
-    address assetToken,
-    uint256 assetAmount
-  )
-    external
-    override
-    lpEnabled(liquidityProviderId)
-    nonReentrant
-    returns (uint256 yieldTokensAmount)
-  {
-    require(whitelisted[contractAddress], "ChargedParticles: E-417");
-
-    _validateDeposit(contractAddress, tokenId, liquidityProviderId, assetToken, assetAmount);
-
-    // Transfer ERC20 Token from Caller to Contract (reverts on fail)
-    _collectAssetToken(_msgSender(), assetToken, assetAmount);
-
-    // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
-    yieldTokensAmount = _depositIntoWalletManager(contractAddress, tokenId, liquidityProviderId, assetToken, assetAmount);
-
-    // Signal to Universe Controller
-    if (address(_universe) != address(0)) {
-      _universe.onEnergize(contractAddress, tokenId, liquidityProviderId, assetToken, assetAmount);
-    }
-  }
-
-  /***********************************|
-  |        Discharge Particles        |
-  |__________________________________*/
-
-  /// @notice Allows the owner or operator of the Token to collect or transfer the interest generated
-  ///         from the token without removing the underlying Asset that is held within the token.
-  /// @param receiver             The Address to Receive the Discharged Asset Tokens
-  /// @param contractAddress      The Address to the Contract of the Token to Discharge
-  /// @param tokenId              The ID of the Token to Discharge
-  /// @param liquidityProviderId  The LP of the Assets to Discharge from the Token
-  /// @param assetToken           The Address of the Asset Token being discharged
-  /// @return creatorAmount Amount of Asset Token discharged to the Creator
-  /// @return receiverAmount Amount of Asset Token discharged to the Receiver
-  function dischargeParticle(
-    address receiver,
-    address contractAddress,
-    uint256 tokenId,
-    string calldata liquidityProviderId,
-    address assetToken
-  )
-    external
-    override
-    lpEnabled(liquidityProviderId)
-    nonReentrant
-    returns (uint256 creatorAmount, uint256 receiverAmount)
-  {
-    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
-
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-
-    // Validate Timelock
-    if (_dischargeTimelock[tokenUuid] > 0) {
-      require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: E-302");
-    }
-
-    address creatorRedirect = _creatorAnnuityRedirect[tokenUuid];
-    (creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].discharge(receiver, contractAddress, tokenId, assetToken, creatorRedirect);
-
-    // Signal to Universe Controller
-    if (address(_universe) != address(0)) {
-      _universe.onDischarge(contractAddress, tokenId, liquidityProviderId, assetToken, creatorAmount, receiverAmount);
-    }
-  }
-
-  /// @notice Allows the owner or operator of the Token to collect or transfer a specific amount the interest
-  ///         generated from the token without removing the underlying Asset that is held within the token.
-  /// @param receiver             The Address to Receive the Discharged Asset Tokens
-  /// @param contractAddress      The Address to the Contract of the Token to Discharge
-  /// @param tokenId              The ID of the Token to Discharge
-  /// @param liquidityProviderId  The LP of the Assets to Discharge from the Token
-  /// @param assetToken           The Address of the Asset Token being discharged
-  /// @param assetAmount          The specific amount of Asset Token to Discharge from the Token
-  /// @return creatorAmount Amount of Asset Token discharged to the Creator
-  /// @return receiverAmount Amount of Asset Token discharged to the Receiver
-  function dischargeParticleAmount(
-    address receiver,
-    address contractAddress,
-    uint256 tokenId,
-    string calldata liquidityProviderId,
-    address assetToken,
-    uint256 assetAmount
-  )
-    external
-    override
-    lpEnabled(liquidityProviderId)
-    nonReentrant
-    returns (uint256 creatorAmount, uint256 receiverAmount)
-  {
-    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
-
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-
-    // Validate Timelock
-    if (_dischargeTimelock[tokenUuid] > 0) {
-      require(block.number >= _dischargeTimelock[tokenUuid], "ChargedParticles: E-302");
-    }
-
-    address creatorRedirect = _creatorAnnuityRedirect[tokenUuid];
-    (creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].dischargeAmount(
-      receiver,
-      contractAddress,
-      tokenId,
-      assetToken,
-      assetAmount,
-      creatorRedirect
-    );
-
-    // Signal to Universe Controller
-    if (address(_universe) != address(0)) {
-      _universe.onDischarge(contractAddress, tokenId, liquidityProviderId, assetToken, creatorAmount, receiverAmount);
-    }
-  }
-
-  /// @notice Allows the Creator of the Token to collect or transfer a their portion of the interest (if any)
-  ///         generated from the token without removing the underlying Asset that is held within the token.
-  /// @param receiver             The Address to Receive the Discharged Asset Tokens
-  /// @param contractAddress      The Address to the Contract of the Token to Discharge
-  /// @param tokenId              The ID of the Token to Discharge
-  /// @param liquidityProviderId  The LP of the Assets to Discharge from the Token
-  /// @param assetToken           The Address of the Asset Token being discharged
-  /// @param assetAmount          The specific amount of Asset Token to Discharge from the Token
-  /// @return receiverAmount      Amount of Asset Token discharged to the Receiver
-  function dischargeParticleForCreator(
-    address receiver,
-    address contractAddress,
-    uint256 tokenId,
-    string calldata liquidityProviderId,
-    address assetToken,
-    uint256 assetAmount
-  )
-    external
-    override
-    lpEnabled(liquidityProviderId)
-    nonReentrant
-    returns (uint256 receiverAmount)
-  {
-    address sender = _msgSender();
-    require(_isTokenCreator(contractAddress, tokenId, sender), "ChargedParticles: E-104");
-
-    receiverAmount = _lpWalletManager[liquidityProviderId].dischargeAmountForCreator(
-      receiver,
-      contractAddress,
-      tokenId,
-      sender,
-      assetToken,
-      assetAmount
-    );
-
-    // Signal to Universe Controller
-    if (address(_universe) != address(0)) {
-      _universe.onDischargeForCreator(contractAddress, tokenId, liquidityProviderId, sender, assetToken, receiverAmount);
-    }
-  }
-
-
-  /***********************************|
-  |         Release Particles         |
-  |__________________________________*/
-
-  /// @notice Releases the Full amount of Asset + Interest held within the Particle by LP of the Assets
-  /// @param receiver             The Address to Receive the Released Asset Tokens
-  /// @param contractAddress      The Address to the Contract of the Token to Release
-  /// @param tokenId              The ID of the Token to Release
-  /// @param liquidityProviderId  The LP of the Assets to Release from the Token
-  /// @return creatorAmount Amount of Asset Token released to the Creator
-  /// @return receiverAmount Amount of Asset Token released to the Receiver (includes principalAmount)
-  function releaseParticle(
-    address receiver,
-    address contractAddress,
-    uint256 tokenId,
-    string calldata liquidityProviderId,
-    address assetToken
-  )
-    external
-    override
-    lpEnabled(liquidityProviderId)
-    nonReentrant
-    returns (uint256 creatorAmount, uint256 receiverAmount)
-  {
-    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "ChargedParticles: E-105");
-
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-
-    // Validate Timelock
-    if (_releaseTimelock[tokenUuid] > 0) {
-      require(block.number >= _releaseTimelock[tokenUuid], "ChargedParticles: E-302");
-    }
-
-    // Release Particle to Receiver
-    uint256 principalAmount;
-    address creatorRedirect = _creatorAnnuityRedirect[tokenUuid];
-    (principalAmount, creatorAmount, receiverAmount) = _lpWalletManager[liquidityProviderId].release(
-      receiver,
-      contractAddress,
-      tokenId,
-      assetToken,
-      creatorRedirect
-    );
-
-    // Signal to Universe Controller
-    if (address(_universe) != address(0)) {
-      _universe.onRelease(contractAddress, tokenId, liquidityProviderId, assetToken, principalAmount, creatorAmount, receiverAmount);
-    }
-  }
 
   /***********************************|
   |          Only Admin/DAO           |
@@ -723,15 +882,15 @@ contract ChargedParticles is
   }
 
   /// @dev Register Contracts as wallet managers with a unique liquidity provider ID
-  function registerLiquidityProvider(string calldata liquidityProviderId, address walletManager) external onlyOwner {
+  function registerWalletManager(string calldata walletManagerId, address walletManager) external onlyOwner {
     // Validate wallet manager
     IWalletManager newWalletMgr = IWalletManager(walletManager);
     require(newWalletMgr.isPaused() != true, "ChargedParticles: E-418");
 
     // Register LP ID
-    _liquidityProviders.push(liquidityProviderId);
-    _lpWalletManager[liquidityProviderId] = newWalletMgr;
-    emit LiquidityProviderRegistered(liquidityProviderId, walletManager);
+    _walletManagers.push(walletManagerId);
+    _ftWalletManager[walletManagerId] = newWalletMgr;
+    emit LiquidityProviderRegistered(walletManagerId, walletManager);
   }
 
   /// @dev Register Contracts as basket managers with a unique basket ID
@@ -766,14 +925,14 @@ contract ChargedParticles is
     return _creatorAnnuityRedirect[tokenUuid];
   }
 
-  /// @dev See {ChargedParticles-isLiquidityProviderEnabled}.
-  function _isLiquidityProviderEnabled(string calldata liquidityProviderId) internal view returns (bool) {
-    return (address(_lpWalletManager[liquidityProviderId]) != address(0x0));
+  /// @dev See {ChargedParticles-isWalletManagerEnabled}.
+  function _isWalletManagerEnabled(string calldata walletManagerId) internal view returns (bool) {
+    return (address(_ftWalletManager[walletManagerId]) != address(0x0));
   }
 
   /// @dev See {ChargedParticles-isLiquidityProviderPaused}.
-  function _isLiquidityProviderPaused(string calldata liquidityProviderId) internal view returns (bool) {
-    return _lpWalletManager[liquidityProviderId].isPaused();
+  function _isLiquidityProviderPaused(string calldata walletManagerId) internal view returns (bool) {
+    return _ftWalletManager[walletManagerId].isPaused();
   }
 
   /// @dev See {ChargedParticles-isNftBasketEnabled}.
@@ -792,8 +951,8 @@ contract ChargedParticles is
   }
 
   /// @dev See {ChargedParticles-getOwnerUUID}.
-  function _getOwnerUUID(string memory liquidityProviderId, address _owner) internal pure returns (uint256) {
-    return uint256(keccak256(abi.encodePacked(liquidityProviderId, _owner)));
+  function _getOwnerUUID(string memory walletManagerId, address _owner) internal pure returns (uint256) {
+    return uint256(keccak256(abi.encodePacked(walletManagerId, _owner)));
   }
 
   /// @dev See {ChargedParticles-getTokenOwner}.
@@ -880,25 +1039,25 @@ contract ChargedParticles is
   /// @dev Validates a Deposit according to the rules set by the Token Contract
   /// @param contractAddress      The Address to the Contract of the External NFT to check
   /// @param tokenId              The Token ID of the External NFT to check
-  /// @param liquidityProviderId  The LP of the Assets to Deposit
+  /// @param walletManagerId  The LP of the Assets to Deposit
   /// @param assetToken           The Address of the Asset Token to Deposit
   /// @param assetAmount          The specific amount of Asset Token to Deposit
   function _validateDeposit(
     address contractAddress,
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string calldata walletManagerId,
     address assetToken,
     uint256 assetAmount
   )
     internal
   {
-    IWalletManager lpWalletMgr = _lpWalletManager[liquidityProviderId];
+    IWalletManager lpWalletMgr = _ftWalletManager[walletManagerId];
     uint256 existingBalance = lpWalletMgr.getPrincipal(contractAddress, tokenId, assetToken);
     uint256 newBalance = assetAmount.add(existingBalance);
 
     // Valid LP?
     if (bytes(_nftLiquidityProvider[contractAddress]).length > 0) {
-        require(keccak256(abi.encodePacked(_nftLiquidityProvider[contractAddress])) == keccak256(abi.encodePacked(liquidityProviderId)), "ChargedParticles: E-419");
+        require(keccak256(abi.encodePacked(_nftLiquidityProvider[contractAddress])) == keccak256(abi.encodePacked(walletManagerId)), "ChargedParticles: E-419");
     }
 
     // Valid Amount for Deposit?
@@ -913,13 +1072,13 @@ contract ChargedParticles is
   /// @dev Deposit Asset Tokens into an NFT via the Wallet Manager
   /// @param contractAddress      The Address to the Contract of the NFT
   /// @param tokenId              The Token ID of the NFT
-  /// @param liquidityProviderId  The LP of the Assets to Deposit
+  /// @param walletManagerId  The LP of the Assets to Deposit
   /// @param assetToken           The Address of the Asset Token to Deposit
   /// @param assetAmount          The specific amount of Asset Token to Deposit
   function _depositIntoWalletManager(
     address contractAddress,
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string calldata walletManagerId,
     address assetToken,
     uint256 assetAmount
   )
@@ -927,13 +1086,36 @@ contract ChargedParticles is
     returns (uint256)
   {
     // Get Wallet-Manager for LP
-    IWalletManager lpWalletMgr = _lpWalletManager[liquidityProviderId];
+    IWalletManager lpWalletMgr = _ftWalletManager[walletManagerId];
     (address creator, uint256 annuityPct) = _getCreatorAnnuity(contractAddress, tokenId);
 
     // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
     address wallet = lpWalletMgr.getWalletAddressById(contractAddress, tokenId, creator, annuityPct);
     IERC20Upgradeable(assetToken).transfer(wallet, assetAmount);
     return lpWalletMgr.energize(contractAddress, tokenId, assetToken, assetAmount);
+  }
+
+  /// @dev Deposit NFT Tokens into the Basket Manager
+  /// @param contractAddress      The Address to the Contract of the NFT
+  /// @param tokenId              The Token ID of the NFT
+  /// @param basketManagerId      The LP of the Assets to Deposit
+  /// @param nftTokenAddress      The Address of the Asset Token to Deposit
+  /// @param nftTokenId           The specific amount of Asset Token to Deposit
+  function _depositIntoBasketManager(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId,
+    address nftTokenAddress,
+    uint256 nftTokenId
+  )
+    internal
+    returns (bool)
+  {
+    // Deposit NFT Token directly into Smart Wallet (reverts on fail) and Update BasketManager
+    IBasketManager basketMgr = _nftBasketManager[basketManagerId];
+    address wallet = basketMgr.getBasketAddressById(contractAddress, tokenId);
+    IERC721Upgradeable(nftTokenAddress).safeTransferFrom(address(this), wallet, nftTokenId);
+    return basketMgr.addToBasket(contractAddress, tokenId, nftTokenAddress, nftTokenId);
   }
 
   /// @dev Gets the amount of creator annuities reserved for the creator for the specified NFT
@@ -955,56 +1137,76 @@ contract ChargedParticles is
   }
 
   /// @dev Collects the Required ERC20 Token(s) from the users wallet
+  ///   Be sure to Approve this Contract to transfer your Token(s)
   /// @param from         The owner address to collect the tokens from
   /// @param tokenAddress  The addres of the token to transfer
   /// @param tokenAmount  The amount of tokens to collect
   function _collectAssetToken(address from, address tokenAddress, uint256 tokenAmount) internal {
-    uint256 userBalance = IERC20Upgradeable(tokenAddress).balanceOf(from);
-    require(tokenAmount <= userBalance, "ChargedParticles: E-411");
-    // Be sure to Approve this Contract to transfer your Token(s)
     require(IERC20Upgradeable(tokenAddress).transferFrom(from, address(this), tokenAmount), "ChargedParticles: E-401");
+  }
+
+  /// @dev Collects the Required ERC721 Token(s) from the users wallet
+  ///   Be sure to Approve this Contract to transfer your Token(s)
+  /// @param from             The owner address to collect the tokens from
+  /// @param nftTokenAddress  The address of the NFT token to transfer
+  /// @param nftTokenId       The ID of the NFT token to transfer
+  function _collectNftToken(address from, address nftTokenAddress, uint256 nftTokenId) internal {
+    IERC721Upgradeable(nftTokenAddress).transferFrom(from, address(this), nftTokenId);
   }
 
   /// @dev See {ChargedParticles-baseParticleMass}.
   function _baseParticleMass(
     address contractAddress,
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string calldata walletManagerId,
     address assetToken
   )
     internal
     returns (uint256)
   {
-    return _lpWalletManager[liquidityProviderId].getPrincipal(contractAddress, tokenId, assetToken);
+    return _ftWalletManager[walletManagerId].getPrincipal(contractAddress, tokenId, assetToken);
   }
 
   /// @dev See {ChargedParticles-currentParticleCharge}.
   function _currentParticleCharge(
     address contractAddress,
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string calldata walletManagerId,
     address assetToken
   )
     internal
     returns (uint256)
   {
-    (, uint256 ownerInterest) = _lpWalletManager[liquidityProviderId].getInterest(contractAddress, tokenId, assetToken);
+    (, uint256 ownerInterest) = _ftWalletManager[walletManagerId].getInterest(contractAddress, tokenId, assetToken);
     return ownerInterest;
   }
-
 
   /// @dev See {ChargedParticles-currentParticleKinetics}.
   function _currentParticleKinetics(
     address contractAddress,
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string calldata walletManagerId,
     address assetToken
   )
     internal
     returns (uint256)
   {
-    return _lpWalletManager[liquidityProviderId].getRewards(contractAddress, tokenId, assetToken);
+    return _ftWalletManager[walletManagerId].getRewards(contractAddress, tokenId, assetToken);
   }
+
+  /// @dev See {ChargedParticles-currentParticleCovalentBonds}.
+  function _currentParticleCovalentBonds(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId
+  )
+    internal
+    view
+    returns (uint256)
+  {
+    return _nftBasketManager[basketManagerId].getTokenTotalCount(contractAddress, tokenId);
+  }
+
 
   /// @dev See {BaseRelayRecipient-_msgSender}.
   function _msgSender()
@@ -1052,13 +1254,13 @@ contract ChargedParticles is
     _;
   }
 
-  modifier lpEnabled(string calldata liquidityProviderId) {
-    require(_isLiquidityProviderEnabled(liquidityProviderId), "ChargedParticles: E-419");
+  modifier managerEnabled(string calldata walletManagerId) {
+    require(_isWalletManagerEnabled(walletManagerId), "ChargedParticles: E-419");
     _;
   }
 
-  modifier lpNotPaused(string calldata liquidityProviderId) {
-    require(!_isLiquidityProviderPaused(liquidityProviderId), "ChargedParticles: E-101");
+  modifier lpNotPaused(string calldata walletManagerId) {
+    require(!_isLiquidityProviderPaused(walletManagerId), "ChargedParticles: E-101");
     _;
   }
 }

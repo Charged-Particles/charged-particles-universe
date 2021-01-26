@@ -35,11 +35,13 @@ interface IChargedParticles {
   function isTokenCreator(address contractAddress, uint256 tokenId, address account) external view returns (bool);
   function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external view returns (address);
 
-  function isLiquidityProviderEnabled(string calldata liquidityProviderId) external view returns (bool);
-  function getLiquidityProvidersCount() external view returns (uint);
-  function getLiquidityProviderByIndex(uint index) external view returns (string memory);
+  // ERC20
+  function isWalletManagerEnabled(string calldata liquidityProviderId) external view returns (bool);
+  function getWalletManagerCount() external view returns (uint);
+  function getWalletManagerByIndex(uint index) external view returns (string memory);
   function getWalletManager(string calldata liquidityProviderId) external view returns (address);
 
+  // ERC721
   function isNftBasketEnabled(string calldata basketId) external view returns (bool);
   function getNftBasketCount() external view returns (uint);
   function getNftBasketByIndex(uint index) external view returns (string memory);
@@ -59,6 +61,7 @@ interface IChargedParticles {
   function baseParticleMass(address contractAddress, uint256 tokenId, string calldata liquidityProviderId, address assetToken) external returns (uint256);
   function currentParticleCharge(address contractAddress, uint256 tokenId, string calldata liquidityProviderId, address assetToken) external returns (uint256);
   function currentParticleKinetics(address contractAddress, uint256 tokenId, string calldata liquidityProviderId, address assetToken) external returns (uint256);
+  function currentParticleCovalentBonds(address contractAddress, uint256 tokenId, string calldata basketManagerId) external view returns (uint256);
 
   /***********************************|
   |     Register Contract Settings    |
@@ -108,7 +111,8 @@ interface IChargedParticles {
       uint256 tokenId,
       string calldata liquidityProviderId,
       address assetToken,
-      uint256 assetAmount
+      uint256 assetAmount,
+    address referrer
   ) external returns (uint256 yieldTokensAmount);
 
   function dischargeParticle(
@@ -144,6 +148,32 @@ interface IChargedParticles {
       string calldata liquidityProviderId,
       address assetToken
   ) external returns (uint256 creatorAmount, uint256 receiverAmount);
+
+  function releaseParticleAmount(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken,
+    uint256 assetAmount
+  ) external returns (uint256 creatorAmount, uint256 receiverAmount);
+
+  function covalentBond(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId,
+    address nftTokenAddress,
+    uint256 nftTokenId
+  ) external returns (bool success);
+
+  function breakCovalentBond(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId,
+    address nftTokenAddress,
+    uint256 nftTokenId
+  ) external returns (bool success);
 
   /***********************************|
   |          Particle Events          |

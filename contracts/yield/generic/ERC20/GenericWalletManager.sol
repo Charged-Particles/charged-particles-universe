@@ -180,7 +180,13 @@ contract GenericWalletManager is WalletManagerBase {
     return 0;
   }
 
-  function release(address receiver, address contractAddress, uint256 tokenId, address assetToken, address creatorRedirect)
+  function release(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    address assetToken,
+    address creatorRedirect
+  )
     public
     override
     onlyController
@@ -193,6 +199,31 @@ contract GenericWalletManager is WalletManagerBase {
     // Release Principal + Interest
     principalAmount = GenericSmartWallet(wallet).getPrincipal(assetToken);
     (creatorAmount, receiverAmount) = GenericSmartWallet(wallet).withdraw(receiver, creatorRedirect, assetToken);
+
+    // Log Event
+    emit WalletReleased(contractAddress, tokenId, receiver, assetToken, principalAmount, creatorAmount, receiverAmount);
+  }
+
+  function releaseAmount(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    address assetToken,
+    uint256 assetAmount,
+    address creatorRedirect
+  )
+    public
+    override
+    onlyController
+    returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount)
+  {
+    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    address wallet = _wallets[uuid];
+    require(wallet != address(0x0), "GenericWalletManager: E-403");
+
+    // Release from interest first + principal if needed
+    principalAmount = GenericSmartWallet(wallet).getPrincipal(assetToken);
+    (creatorAmount, receiverAmount) = GenericSmartWallet(wallet).withdrawAmount(receiver, creatorRedirect, assetToken, assetAmount);
 
     // Log Event
     emit WalletReleased(contractAddress, tokenId, receiver, assetToken, principalAmount, creatorAmount, receiverAmount);

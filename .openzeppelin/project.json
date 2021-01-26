@@ -5,6 +5,7 @@
     "ChargedParticles": "ChargedParticles",
     "Photon": "Photon",
     "GenericWalletManager": "GenericWalletManager",
+    "GenericBasketManager": "GenericBasketManager",
     "AaveWalltManager": "AaveWalletManager",
     "AaveBridgeV1": "AaveBridgeV1",
     "AaveBridgeV2": "AaveBridgeV2",

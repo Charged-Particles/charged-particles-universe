@@ -36,6 +36,8 @@ interface IBasketManager {
 
   function isPaused() external view returns (bool);
 
+  function getTokenTotalCount(address contractAddress, uint256 tokenId) external view returns (uint256);
+
   function getTokenContractCount(address contractAddress, uint256 tokenId) external view returns (uint256);
   function getTokenContractByIndex(address contractAddress, uint256 tokenId, uint256 index) external view returns (address);
 

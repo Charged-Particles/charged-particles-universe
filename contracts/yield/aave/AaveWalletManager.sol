@@ -245,6 +245,33 @@ contract AaveWalletManager is WalletManagerBase {
     emit WalletReleased(contractAddress, tokenId, receiver, assetToken, principalAmount, creatorAmount, receiverAmount);
   }
 
+  function releaseAmount(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    address assetToken,
+    uint256 assetAmount,
+    address creatorRedirect
+  )
+    external
+    override
+    onlyController
+    returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount)
+  {
+    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    address wallet = _wallets[uuid];
+    require(wallet != address(0x0), "AaveWalletManager: E-403");
+
+    (, uint256 ownerInterest) = AaveSmartWallet(wallet).getInterest(assetToken);
+    principalAmount = (ownerInterest < assetAmount) ? assetAmount.sub(ownerInterest) : 0;
+
+    // Release from interest first + principal if needed
+    (creatorAmount, receiverAmount) = AaveSmartWallet(wallet).withdrawAmount(receiver, creatorRedirect, assetToken, assetAmount);
+
+    // Log Event
+    emit WalletReleased(contractAddress, tokenId, receiver, assetToken, principalAmount, creatorAmount, receiverAmount);
+  }
+
   function withdrawRewards(
     address receiver,
     address contractAddress,

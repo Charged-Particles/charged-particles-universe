@@ -37,9 +37,11 @@ interface IUniverse {
   event MetallicBond(address indexed account, address cationSource, uint256 energy);
 
   function onEnergize(
+    address sender,
+    address referrer,
     address contractAddress,
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string calldata managerId,
     address assetToken,
     uint256 assetEnergy
   ) external;
@@ -47,7 +49,7 @@ interface IUniverse {
   function onDischarge(
     address contractAddress,
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string calldata managerId,
     address assetToken,
     uint256 creatorEnergy,
     uint256 receiverEnergy
@@ -56,7 +58,7 @@ interface IUniverse {
   function onDischargeForCreator(
     address contractAddress,
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string calldata managerId,
     address creator,
     address assetToken,
     uint256 receiverEnergy
@@ -65,11 +67,27 @@ interface IUniverse {
   function onRelease(
     address contractAddress,
     uint256 tokenId,
-    string calldata liquidityProviderId,
+    string calldata managerId,
     address assetToken,
     uint256 principalEnergy,
     uint256 creatorEnergy,
     uint256 receiverEnergy
+  ) external;
+
+  function onCovalentBond(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata managerId,
+    address nftTokenAddress,
+    uint256 nftTokenId
+  ) external;
+
+  function onCovalentBreak(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata managerId,
+    address nftTokenAddress,
+    uint256 nftTokenId
   ) external;
 
   function onProtonSale(

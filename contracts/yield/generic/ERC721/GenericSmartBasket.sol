@@ -24,6 +24,7 @@
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../../../interfaces/ISmartBasket.sol";
 
@@ -32,7 +33,7 @@ import "../../../interfaces/ISmartBasket.sol";
  * @notice Generic ERC721-Token Smart-Basket
  * @dev Non-upgradeable Contract
  */
-contract GenericSmartBasket is ISmartBasket {
+contract GenericSmartBasket is ISmartBasket, IERC721Receiver {
   using EnumerableSet for EnumerableSet.UintSet;
   using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -73,6 +74,9 @@ contract GenericSmartBasket is ISmartBasket {
     return _nftContractTokens[contractAddress].at(index);
   }
 
+  function onERC721Received(address, address, uint256, bytes calldata) external override returns (bytes4) {
+    return IERC721Receiver(0).onERC721Received.selector;
+  }
 
 
   function addToBasket(address contractAddress, uint256 tokenId)

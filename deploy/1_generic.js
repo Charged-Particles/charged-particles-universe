@@ -37,7 +37,7 @@ module.exports = async (hre) => {
       deployTransaction: genericWalletManager.deployTransaction,
     }
 
-    log('\n  Deploying GenericBasketManager...')(alchemyTimeout);
+    log('  Deploying GenericBasketManager...')(alchemyTimeout);
     const GenericBasketManager = await hre.ethers.getContractFactory('GenericBasketManager');
     const GenericBasketManagerInstance = await GenericBasketManager.deploy();
     const genericBasketManager = await GenericBasketManagerInstance.deployed();

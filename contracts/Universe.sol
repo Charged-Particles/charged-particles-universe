@@ -63,6 +63,9 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   //       Account => Electrostatic Attraction Levels
   mapping (address => uint256) internal esaLevel;
 
+  // Energizing Account => Referral Source
+  mapping (address => address) internal referralSource;
+
 
   /***********************************|
   |          Initialization           |
@@ -89,6 +92,8 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   |__________________________________*/
 
   function onEnergize(
+    address sender,
+    address referrer,
     address contractAddress,
     uint256 tokenId,
     string calldata liquidityProviderId,
@@ -99,7 +104,10 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
     override
     onlyChargedParticles
   {
-    // no-op
+    if (referralSource[sender] == address(0x1)) { return; }
+    if (referralSource[sender] == address(0x0)) {
+      referralSource[sender] = (referrer == address(0x0)) ? address(0x1) : referrer;
+    }
   }
 
   function onDischarge(
@@ -156,6 +164,34 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
       address nftOwner = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
       _electrostaticAttraction(nftOwner, assetToken, totalEnergy);
     }
+  }
+
+  function onCovalentBond(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata managerId,
+    address nftTokenAddress,
+    uint256 nftTokenId
+  )
+    external
+    override
+    onlyChargedParticles
+  {
+    // no-op
+  }
+
+  function onCovalentBreak(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata managerId,
+    address nftTokenAddress,
+    uint256 nftTokenId
+  )
+    external
+    override
+    onlyChargedParticles
+  {
+    // no-op
   }
 
   function onProtonSale(

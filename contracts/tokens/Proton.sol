@@ -98,6 +98,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
   function createChargedParticle(
     address creator,
     address receiver,
+    address referrer,
     string memory tokenMetaUri,
     string memory liquidityProviderId,
     address assetToken,
@@ -113,6 +114,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
     newTokenId = _createChargedParticle(
       creator,
       receiver,
+      referrer,
       tokenMetaUri,
       liquidityProviderId,
       assetToken,
@@ -303,6 +305,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
   function _createChargedParticle(
     address creator,
     address receiver,
+    address referrer,
     string memory tokenMetaUri,
     string memory liquidityProviderId,
     address assetToken,
@@ -316,7 +319,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
 
     newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent, 0, 0);
 
-    _chargeParticle(newTokenId, liquidityProviderId, assetToken, assetAmount);
+    _chargeParticle(newTokenId, liquidityProviderId, assetToken, assetAmount, referrer);
   }
 
   function _createProton(
@@ -405,7 +408,8 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
     uint256 tokenId,
     string memory liquidityProviderId,
     address assetToken,
-    uint256 assetAmount
+    uint256 assetAmount,
+    address referrer
   )
     internal
   {
@@ -418,7 +422,8 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
       tokenId,
       liquidityProviderId,
       assetToken,
-      assetAmount
+      assetAmount,
+      referrer
     );
   }
 

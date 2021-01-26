@@ -24,6 +24,7 @@
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 import "../../../interfaces/IBasketManager.sol";
 import "./GenericSmartBasket.sol";
 
@@ -32,6 +33,7 @@ import "./GenericSmartBasket.sol";
  * @dev Non-upgradeable Contract
  */
 contract GenericBasketManager is Ownable, IBasketManager {
+  using Counters for Counters.Counter;
 
   event ControllerSet(address indexed controller);
   event PausedStateSet(bool isPaused);
@@ -44,6 +46,8 @@ contract GenericBasketManager is Ownable, IBasketManager {
 
   //       TokenID => Token Smart-Basket Address
   mapping (uint256 => address) internal _baskets;
+
+  mapping (uint256 => Counters.Counter) internal _totalTokens;
 
   // State of Basket Manager
   bool internal _paused;
@@ -62,6 +66,19 @@ contract GenericBasketManager is Ownable, IBasketManager {
 
   function isPaused() external view override returns (bool) {
     return _paused;
+  }
+
+  function getTokenTotalCount(
+    address contractAddress,
+    uint256 tokenId
+  )
+    external
+    view
+    override
+    returns (uint256)
+  {
+    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    return _totalTokens[uuid].current();
   }
 
   function getTokenContractCount(
@@ -144,6 +161,7 @@ contract GenericBasketManager is Ownable, IBasketManager {
 
     // Log Event
     if (added) {
+      _totalTokens[uuid].increment();
       emit BasketAdd(contractAddress, tokenId, basketTokenAddress, basketTokenId);
     }
   }
@@ -169,6 +187,7 @@ contract GenericBasketManager is Ownable, IBasketManager {
 
     // Log Event
     if (removed) {
+      _totalTokens[uuid].decrement();
       emit BasketRemove(receiver, contractAddress, tokenId, basketTokenAddress, basketTokenId);
     }
   }
