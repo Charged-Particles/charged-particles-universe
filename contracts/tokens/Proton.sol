@@ -62,6 +62,8 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
 
   mapping (uint256 => address) internal _tokenCreator;
   mapping (uint256 => uint256) internal _tokenCreatorRoyaltiesPct;
+  mapping (uint256 => address) internal _tokenCreatorRoyaltiesRedirect;
+
   mapping (uint256 => uint256) internal _tokenSalePrice;
   mapping (uint256 => uint256) internal _tokenLastSellPrice;
 
@@ -91,6 +93,10 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
 
   function getCreatorRoyalties(uint256 tokenId) public view returns (uint256) {
     return _tokenCreatorRoyaltiesPct[tokenId];
+  }
+
+  function getCreatorRoyaltiesReceiver(uint256 tokenId) public view returns (address) {
+    return _creatorRoyaltiesReceiver(tokenId);
   }
 
   function createChargedParticle(
@@ -223,6 +229,14 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     _setRoyaltiesPct(tokenId, royaltiesPct);
   }
 
+  function setCreatorRoyaltiesReceiver(uint256 tokenId, address receiver)
+    external
+    onlyTokenCreator(tokenId)
+    onlyTokenOwnerOrApproved(tokenId)
+  {
+    _tokenCreatorRoyaltiesRedirect[tokenId] = receiver;
+  }
+
 
   /***********************************|
   |          Only Admin/DAO           |
@@ -283,6 +297,14 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     require(royaltiesPct <= MAX_ROYALTIES, "Proton: E-421");
     _tokenCreatorRoyaltiesPct[tokenId] = royaltiesPct;
     emit CreatorRoyaltiesSet(tokenId, royaltiesPct);
+  }
+
+  function _creatorRoyaltiesReceiver(uint256 tokenId) internal view returns (address) {
+    address receiver = _tokenCreatorRoyaltiesRedirect[tokenId];
+    if (receiver == address(0x0)) {
+      receiver = _tokenCreator[tokenId];
+    }
+    return receiver;
   }
 
   function _createChargedParticle(
@@ -421,7 +443,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     address newOwner = _msgSender();
 
     // Creator Royalties
-    address creator = _tokenCreator[tokenId];
+    address royaltiesReceiver = _creatorRoyaltiesReceiver(tokenId);
     uint256 royaltiesPct = _tokenCreatorRoyaltiesPct[tokenId];
     uint256 lastSellPrice = _tokenLastSellPrice[tokenId];
     if (royaltiesPct > 0 && lastSellPrice > 0 && salePrice > lastSellPrice) {
@@ -432,7 +454,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
 
     // Signal to Universe Controller
     if (address(_universe) != address(0)) {
-      _universe.onProtonSale(address(this), tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
+      _universe.onProtonSale(address(this), tokenId, oldOwner, newOwner, salePrice, royaltiesReceiver, creatorAmount);
     }
 
     // Transfer Token
@@ -441,10 +463,10 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     // Transfer Payment
     payable(oldOwner).sendValue(ownerAmount);
     if (creatorAmount > 0) {
-      payable(creator).sendValue(creatorAmount);
+      payable(royaltiesReceiver).sendValue(creatorAmount);
     }
 
-    emit ProtonSold(tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
+    emit ProtonSold(tokenId, oldOwner, newOwner, salePrice, royaltiesReceiver, creatorAmount);
 
     _refundOverpayment(salePrice);
     return true;
