@@ -14,7 +14,7 @@ const verifyContract = async (name, network, addressOverride = null) => {
 
     await exec(`hardhat verify --network ${network} ${address}`);
     success(`${name} verified!`);
-  } 
+  }
   catch (err) {
     if (/Contract source code already verified/.test(err.message || err)) {
       info(`${name} already verified`);
@@ -33,16 +33,20 @@ async function run() {
   let universeAddress = null;
   let chargedParticlesAddress = null;
   if (networkName === 'kovan') {
-    universeAddress = '0x63734522557D976D9D5Ae5F09E4CC9aCbE9F4D4B';
-    chargedParticlesAddress = '0x63Cc225eB6d94fdb8C94409299CA494d4d345CB5';
+    universeAddress = '0xeC08CB0f69E2095CF27eCB6E9D4BB60b430334Ad';
+    chargedParticlesAddress = '0x0cFAAD8cD948A0BAe647615ecc8DfeFD0294a5f2';
   }
 
   // Protocol
   await verifyContract('Universe', networkName, universeAddress);
   await verifyContract('ChargedParticles', networkName, chargedParticlesAddress);
+  await verifyContract('Photon', networkName);
   await verifyContract('Ion', networkName);
+  await verifyContract('IonTimelock', networkName);
 
-  // Liquidity Providers
+  // Wallet Managers
+  await verifyContract('GenericWalletManager', networkName);
+  await verifyContract('GenericBasketManager', networkName);
   await verifyContract('AaveWalletManager', networkName);
 
   // NFTs
