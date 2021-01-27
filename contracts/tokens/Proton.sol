@@ -60,13 +60,10 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
 
   Counters.Counter internal _tokenIds;
 
-  mapping (address => bool) internal _approvedBatchMinters;
   mapping (uint256 => address) internal _tokenCreator;
   mapping (uint256 => uint256) internal _tokenCreatorRoyaltiesPct;
   mapping (uint256 => uint256) internal _tokenSalePrice;
   mapping (uint256 => uint256) internal _tokenLastSellPrice;
-
-  uint256 public mintFee;
 
 
   /***********************************|
@@ -107,9 +104,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     uint256 annuityPercent
   )
     external
-    payable
     nonReentrant
-    requireMintFee
     returns (uint256 newTokenId)
   {
     newTokenId = _createChargedParticle(
@@ -130,9 +125,6 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     string memory tokenMetaUri
   )
     external
-    payable
-    nonReentrant
-    requireMintFee
     returns (uint256 newTokenId)
   {
     newTokenId = _createProton(
@@ -152,9 +144,6 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     uint256 annuityPercent
   )
     external
-    payable
-    nonReentrant
-    requireMintFee
     returns (uint256 newTokenId)
   {
     newTokenId = _createProton(
@@ -176,9 +165,6 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     uint256 salePrice
   )
     external
-    payable
-    nonReentrant
-    requireMintFee
     returns (uint256 newTokenId)
   {
     newTokenId = _createProton(
@@ -199,8 +185,6 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     uint256[] calldata salePrices
   )
     external
-    payable
-    nonReentrant
   {
     _batchProtonsForSale(
       creator,
@@ -263,24 +247,6 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   function setTrustedForwarder(address _trustedForwarder) external onlyOwner {
     trustedForwarder = _trustedForwarder;
   }
-
-  function updateBatchMinter(address minter, bool state) external onlyOwner {
-    _approvedBatchMinters[minter] = state;
-  }
-
-  function setMintFee(uint256 newMintFee) external onlyOwner {
-    mintFee = newMintFee;
-    emit MintFeeSet(newMintFee);
-  }
-
-  function withdrawFees(address payable receiver) external onlyOwner {
-    uint256 amount = address(this).balance;
-    if (amount > 0) {
-      receiver.sendValue(amount);
-      emit FeesWithdrawn(receiver, amount);
-    }
-  }
-
 
   /***********************************|
   |          Only Admin/DAO           |
@@ -374,8 +340,6 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
         annuityPercent
       );
     }
-
-    _refundOverpayment(mintFee);
   }
 
   function _batchProtonsForSale(
@@ -387,7 +351,6 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   )
     internal
   {
-    require(_approvedBatchMinters[_msgSender()], "Proton: E-105");
     require(tokenMetaUris.length == salePrices.length, "Proton: E-202");
     address self = address(this);
 
@@ -454,6 +417,8 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
 
     uint256 ownerAmount = salePrice;
     uint256 creatorAmount;
+    address oldOwner = ownerOf(tokenId);
+    address newOwner = _msgSender();
 
     // Creator Royalties
     address creator = _tokenCreator[tokenId];
@@ -465,20 +430,18 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     }
     _tokenLastSellPrice[tokenId] = salePrice;
 
+    // Signal to Universe Controller
+    if (address(_universe) != address(0)) {
+      _universe.onProtonSale(address(this), tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
+    }
+
     // Transfer Token
-    address oldOwner = ownerOf(tokenId);
-    address newOwner = _msgSender();
     _transfer(oldOwner, newOwner, tokenId);
 
     // Transfer Payment
     payable(oldOwner).sendValue(ownerAmount);
     if (creatorAmount > 0) {
       payable(creator).sendValue(creatorAmount);
-    }
-
-    // Signal to Universe Controller
-    if (address(_universe) != address(0)) {
-      _universe.onProtonSale(address(this), tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
     }
 
     emit ProtonSold(tokenId, oldOwner, newOwner, salePrice, creator, creatorAmount);
@@ -511,6 +474,11 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     super._transfer(from, to, tokenId);
   }
 
+
+  /***********************************|
+  |          GSN/MetaTx Relay         |
+  |__________________________________*/
+
   /// @dev See {BaseRelayRecipient-_msgSender}.
   function _msgSender()
     internal
@@ -533,10 +501,10 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     return BaseRelayRecipient._msgData();
   }
 
-  modifier requireMintFee() {
-    require(msg.value >= mintFee, "Proton: E-415");
-    _;
-  }
+
+  /***********************************|
+  |             Modifiers             |
+  |__________________________________*/
 
   modifier onlyTokenOwnerOrApproved(uint256 tokenId) {
     require(_isApprovedOrOwner(_msgSender(), tokenId), "Proton: E-105");

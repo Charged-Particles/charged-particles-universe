@@ -41,11 +41,19 @@ contract Photon is Initializable, ContextUpgradeable, RelayRecipient, BlackholeP
   mapping (address => string) private _photonURIs;
 
 
+  /***********************************|
+  |          Initialization           |
+  |__________________________________*/
+
   function initialize(address _trustedForwarder) public initializer {
     __Context_init_unchained();
     trustedForwarder = _trustedForwarder;
   }
 
+
+  /***********************************|
+  |              Public               |
+  |__________________________________*/
 
   function photonURI(address photon) external view returns (string memory) {
     return _photonURIs[photon];
@@ -67,6 +75,11 @@ contract Photon is Initializable, ContextUpgradeable, RelayRecipient, BlackholeP
   }
 
 
+  /***********************************|
+  |          GSN/MetaTx Relay         |
+  |__________________________________*/
+
+  /// @dev See {BaseRelayRecipient-_msgSender}.
   function _msgSender()
     internal view
     override(BaseRelayRecipient, ContextUpgradeable)
@@ -75,6 +88,7 @@ contract Photon is Initializable, ContextUpgradeable, RelayRecipient, BlackholeP
     return BaseRelayRecipient._msgSender();
   }
 
+  /// @dev See {BaseRelayRecipient-_msgData}.
   function _msgData()
     internal view
     override(BaseRelayRecipient, ContextUpgradeable)

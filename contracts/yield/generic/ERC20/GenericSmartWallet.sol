@@ -103,6 +103,7 @@ contract GenericSmartWallet is SmartWalletBase {
   function deposit(address assetToken, uint256 assetAmount, uint256 /* referralCode */)
     external
     override
+    onlyWalletManager
     returns (uint256)
   {
     // Track Principal

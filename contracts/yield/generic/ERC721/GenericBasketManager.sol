@@ -27,13 +27,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "../../../interfaces/IBasketManager.sol";
 import "../../../interfaces/ISmartBasket.sol";
+import "../../../lib/BlackholePrevention.sol";
 import "./GenericSmartBasket.sol";
 
 /**
  * @notice Generic ERC721 Basket Manager
  * @dev Non-upgradeable Contract
  */
-contract GenericBasketManager is Ownable, IBasketManager {
+contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
   using Counters for Counters.Counter;
 
   event ControllerSet(address indexed controller);
@@ -253,6 +254,7 @@ contract GenericBasketManager is Ownable, IBasketManager {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address basket = _baskets[uuid];
+    _withdrawEther(receiver, amount);
     return ISmartBasket(basket).withdrawEther(receiver, amount);
   }
 
@@ -264,6 +266,7 @@ contract GenericBasketManager is Ownable, IBasketManager {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address basket = _baskets[uuid];
+    _withdrawERC20(receiver, tokenAddress, amount);
     return ISmartBasket(basket).withdrawERC20(receiver, tokenAddress, amount);
   }
 
@@ -275,6 +278,7 @@ contract GenericBasketManager is Ownable, IBasketManager {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address basket = _baskets[uuid];
+    _withdrawERC721(receiver, nftTokenAddress, nftTokenId);
     return ISmartBasket(basket).withdrawERC721(receiver, nftTokenAddress, nftTokenId);
   }
 

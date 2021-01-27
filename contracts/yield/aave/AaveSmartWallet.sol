@@ -95,6 +95,7 @@ contract AaveSmartWallet is SmartWalletBase {
   )
     external
     override
+    onlyWalletManager
     returns (uint256)
   {
     return _deposit(assetToken, assetAmount, referralCode);
@@ -168,13 +169,14 @@ contract AaveSmartWallet is SmartWalletBase {
     internal
     returns (uint256)
   {
-    // Deposit Assets into Aave (reverts on fail)
     _trackAssetToken(assetToken);
-    _sendToken(address(_bridge), assetToken, assetAmount);
-    uint256 aTokensAmount = _bridge.deposit(assetToken, assetAmount, referralCode);
 
     // Track Principal
     _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].add(assetAmount);
+
+    // Deposit Assets into Aave (reverts on fail)
+    _sendToken(address(_bridge), assetToken, assetAmount);
+    uint256 aTokensAmount = _bridge.deposit(assetToken, assetAmount, referralCode);
 
     // Return amount of aTokens transfered
     return aTokensAmount;

@@ -27,14 +27,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-// interface IERC20 {
-//   function transfer(address to, uint256 amount) external returns (bool);
-// }
-
-// interface IERC721 {
-//   function transferFrom(address from, address to, uint256 tokenId) external;
-// }
-
 /**
  * @notice Prevents ETH or Tokens from getting stuck in a contract by allowing
  *  the Owner/DAO to pull them out on behalf of a user
@@ -45,17 +37,22 @@ contract BlackholePrevention {
 
   function _withdrawEther(address payable receiver, uint256 amount) internal virtual {
     require(receiver != address(0x0), "BHP: E-403");
-    receiver.sendValue(amount);
+    if (address(this).balance >= amount) {
+      receiver.sendValue(amount);
+    }
   }
 
   function _withdrawERC20(address payable receiver, address tokenAddress, uint256 amount) internal virtual {
     require(receiver != address(0x0), "BHP: E-403");
-    require(tokenAddress != address(0x0), "BHP: E-403");
-    require(IERC20(tokenAddress).transfer(receiver, amount), "BHP: E-401");
+    if (IERC20(tokenAddress).balanceOf(address(this)) >= amount) {
+      IERC20(tokenAddress).transfer(receiver, amount);
+    }
   }
 
   function _withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) internal virtual {
     require(receiver != address(0x0), "BHP: E-403");
-    IERC721(tokenAddress).transferFrom(address(this), receiver, tokenId);
+    if (IERC721(tokenAddress).ownerOf(tokenId) == address(this)) {
+      IERC721(tokenAddress).transferFrom(address(this), receiver, tokenId);
+    }
   }
 }

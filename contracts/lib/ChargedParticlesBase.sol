@@ -693,6 +693,10 @@ abstract contract ChargedParticlesBase is
   }
 
 
+  /***********************************|
+  |          GSN/MetaTx Relay         |
+  |__________________________________*/
+
   /// @dev See {BaseRelayRecipient-_msgSender}.
   function _msgSender()
     internal

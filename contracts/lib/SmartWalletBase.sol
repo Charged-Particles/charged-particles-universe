@@ -24,6 +24,7 @@
 pragma solidity >=0.6.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../interfaces/ISmartWallet.sol";
 import "./BlackholePrevention.sol";
 
@@ -33,6 +34,7 @@ import "./BlackholePrevention.sol";
  */
 abstract contract SmartWalletBase is ISmartWallet, BlackholePrevention {
   using Address for address payable;
+  using EnumerableSet for EnumerableSet.AddressSet;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
 
@@ -42,12 +44,7 @@ abstract contract SmartWalletBase is ISmartWallet, BlackholePrevention {
   uint256 internal nftCreatorAnnuityPct;
   uint256 internal nftCreatorAmountDischarged;
 
-  // List of Asset Tokens held in Wallet
-  address[] internal _assetTokens;
-
-  //   Asset Token => Added to List
-  mapping (address => bool) internal _assetTokenAdded;
-
+  EnumerableSet.AddressSet internal _assetTokens;
 
   /***********************************|
   |          Initialization           |
@@ -64,14 +61,14 @@ abstract contract SmartWalletBase is ISmartWallet, BlackholePrevention {
   |__________________________________*/
 
   function getAssetTokenCount() external view virtual override returns (uint256) {
-    return _assetTokens.length;
+    return _assetTokens.length();
   }
 
   function getAssetTokenByIndex(uint256 index) external view virtual override returns (address) {
-    if (index >= _assetTokens.length) {
+    if (index >= _assetTokens.length()) {
       return address(0);
     }
-    return _assetTokens[index];
+    return _assetTokens.at(index);
   }
 
   function setNftCreator(address creator, uint256 annuityPct) external virtual override onlyWalletManager {
@@ -118,9 +115,8 @@ abstract contract SmartWalletBase is ISmartWallet, BlackholePrevention {
   |__________________________________*/
 
   function _trackAssetToken(address assetToken) internal virtual {
-    if (!_assetTokenAdded[assetToken]) {
-      _assetTokens.push(assetToken);
-      _assetTokenAdded[assetToken] = true;
+    if (!_assetTokens.contains(assetToken)) {
+      _assetTokens.add(assetToken);
     }
   }
 

@@ -37,6 +37,10 @@ contract IonTimelock is IIonTimelock {
   Portion[] public portions;
 
 
+  /***********************************|
+  |          Initialization           |
+  |__________________________________*/
+
   constructor (address _receiver, address _token) public {
     require(_receiver != address(0x0), "IonTimelock: E-403");
     require(_token != address(0x0), "IonTimelock: E-403");
@@ -44,6 +48,11 @@ contract IonTimelock is IIonTimelock {
     token = IERC20(_token);
     receiver = _receiver;
   }
+
+
+  /***********************************|
+  |              Public               |
+  |__________________________________*/
 
   function addPortions(uint256[] memory amounts, uint256[] memory releaseTimes) public override returns (bool) {
     require(amounts.length == releaseTimes.length, "IonTimelock: E-202");

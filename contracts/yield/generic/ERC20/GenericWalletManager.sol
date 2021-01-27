@@ -34,8 +34,6 @@ import "./GenericSmartWallet.sol";
 contract GenericWalletManager is WalletManagerBase {
   using SafeMath for uint256;
 
-  uint256 internal _referralCode;
-
   /***********************************|
   |          Initialization           |
   |__________________________________*/
@@ -140,7 +138,7 @@ contract GenericWalletManager is WalletManagerBase {
     address wallet = _wallets[uuid];
 
     // Deposit into Smart-Wallet
-    yieldTokensAmount = GenericSmartWallet(wallet).deposit(assetToken, assetAmount, _referralCode);
+    yieldTokensAmount = GenericSmartWallet(wallet).deposit(assetToken, assetAmount, 0);
 
     // Log Event
     emit WalletEnergized(contractAddress, tokenId, assetToken, assetAmount, yieldTokensAmount);
@@ -244,16 +242,6 @@ contract GenericWalletManager is WalletManagerBase {
 
     // Log Event
     emit WalletRewarded(contractAddress, tokenId, receiver, rewardsToken, amount);
-  }
-
-  function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount)
-    public
-    override
-    onlyController
-  {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
-    address wallet = _wallets[uuid];
-    return GenericSmartWallet(wallet).withdrawEther(receiver, amount);
   }
 
   function executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes memory encodedParams)

@@ -45,8 +45,7 @@ contract Ion is ERC20Permit, Ownable, BlackholePrevention {
   mapping (address => mapping (address => uint256)) internal _lockAllowances;
 
 
-
-  // TODO:
+  // Manual TODO after Launch:
   //  Owner - Mint Portions to Universe which will distribute to Internal Team/Advisors via TokenTimelock
   //  Owner - Mint Portions to Universe for Community Distribution
 
@@ -59,7 +58,7 @@ contract Ion is ERC20Permit, Ownable, BlackholePrevention {
 
 
   /***********************************|
-  |              Public               |
+  |              Staking              |
   |__________________________________*/
 
   function lockAllowance(address owner, address operator) external view returns (uint256) {
@@ -84,7 +83,7 @@ contract Ion is ERC20Permit, Ownable, BlackholePrevention {
   function lock(address account, uint256 amount, uint256 blocks) external returns (bool) {
     // Set number of blocks until unlocked
     // Cannot be changed once locked
-    if (lockedUntil[account] <= block.number) {
+    if (lockedUntil[account] <= block.number) { // unlocked
       lockedUntil[account] = blocks.add(block.number);
       locked[account] = 0;
     }
@@ -152,7 +151,6 @@ contract Ion is ERC20Permit, Ownable, BlackholePrevention {
   /***********************************|
   |         Private Functions         |
   |__________________________________*/
-
 
   function _approveLock(address owner, address operator, uint256 amount) internal {
     require(owner != address(0), "ION: E-403");

@@ -28,13 +28,14 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "../interfaces/IWalletManager.sol";
 import "../interfaces/ISmartWallet.sol";
+import "./BlackholePrevention.sol";
 
 
 /**
  * @notice Wallet-Manager Base Contract
  * @dev Non-upgradeable Contract
  */
-abstract contract WalletManagerBase is Ownable, IWalletManager {
+abstract contract WalletManagerBase is Ownable, BlackholePrevention, IWalletManager {
 
   event ControllerSet(address indexed controller);
   event PausedStateSet(bool isPaused);
@@ -88,6 +89,7 @@ abstract contract WalletManagerBase is Ownable, IWalletManager {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
+    _withdrawEther(receiver, amount);
     return ISmartWallet(wallet).withdrawEther(receiver, amount);
   }
 
@@ -99,6 +101,7 @@ abstract contract WalletManagerBase is Ownable, IWalletManager {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
+    _withdrawERC20(receiver, tokenAddress, amount);
     return ISmartWallet(wallet).withdrawERC20(receiver, tokenAddress, amount);
   }
 
@@ -110,6 +113,7 @@ abstract contract WalletManagerBase is Ownable, IWalletManager {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
+    _withdrawERC721(receiver, nftTokenAddress, nftTokenId);
     return ISmartWallet(wallet).withdrawERC721(receiver, nftTokenAddress, nftTokenId);
   }
 
