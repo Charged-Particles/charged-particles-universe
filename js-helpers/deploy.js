@@ -93,11 +93,8 @@ const getTxGasCost = ({deployTransaction}) => {
 
 
 const presets = {
-  Proton: {
-    mintFee: toWei('0')
-  },
   Ion: {
-    maxSupply: toWei('100000000'), // 100 Million
+    maxSupply: toWei('40000000'), // 40% of 100 Million (Community Liquidity Mining Portion)
     rewardsForAssetTokens: [
       {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI
     ],

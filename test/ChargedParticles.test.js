@@ -141,7 +141,6 @@ describe("Charged Particles", () => {
         toWei('10'),                  // assetAmount
         annuityPct,                   // annuityPercent
       ],
-      callValue: presets.Proton.mintFee,
     });
 
     await chargedParticles.connect(signer2).releaseParticle(
@@ -178,7 +177,6 @@ describe("Charged Particles", () => {
         toWei('10'),
         annuityPct,
       ],
-      callValue: presets.Proton.mintFee
     });
 
     const blockNumberTimelock = (await getNetworkBlockNumber()).add(toBN('10'));
@@ -232,7 +230,6 @@ describe("Charged Particles", () => {
         toWei('10'),
         annuityPct,
       ],
-      callValue: presets.Proton.mintFee
     });
 
     await proton.connect(signer1).setSalePrice(energizedParticleId, toWei('0.1'));
@@ -333,7 +330,6 @@ describe("Charged Particles", () => {
         toWei('10'),                  // assetAmount
         annuityPct,                   // annuityPercent
       ],
-      callValue: presets.Proton.mintFee,
     });
 
     await chargedParticles.connect(signer2).releaseParticle(
@@ -367,7 +363,6 @@ describe("Charged Particles", () => {
   //       toWei('10'),                  // assetAmount
   //       annuityPct,                   // annuityPercent
   //     ],
-  //     callValue: presets.Proton.mintFee,
   //   });
 
   //   const energizedParticleId = await callAndReturn({
@@ -384,7 +379,6 @@ describe("Charged Particles", () => {
   //       tokenId,                      // assetID
   //       annuityPct,                   // annuityPercent
   //     ],
-  //     callValue: presets.Proton.mintFee,
   //   });
 
   //   await chargedParticles.connect(signer3).releaseParticle(

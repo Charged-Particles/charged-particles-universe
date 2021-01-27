@@ -19,7 +19,6 @@ module.exports = async (hre) => {
     const lendingPoolProviderV1 = presets.Aave.v1.lendingPoolProvider[chainId];
     const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
     const referralCode = presets.Aave.referralCode[chainId];
-    const mintFee = presets.Proton.mintFee;
     const ionMaxSuppy = presets.Ion.maxSupply;
 
     const ddUniverse = getDeployData('Universe', chainId);
@@ -158,12 +157,6 @@ module.exports = async (hre) => {
 
     log(`  - [TX-${txCount++}] Proton: Registering ChargedParticles`)(alchemyTimeout);
     await proton.setChargedParticles(ddChargedParticles.address);
-
-    log(`  - [TX-${txCount++}] Proton: Registering Protocol Owner as Batch-Minter`)(alchemyTimeout);
-    await proton.updateBatchMinter(protocolOwner, true);
-
-    log(`  - [TX-${txCount++}] Proton: Setting Mint Fee:`, mintFee.toString())(alchemyTimeout);
-    await proton.setMintFee(mintFee);
 
     log(`  - [TX-${txCount++}] ChargedParticles: Registering Proton`)(alchemyTimeout);
     await chargedParticles.updateWhitelist(ddProton.address, true);

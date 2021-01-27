@@ -3,7 +3,6 @@ const {
   chainIdByName,
   getDeployData,
   log,
-  presets,
 } = require("../js-helpers/deploy");
 
 const _ = require('lodash');
@@ -48,8 +47,7 @@ module.exports = async (hre) => {
         .createBasicProton(
           initialMinter,
           initialMinter,
-          SingularityCollection[i],
-          { value: presets.Proton.mintFee }
+          SingularityCollection[i]
         );
     }
 
