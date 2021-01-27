@@ -232,7 +232,6 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   function setCreatorRoyaltiesReceiver(uint256 tokenId, address receiver)
     external
     onlyTokenCreator(tokenId)
-    onlyTokenOwnerOrApproved(tokenId)
   {
     _tokenCreatorRoyaltiesRedirect[tokenId] = receiver;
   }
