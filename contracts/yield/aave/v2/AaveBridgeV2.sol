@@ -35,8 +35,9 @@ import "./ILendingPoolV2.sol";
 import "./ILendingPoolAddressesProviderV2.sol";
 
 import "../../../interfaces/IAaveBridge.sol";
+import "../../../lib/BlackholePrevention.sol";
 
-contract AaveBridgeV2 is Ownable, IAaveBridge {
+contract AaveBridgeV2 is Ownable, IAaveBridge, BlackholePrevention {
   using SafeMath for uint256;
   using SafeCast for uint256;
   using Address for address payable;
@@ -116,15 +117,27 @@ contract AaveBridgeV2 is Ownable, IAaveBridge {
   }
 
 
+  /***********************************|
+  |          Only Admin/DAO           |
+  |      (blackhole prevention)       |
+  |__________________________________*/
+
   function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
-    require(receiver != address(0x0), "AaveBridgeV1: E-403");
-    receiver.sendValue(amount);
+    _withdrawEther(receiver, amount);
   }
 
-  function withdrawErc20(address payable receiver, address token, uint256 amount) external onlyOwner {
-    require(receiver != address(0x0), "AaveBridgeV1: E-403");
-    _sendToken(receiver, token, amount);
+  function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external onlyOwner {
+    _withdrawERC20(receiver, tokenAddress, amount);
   }
+
+  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external onlyOwner {
+    _withdrawERC721(receiver, tokenAddress, tokenId);
+  }
+
+
+  /***********************************|
+  |         Private Functions         |
+  |__________________________________*/
 
   function _sendToken(address to, address token, uint256 amount) internal {
     require(IERC20(token).transfer(to, amount), "AaveBridgeV2: E-401");

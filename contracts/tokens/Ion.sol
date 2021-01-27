@@ -28,9 +28,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "../interfaces/IUniverse.sol";
 import "../interfaces/IIonTimelock.sol";
+import "../lib/BlackholePrevention.sol";
 
 
-contract Ion is ERC20Permit, Ownable {
+contract Ion is ERC20Permit, Ownable, BlackholePrevention {
 
   event LockApproval(address indexed owner, address indexed operator, uint256 amount);
 
@@ -127,6 +128,24 @@ contract Ion is ERC20Permit, Ownable {
 
     _mint(address(ionTimelock), totalAmount);
     require(IIonTimelock(ionTimelock).addPortions(amounts, releaseTimes), "ION: E-406");
+  }
+
+
+  /***********************************|
+  |          Only Admin/DAO           |
+  |      (blackhole prevention)       |
+  |__________________________________*/
+
+  function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
+    _withdrawEther(receiver, amount);
+  }
+
+  function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external onlyOwner {
+    _withdrawERC20(receiver, tokenAddress, amount);
+  }
+
+  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external onlyOwner {
+    _withdrawERC721(receiver, tokenAddress, tokenId);
   }
 
 

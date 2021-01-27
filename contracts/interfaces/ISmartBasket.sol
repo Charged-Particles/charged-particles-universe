@@ -36,6 +36,9 @@ interface ISmartBasket {
 
   function addToBasket(address contractAddress, uint256 tokenId) external returns (bool);
   function removeFromBasket(address receiver, address contractAddress, uint256 tokenId) external returns (bool);
-
   function executeForAccount(address contractAddress, uint256 ethValue, bytes memory encodedParams) external returns (bytes memory);
+
+  function withdrawEther(address payable receiver, uint256 amount) external;
+  function withdrawERC20(address payable receiver, address tokenAddress, uint256 amount) external;
+  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external;
 }

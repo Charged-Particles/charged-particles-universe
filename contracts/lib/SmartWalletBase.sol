@@ -23,14 +23,15 @@
 
 pragma solidity >=0.6.0;
 
-import "../interfaces/ISmartWallet.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+import "../interfaces/ISmartWallet.sol";
+import "./BlackholePrevention.sol";
 
 /**
  * @notice ERC20-Token Smart-Wallet Base Contract
  * @dev Non-upgradeable Contract
  */
-abstract contract SmartWalletBase is ISmartWallet {
+abstract contract SmartWalletBase is ISmartWallet, BlackholePrevention {
   using Address for address payable;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
@@ -78,11 +79,6 @@ abstract contract SmartWalletBase is ISmartWallet {
     nftCreatorAnnuityPct = annuityPct;
   }
 
-  function withdrawEther(address payable receiver, uint256 amount) external virtual override onlyWalletManager {
-    require(receiver != address(0x0), "SmartWalletBase: E-403");
-    receiver.sendValue(amount);
-  }
-
   function executeForAccount(
     address contractAddress,
     uint256 ethValue,
@@ -97,6 +93,25 @@ abstract contract SmartWalletBase is ISmartWallet {
     require(success, string(result));
     return result;
   }
+
+
+  /***********************************|
+  |          Only Admin/DAO           |
+  |      (blackhole prevention)       |
+  |__________________________________*/
+
+  function withdrawEther(address payable receiver, uint256 amount) external virtual override onlyWalletManager {
+    _withdrawEther(receiver, amount);
+  }
+
+  function withdrawERC20(address payable receiver, address tokenAddress, uint256 amount) external virtual override onlyWalletManager {
+    _withdrawERC20(receiver, tokenAddress, amount);
+  }
+
+  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external virtual override onlyWalletManager {
+    _withdrawERC721(receiver, tokenAddress, tokenId);
+  }
+
 
   /***********************************|
   |         Private Functions         |

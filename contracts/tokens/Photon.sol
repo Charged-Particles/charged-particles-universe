@@ -28,10 +28,11 @@ import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/GSN/ContextUpgradeable.sol";
 
+import "../lib/BlackholePrevention.sol";
 import "../lib/RelayRecipient.sol";
 
 // Charged Particles Membership
-contract Photon is Initializable, ContextUpgradeable, RelayRecipient {
+contract Photon is Initializable, ContextUpgradeable, RelayRecipient, BlackholePrevention {
   using AddressUpgradeable for address;
 
   event PhotonUpdated(address indexed owner, string photonURI);

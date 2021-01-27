@@ -33,13 +33,14 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol"
 
 import "./interfaces/IUniverse.sol";
 import "./interfaces/IChargedParticles.sol";
+import "./lib/BlackholePrevention.sol";
 
 
 /**
  * @notice Charged Particles Universe Contract
  * @dev Upgradeable Contract
  */
-contract Universe is IUniverse, Initializable, OwnableUpgradeable {
+contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrevention {
   using SafeMathUpgradeable for uint256;
   using AddressUpgradeable for address;
   using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -94,11 +95,11 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
   function onEnergize(
     address sender,
     address referrer,
-    address contractAddress,
-    uint256 tokenId,
-    string calldata liquidityProviderId,
-    address assetToken,
-    uint256 assetAmount
+    address /* contractAddress */,
+    uint256 /* tokenId */,
+    string calldata /* walletManagerId */,
+    address /* assetToken */,
+    uint256 /* assetAmount */
   )
     external
     override
@@ -259,6 +260,19 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable {
     esaMultiplier[assetToken] = multiplier;
     emit EsaMultiplierSet(assetToken, multiplier);
   }
+
+  function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
+    _withdrawEther(receiver, amount);
+  }
+
+  function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external onlyOwner {
+    _withdrawERC20(receiver, tokenAddress, amount);
+  }
+
+  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external onlyOwner {
+    _withdrawERC721(receiver, tokenAddress, tokenId);
+  }
+
 
 
   /***********************************|

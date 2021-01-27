@@ -35,10 +35,11 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "../interfaces/IUniverse.sol";
 import "../interfaces/IChargedParticles.sol";
 
+import "../lib/BlackholePrevention.sol";
 import "../lib/RelayRecipient.sol";
 
 
-contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
+contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePrevention {
   using SafeMath for uint256;
   using Address for address payable;
   using Counters for Counters.Counter;
@@ -100,7 +101,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
     address receiver,
     address referrer,
     string memory tokenMetaUri,
-    string memory liquidityProviderId,
+    string memory walletManagerId,
     address assetToken,
     uint256 assetAmount,
     uint256 annuityPercent
@@ -116,7 +117,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
       receiver,
       referrer,
       tokenMetaUri,
-      liquidityProviderId,
+      walletManagerId,
       assetToken,
       assetAmount,
       annuityPercent
@@ -280,10 +281,28 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
     }
   }
 
+
+  /***********************************|
+  |          Only Admin/DAO           |
+  |      (blackhole prevention)       |
+  |__________________________________*/
+
+  function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
+    _withdrawEther(receiver, amount);
+  }
+
+  function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external onlyOwner {
+    _withdrawERC20(receiver, tokenAddress, amount);
+  }
+
+  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external onlyOwner {
+    _withdrawERC721(receiver, tokenAddress, tokenId);
+  }
+
+
   /***********************************|
   |         Private Functions         |
   |__________________________________*/
-
 
   function _setSalePrice(uint256 tokenId, uint256 salePrice)
     internal
@@ -300,14 +319,12 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
     emit CreatorRoyaltiesSet(tokenId, royaltiesPct);
   }
 
-
-
   function _createChargedParticle(
     address creator,
     address receiver,
     address referrer,
     string memory tokenMetaUri,
-    string memory liquidityProviderId,
+    string memory walletManagerId,
     address assetToken,
     uint256 assetAmount,
     uint256 annuityPercent
@@ -319,7 +336,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
 
     newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent, 0, 0);
 
-    _chargeParticle(newTokenId, liquidityProviderId, assetToken, assetAmount, referrer);
+    _chargeParticle(newTokenId, walletManagerId, assetToken, assetAmount, referrer);
   }
 
   function _createProton(
@@ -406,7 +423,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
 
   function _chargeParticle(
     uint256 tokenId,
-    string memory liquidityProviderId,
+    string memory walletManagerId,
     address assetToken,
     uint256 assetAmount,
     address referrer
@@ -420,7 +437,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard {
     _chargedParticles.energizeParticle(
       address(this),
       tokenId,
-      liquidityProviderId,
+      walletManagerId,
       assetToken,
       assetAmount,
       referrer

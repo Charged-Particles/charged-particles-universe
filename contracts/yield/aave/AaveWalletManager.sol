@@ -296,12 +296,6 @@ contract AaveWalletManager is WalletManagerBase {
     emit WalletRewarded(contractAddress, tokenId, receiver, rewardsToken, amount);
   }
 
-  function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount) external virtual override onlyController {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
-    address wallet = _wallets[uuid];
-    return AaveSmartWallet(wallet).withdrawEther(receiver, amount);
-  }
-
   function executeForAccount(
     address contractAddress,
     uint256 tokenId,

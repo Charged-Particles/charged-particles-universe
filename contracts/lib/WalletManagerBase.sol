@@ -27,6 +27,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "../interfaces/IWalletManager.sol";
+import "../interfaces/ISmartWallet.sol";
 
 
 /**
@@ -77,6 +78,39 @@ abstract contract WalletManagerBase is Ownable, IWalletManager {
   function setController(address controller) external onlyOwner {
     _controller = controller;
     emit ControllerSet(controller);
+  }
+
+  function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount)
+    external
+    virtual
+    override
+    onlyOwner
+  {
+    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    address wallet = _wallets[uuid];
+    return ISmartWallet(wallet).withdrawEther(receiver, amount);
+  }
+
+  function withdrawERC20(address contractAddress, uint256 tokenId, address payable receiver, address tokenAddress, uint256 amount)
+    external
+    virtual
+    override
+    onlyOwner
+  {
+    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    address wallet = _wallets[uuid];
+    return ISmartWallet(wallet).withdrawERC20(receiver, tokenAddress, amount);
+  }
+
+  function withdrawERC721(address contractAddress, uint256 tokenId, address payable receiver, address nftTokenAddress, uint256 nftTokenId)
+    external
+    virtual
+    override
+    onlyOwner
+  {
+    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    address wallet = _wallets[uuid];
+    return ISmartWallet(wallet).withdrawERC721(receiver, nftTokenAddress, nftTokenId);
   }
 
 

@@ -27,13 +27,14 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../../../interfaces/ISmartBasket.sol";
+import "../../../lib/BlackholePrevention.sol";
 
 
 /**
  * @notice Generic ERC721-Token Smart-Basket
  * @dev Non-upgradeable Contract
  */
-contract GenericSmartBasket is ISmartBasket, IERC721Receiver {
+contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receiver {
   using EnumerableSet for EnumerableSet.UintSet;
   using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -128,6 +129,24 @@ contract GenericSmartBasket is ISmartBasket, IERC721Receiver {
     (bool success, bytes memory result) = contractAddress.call{value: ethValue}(encodedParams);
     require(success, string(result));
     return result;
+  }
+
+
+  /***********************************|
+  |          Only Admin/DAO           |
+  |      (blackhole prevention)       |
+  |__________________________________*/
+
+  function withdrawEther(address payable receiver, uint256 amount) external virtual override onlyBasketManager {
+    _withdrawEther(receiver, amount);
+  }
+
+  function withdrawERC20(address payable receiver, address tokenAddress, uint256 amount) external virtual override onlyBasketManager {
+    _withdrawERC20(receiver, tokenAddress, amount);
+  }
+
+  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external virtual override onlyBasketManager {
+    _withdrawERC721(receiver, tokenAddress, tokenId);
   }
 
 

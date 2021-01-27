@@ -26,6 +26,7 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "../../../interfaces/IBasketManager.sol";
+import "../../../interfaces/ISmartBasket.sol";
 import "./GenericSmartBasket.sol";
 
 /**
@@ -242,6 +243,39 @@ contract GenericBasketManager is Ownable, IBasketManager {
   function setController(address controller) external onlyOwner {
     _controller = controller;
     emit ControllerSet(controller);
+  }
+
+  function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount)
+    external
+    virtual
+    override
+    onlyOwner
+  {
+    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    address basket = _baskets[uuid];
+    return ISmartBasket(basket).withdrawEther(receiver, amount);
+  }
+
+  function withdrawERC20(address contractAddress, uint256 tokenId, address payable receiver, address tokenAddress, uint256 amount)
+    external
+    virtual
+    override
+    onlyOwner
+  {
+    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    address basket = _baskets[uuid];
+    return ISmartBasket(basket).withdrawERC20(receiver, tokenAddress, amount);
+  }
+
+  function withdrawERC721(address contractAddress, uint256 tokenId, address payable receiver, address nftTokenAddress, uint256 nftTokenId)
+    external
+    virtual
+    override
+    onlyOwner
+  {
+    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    address basket = _baskets[uuid];
+    return ISmartBasket(basket).withdrawERC721(receiver, nftTokenAddress, nftTokenId);
   }
 
 

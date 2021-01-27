@@ -136,7 +136,7 @@ describe("Charged Particles", () => {
         user2,                        // receiver
         user3,                        // referrer
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
-        'aave',                       // liquidityProviderId
+        'aave',                       // walletManagerId
         daiAddress, // assetToken
         toWei('10'),                  // assetAmount
         annuityPct,                   // annuityPercent
@@ -197,7 +197,7 @@ describe("Charged Particles", () => {
       energizedParticleId,
       'aave',
       daiAddress
-    )).to.be.revertedWith("ChargedParticles: E-302");
+    )).to.be.revertedWith("CP: E-302");
 
     await setNetworkAfterBlockNumber(blockNumberTimelock);
 
@@ -328,7 +328,7 @@ describe("Charged Particles", () => {
         user2,                        // receiver
         user3,                        // referrer
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
-        'generic',                    // liquidityProviderId
+        'generic',                    // walletManagerId
         daiAddress,                   // assetToken
         toWei('10'),                  // assetAmount
         annuityPct,                   // annuityPercent
@@ -362,7 +362,7 @@ describe("Charged Particles", () => {
   //       user2,                        // receiver
   //       user3,                        // referrer
   //       TEST_NFT_TOKEN_URI,           // tokenMetaUri
-  //       'generic',                    // liquidityProviderId
+  //       'generic',                    // walletManagerId
   //       daiAddress,                   // assetToken
   //       toWei('10'),                  // assetAmount
   //       annuityPct,                   // annuityPercent
@@ -379,7 +379,7 @@ describe("Charged Particles", () => {
   //       user3,                        // receiver
   //       user1,                        // referrer
   //       TEST_NFT_TOKEN_URI,           // tokenMetaUri
-  //       'genericERC721',              // liquidityProviderId
+  //       'genericERC721',              // walletManagerId
   //       proton.address,               // assetToken
   //       tokenId,                      // assetID
   //       annuityPct,                   // annuityPercent
