@@ -101,7 +101,6 @@ abstract contract ChargedParticlesBase is
   mapping (address => uint256) internal _nftAssetDepositMin;
   mapping (address => uint256) internal _nftAssetDepositMax;
 
-  //
   // TokenUUID => Config for individual NFTs set by NFT Creator
   mapping (uint256 => uint256) internal _creatorAnnuityPercent;
   mapping (uint256 => address) internal _creatorAnnuityRedirect;

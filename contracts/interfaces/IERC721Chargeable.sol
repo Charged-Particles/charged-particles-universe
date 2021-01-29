@@ -25,7 +25,14 @@ pragma solidity >=0.6.0;
 
 interface IERC721Chargeable {
     function owner() external view returns (address);
-    function ownerOf(uint256 tokenId) external view returns (address);
     function creatorOf(uint256 tokenId) external view returns (address);
+    function balanceOf(address tokenOwner) external view returns (uint256 balance);
+    function ownerOf(uint256 tokenId) external view returns (address tokenOwner);
+    function safeTransferFrom(address from, address to, uint256 tokenId) external;
+    function transferFrom(address from, address to, uint256 tokenId) external;
+    function approve(address to, uint256 tokenId) external;
+    function getApproved(uint256 tokenId) external view returns (address operator);
+    function setApprovalForAll(address operator, bool _approved) external;
     function isApprovedForAll(address tokenOwner, address operator) external view returns (bool);
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data) external;
 }

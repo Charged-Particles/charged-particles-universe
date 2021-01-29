@@ -24,7 +24,9 @@ const {
 const { expect } = require('chai');
 const { max } = require('lodash');
 
+const EthSender = require('../build/contracts/contracts/test/EthSender.sol/EthSender.json');
 const IERC721Chargeable = require('../build/contracts/contracts/interfaces/IERC721Chargeable.sol/IERC721Chargeable.json');
+const ERC20Mintable = require('../build/contracts/contracts/test/ERC20Mintable.sol/ERC20Mintable.json');
 const daiABI = require('./abis/dai');
 
 const daiHodler = "0x55e4d16f9c3041EfF17Ca32850662f3e9Dddbce7"; // Hodler with the highest current amount of DAI, used for funding our operations on mainnet fork.
@@ -43,12 +45,14 @@ describe("Charged Particles", () => {
   let chainId;
 
   // External contracts
+  let erc20token;
   let erc721chargeable;
   let dai;
   let daiAddress;
 
   // Internal contracts
   let chargedParticles;
+  let ethSender;
 
   // Accounts
   let trustedForwarder;
@@ -88,6 +92,7 @@ describe("Charged Particles", () => {
     dai = new ethers.Contract(daiAddress, daiABI, daiSigner);
 
     // Deploy Mocked Contracts
+    erc20token = await deployMockContract(signerD, ERC20Mintable.abi, overrides);
     erc721chargeable = await deployMockContract(signerD, IERC721Chargeable.abi, overrides);
 
     // Connect to Internal Contracts
@@ -270,16 +275,63 @@ describe("Charged Particles", () => {
 
 
   describe('Blackhole Prevention', async () => {
-    it('should allow the contract owner to release stuck ETH from the contract', async () => {
-      // todo..
+    beforeEach(async () => {
+      const EthSenderFactory = new ethers.ContractFactory(EthSender.abi, EthSender.bytecode, signerD);
+      ethSender = await EthSenderFactory.deploy();
+      await ethSender.deployTransaction.wait();
+    });
+
+    it('should not allow sending ETH into the contract', async () => {
+      // No fallback or receive functions
+      await expect(signer1.sendTransaction({to: chargedParticles.address, value: toWei('10')}))
+        .to.be.revertedWith('function selector was not recognized and there\'s no fallback nor receive function');
+    });
+
+    it('should allow only the contract owner to release stuck ETH from the contract', async () => {
+      const amount = toWei('10');
+
+      // Force ETH into ChargedParticles Contract
+      await signer1.sendTransaction({to: ethSender.address, value: amount});
+      await ethSender.sendEther(chargedParticles.address);
+
+      // Attempt withdraw by Non-Owner
+      await expect(chargedParticles.connect(signer2).withdrawEther(user2, amount))
+        .to.be.revertedWith('Ownable: caller is not the owner');
+
+      // Withdraw by Owner
+      await expect(chargedParticles.connect(signerD).withdrawEther(user1, amount))
+        .to.emit(chargedParticles, 'WithdrawStuckEther')
+        .withArgs(user1, amount);
     });
 
     it('should allow the contract owner to release stuck ERC20s from the contract', async () => {
-      // todo..
+      const amount = toWei('10');
+
+      await erc20token.mock.balanceOf.withArgs(chargedParticles.address).returns(amount);
+      await erc20token.mock.transfer.withArgs(user1, amount).returns(true);
+
+      // Attempt withdraw by Non-Owner
+      await expect(chargedParticles.connect(signer2).withdrawErc20(user1, erc20token.address, amount))
+        .to.be.revertedWith('Ownable: caller is not the owner');
+
+      // Withdraw by Owner
+      await expect(chargedParticles.connect(signerD).withdrawErc20(user1, erc20token.address, amount))
+        .to.emit(chargedParticles, 'WithdrawStuckERC20')
+        .withArgs(user1, erc20token.address, amount);
     });
 
     it('should allow the contract owner to release stuck ERC721s from the contract', async () => {
-      // todo..
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(chargedParticles.address);
+      await erc721chargeable.mock.transferFrom.withArgs(chargedParticles.address, user1, TEST_TOKEN_ID).returns();
+
+      // Attempt withdraw by Non-Owner
+      await expect(chargedParticles.connect(signer2).withdrawERC721(user1, erc721chargeable.address, TEST_TOKEN_ID))
+        .to.be.revertedWith('Ownable: caller is not the owner');
+
+      // Withdraw by Owner
+      await expect(chargedParticles.connect(signerD).withdrawERC721(user1, erc721chargeable.address, TEST_TOKEN_ID))
+        .to.emit(chargedParticles, 'WithdrawStuckERC721')
+        .withArgs(user1, erc721chargeable.address, TEST_TOKEN_ID);
     });
   });
 

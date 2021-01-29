@@ -24,7 +24,9 @@ const {
 const { expect } = require('chai');
 const { max } = require('lodash');
 
+const EthSender = require('../build/contracts/contracts/test/EthSender.sol/EthSender.json');
 const IERC721Chargeable = require('../build/contracts/contracts/interfaces/IERC721Chargeable.sol/IERC721Chargeable.json');
+const ERC20Mintable = require('../build/contracts/contracts/test/ERC20Mintable.sol/ERC20Mintable.json');
 const daiABI = require('./abis/dai');
 
 const daiHodler = "0x55e4d16f9c3041EfF17Ca32850662f3e9Dddbce7"; // Hodler with the highest current amount of DAI, used for funding our operations on mainnet fork.
@@ -43,6 +45,7 @@ describe("Universe", () => {
   let chainId;
 
   // External contracts
+  let erc20token;
   let erc721chargeable;
   let dai;
   let daiAddress;
@@ -52,6 +55,7 @@ describe("Universe", () => {
   let chargedParticlesAddress;
   let ionAddress;
   let protonAddress;
+  let ethSender;
 
   // Accounts
   let trustedForwarder;
@@ -95,6 +99,7 @@ describe("Universe", () => {
     dai = new ethers.Contract(daiAddress, daiABI, daiSigner);
 
     // Deploy Mocked Contracts
+    erc20token = await deployMockContract(signerD, ERC20Mintable.abi, overrides);
     erc721chargeable = await deployMockContract(signerD, IERC721Chargeable.abi, overrides);
 
     // Connect to Internal Contracts
@@ -110,6 +115,32 @@ describe("Universe", () => {
     });
   });
 
+  describe('Events', async () => {
+    it('should only allow ChargedParticles to call specific events', async () => {
+      await expect(universe.connect(signer1).onEnergize(user1, user2, TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, toWei('1')))
+        .to.be.revertedWith('Universe: E-108');
+
+      await expect(universe.connect(signer1).onDischarge(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, toWei('1'), toWei('1')))
+        .to.be.revertedWith('Universe: E-108');
+
+      await expect(universe.connect(signer1).onDischargeForCreator(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, daiAddress, toWei('1')))
+        .to.be.revertedWith('Universe: E-108');
+
+      await expect(universe.connect(signer1).onRelease(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, toWei('1'), toWei('1'), toWei('1')))
+        .to.be.revertedWith('Universe: E-108');
+
+      await expect(universe.connect(signer1).onCovalentBond(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, '1'))
+        .to.be.revertedWith('Universe: E-108');
+
+      await expect(universe.connect(signer1).onCovalentBreak(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, '1'))
+        .to.be.revertedWith('Universe: E-108');
+    });
+
+    it('should only allow Proton to call specific events', async () => {
+      await expect(universe.connect(signer1).onProtonSale(TEST_ADDRESS, TEST_TOKEN_ID, user2, user3, toWei('1'), user1, toWei('1')))
+        .to.be.revertedWith('Universe: E-110');
+    });
+  });
 
   describe('Contract Configuration', async () => {
     it('should allow the contract owner to set the ChargedParticles contract', async () => {
@@ -172,6 +203,68 @@ describe("Universe", () => {
 
       await expect(universe.connect(signerD).setProtonToken(TEST_ADDRESS))
         .to.be.revertedWith('Universe: E-417');
+    });
+  });
+
+
+  describe('Blackhole Prevention', async () => {
+    beforeEach(async () => {
+      const EthSenderFactory = new ethers.ContractFactory(EthSender.abi, EthSender.bytecode, signerD);
+      ethSender = await EthSenderFactory.deploy();
+      await ethSender.deployTransaction.wait();
+    });
+
+    it('should not allow sending ETH into the contract', async () => {
+      // No fallback or receive functions
+      await expect(signer1.sendTransaction({to: universe.address, value: toWei('10')}))
+        .to.be.revertedWith('function selector was not recognized and there\'s no fallback nor receive function');
+    });
+
+    it('should allow only the contract owner to release stuck ETH from the contract', async () => {
+      const amount = toWei('10');
+
+      // Force ETH into ChargedParticles Contract
+      await signer1.sendTransaction({to: ethSender.address, value: amount});
+      await ethSender.sendEther(universe.address);
+
+      // Attempt withdraw by Non-Owner
+      await expect(universe.connect(signer2).withdrawEther(user2, amount))
+        .to.be.revertedWith('Ownable: caller is not the owner');
+
+      // Withdraw by Owner
+      await expect(universe.connect(signerD).withdrawEther(user1, amount))
+        .to.emit(universe, 'WithdrawStuckEther')
+        .withArgs(user1, amount);
+    });
+
+    it('should allow the contract owner to release stuck ERC20s from the contract', async () => {
+      const amount = toWei('10');
+
+      await erc20token.mock.balanceOf.withArgs(universe.address).returns(amount);
+      await erc20token.mock.transfer.withArgs(user1, amount).returns(true);
+
+      // Attempt withdraw by Non-Owner
+      await expect(universe.connect(signer2).withdrawErc20(user1, erc20token.address, amount))
+        .to.be.revertedWith('Ownable: caller is not the owner');
+
+      // Withdraw by Owner
+      await expect(universe.connect(signerD).withdrawErc20(user1, erc20token.address, amount))
+        .to.emit(universe, 'WithdrawStuckERC20')
+        .withArgs(user1, erc20token.address, amount);
+    });
+
+    it('should allow the contract owner to release stuck ERC721s from the contract', async () => {
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(universe.address);
+      await erc721chargeable.mock.transferFrom.withArgs(universe.address, user1, TEST_TOKEN_ID).returns();
+
+      // Attempt withdraw by Non-Owner
+      await expect(universe.connect(signer2).withdrawERC721(user1, erc721chargeable.address, TEST_TOKEN_ID))
+        .to.be.revertedWith('Ownable: caller is not the owner');
+
+      // Withdraw by Owner
+      await expect(universe.connect(signerD).withdrawERC721(user1, erc721chargeable.address, TEST_TOKEN_ID))
+        .to.emit(universe, 'WithdrawStuckERC721')
+        .withArgs(user1, erc721chargeable.address, TEST_TOKEN_ID);
     });
   });
 
