@@ -33,6 +33,7 @@ interface IChargedParticles {
   |__________________________________*/
 
   function isTokenCreator(address contractAddress, uint256 tokenId, address account) external view returns (bool);
+  function getCreatorAnnuities(address contractAddress, uint256 tokenId) external view returns (address creator, uint256 annuityPct);
   function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external view returns (address);
 
   // ERC20

@@ -124,6 +124,10 @@ abstract contract ChargedParticlesBase is
     return _isTokenCreator(contractAddress, tokenId, account);
   }
 
+  function getCreatorAnnuities(address contractAddress, uint256 tokenId) external override view returns (address creator, uint256 annuityPct) {
+    return _getCreatorAnnuity(contractAddress, tokenId);
+  }
+
   function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external override view returns (address) {
     return _getCreatorAnnuitiesRedirect(contractAddress, tokenId);
   }
