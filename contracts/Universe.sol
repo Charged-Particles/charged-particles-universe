@@ -105,9 +105,8 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    if (referralSource[sender] == address(0x1)) { return; }
-    if (referralSource[sender] == address(0x0)) {
-      referralSource[sender] = (referrer == address(0x0)) ? address(0x1) : referrer;
+    if (referralSource[sender] == address(0x0) && referrer != address(0x0)) {
+      referralSource[sender] = referrer;
     }
   }
 
