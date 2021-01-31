@@ -175,6 +175,9 @@ module.exports = async (hre) => {
     log(`  - [TX-${txCount++}] Universe: Registering Ion`)(alchemyTimeout);
     await universe.setCation(ddIon.address, ionMaxSuppy);
 
+    log(`  - [TX-${txCount++}] Ion: Minting to Universe`)(alchemyTimeout);
+    await ion.mintToUniverse(ionMaxSuppy);
+
     let assetTokenId;
     let assetTokenAddress;
     let assetTokenMultiplier;

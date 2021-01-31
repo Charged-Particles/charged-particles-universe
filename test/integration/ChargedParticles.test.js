@@ -466,4 +466,42 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect((await dai.balanceOf(user2)).sub(user2BalanceBefore)).to.be.above(toWei('9.9')).and.to.be.below(toWei('10.1'));
   });
 
+  it("can succesfully conduct metallic bond", async () => {
+    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+
+    await dai.connect(daiSigner).transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    const energizedParticleId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'aave',                       // walletManagerId
+        daiAddress, // assetToken
+        toWei('10'),                  // assetAmount
+        annuityPct,                   // annuityPercent
+      ],
+    });
+
+    await chargedParticles.connect(signer2).releaseParticle(
+      user2,
+      proton.address,
+      energizedParticleId,
+      'aave',
+      daiAddress
+    );
+
+    const bondWeight = toWei('1');
+    const user2BalanceBefore = await ion.balanceOf(user2);
+
+    await universe.connect(signer2).conductMetallicBond(bondWeight);
+
+    expect(await ion.balanceOf(user2)).to.be.above(user2BalanceBefore).and.below(user2BalanceBefore.add(bondWeight));
+  });
+
 });
