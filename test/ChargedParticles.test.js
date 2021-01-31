@@ -286,7 +286,7 @@ describe("Charged Particles", () => {
       await erc721chargeable.mock.owner.withArgs().returns(user1);
       await erc721chargeable.mock.supportsInterface.withArgs(INTERFACE_SIGNATURE_ERC721).returns(true); // supports ERC721 interface
       await erc721chargeable.mock.supportsInterface.withArgs(INTERFACE_SIGNATURE_ERC1155).returns(false); // does not support ERC1155 interface
-      await chargedParticles.connect(signerD).updateWhitelist(erc721chargeable.address, true);
+      await chargedParticles.connect(signerD).enableNftContracts([erc721chargeable.address]);
     });
 
     it('should return the contract owner of the external NFT contract', async () => {
@@ -294,32 +294,39 @@ describe("Charged Particles", () => {
     });
 
     it('should allow the external NFT contract owner to configure integration settings', async () => {
-      await expect(chargedParticles.connect(signer1).setExternalContractConfigs(erc721chargeable.address, 'aave', assetDepositMin, assetDepositMax)).to.emit(chargedParticles, 'TokenContractConfigsSet').withArgs(
+      await expect(chargedParticles.connect(signer1).setExternalContractConfigs(erc721chargeable.address, 'newGeneric', 'newGeneric', daiAddress, assetDepositMin, assetDepositMax)).to.emit(chargedParticles, 'TokenContractConfigsSet').withArgs(
         erc721chargeable.address,
-        'aave',
+        'newGeneric',
+        'newGeneric',
+        daiAddress,
         assetDepositMin,
         assetDepositMax
       );
     });
     
     it('should allow the Charged Particles admin to configure external NFT contract integration settings', async () => {
-      await expect(chargedParticles.connect(signerD).setExternalContractConfigs(erc721chargeable.address, 'aave', assetDepositMin, assetDepositMax)).to.emit(chargedParticles, 'TokenContractConfigsSet').withArgs(
+      await expect(chargedParticles.connect(signerD).setExternalContractConfigs(erc721chargeable.address, 'newGeneric', 'newGeneric', daiAddress, assetDepositMin, assetDepositMax)).to.emit(chargedParticles, 'TokenContractConfigsSet').withArgs(
         erc721chargeable.address,
-        'aave',
+        'newGeneric',
+        'newGeneric',
+        daiAddress,
         assetDepositMin,
         assetDepositMax
       );
     });
 
     it('should not allow anyone else to configure external NFT contract integration settings', async () => {
-      await expect(chargedParticles.connect(signer2).setExternalContractConfigs(erc721chargeable.address, 'aave', assetDepositMin, assetDepositMax)).to.be.revertedWith('CP: E-103');
+      await expect(chargedParticles.connect(signer2).setExternalContractConfigs(erc721chargeable.address, 'newGeneric', 'newGeneric', daiAddress, assetDepositMin, assetDepositMax)).to.be.revertedWith('CP: E-103');
     });
   });
 
 
   describe('Contract Configurations', async () => {
     it('should allow the contract owner to update the whitelist of supported NFTs', async () => {
-      expect(await chargedParticles.connect(signerD).updateWhitelist(erc721chargeable.address, false)).to.emit(chargedParticles, 'UpdateContractWhitelist').withArgs(erc721chargeable.address, false);
+      expect(await chargedParticles.connect(signerD).enableNftContracts([erc721chargeable.address]))
+      .to.emit(chargedParticles, 'WhitelistedForCharge').withArgs(erc721chargeable.address, true)
+      .and.to.emit(chargedParticles, 'WhitelistedForBasket').withArgs(erc721chargeable.address, true)
+      .and.to.emit(chargedParticles, 'WhitelistedForTimelockSelf').withArgs(erc721chargeable.address, true);
     });
 
     it('should allow the contract owner to set the Universe contract', async () => {
@@ -327,11 +334,11 @@ describe("Charged Particles", () => {
     });
 
     it('should allow the contract owner to register new wallet managers', async () => {
-      expect(await chargedParticles.connect(signerD).registerWalletManager('newGeneric', newGenericWalletManager.address)).to.emit(chargedParticles, 'LiquidityProviderRegistered').withArgs('newGeneric', newGenericWalletManager.address);
+      expect(await chargedParticles.connect(signerD).registerWalletManager('newGeneric', newGenericWalletManager.address)).to.emit(chargedParticles, 'WalletManagerRegistered').withArgs('newGeneric', newGenericWalletManager.address);
     });
 
     it('should allow the contract owner to register new basket managers', async () => {
-      expect(await chargedParticles.connect(signerD).registerBasketManager('newGeneric', newGenericBasketManager.address)).to.emit(chargedParticles, 'NftBasketRegistered').withArgs('newGeneric', newGenericBasketManager.address);
+      expect(await chargedParticles.connect(signerD).registerBasketManager('newGeneric', newGenericBasketManager.address)).to.emit(chargedParticles, 'BasketManagerRegistered').withArgs('newGeneric', newGenericBasketManager.address);
     });
   });
 
