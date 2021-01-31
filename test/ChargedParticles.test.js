@@ -52,6 +52,9 @@ describe("Charged Particles", () => {
 
   // Internal contracts
   let chargedParticles;
+  let universe;
+  let newGenericWalletManager;
+  let newGenericBasketManager;
   let ethSender;
 
   // Accounts
@@ -98,6 +101,14 @@ describe("Charged Particles", () => {
     // Connect to Internal Contracts
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
     chargedParticles = ChargedParticles.attach(getDeployData('ChargedParticles', chainId).address);
+    const Universe = await ethers.getContractFactory('Universe');
+    universe = Universe.attach(getDeployData('Universe', chainId).address);
+    const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
+    const GenericWalletManagerInstance = await GenericWalletManager.deploy();
+    newGenericWalletManager = await GenericWalletManagerInstance.deployed();
+    const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
+    const GenericBasketManagerInstance = await GenericBasketManager.deploy();
+    newGenericBasketManager = await GenericBasketManagerInstance.deployed();
   });
 
   afterEach(async () => {
@@ -275,7 +286,7 @@ describe("Charged Particles", () => {
       await erc721chargeable.mock.owner.withArgs().returns(user1);
       await erc721chargeable.mock.supportsInterface.withArgs(INTERFACE_SIGNATURE_ERC721).returns(true); // supports ERC721 interface
       await erc721chargeable.mock.supportsInterface.withArgs(INTERFACE_SIGNATURE_ERC1155).returns(false); // does not support ERC1155 interface
-      await chargedParticles.updateWhitelist(erc721chargeable.address, true);
+      await chargedParticles.connect(signerD).updateWhitelist(erc721chargeable.address, true);
     });
 
     it('should return the contract owner of the external NFT contract', async () => {
@@ -308,19 +319,19 @@ describe("Charged Particles", () => {
 
   describe('Contract Configurations', async () => {
     it('should allow the contract owner to update the whitelist of supported NFTs', async () => {
-      // todo..
+      expect(await chargedParticles.connect(signerD).updateWhitelist(erc721chargeable.address, false)).to.emit(chargedParticles, 'UpdateContractWhitelist').withArgs(erc721chargeable.address, false);
     });
 
     it('should allow the contract owner to set the Universe contract', async () => {
-      // todo..
+      expect(await chargedParticles.connect(signerD).setUniverse(universe.address)).to.emit(chargedParticles, 'UniverseSet').withArgs(universe.address);
     });
 
     it('should allow the contract owner to register new wallet managers', async () => {
-      // todo..
+      expect(await chargedParticles.connect(signerD).registerWalletManager('newGeneric', newGenericWalletManager.address)).to.emit(chargedParticles, 'LiquidityProviderRegistered').withArgs('newGeneric', newGenericWalletManager.address);
     });
 
     it('should allow the contract owner to register new basket managers', async () => {
-      // todo..
+      expect(await chargedParticles.connect(signerD).registerBasketManager('newGeneric', newGenericBasketManager.address)).to.emit(chargedParticles, 'NftBasketRegistered').withArgs('newGeneric', newGenericBasketManager.address);
     });
   });
 
