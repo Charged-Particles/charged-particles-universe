@@ -23,7 +23,9 @@
 
 pragma solidity >=0.6.0;
 
-interface IERC721Chargeable {
+import "@openzeppelin/contracts-upgradeable/introspection/IERC165Upgradeable.sol";
+
+interface IERC721Chargeable is IERC165Upgradeable {
     function owner() external view returns (address);
     function creatorOf(uint256 tokenId) external view returns (address);
     function balanceOf(address tokenOwner) external view returns (uint256 balance);

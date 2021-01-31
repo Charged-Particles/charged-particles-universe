@@ -185,76 +185,79 @@ describe("Charged Particles", () => {
   });
 
   describe('Token Discharge Approvals', async () => {
-    it('should confirm operator approval for discharge', async () => {
+
+    beforeEach(async() => {
       await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+    });
+
+    it('should confirm operator approval for discharge', async () => {
       expect(await chargedParticles.isApprovedForDischarge(erc721chargeable.address, TEST_TOKEN_ID, user1)).to.be.true;
     });
 
     it('should allow the NFT owner to set an operator for discharge', async () => {
-      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
       await chargedParticles.connect(signer1).setDischargeApproval(erc721chargeable.address, TEST_TOKEN_ID, user2);
       expect(await chargedParticles.isApprovedForDischarge(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.true;
     });
 
     it('should allow the NFT operator to set an operator for discharge', async () => {
-      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
       await erc721chargeable.mock.isApprovedForAll.withArgs(user1, user2).returns(true);
       await chargedParticles.connect(signer2).setDischargeApproval(erc721chargeable.address, TEST_TOKEN_ID, user3);
       expect(await chargedParticles.isApprovedForDischarge(erc721chargeable.address, TEST_TOKEN_ID, user3)).to.be.true;
     });
 
     it('should not allow anyone else to set an operator for discharge', async () => {
-      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
       expect(await chargedParticles.isApprovedForDischarge(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.false;
     });
   });
 
   describe('Token Release Approvals', async () => {
-    it('should confirm operator approval for release', async () => {
+
+    beforeEach(async() => {
       await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+    });
+
+    it('should confirm operator approval for release', async () => {
       expect(await chargedParticles.isApprovedForRelease(erc721chargeable.address, TEST_TOKEN_ID, user1)).to.be.true;
     });
 
     it('should allow the NFT owner to set an operator for release', async () => {
-      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
       await chargedParticles.connect(signer1).setReleaseApproval(erc721chargeable.address, TEST_TOKEN_ID, user2);
       expect(await chargedParticles.isApprovedForRelease(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.true;
     });
 
     it('should allow the NFT operator to set an operator for release', async () => {
-      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
       await erc721chargeable.mock.isApprovedForAll.withArgs(user1, user2).returns(true);
       await chargedParticles.connect(signer2).setReleaseApproval(erc721chargeable.address, TEST_TOKEN_ID, user3);
       expect(await chargedParticles.isApprovedForRelease(erc721chargeable.address, TEST_TOKEN_ID, user3)).to.be.true;
     });
 
     it('should not allow anyone else to set an operator for release', async () => {
-      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
       expect(await chargedParticles.isApprovedForRelease(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.false;
     });
   });
 
   describe('Token Timelock Approvals', async () => {
-    it('should confirm operator approval for timelock', async () => {
+
+    beforeEach(async() => {
       await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+    });
+
+    it('should confirm operator approval for timelock', async () => {
       expect(await chargedParticles.isApprovedForTimelock(erc721chargeable.address, TEST_TOKEN_ID, user1)).to.be.true;
     });
 
     it('should allow the NFT owner to set an operator for timelock', async () => {
-      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
       await chargedParticles.connect(signer1).setTimelockApproval(erc721chargeable.address, TEST_TOKEN_ID, user2);
       expect(await chargedParticles.isApprovedForTimelock(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.true;
     });
 
     it('should allow the NFT operator to set an operator for timelock', async () => {
-      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
       await erc721chargeable.mock.isApprovedForAll.withArgs(user1, user2).returns(true);
       await chargedParticles.connect(signer2).setTimelockApproval(erc721chargeable.address, TEST_TOKEN_ID, user3);
       expect(await chargedParticles.isApprovedForTimelock(erc721chargeable.address, TEST_TOKEN_ID, user3)).to.be.true;
     });
 
     it('should not allow anyone else to set an operator for timelock', async () => {
-      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
       expect(await chargedParticles.isApprovedForTimelock(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.false;
     });
   });
@@ -262,16 +265,43 @@ describe("Charged Particles", () => {
 
 
   describe('External NFT Integrations', async () => {
+
+    const assetDepositMin = toWei('1');
+    const assetDepositMax = toWei('1000');
+    const INTERFACE_SIGNATURE_ERC721 = '0x80ac58cd';
+    const INTERFACE_SIGNATURE_ERC1155 = '0xd9b67a26';
+
+    beforeEach(async () => {
+      await erc721chargeable.mock.owner.withArgs().returns(user1);
+      await erc721chargeable.mock.supportsInterface.withArgs(INTERFACE_SIGNATURE_ERC721).returns(true); // supports ERC721 interface
+      await erc721chargeable.mock.supportsInterface.withArgs(INTERFACE_SIGNATURE_ERC1155).returns(false); // does not support ERC1155 interface
+      await chargedParticles.updateWhitelist(erc721chargeable.address, true);
+    });
+
     it('should return the contract owner of the external NFT contract', async () => {
-      // todo..
+      expect(await chargedParticles.isContractOwner(erc721chargeable.address, user1));
     });
 
     it('should allow the external NFT contract owner to configure integration settings', async () => {
-      // todo..
+      await expect(chargedParticles.connect(signer1).setExternalContractConfigs(erc721chargeable.address, 'aave', assetDepositMin, assetDepositMax)).to.emit(chargedParticles, 'TokenContractConfigsSet').withArgs(
+        erc721chargeable.address,
+        'aave',
+        assetDepositMin,
+        assetDepositMax
+      );
+    });
+    
+    it('should allow the Charged Particles admin to configure external NFT contract integration settings', async () => {
+      await expect(chargedParticles.connect(signerD).setExternalContractConfigs(erc721chargeable.address, 'aave', assetDepositMin, assetDepositMax)).to.emit(chargedParticles, 'TokenContractConfigsSet').withArgs(
+        erc721chargeable.address,
+        'aave',
+        assetDepositMin,
+        assetDepositMax
+      );
     });
 
     it('should not allow anyone else to configure external NFT contract integration settings', async () => {
-      // todo..
+      await expect(chargedParticles.connect(signer2).setExternalContractConfigs(erc721chargeable.address, 'aave', assetDepositMin, assetDepositMax)).to.be.revertedWith('CP: E-103');
     });
   });
 
