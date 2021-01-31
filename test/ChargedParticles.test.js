@@ -187,12 +187,13 @@ describe("Charged Particles", () => {
   describe('Token Discharge Approvals', async () => {
     it('should confirm operator approval for discharge', async () => {
       await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
-      await chargedParticles.connect(signer1).setDischargeApproval(erc721chargeable.address, TEST_TOKEN_ID, user2);
-      expect(await chargedParticles.isApprovedForDischarge(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.true;
+      expect(await chargedParticles.isApprovedForDischarge(erc721chargeable.address, TEST_TOKEN_ID, user1)).to.be.true;
     });
 
     it('should allow the NFT owner to set an operator for discharge', async () => {
-      // todo..
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+      await chargedParticles.connect(signer1).setDischargeApproval(erc721chargeable.address, TEST_TOKEN_ID, user2);
+      expect(await chargedParticles.isApprovedForDischarge(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.true;
     });
 
     it('should allow the NFT operator to set an operator for discharge', async () => {
