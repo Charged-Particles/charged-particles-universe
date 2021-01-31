@@ -397,4 +397,36 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(await proton.ownerOf(tokenId2)).to.be.equal(user1);
   });
 
+  it("cannot discharge more than the wallet holds", async () => {
+    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+
+    await dai.connect(daiSigner).transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    const energizedParticleId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'aave',                       // walletManagerId
+        daiAddress, // assetToken
+        toWei('10'),                  // assetAmount
+        annuityPct,                   // annuityPercent
+      ],
+    });
+
+    await expect(chargedParticles.connect(signer2).dischargeParticleAmount(
+      user2,
+      proton.address,
+      energizedParticleId,
+      'aave',
+      daiAddress,
+      toWei('5')
+    )).to.be.revertedWith('AaveWalletManager: E-412');
+  });
+
 });
