@@ -34,7 +34,7 @@
     "@opengsn/gsn": "^2.0.1",
     "@openzeppelin/cli": "^2.8.0",
     "@openzeppelin/contracts-upgradeable": "^3.3.0",
-    "@openzeppelin/hardhat-upgrades": "^1.3.0",
+    "@openzeppelin/hardhat-upgrades": "^1.6.0",
     "@openzeppelin/upgrades": "^2.8.0",
     "@truffle/hdwallet-provider": "^1.0.34",
     "chai": "^4.2.0",
