@@ -32,7 +32,9 @@ interface IChargedParticles {
   |             Public API            |
   |__________________________________*/
 
+  function getDepositCap() external view returns (uint256);
   function isTokenCreator(address contractAddress, uint256 tokenId, address account) external view returns (bool);
+  function getCreatorAnnuities(address contractAddress, uint256 tokenId) external view returns (address creator, uint256 annuityPct);
   function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external view returns (address);
 
   // ERC20
@@ -63,6 +65,18 @@ interface IChargedParticles {
   function currentParticleKinetics(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
   function currentParticleCovalentBonds(address contractAddress, uint256 tokenId, string calldata basketManagerId) external view returns (uint256);
 
+  function setDischargeTimelock(
+    address contractAddress,
+    uint256 tokenId,
+    uint256 unlockBlock
+  ) external;
+
+  function setReleaseTimelock(
+    address contractAddress,
+    uint256 tokenId,
+    uint256 unlockBlock
+  ) external;
+
   /***********************************|
   |     Register Contract Settings    |
   |(For External Contract Integration)|
@@ -72,7 +86,9 @@ interface IChargedParticles {
 
   function setExternalContractConfigs(
     address contractAddress,
-    string calldata liquidityProvider,
+    string calldata walletManager,
+    string calldata basketManager,
+    address assetToken,
     uint256 assetDepositMin,
     uint256 assetDepositMax
   ) external;
@@ -88,18 +104,6 @@ interface IChargedParticles {
     address contractAddress,
     uint256 tokenId,
     address receiver
-  ) external;
-
-  function setDischargeTimelock(
-    address contractAddress,
-    uint256 tokenId,
-    uint256 unlockBlock
-  ) external;
-
-  function setReleaseTimelock(
-    address contractAddress,
-    uint256 tokenId,
-    uint256 unlockBlock
   ) external;
 
   /***********************************|
@@ -182,17 +186,22 @@ interface IChargedParticles {
   event UniverseSet(
     address indexed universeAddress
   );
-  event LiquidityProviderRegistered(
+  event WalletManagerRegistered(
     string indexed walletManagerId,
     address indexed walletManager
   );
-  event NftBasketRegistered(
+  event BasketManagerRegistered(
     string indexed basketId,
     address indexed basketManager
   );
+  event DepositCapSet(
+    uint256 depositCap
+  );
   event TokenContractConfigsSet(
     address indexed contractAddress,
-    string indexed liquidityProvider,
+    string walletManager,
+    string basketManager,
+    address assetToken,
     uint256 assetDepositMin,
     uint256 assetDepositMax
   );
@@ -237,8 +246,9 @@ interface IChargedParticles {
     address indexed operator,
     uint256 unlockBlock
   );
-  event UpdateContractWhitelist(
-    address indexed contractAddress,
-    bool state
-  );
+
+  event WhitelistedForCharge(address indexed contractAddress, bool state);
+  event WhitelistedForBasket(address indexed contractAddress, bool state);
+  event WhitelistedForTimelockAny(address indexed contractAddress, bool state);
+  event WhitelistedForTimelockSelf(address indexed contractAddress, bool state);
 }

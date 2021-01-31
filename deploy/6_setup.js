@@ -20,6 +20,7 @@ module.exports = async (hre) => {
     const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
     const referralCode = presets.Aave.referralCode[chainId];
     const ionMaxSuppy = presets.Ion.maxSupply;
+    const depositCap = presets.ChargedParticles.maxDeposit;
 
     const ddUniverse = getDeployData('Universe', chainId);
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
@@ -90,6 +91,9 @@ module.exports = async (hre) => {
     log(`  - [TX-${txCount++}] ChargedParticles: Registering Universe`)(alchemyTimeout);
     await chargedParticles.setUniverse(ddUniverse.address);
 
+    log(`  - [TX-${txCount++}] ChargedParticles: Setting Deposit Cap`)(alchemyTimeout);
+    await chargedParticles.setDepositCap(depositCap);
+
     // log(`  - [TX-${txCount++}] ChargedParticles: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     // await chargedParticles.transferOwnership(owner);
 
@@ -158,8 +162,14 @@ module.exports = async (hre) => {
     log(`  - [TX-${txCount++}] Proton: Registering ChargedParticles`)(alchemyTimeout);
     await proton.setChargedParticles(ddChargedParticles.address);
 
-    log(`  - [TX-${txCount++}] ChargedParticles: Registering Proton`)(alchemyTimeout);
-    await chargedParticles.updateWhitelist(ddProton.address, true);
+    log(`  - [TX-${txCount++}] ChargedParticles: Whitelisting Proton for Charge`)(alchemyTimeout);
+    await chargedParticles.whitelistForCharge(ddProton.address, true);
+
+    log(`  - [TX-${txCount++}] ChargedParticles: Whitelisting Proton for Basket`)(alchemyTimeout);
+    await chargedParticles.whitelistForBasket(ddProton.address, true);
+
+    log(`  - [TX-${txCount++}] ChargedParticles: Whitelisting Proton for Timelock-Self`)(alchemyTimeout);
+    await chargedParticles.whitelistForTimelockSelf(ddProton.address, true);
 
     log(`  - [TX-${txCount++}] Universe: Registering Proton`)(alchemyTimeout);
     await universe.setProtonToken(ddProton.address);
