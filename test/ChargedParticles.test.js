@@ -211,19 +211,26 @@ describe("Charged Particles", () => {
 
   describe('Token Release Approvals', async () => {
     it('should confirm operator approval for release', async () => {
-      // todo..
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+      expect(await chargedParticles.isApprovedForRelease(erc721chargeable.address, TEST_TOKEN_ID, user1)).to.be.true;
     });
 
     it('should allow the NFT owner to set an operator for release', async () => {
-      // todo..
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+      await chargedParticles.connect(signer1).setReleaseApproval(erc721chargeable.address, TEST_TOKEN_ID, user2);
+      expect(await chargedParticles.isApprovedForRelease(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.true;
     });
 
     it('should allow the NFT operator to set an operator for release', async () => {
-      // todo..
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+      await erc721chargeable.mock.isApprovedForAll.withArgs(user1, user2).returns(true);
+      await chargedParticles.connect(signer2).setReleaseApproval(erc721chargeable.address, TEST_TOKEN_ID, user3);
+      expect(await chargedParticles.isApprovedForRelease(erc721chargeable.address, TEST_TOKEN_ID, user3)).to.be.true;
     });
 
     it('should not allow anyone else to set an operator for release', async () => {
-      // todo..
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+      expect(await chargedParticles.isApprovedForRelease(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.false;
     });
   });
 
