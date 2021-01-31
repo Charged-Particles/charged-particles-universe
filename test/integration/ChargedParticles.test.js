@@ -19,12 +19,13 @@ const {
   setNetworkAfterTimestamp
 } = require('../../js-helpers/test')(network);
 
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 const { max } = require('lodash');
 
 const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
 
 const daiABI = require('../abis/dai');
+const { balanceOf } = require('../../js-helpers/balanceOf');
 const daiHodler = "0x55e4d16f9c3041EfF17Ca32850662f3e9Dddbce7"; // Hodler with the highest current amount of DAI, used for funding our operations on mainnet fork.
 
 describe("[INTEGRATION] Charged Particles", () => {
@@ -427,6 +428,42 @@ describe("[INTEGRATION] Charged Particles", () => {
       daiAddress,
       toWei('5')
     )).to.be.revertedWith('AaveWalletManager: E-412');
+  });
+
+  it("can order to release more than the wallet holds, but receive only the wallet amount", async () => {
+    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+
+    await dai.connect(daiSigner).transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    const energizedParticleId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'aave',                       // walletManagerId
+        daiAddress, // assetToken
+        toWei('10'),                  // assetAmount
+        annuityPct,                   // annuityPercent
+      ],
+    });
+
+    const user2BalanceBefore = await dai.balanceOf(user2);
+
+    await chargedParticles.connect(signer2).releaseParticleAmount(
+      user2,
+      proton.address,
+      energizedParticleId,
+      'aave',
+      daiAddress,
+      toWei('20')
+    );
+
+    expect((await dai.balanceOf(user2)).sub(user2BalanceBefore)).to.be.above(toWei('9.9')).and.to.be.below(toWei('10.1'));
   });
 
 });

@@ -217,7 +217,7 @@ contract AaveSmartWallet is SmartWalletBase {
     else {
       uint256 fromPrincipal = assetAmount.sub(ownerInterest);
       if (fromPrincipal > walletPrincipal) {
-        fromPrincipal = walletPrincipal;
+        fromPrincipal = walletPrincipal.sub(ownerInterest);
       }
 
       creatorAmount = creatorInterest;

@@ -159,10 +159,10 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    uint256 totalEnergy = creatorEnergy.add(receiverEnergy).sub(principalAmount);
-    if (esaMultiplier[assetToken] > 0 && totalEnergy > 0) {
+    uint256 totalEnergy = creatorEnergy.add(receiverEnergy);
+    if (esaMultiplier[assetToken] > 0 && totalEnergy > principalAmount) {
       address nftOwner = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
-      _electrostaticAttraction(nftOwner, assetToken, totalEnergy);
+      _electrostaticAttraction(nftOwner, assetToken, totalEnergy.sub(principalAmount));
     }
   }
 
