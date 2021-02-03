@@ -34,19 +34,16 @@ interface IChargedParticles {
 
   function getDepositCap() external view returns (uint256);
   function isTokenCreator(address contractAddress, uint256 tokenId, address account) external view returns (bool);
+  function getTokenLockExpiry(address contractAddress, uint256 tokenId) external view returns (uint256 lockExpiry);
   function getCreatorAnnuities(address contractAddress, uint256 tokenId) external view returns (address creator, uint256 annuityPct);
   function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external view returns (address);
 
   // ERC20
   function isWalletManagerEnabled(string calldata walletManagerId) external view returns (bool);
-  function getWalletManagerCount() external view returns (uint);
-  function getWalletManagerByIndex(uint index) external view returns (string memory);
   function getWalletManager(string calldata walletManagerId) external view returns (address);
 
   // ERC721
   function isNftBasketEnabled(string calldata basketId) external view returns (bool);
-  function getNftBasketCount() external view returns (uint);
-  function getNftBasketByIndex(uint index) external view returns (string memory);
   function getBasketManager(string calldata basketId) external view returns (address);
 
   function getTokenUUID(address contractAddress, uint256 tokenId) external pure returns (uint256);
@@ -55,6 +52,7 @@ interface IChargedParticles {
   function setDischargeApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setReleaseApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setTimelockApproval(address contractAddress, uint256 tokenId, address operator) external;
+  function setApprovalForAll(address contractAddress, uint256 tokenId, address operator) external;
 
   function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
   function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
@@ -77,6 +75,12 @@ interface IChargedParticles {
     uint256 unlockBlock
   ) external;
 
+  function setTemporaryLock(
+    address contractAddress,
+    uint256 tokenId,
+    bool isLocked
+  ) external;
+
   /***********************************|
   |     Register Contract Settings    |
   |(For External Contract Integration)|
@@ -84,13 +88,32 @@ interface IChargedParticles {
 
   function isContractOwner(address contractAddress, address account) external view returns (bool);
 
-  function setExternalContractConfigs(
+  function setRequiredWalletManager(
     address contractAddress,
-    string calldata walletManager,
-    string calldata basketManager,
+    string calldata walletManager
+  ) external;
+
+  function setRequiredBasketManager(
+    address contractAddress,
+    string calldata basketManager
+  ) external;
+
+  function setAssetTokenRestrictions(
+    address contractAddress,
+    bool restrictionsEnabled
+  ) external;
+
+  function setAllowedAssetToken(
+    address contractAddress,
     address assetToken,
-    uint256 assetDepositMin,
-    uint256 assetDepositMax
+    bool isAllowed
+  ) external;
+
+  function setAssetTokenLimits(
+    address contractAddress,
+    address assetToken,
+    uint256 depositMin,
+    uint256 depositMax
   ) external;
 
   function setCreatorConfigs(
@@ -197,10 +220,25 @@ interface IChargedParticles {
   event DepositCapSet(
     uint256 depositCap
   );
-  event TokenContractConfigsSet(
+  event RequiredWalletManagerSet(
     address indexed contractAddress,
-    string walletManager,
-    string basketManager,
+    string walletManager
+  );
+  event RequiredBasketManagerSet(
+    address indexed contractAddress,
+    string basketManager
+  );
+  event AssetTokenRestrictionsSet(
+    address indexed contractAddress,
+    bool restrictionsEnabled
+  );
+  event AllowedAssetTokenSet(
+    address indexed contractAddress,
+    address assetToken,
+    bool isAllowed
+  );
+  event AssetTokenLimitsSet(
+    address indexed contractAddress,
     address assetToken,
     uint256 assetDepositMin,
     uint256 assetDepositMax
@@ -244,6 +282,11 @@ interface IChargedParticles {
     address indexed contractAddress,
     uint256 indexed tokenId,
     address indexed operator,
+    uint256 unlockBlock
+  );
+  event TokenTempLock(
+    address indexed contractAddress,
+    uint256 indexed tokenId,
     uint256 unlockBlock
   );
 

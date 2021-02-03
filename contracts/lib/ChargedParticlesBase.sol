@@ -38,6 +38,7 @@ import "../interfaces/IChargedParticles.sol";
 import "../interfaces/IWalletManager.sol";
 import "../interfaces/IBasketManager.sol";
 
+import "../lib/Bitwise.sol";
 import "../lib/RelayRecipient.sol";
 
 
@@ -54,6 +55,7 @@ abstract contract ChargedParticlesBase is
   IERC721ReceiverUpgradeable
 {
   using SafeMathUpgradeable for uint256;
+  using Bitwise for uint256;
 
   //
   // Particle Terminology
@@ -79,42 +81,6 @@ abstract contract ChargedParticlesBase is
   //                              as a result of having lost or gained one or more electrons.
   //
 
-  // Optional Configs set by Owner of External Token Contracts;
-  //  - Any user can add any whitelisted ERC721 or ERC1155 token as a Charged Particle without Limits,
-  //    unless the Owner of the ERC721 or ERC1155 token contract registers the token here
-  //    and sets the Custom Configs for their token(s)
-  struct ExternalContractConfigs {
-    string walletManager;
-    string basketManager;
-    address assetToken;
-    uint256 depositMin;
-    uint256 depositMax;
-  }
-
-  // Optional Configs for individual NFTs set by NFT Creator
-  struct CreatorConfigs {
-    uint256 annuityPercent;
-    address annuityRedirect;
-  }
-
-  struct NftState {
-    uint256 dischargeTimelock;
-    uint256 releaseTimelock;
-  }
-
-  struct NftApprovals {
-    address discharge;
-    address release;
-    address timelock;
-  }
-
-  struct Whitelists {
-    bool chargeNft;       // NFT Contracts that can have assets Deposited into them (Charged)
-    bool basketNft;       // NFT Contracts that can have other NFTs Deposited into them
-    bool timelockAnyNft;  // NFT Contracts that can timelock any NFT on behalf of users (primarily used for Front-run Protection)
-    bool timelockOwnNft;  // NFT Contracts that can timelock their own NFTs on behalf of their users
-  }
-
   // uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
   uint256 constant internal MAX_ANNUITIES = 1e4;      // 10000  (100%)
 
@@ -122,30 +88,64 @@ abstract contract ChargedParticlesBase is
   bytes4 constant internal INTERFACE_SIGNATURE_ERC721 = 0x80ac58cd;
   bytes4 constant internal INTERFACE_SIGNATURE_ERC1155 = 0xd9b67a26;
 
+  uint256 constant internal PERM_CHARGE_NFT       = 1;   // NFT Contracts that can have assets Deposited into them (Charged)
+  uint256 constant internal PERM_BASKET_NFT       = 2;   // NFT Contracts that can have other NFTs Deposited into them
+  uint256 constant internal PERM_TIMELOCK_ANY_NFT = 4;   // NFT Contracts that can timelock any NFT on behalf of users (primarily used for Front-run Protection)
+  uint256 constant internal PERM_TIMELOCK_OWN_NFT = 8;   // NFT Contracts that can timelock their own NFTs on behalf of their users
+
+  // Current Settings for External NFT Token Contracts;
+  //  - Any user can add any whitelisted ERC721 or ERC1155 token as a Charged Particle without Limits,
+  //    unless the Owner of the ERC721 or ERC1155 token contract registers the token
+  //    and sets the Custom Settings for their token(s)
+  struct NftSettings {
+    uint256 actionPerms;
+    string requiredWalletManager;
+    string requiredBasketManager;
+
+    // ERC20
+    bool restrictedAssetTokens;
+    mapping (address => bool) allowedAssetTokens;
+    mapping (address => uint256) depositMin;  // Asset Token Address => Min
+    mapping (address => uint256) depositMax;  // Asset Token Address => Max
+
+    // ERC721 / ERC1155
+    mapping (address => uint256) maxNfts;     // NFT Token Address => Max
+  }
+
+  // Optional Configs for individual NFTs set by NFT Creator
+  struct CreatorSettings {
+    uint256 annuityPercent;
+    address annuityRedirect;
+  }
+
+  struct NftState {
+    uint256 dischargeTimelock;
+    uint256 releaseTimelock;
+    uint256 tempLockExpiry;
+
+    mapping (address => address) dischargeApproval;
+    mapping (address => address) releaseApproval;
+    mapping (address => address) timelockApproval;
+  }
+
   // Linked Contracts
   IUniverse internal _universe;
-  string[] internal _walletManagers;
-  string[] internal _nftBaskets;
+
+  uint256 internal _depositCap;
+  uint256 internal _tempLockExpiryBlocks;
+
+  // Wallet/Basket Managers (by Unique Manager ID)
   mapping (string => IWalletManager) internal _ftWalletManager;
   mapping (string => IBasketManager) internal _nftBasketManager;
 
-  // Optional Configs set by Owner of External Token Contracts;
-  mapping (address => Whitelists) internal _contractWhitelists;
+  // Settings for individual NFTs set by NFT Creator (by Token UUID)
+  mapping (uint256 => CreatorSettings) internal _creatorSettings;
 
-  // Optional Configs set by Owner of External Token Contracts;
-  mapping (address => ExternalContractConfigs) internal _externalConfigs;
+  // Settings for External NFT Token Contracts (by Token Contract Address)
+  mapping (address => NftSettings) internal _nftSettings;
 
-  //     TokenUUID => Config for individual NFTs set by NFT Creator
-  mapping (uint256 => CreatorConfigs) internal _creatorConfigs;
-
-  // TokenUUID => NFT Owner => NFT Approvals
-  mapping (uint256 => mapping (address => NftApprovals)) internal _nftApprovals;
-
-  // TokenUUID => NFT State
+  // Stae of individuak NFTs (by Token UUID)
   mapping (uint256 => NftState) internal _nftState;
-
-  // Deposit Cap
-  uint256 internal _depositCap;
 
 
   /***********************************|
@@ -154,6 +154,22 @@ abstract contract ChargedParticlesBase is
 
   function getDepositCap() external virtual override view returns (uint256) {
     return _depositCap;
+  }
+
+  function getTokenLockExpiry(address contractAddress, uint256 tokenId) external virtual override view returns (uint256 lockExpiry) {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+
+    if (_nftState[tokenUuid].dischargeTimelock > block.number) {
+      lockExpiry = _nftState[tokenUuid].dischargeTimelock;
+    }
+
+    if (_nftState[tokenUuid].releaseTimelock > block.number) {
+      lockExpiry = _nftState[tokenUuid].releaseTimelock;
+    }
+
+    if (_nftState[tokenUuid].tempLockExpiry > block.number) {
+      lockExpiry = _nftState[tokenUuid].tempLockExpiry;
+    }
   }
 
   function isTokenCreator(address contractAddress, uint256 tokenId, address account) external virtual override view returns (bool) {
@@ -172,30 +188,12 @@ abstract contract ChargedParticlesBase is
     return _isWalletManagerEnabled(walletManagerId);
   }
 
-  function getWalletManagerCount() external virtual override view returns (uint) {
-    return _walletManagers.length;
-  }
-
-  function getWalletManagerByIndex(uint index) external virtual override view returns (string memory) {
-    require(index >= 0 && index < _walletManagers.length, "CP: E-201");
-    return _walletManagers[index];
-  }
-
   function getWalletManager(string calldata walletManagerId) external virtual override view returns (address) {
     return address(_ftWalletManager[walletManagerId]);
   }
 
   function isNftBasketEnabled(string calldata basketId) external virtual override view returns (bool) {
     return _isNftBasketEnabled(basketId);
-  }
-
-  function getNftBasketCount() external virtual override view returns (uint) {
-    return _nftBaskets.length;
-  }
-
-  function getNftBasketByIndex(uint index) external virtual override view returns (string memory) {
-    require(index >= 0 && index < _nftBaskets.length, "CP: E-201");
-    return _nftBaskets[index];
   }
 
   function getBasketManager(string calldata basketId) external virtual override view returns (address) {
@@ -334,29 +332,23 @@ abstract contract ChargedParticlesBase is
   |(For External Contract Integration)|
   |__________________________________*/
 
-  /// @notice Checks if an Account is the Owner of a Contract
+  /// @notice Checks if an Account is the Owner of an NFT Contract
   ///    When Custom Contracts are registered, only the "owner" or operator of the Contract
   ///    is allowed to register them and define custom rules for how their tokens are "Charged".
   ///    Otherwise, any token can be "Charged" according to the default rules of Charged Particles.
-  /// @param contractAddress  The Address to the External Contract to check
+  /// @param contractAddress  The Address to the External NFT Contract to check
   /// @param account          The Account to check if it is the Owner of the specified Contract
   /// @return True if the account is the Owner of the _contract
   function isContractOwner(address contractAddress, address account) external override virtual view returns (bool) {
     return _isContractOwner(contractAddress, account);
   }
 
-  /// @notice Sets the Custom Configuration for External Contracts
-  /// @param contractAddress    The Address to the External Contract to configure
-  /// @param walletManager      If set, will only allow deposits from this specific LP, otherwise any LP supported
-  /// @param assetDepositMin    If set, will define the minimum amount of Asset tokens the NFT may hold, otherwise any amount
-  /// @param assetDepositMax    If set, will define the maximum amount of Asset tokens the NFT may hold, otherwise any amount
-  function setExternalContractConfigs(
+  /// @notice Sets a Required Wallet-Manager for External NFT Contracts (otherwise set to "none" to allow any Wallet-Manager)
+  /// @param contractAddress    The Address to the External NFT Contract to configure
+  /// @param walletManager      If set, will only allow deposits from this specific Wallet-Manager
+  function setRequiredWalletManager(
     address contractAddress,
-    string calldata walletManager,
-    string calldata basketManager,
-    address assetToken,
-    uint256 assetDepositMin,
-    uint256 assetDepositMax
+    string calldata walletManager
   )
     external
     virtual
@@ -365,19 +357,117 @@ abstract contract ChargedParticlesBase is
     onlyContractOwnerOrAdmin(contractAddress, msg.sender)
   {
     // Update Configs for External Token Contract
-    _externalConfigs[contractAddress].walletManager = walletManager;
-    _externalConfigs[contractAddress].basketManager = basketManager;
-    _externalConfigs[contractAddress].assetToken = assetToken;
-    _externalConfigs[contractAddress].depositMin = assetDepositMin;
-    _externalConfigs[contractAddress].depositMax = assetDepositMax;
+    if (keccak256(bytes(walletManager)) == keccak256(bytes("none"))) {
+      _nftSettings[contractAddress].requiredWalletManager = "";
+    } else {
+      _nftSettings[contractAddress].requiredWalletManager = walletManager;
+    }
 
-    emit TokenContractConfigsSet(
+    emit RequiredWalletManagerSet(
       contractAddress,
-      walletManager,
-      basketManager,
+      walletManager
+    );
+  }
+
+  /// @notice Sets a Required Basket-Manager for External NFT Contracts (otherwise set to "none" to allow any Basket-Manager)
+  /// @param contractAddress    The Address to the External Contract to configure
+  /// @param basketManager      If set, will only allow deposits from this specific Basket-Manager
+  function setRequiredBasketManager(
+    address contractAddress,
+    string calldata basketManager
+  )
+    external
+    virtual
+    override
+    onlyValidExternalContract(contractAddress)
+    onlyContractOwnerOrAdmin(contractAddress, msg.sender)
+  {
+    // Update Configs for External Token Contract
+    if (keccak256(bytes(basketManager)) == keccak256(bytes("none"))) {
+      _nftSettings[contractAddress].requiredBasketManager = "";
+    } else {
+      _nftSettings[contractAddress].requiredBasketManager = basketManager;
+    }
+
+    emit RequiredBasketManagerSet(
+      contractAddress,
+      basketManager
+    );
+  }
+
+  /// @notice Enables or Disables Asset-Token Restrictions for External NFT Contracts
+  /// @param contractAddress      The Address to the External NFT Contract to configure
+  /// @param restrictionsEnabled  If set, will only allow deposits from Allowed Asset Tokens
+  function setAssetTokenRestrictions(
+    address contractAddress,
+    bool restrictionsEnabled
+  )
+    external
+    virtual
+    override
+    onlyValidExternalContract(contractAddress)
+    onlyContractOwnerOrAdmin(contractAddress, msg.sender)
+  {
+    // Update Configs for External Token Contract
+    _nftSettings[contractAddress].restrictedAssetTokens = restrictionsEnabled;
+
+    emit AssetTokenRestrictionsSet(
+      contractAddress,
+      restrictionsEnabled
+    );
+  }
+
+  /// @notice Enables or Disables Allowed Asset Tokens for External NFT Contracts
+  /// @param contractAddress  The Address to the External NFT Contract to configure
+  /// @param assetToken       The Address of the Asset Token to Allow or Disallow
+  /// @param isAllowed        True if the Asset Token is allowed
+  function setAllowedAssetToken(
+    address contractAddress,
+    address assetToken,
+    bool isAllowed
+  )
+    external
+    virtual
+    override
+    onlyValidExternalContract(contractAddress)
+    onlyContractOwnerOrAdmin(contractAddress, msg.sender)
+  {
+    // Update Configs for External Token Contract
+    _nftSettings[contractAddress].allowedAssetTokens[assetToken] = isAllowed;
+
+    emit AllowedAssetTokenSet(
+      contractAddress,
       assetToken,
-      assetDepositMin,
-      assetDepositMax
+      isAllowed
+    );
+  }
+
+  /// @notice Sets the Custom Configuration for External Contracts
+  /// @param contractAddress  The Address to the External Contract to configure
+  /// @param assetToken       The address of the Asset Token to set Limits for
+  /// @param depositMin       If set, will define the minimum amount of Asset tokens the NFT may hold, otherwise any amount
+  /// @param depositMax       If set, will define the maximum amount of Asset tokens the NFT may hold, otherwise any amount
+  function setAssetTokenLimits(
+    address contractAddress,
+    address assetToken,
+    uint256 depositMin,
+    uint256 depositMax
+  )
+    external
+    virtual
+    override
+    onlyValidExternalContract(contractAddress)
+    onlyContractOwnerOrAdmin(contractAddress, msg.sender)
+  {
+    // Update Configs for External Token Contract
+    _nftSettings[contractAddress].depositMin[assetToken] = depositMin;
+    _nftSettings[contractAddress].depositMax[assetToken] = depositMax;
+
+    emit AssetTokenLimitsSet(
+      contractAddress,
+      assetToken,
+      depositMin,
+      depositMax
     );
   }
 
@@ -402,7 +492,7 @@ abstract contract ChargedParticlesBase is
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
     // Update Configs for External Token Creator
-    _creatorConfigs[tokenUuid].annuityPercent = annuityPercent;
+    _creatorSettings[tokenUuid].annuityPercent = annuityPercent;
 
     emit TokenCreatorConfigsSet(
       contractAddress,
@@ -423,7 +513,7 @@ abstract contract ChargedParticlesBase is
   {
     require(_isTokenCreator(contractAddress, tokenId, _msgSender()), "CP: E-104");
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    _creatorConfigs[tokenUuid].annuityRedirect = receiver;
+    _creatorSettings[tokenUuid].annuityRedirect = receiver;
     emit TokenCreatorAnnuitiesRedirected(contractAddress, tokenId, receiver);
   }
 
@@ -445,7 +535,6 @@ abstract contract ChargedParticlesBase is
     require(newWalletMgr.isPaused() != true, "CP: E-418");
 
     // Register LP ID
-    _walletManagers.push(walletManagerId);
     _ftWalletManager[walletManagerId] = newWalletMgr;
     emit WalletManagerRegistered(walletManagerId, walletManager);
   }
@@ -457,7 +546,6 @@ abstract contract ChargedParticlesBase is
     require(newBasketMgr.isPaused() != true, "CP: E-418");
 
     // Register Basket ID
-    _nftBaskets.push(basketId);
     _nftBasketManager[basketId] = newBasketMgr;
     emit BasketManagerRegistered(basketId, basketManager);
   }
@@ -465,6 +553,10 @@ abstract contract ChargedParticlesBase is
   function setDepositCap(uint256 cap) external virtual onlyOwner {
     _depositCap = cap;
     emit DepositCapSet(cap);
+  }
+
+  function setTempLockExpiryBlocks(uint256 numBlocks) external virtual onlyOwner {
+    _tempLockExpiryBlocks = numBlocks;
   }
 
 
@@ -475,7 +567,7 @@ abstract contract ChargedParticlesBase is
   /// @dev See {ChargedParticles-getCreatorAnnuitiesRedirect}.
   function _getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) internal view virtual returns (address) {
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    return _creatorConfigs[tokenUuid].annuityRedirect;
+    return _creatorSettings[tokenUuid].annuityRedirect;
   }
 
   /// @dev See {ChargedParticles-isWalletManagerEnabled}.
@@ -508,35 +600,35 @@ abstract contract ChargedParticlesBase is
   function _isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) internal view virtual returns (bool) {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    return contractAddress == operator || tokenOwner == operator || _nftApprovals[tokenUuid][tokenOwner].discharge == operator;
+    return contractAddress == operator || tokenOwner == operator || _nftState[tokenUuid].dischargeApproval[tokenOwner] == operator;
   }
 
   /// @dev See {ChargedParticles-isApprovedForRelease}.
   function _isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) internal view virtual returns (bool) {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    return contractAddress == operator || tokenOwner == operator || _nftApprovals[tokenUuid][tokenOwner].release == operator;
+    return contractAddress == operator || tokenOwner == operator || _nftState[tokenUuid].releaseApproval[tokenOwner] == operator;
   }
 
   /// @dev See {ChargedParticles-isApprovedForTimelock}.
   function _isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) internal view virtual returns (bool) {
-    if (_contractWhitelists[operator].timelockAnyNft) { return true; }
-    if (_contractWhitelists[operator].timelockOwnNft && contractAddress == operator) { return true; }
+    if (_nftSettings[operator].actionPerms.hasBit(PERM_TIMELOCK_ANY_NFT)) { return true; }
+    if (_nftSettings[operator].actionPerms.hasBit(PERM_TIMELOCK_OWN_NFT) && contractAddress == operator) { return true; }
 
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    return tokenOwner == operator || _nftApprovals[tokenUuid][tokenOwner].timelock == operator;
+    return tokenOwner == operator || _nftState[tokenUuid].timelockApproval[tokenOwner] == operator;
   }
 
-  /// @dev Checks if an External NFT contract follows standards
+  /// @dev Checks if an External NFT contract is vald
   /// @param contractAddress  The Address to the Contract of the NFT
   /// @return True if the contract follows current standards
   function isValidExternalContract(address contractAddress) internal view virtual returns (bool) {
-    // Check Token Interface to ensure compliance
-    IERC165Upgradeable tokenInterface = IERC165Upgradeable(contractAddress);
-    bool _is721 = tokenInterface.supportsInterface(INTERFACE_SIGNATURE_ERC721);
-    bool _is1155 = tokenInterface.supportsInterface(INTERFACE_SIGNATURE_ERC1155);
-    return (_is721 || _is1155);
+    bytes32 codehash;
+    bytes32 accountHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470;
+    // solhint-disable-next-line no-inline-assembly
+    assembly { codehash := extcodehash(contractAddress) }
+    return (codehash != accountHash && codehash != 0x0);
   }
 
   /// @dev Checks if an account is the Owner of an External NFT contract
@@ -582,6 +674,63 @@ abstract contract ChargedParticlesBase is
     return (sender == tokenOwner || tokenInterface.isApprovedForAll(tokenOwner, sender));
   }
 
+  /// @notice Sets an Operator as Approved to Discharge a specific Token
+  /// This allows an operator to withdraw the interest-portion only
+  /// @param contractAddress  The Address to the Contract of the Token
+  /// @param tokenId          The ID of the Token
+  /// @param tokenOwner       The Owner Address of the Token
+  /// @param operator         The Address of the Operator to Approve
+  function _setDischargeApproval(
+    address contractAddress,
+    uint256 tokenId,
+    address tokenOwner,
+    address operator
+  )
+    internal
+  {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    _nftState[tokenUuid].dischargeApproval[tokenOwner] = operator;
+    emit DischargeApproval(contractAddress, tokenId, tokenOwner, operator);
+  }
+
+  /// @notice Sets an Operator as Approved to Release a specific Token
+  /// This allows an operator to withdraw the principal + interest
+  /// @param contractAddress  The Address to the Contract of the Token
+  /// @param tokenId          The ID of the Token
+  /// @param tokenOwner       The Owner Address of the Token
+  /// @param operator         The Address of the Operator to Approve
+  function _setReleaseApproval(
+    address contractAddress,
+    uint256 tokenId,
+    address tokenOwner,
+    address operator
+  )
+    internal
+  {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    _nftState[tokenUuid].releaseApproval[tokenOwner] = operator;
+    emit ReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
+  }
+
+  /// @notice Sets an Operator as Approved to Timelock a specific Token
+  /// This allows an operator to timelock the principal or interest
+  /// @param contractAddress  The Address to the Contract of the Token
+  /// @param tokenId          The ID of the Token
+  /// @param tokenOwner       The Owner Address of the Token
+  /// @param operator         The Address of the Operator to Approve
+  function _setTimelockApproval(
+    address contractAddress,
+    uint256 tokenId,
+    address tokenOwner,
+    address operator
+  )
+    internal
+  {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    _nftState[tokenUuid].timelockApproval[tokenOwner] = operator;
+    emit TimelockApproval(contractAddress, tokenId, tokenOwner, operator);
+  }
+
   /// @dev Validates a Deposit according to the rules set by the Token Contract
   /// @param contractAddress      The Address to the Contract of the External NFT to check
   /// @param tokenId              The Token ID of the External NFT to check
@@ -608,17 +757,17 @@ abstract contract ChargedParticlesBase is
     }
 
     // Valid Wallet Manager?
-    string memory requiredWalletManager = _externalConfigs[contractAddress].walletManager;
+    string memory requiredWalletManager = _nftSettings[contractAddress].requiredWalletManager;
     if (bytes(requiredWalletManager).length > 0) {
         require(keccak256(abi.encodePacked(requiredWalletManager)) == keccak256(abi.encodePacked(walletManagerId)), "CP: E-419");
     }
 
     // Valid Amount for Deposit?
-    if (_externalConfigs[contractAddress].depositMin > 0) {
-        require(newBalance >= _externalConfigs[contractAddress].depositMin, "CP: E-410");
+    if (_nftSettings[contractAddress].depositMin[assetToken] > 0) {
+        require(newBalance >= _nftSettings[contractAddress].depositMin[assetToken], "CP: E-410");
     }
-    if (_externalConfigs[contractAddress].depositMax > 0) {
-        require(newBalance <= _externalConfigs[contractAddress].depositMax, "CP: E-410");
+    if (_nftSettings[contractAddress].depositMax[assetToken] > 0) {
+        require(newBalance <= _nftSettings[contractAddress].depositMax[assetToken], "CP: E-410");
     }
   }
 
@@ -670,7 +819,7 @@ abstract contract ChargedParticlesBase is
     IBasketManager basketMgr = _nftBasketManager[basketManagerId];
 
     // Valid Basket Manager?
-    string memory requiredBasketManager = _externalConfigs[contractAddress].basketManager;
+    string memory requiredBasketManager = _nftSettings[contractAddress].requiredBasketManager;
     if (bytes(requiredBasketManager).length > 0) {
         require(keccak256(abi.encodePacked(requiredBasketManager)) == keccak256(abi.encodePacked(basketManagerId)), "CP: E-419");
     }
@@ -696,7 +845,7 @@ abstract contract ChargedParticlesBase is
   {
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     creator = IERC721Chargeable(contractAddress).creatorOf(tokenId);
-    annuityPct = _creatorConfigs[tokenUuid].annuityPercent;
+    annuityPct = _creatorSettings[tokenUuid].annuityPercent;
   }
 
   /// @dev Collects the Required ERC20 Token(s) from the users wallet

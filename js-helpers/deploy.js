@@ -94,7 +94,8 @@ const getTxGasCost = ({deployTransaction}) => {
 
 const presets = {
   ChargedParticles: {
-    maxDeposit: toWei('10000') // Temporary limit; remove after launch proves successful
+    maxDeposit: toWei('10000'),    // Temporary limit; remove after launch proves successful
+    tempLockExpiryBlocks: '5760'   // ~ One Day; 86400 / 15
   },
   Ion: {
     maxSupply: toWei('40000000'), // 40% of 100 Million (Community Liquidity Mining Portion)

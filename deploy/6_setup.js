@@ -21,6 +21,7 @@ module.exports = async (hre) => {
     const referralCode = presets.Aave.referralCode[chainId];
     const ionMaxSuppy = presets.Ion.maxSupply;
     const depositCap = presets.ChargedParticles.maxDeposit;
+    const tempLockExpiryBlocks = presets.ChargedParticles.tempLockExpiryBlocks;
 
     const ddUniverse = getDeployData('Universe', chainId);
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
@@ -93,6 +94,9 @@ module.exports = async (hre) => {
 
     log(`  - [TX-${txCount++}] ChargedParticles: Setting Deposit Cap`)(alchemyTimeout);
     await chargedParticles.setDepositCap(depositCap);
+
+    log(`  - [TX-${txCount++}] ChargedParticles: Setting Temp-Lock Expiry Blocks`)(alchemyTimeout);
+    await chargedParticles.setTempLockExpiryBlocks(tempLockExpiryBlocks);
 
     // log(`  - [TX-${txCount++}] ChargedParticles: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     // await chargedParticles.transferOwnership(owner);
