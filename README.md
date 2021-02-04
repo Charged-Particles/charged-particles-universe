@@ -1,10 +1,10 @@
-## Charged Particles Universe - Solidity Contracts v0.1.1
+## Charged Particles Universe - Solidity Contracts v0.2.0
 
-[![Discord](https://badgen.net/badge/definft/Charged%20Particles?icon=discord&label=discord)](https://discord.gg/Syh3gjz)
+[![Discord](https://badgen.net/badge/definft/Charged%20Particles?icon=discord&label=discord)](https://discord.gg/Cdv6zZMKEa)
 [![Twitter Follow](https://badgen.net/twitter/follow/DeFiNFT?icon=twitter)](https://twitter.com/intent/follow?screen_name=DeFiNFT)
 [![built-with openzeppelin](https://img.shields.io/badge/built%20with-OpenZeppelin-3677FF)](https://docs.openzeppelin.com/)
 
-[![Coverage Status](https://coveralls.io/repos/github/Charged-Particles/ChargedParticlesEth/badge.svg?branch=master)](https://coveralls.io/github/Charged-Particles/charged-particles-universe?branch=main&v=v0.1.1)
+[![Coverage Status](https://coveralls.io/repos/github/Charged-Particles/ChargedParticlesEth/badge.svg?branch=master)](https://coveralls.io/github/Charged-Particles/charged-particles-universe?branch=main&v=v0.2.0)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Charged-Particles/charged-particles-universe)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/Charged-Particles/charged-particles-universe)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Charged-Particles/charged-particles-universe)
@@ -14,6 +14,7 @@
 
 **Coming Soon**:
 
+- Compound - cTokens
 - mStable - mTokens
 - yEarn - yTokens
 
@@ -24,7 +25,7 @@
 - https://charged.fi
 
 #### Staging Site
-- https://charged-particles.tmnl.co/
+- https://charged-particles-stg.netlify.app/
 
 ---
 
@@ -61,9 +62,7 @@ Other possibilities include battling over the "charge" of a particle - the winne
 competitor's particles.  (Still trying to work this part out, ideas are welcome!)
 
 #### Particle Accelerator
- - Fully-decentralized Public Particle Energizing Station
- - Work-in-progress
- - Repo: https://github.com/robsecord/ChargedParticlesWeb
+ - Fully-decentralized Public Particle Minting & Energizing Station
 
 #### Feedback & Contributions
 Feel free to fork and/or use in your own projects!
@@ -73,7 +72,7 @@ And, of course, contributions are always welcome!
 #### Community
 Join our community, share ideas and help support the project in anyway you want!
 
-**Discord**: https://discord.gg/Syh3gjz
+**Discord**: https://discord.gg/Cdv6zZMKEa
 
 ---
 
@@ -81,22 +80,23 @@ Join our community, share ideas and help support the project in anyway you want!
  - Main Repo:
     - OpenZeppelin CLI **v2.8.0**
     - OpenZeppelin Upgrades **v2.8.0**
-    - OpenZeppelin Ethereum Contracts **v3.0.0**
+    - OpenZeppelin Ethereum Contracts **v3.3.0**
     - Solidity  **v0.6.12** (solc-js)
     - NodeJS **v12.16.3**
-    - hardhat **v1.3.8**
-    - EthersJS **v5.0.3**
+    - hardhat **v2.0.3**
+    - EthersJS **v5.0.8**
 
 ### Prepare environment:
 
  Create a local .env file with the following (replace ... with your keys):
 
 ```bash
-    INFURA_API_KEY="__api_key_only_no_url__"
-
-    TESTNET_MNEMONIC="__12-word_mnemonic__"
-
-    MAINNET_MNEMONIC="__12-word_mnemonic__"
+    INFURA_APIKEY="__api_key_only_no_url__"
+    ALCHEMY_APIKEY="__api_key_only_no_url__"
+    ETHERSCAN_APIKEY="__api_key_only_no_url__"
+    TESTNET_MNEMONIC="wallet_mnemonic_separated_by_underscores"
+    MAINNET_MNEMONIC="wallet_mnemonic_separated_by_underscores"
+    OPTIMIZER_DISABLED="true|false"
 ```
 
 ### Deploy:

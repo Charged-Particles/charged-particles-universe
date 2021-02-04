@@ -98,7 +98,7 @@ const presets = {
     maxDeposit: toWei('10000') // Temporary limit; remove after launch proves successful
   },
   Ion: {
-    maxSupply: toWei('40000000'), // 40% of 100 Million (Community Liquidity Mining Portion)
+    universeMaxSupply: toWei('40000000'), // 40% of 100 Million (Community Liquidity Mining Portion)
     rewardsForAssetTokens: [
       {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI
     ],

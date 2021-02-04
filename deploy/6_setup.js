@@ -19,7 +19,7 @@ module.exports = async (hre) => {
     const lendingPoolProviderV1 = presets.Aave.v1.lendingPoolProvider[chainId];
     const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
     const referralCode = presets.Aave.referralCode[chainId];
-    const ionMaxSuppy = presets.Ion.maxSupply;
+    const ionMaxSuppy = presets.Ion.universeMaxSupply;
     const depositCap = presets.ChargedParticles.maxDeposit;
     const tempLockExpiryBlocks = presets.ChargedParticles.tempLockExpiryBlocks;
 
@@ -86,9 +86,6 @@ module.exports = async (hre) => {
     await log(`\n  - [TX-${txCount++}] Universe: Registering ChargedParticles`)(alchemyTimeout);
     await universe.setChargedParticles(ddChargedParticles.address);
 
-    // await log(`  - [TX-${txCount++}] Universe: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
-    // await universe.transferOwnership(owner);
-
     await log(`  - [TX-${txCount++}] ChargedParticles: Registering Universe`)(alchemyTimeout);
     await chargedParticles.setUniverse(ddUniverse.address);
 
@@ -97,9 +94,6 @@ module.exports = async (hre) => {
 
     await log(`  - [TX-${txCount++}] ChargedParticles: Setting Temp-Lock Expiry Blocks`)(alchemyTimeout);
     await chargedParticles.setTempLockExpiryBlocks(tempLockExpiryBlocks);
-
-    // await log(`  - [TX-${txCount++}] ChargedParticles: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
-    // await chargedParticles.transferOwnership(owner);
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -112,17 +106,11 @@ module.exports = async (hre) => {
     await log(`  - [TX-${txCount++}] GenericWalletManager: Registering Generic Wallet Manager with ChargedParticles`)(alchemyTimeout);
     await chargedParticles.registerWalletManager('generic', ddGenericWalletManager.address);
 
-    // await log(`  - [TX-${txCount++}] GenericWalletManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
-    // await genericWalletManager.transferOwnership(owner);
-
     await log(`  - [TX-${txCount++}] GenericBasketManager: Setting Charged Particles as Controller`)(alchemyTimeout);
     await genericBasketManager.setController(ddChargedParticles.address);
 
     await log(`  - [TX-${txCount++}] GenericBasketManager: Registering Generic Basket Manager with ChargedParticles`)(alchemyTimeout);
     await chargedParticles.registerBasketManager('generic', ddGenericBasketManager.address);
-
-    // await log(`  - [TX-${txCount++}] GenericBasketManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
-    // await genericBasketManager.transferOwnership(owner);
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -152,9 +140,6 @@ module.exports = async (hre) => {
     await log(`  - [TX-${txCount++}] AaveWalletManager: Registering Aave as LP with ChargedParticles`)(alchemyTimeout);
     await chargedParticles.registerWalletManager('aave', ddAaveWalletManager.address);
 
-    // await log(`  - [TX-${txCount++}] AaveWalletManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
-    // await aaveWalletManager.transferOwnership(owner);
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Proton
@@ -182,9 +167,6 @@ module.exports = async (hre) => {
 
     await log(`  - [TX-${txCount++}] Universe: Registering Ion`)(alchemyTimeout);
     await universe.setCation(ddIon.address, ionMaxSuppy);
-
-    await log(`  - [TX-${txCount++}] Ion: Minting to Universe`)(alchemyTimeout);
-    await ion.mintToUniverse(ionMaxSuppy);
 
     let assetTokenId;
     let assetTokenAddress;
