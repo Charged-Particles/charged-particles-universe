@@ -39,7 +39,7 @@ module.exports = async (hre) => {
       deployTransaction: universe.deployTransaction,
     }
 
-    log('  Deploying ChargedParticles...')(alchemyTimeout);
+    await log('  Deploying ChargedParticles...')(alchemyTimeout);
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
     const ChargedParticlesInstance = await upgrades.deployProxy(ChargedParticles, [trustedForwarder], { unsafeAllowCustomTypes: true });
     const chargedParticles = await ChargedParticlesInstance.deployed();
@@ -50,7 +50,7 @@ module.exports = async (hre) => {
     }
 
     // Display Contract Addresses
-    log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
+    await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
     log('  - Universe:         ', universe.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
     log('  - ChargedParticles: ', chargedParticles.address);

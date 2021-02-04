@@ -192,7 +192,7 @@ contract GenericWalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "GenericWalletManager: E-403");
+    require(wallet != address(0x0), "GenericWalletManager:E-403");
 
     // Release Principal + Interest
     principalAmount = GenericSmartWallet(wallet).getPrincipal(assetToken);
@@ -217,7 +217,7 @@ contract GenericWalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "GenericWalletManager: E-403");
+    require(wallet != address(0x0), "GenericWalletManager:E-403");
 
     // Release from interest first + principal if needed
     principalAmount = GenericSmartWallet(wallet).getPrincipal(assetToken);
@@ -235,7 +235,7 @@ contract GenericWalletManager is WalletManagerBase {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "genericERC20WalletManager: E-403");
+    require(wallet != address(0x0), "genericERC20WalletManager:E-403");
 
     // Withdraw Rewards to Receiver
     amount = GenericSmartWallet(wallet).withdrawRewards(receiver, rewardsToken, rewardsAmount);

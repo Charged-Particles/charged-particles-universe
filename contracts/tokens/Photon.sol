@@ -67,7 +67,7 @@ contract Photon is Initializable, ContextUpgradeable, RelayRecipient, BlackholeP
 
   function transfer(address receiver) external {
     address sender = _msgSender();
-    require(bytes(_photonURIs[sender]).length > 0, "Photon: E-422");
+    require(bytes(_photonURIs[sender]).length > 0, "Photon:E-422");
 
     _photonURIs[receiver] = _photonURIs[sender];
     delete _photonURIs[sender];

@@ -27,7 +27,7 @@ module.exports = async (hre) => {
     log('  - Owner:       ', protocolOwner);
     log(' ');
 
-    log('\n  Deploying Ion FT...')(alchemyTimeout);
+    await log('\n  Deploying Ion FT...')(alchemyTimeout);
     const Ion = await ethers.getContractFactory('Ion');
     const IonInstance = await Ion.deploy();
     const ion = await IonInstance.deployed();
@@ -38,7 +38,7 @@ module.exports = async (hre) => {
     }
 
     // Display Contract Addresses
-    log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
+    await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
     log('  - Ion:         ', ion.address);
     log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ion.deployTransaction }));
 

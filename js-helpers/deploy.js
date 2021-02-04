@@ -2,7 +2,7 @@ const { ethers } = require('ethers');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
-const { sleep } = require("sleep");
+const sleep = require('sleep-promise');
 
 const toWei = ethers.utils.parseEther;
 const toEth = ethers.utils.formatEther;
@@ -14,7 +14,7 @@ const txOverrides = (options = {}) => ({gasLimit: 15000000, ...options});
 
 const log = (...args) => {
   console.log(...args);
-  return (delay = 0) => (delay && sleep(delay));
+  return async (delay = 0) => (delay && await sleep(delay));
 };
 
 const chainIdByName = (chainName) => {
@@ -94,8 +94,8 @@ const getTxGasCost = ({deployTransaction}) => {
 
 const presets = {
   ChargedParticles: {
-    maxDeposit: toWei('10000'),    // Temporary limit; remove after launch proves successful
-    tempLockExpiryBlocks: '5760'   // ~ One Day; 86400 / 15
+    tempLockExpiryBlocks: toBN('5760'), // 1 Day == 86400 / 15
+    maxDeposit: toWei('10000') // Temporary limit; remove after launch proves successful
   },
   Ion: {
     maxSupply: toWei('40000000'), // 40% of 100 Million (Community Liquidity Mining Portion)

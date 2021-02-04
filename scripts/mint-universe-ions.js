@@ -1,5 +1,5 @@
 
-const { ethers, upgrades, getNamedAccounts, deployments } = require('@nomiclabs/buidler');
+const { ethers, upgrades, getNamedAccounts, deployments } = require('hardhat');
 const _ = require('lodash');
 
 const {

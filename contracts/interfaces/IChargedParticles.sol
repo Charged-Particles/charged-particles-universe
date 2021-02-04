@@ -32,7 +32,6 @@ interface IChargedParticles {
   |             Public API            |
   |__________________________________*/
 
-  function getDepositCap() external view returns (uint256);
   function isTokenCreator(address contractAddress, uint256 tokenId, address account) external view returns (bool);
   function getTokenLockExpiry(address contractAddress, uint256 tokenId) external view returns (uint256 lockExpiry);
   function getCreatorAnnuities(address contractAddress, uint256 tokenId) external view returns (address creator, uint256 annuityPct);
@@ -45,9 +44,6 @@ interface IChargedParticles {
   // ERC721
   function isNftBasketEnabled(string calldata basketId) external view returns (bool);
   function getBasketManager(string calldata basketId) external view returns (address);
-
-  function getTokenUUID(address contractAddress, uint256 tokenId) external pure returns (uint256);
-  function getOwnerUUID(string calldata walletManagerId, address owner) external pure returns (uint256);
 
   function setDischargeApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setReleaseApproval(address contractAddress, uint256 tokenId, address operator) external;
@@ -114,6 +110,12 @@ interface IChargedParticles {
     address assetToken,
     uint256 depositMin,
     uint256 depositMax
+  ) external;
+
+  function setMaxNfts(
+    address contractAddress,
+    address nftTokenAddress,
+    uint256 maxNfts
   ) external;
 
   function setCreatorConfigs(
@@ -242,6 +244,11 @@ interface IChargedParticles {
     address assetToken,
     uint256 assetDepositMin,
     uint256 assetDepositMax
+  );
+  event MaxNftsSet(
+    address indexed contractAddress,
+    address indexed nftTokenAddress,
+    uint256 maxNfts
   );
   event TokenCreatorConfigsSet(
     address indexed contractAddress,

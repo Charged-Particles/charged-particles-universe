@@ -41,6 +41,7 @@
     "chalk": "^4.0.0",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
+    "erc20permit": "^0.0.4",
     "eslint": "^7.0.0",
     "eslint-plugin-jest": "^24.0.1",
     "ethereum-waffle": "^3.0.0",
@@ -53,13 +54,12 @@
     "hardhat-gas-reporter": "^1.0.4",
     "lodash": "^4.17.15",
     "mocha-junit-reporter": "^2.0.0",
-    "sleep": "^6.3.0",
     "solc": "0.6.12",
     "solhint": "^3.0.0",
     "solidity-coverage": "^0.7.4",
     "solidity-docgen": "^0.5.3"
   },
   "dependencies": {
-    "erc20permit": "^0.0.4"
+    "sleep-promise": "^9.1.0"
   }
 }

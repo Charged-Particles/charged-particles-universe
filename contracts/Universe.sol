@@ -82,8 +82,8 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   |__________________________________*/
 
   function conductMetallicBond(uint256 amount) public returns (uint256 positiveEnergy) {
-    require(esaLevel[msg.sender] > 0, "Universe: E-411");
-    require(cationSource.balanceOf(address(this)) > 0, "Universe: E-413");
+    require(esaLevel[msg.sender] > 0, "Universe:E-411");
+    require(cationSource.balanceOf(address(this)) > 0, "Universe:E-413");
     return _conductMetallicBond(msg.sender, amount);
   }
 
@@ -316,19 +316,19 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
 
   /// @dev Throws if called by any non-account
   modifier onlyValidContractAddress(address account) {
-    require(account != address(0x0) && account.isContract(), "Universe: E-417");
+    require(account != address(0x0) && account.isContract(), "Universe:E-417");
     _;
   }
 
   /// @dev Throws if called by any account other than the Charged Particles contract
   modifier onlyChargedParticles() {
-    require(chargedParticles == msg.sender, "Universe: E-108");
+    require(chargedParticles == msg.sender, "Universe:E-108");
     _;
   }
 
   /// @dev Throws if called by any account other than the Proton NFT contract
   modifier onlyProton() {
-    require(proton == msg.sender, "Universe: E-110");
+    require(proton == msg.sender, "Universe:E-110");
     _;
   }
 }

@@ -292,7 +292,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   function _setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct)
     internal
   {
-    require(royaltiesPct <= MAX_ROYALTIES, "Proton: E-421");
+    require(royaltiesPct <= MAX_ROYALTIES, "Proton:E-421");
     _tokenCreatorRoyaltiesPct[tokenId] = royaltiesPct;
     emit CreatorRoyaltiesSet(tokenId, royaltiesPct);
   }
@@ -318,7 +318,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     internal
     returns (uint256 newTokenId)
   {
-    require(address(_chargedParticles) != address(0x0), "Proton: E-107");
+    require(address(_chargedParticles) != address(0x0), "Proton:E-107");
 
     newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent, 0, 0);
 
@@ -371,7 +371,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   )
     internal
   {
-    require(tokenMetaUris.length == salePrices.length, "Proton: E-202");
+    require(tokenMetaUris.length == salePrices.length, "Proton:E-202");
     address self = address(this);
 
     uint256 count = tokenMetaUris.length;
@@ -432,8 +432,8 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     returns (bool)
   {
     uint256 salePrice = _tokenSalePrice[tokenId];
-    require(salePrice > 0, "Proton: E-416");
-    require(msg.value >= salePrice, "Proton: E-414");
+    require(salePrice > 0, "Proton:E-416");
+    require(msg.value >= salePrice, "Proton:E-414");
 
     uint256 ownerAmount = salePrice;
     uint256 creatorAmount;
@@ -477,9 +477,9 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     */
   function _collectAssetToken(address from, address assetToken, uint256 assetAmount) internal {
     uint256 _userAssetBalance = IERC20(assetToken).balanceOf(from);
-    require(assetAmount <= _userAssetBalance, "Proton: E-411");
+    require(assetAmount <= _userAssetBalance, "Proton:E-411");
     // Be sure to Approve this Contract to transfer your Asset Token
-    require(IERC20(assetToken).transferFrom(from, address(this), assetAmount), "Proton: E-401");
+    require(IERC20(assetToken).transferFrom(from, address(this), assetAmount), "Proton:E-401");
   }
 
   function _refundOverpayment(uint256 threshold) internal {
@@ -527,12 +527,12 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   |__________________________________*/
 
   modifier onlyTokenOwnerOrApproved(uint256 tokenId) {
-    require(_isApprovedOrOwner(_msgSender(), tokenId), "Proton: E-105");
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "Proton:E-105");
     _;
   }
 
   modifier onlyTokenCreator(uint256 tokenId) {
-    require(_tokenCreator[tokenId] == _msgSender(), "Proton: E-104");
+    require(_tokenCreator[tokenId] == _msgSender(), "Proton:E-104");
     _;
   }
 }

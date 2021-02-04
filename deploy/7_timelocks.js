@@ -53,27 +53,27 @@ module.exports = async (hre) => {
     };
 
     const _deployTimelock = async (timelockData) => {
-        log('\n  Deploying Ion Timelock for Receiver: ', timelockData.receiver)(alchemyTimeout);
+      await log('\n  Deploying Ion Timelock for Receiver: ', timelockData.receiver)(alchemyTimeout);
 
-        const ionTimelockInstance = await IonTimelock.deploy(timelockData.receiver, ionAddress);
-        const ionTimelockDeployed = await ionTimelockInstance.deployed();
+      const ionTimelockInstance = await IonTimelock.deploy(timelockData.receiver, ionAddress);
+      const ionTimelockDeployed = await ionTimelockInstance.deployed();
 
-        log('  - IonTimelock: ', ionTimelockDeployed.address);
-        log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionTimelockDeployed.deployTransaction }));
-        return ionTimelockDeployed;
+      log('  - IonTimelock: ', ionTimelockDeployed.address);
+      log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionTimelockDeployed.deployTransaction }));
+      return ionTimelockDeployed;
     };
 
     const _mintToTimelock = async (timelockData, ionTimelock) => {
-        log('\n  Minting Ions to Timelock for Receiver: ', timelockData.receiver)(alchemyTimeout);
+      await log('\n  Minting Ions to Timelock for Receiver: ', timelockData.receiver)(alchemyTimeout);
 
-        const amounts = _.map(timelockData.portions, 'amount');
-        const timestamps = _.map(timelockData.portions, 'releaseDate');
+      const amounts = _.map(timelockData.portions, 'amount');
+      const timestamps = _.map(timelockData.portions, 'releaseDate');
 
-        await ion.mintToTimelock(ionTimelock.address, amounts, timestamps);
+      await ion.mintToTimelock(ionTimelock.address, amounts, timestamps);
 
-        const totalMinted = _.reduce(amounts, (sum, amt) => sum.add(amt), toBN('0'));
-        log('  - Total Minted: ', toEth(totalMinted));
-        return totalMinted;
+      const totalMinted = _.reduce(amounts, (sum, amt) => sum.add(amt), toBN('0'));
+      log('  - Total Minted: ', toEth(totalMinted));
+      return totalMinted;
     };
 
     let ionTimelock;

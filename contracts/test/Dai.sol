@@ -195,8 +195,8 @@ contract Dai is IDai {
     * - `sender` must have a balance of at least `amount`.
     */
   function _transfer(address sender, address recipient, uint256 amount) internal virtual {
-      require(sender != address(0), "ERC20: E-403");
-      require(recipient != address(0), "ERC20: E-403");
+      require(sender != address(0), "ERC20:E-403");
+      require(recipient != address(0), "ERC20:E-403");
 
       _beforeTokenTransfer(sender, recipient, amount);
 
@@ -215,7 +215,7 @@ contract Dai is IDai {
     * - `to` cannot be the zero address.
     */
   function _mint(address account, uint256 amount) internal virtual {
-      require(account != address(0), "ERC20: E-403");
+      require(account != address(0), "ERC20:E-403");
 
       _beforeTokenTransfer(address(0), account, amount);
 
@@ -236,7 +236,7 @@ contract Dai is IDai {
     * - `account` must have at least `amount` tokens.
     */
   function _burn(address account, uint256 amount) internal virtual {
-      require(account != address(0), "ERC20: E-403");
+      require(account != address(0), "ERC20:E-403");
 
       _beforeTokenTransfer(account, address(0), amount);
 
@@ -259,8 +259,8 @@ contract Dai is IDai {
     * - `spender` cannot be the zero address.
     */
   function _approve(address owner, address spender, uint256 amount) internal virtual {
-      require(owner != address(0), "ERC20: E-403");
-      require(spender != address(0), "ERC20: E-403");
+      require(owner != address(0), "ERC20:E-403");
+      require(spender != address(0), "ERC20:E-403");
 
       _allowances[owner][spender] = amount;
       emit Approval(owner, spender, amount);

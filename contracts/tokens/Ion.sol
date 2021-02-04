@@ -76,7 +76,7 @@ contract Ion is ERC20Permit, Ownable, BlackholePrevention {
   }
 
   function decreaseLockAllowance(address operator, uint256 subtractedAmount) external returns (bool) {
-    _approveLock(_msgSender(), operator, _lockAllowances[_msgSender()][operator].sub(subtractedAmount, "ION: E-409"));
+    _approveLock(_msgSender(), operator, _lockAllowances[_msgSender()][operator].sub(subtractedAmount, "ION:E-409"));
     return true;
   }
 
@@ -97,7 +97,7 @@ contract Ion is ERC20Permit, Ownable, BlackholePrevention {
     }
 
     if (account != _msgSender()) {
-      _approveLock(account, _msgSender(), _lockAllowances[account][_msgSender()].sub(additional, "ION: E-409"));
+      _approveLock(account, _msgSender(), _lockAllowances[account][_msgSender()].sub(additional, "ION:E-409"));
     }
 
     return true;
@@ -116,12 +116,12 @@ contract Ion is ERC20Permit, Ownable, BlackholePrevention {
   }
 
   function mintToUniverse(uint256 amount) external onlyOwner returns (bool) {
-    require(address(_universe) != address(0x0), "ION: E-404");
+    require(address(_universe) != address(0x0), "ION:E-404");
     _mint(address(_universe), amount);
   }
 
   function mintToTimelock(address ionTimelock, uint256[] memory amounts, uint256[] memory releaseTimes) external onlyOwner {
-    require(address(ionTimelock) != address(0x0), "ION: E-403");
+    require(address(ionTimelock) != address(0x0), "ION:E-403");
 
     uint256 totalAmount;
     for (uint i = 0; i < amounts.length; i++) {
@@ -129,7 +129,7 @@ contract Ion is ERC20Permit, Ownable, BlackholePrevention {
     }
 
     _mint(address(ionTimelock), totalAmount);
-    require(IIonTimelock(ionTimelock).addPortions(amounts, releaseTimes), "ION: E-406");
+    require(IIonTimelock(ionTimelock).addPortions(amounts, releaseTimes), "ION:E-406");
   }
 
 
@@ -156,8 +156,8 @@ contract Ion is ERC20Permit, Ownable, BlackholePrevention {
   |__________________________________*/
 
   function _approveLock(address owner, address operator, uint256 amount) internal {
-    require(owner != address(0), "ION: E-403");
-    require(operator != address(0), "ION: E-403");
+    require(owner != address(0), "ION:E-403");
+    require(operator != address(0), "ION:E-403");
 
     _lockAllowances[owner][operator] = amount;
     emit LockApproval(owner, operator, amount);
@@ -169,14 +169,14 @@ contract Ion is ERC20Permit, Ownable, BlackholePrevention {
 
     // Minting tokens; enforce hard-cap
     if (from == address(0)) {
-      require(totalSupply().add(amount) <= cap, "ION: E-408");
+      require(totalSupply().add(amount) <= cap, "ION:E-408");
     }
 
     // Locked tokens
     if (from != address(0) && lockedUntil[from] > block.number) {
       uint256 fromBalance = balanceOf(from);
       uint256 transferable = (fromBalance > locked[from]) ? fromBalance.sub(locked[from]) : 0;
-      require(transferable >= amount, "ION: E-409");
+      require(transferable >= amount, "ION:E-409");
     }
   }
 }

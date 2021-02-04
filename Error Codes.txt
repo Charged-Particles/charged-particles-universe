@@ -83,3 +83,4 @@ Codes:
     E-424 - INVALID_ASSET
     E-425 - token already exists in basket
     E-426 - token does not exist in basket
+    E-427 - exceeds max allowance

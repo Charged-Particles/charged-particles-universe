@@ -64,7 +64,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
-    require(operator != tokenOwner, "CP: E-106");
+    require(operator != tokenOwner, "CP:E-106");
     _setDischargeApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
@@ -83,7 +83,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
-    require(operator != tokenOwner, "CP: E-106");
+    require(operator != tokenOwner, "CP:E-106");
     _setReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
@@ -102,7 +102,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
-    require(operator != tokenOwner, "CP: E-106");
+    require(operator != tokenOwner, "CP:E-106");
     _setTimelockApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
@@ -120,7 +120,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
-    require(operator != tokenOwner, "CP: E-106");
+    require(operator != tokenOwner, "CP:E-106");
     _setDischargeApproval(contractAddress, tokenId, tokenOwner, operator);
     _setReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
     _setTimelockApproval(contractAddress, tokenId, tokenOwner, operator);
@@ -144,8 +144,8 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     override
   {
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "CP: E-105");
-    require(block.number >= _nftState[tokenUuid].dischargeTimelock, "CP: E-302");
+    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "CP:E-105");
+    require(block.number >= _nftState[tokenUuid].dischargeTimelock, "CP:E-302");
 
     _nftState[tokenUuid].dischargeTimelock = unlockBlock;
 
@@ -165,8 +165,8 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     override
   {
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "CP: E-105");
-    require(block.number >= _nftState[tokenUuid].releaseTimelock, "CP: E-302");
+    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "CP:E-105");
+    require(block.number >= _nftState[tokenUuid].releaseTimelock, "CP:E-302");
 
     _nftState[tokenUuid].releaseTimelock = unlockBlock;
 
@@ -185,7 +185,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     external
     override
   {
-    require(msg.sender == contractAddress, "CP: E-112");
+    require(msg.sender == contractAddress, "CP:E-112");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
     uint256 unlockBlock;
@@ -228,11 +228,12 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
   )
     external
     override
-    onlyWhitelistedForCharge(contractAddress)
     managerEnabled(walletManagerId)
     nonReentrant
     returns (uint256 yieldTokensAmount)
   {
+    require(_nftSettings[contractAddress].actionPerms.hasBit(PERM_CHARGE_NFT), "CP:E-417");
+
     _validateDeposit(contractAddress, tokenId, walletManagerId, assetToken, assetAmount);
 
     // Transfer ERC20 Token from Caller to Contract (reverts on fail)
@@ -273,16 +274,16 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "CP: E-105");
+    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "CP:E-105");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
     // Validate Timelock
     if (_nftState[tokenUuid].dischargeTimelock > 0) {
-      require(block.number >= _nftState[tokenUuid].dischargeTimelock, "CP: E-302");
+      require(block.number >= _nftState[tokenUuid].dischargeTimelock, "CP:E-302");
     }
     if (_nftState[tokenUuid].tempLockExpiry > 0) {
-      require(block.number >= _nftState[tokenUuid].tempLockExpiry, "CP: E-303");
+      require(block.number >= _nftState[tokenUuid].tempLockExpiry, "CP:E-303");
     }
 
     address creatorRedirect = _creatorSettings[tokenUuid].annuityRedirect;
@@ -318,16 +319,16 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "CP: E-105");
+    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "CP:E-105");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
     // Validate Timelock
     if (_nftState[tokenUuid].dischargeTimelock > 0) {
-      require(block.number >= _nftState[tokenUuid].dischargeTimelock, "CP: E-302");
+      require(block.number >= _nftState[tokenUuid].dischargeTimelock, "CP:E-302");
     }
     if (_nftState[tokenUuid].tempLockExpiry > 0) {
-      require(block.number >= _nftState[tokenUuid].tempLockExpiry, "CP: E-303");
+      require(block.number >= _nftState[tokenUuid].tempLockExpiry, "CP:E-303");
     }
 
     address creatorRedirect = _creatorSettings[tokenUuid].annuityRedirect;
@@ -370,7 +371,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     returns (uint256 receiverAmount)
   {
     address sender = _msgSender();
-    require(_isTokenCreator(contractAddress, tokenId, sender), "CP: E-104");
+    require(_isTokenCreator(contractAddress, tokenId, sender), "CP:E-104");
 
     receiverAmount = _ftWalletManager[walletManagerId].dischargeAmountForCreator(
       receiver,
@@ -413,16 +414,16 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP: E-105");
+    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP:E-105");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
     // Validate Timelock
     if (_nftState[tokenUuid].releaseTimelock > 0) {
-      require(block.number >= _nftState[tokenUuid].releaseTimelock, "CP: E-302");
+      require(block.number >= _nftState[tokenUuid].releaseTimelock, "CP:E-302");
     }
     if (_nftState[tokenUuid].tempLockExpiry > 0) {
-      require(block.number >= _nftState[tokenUuid].tempLockExpiry, "CP: E-303");
+      require(block.number >= _nftState[tokenUuid].tempLockExpiry, "CP:E-303");
     }
 
     // Release Particle to Receiver
@@ -465,16 +466,16 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP: E-105");
+    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP:E-105");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
     // Validate Timelock
     if (_nftState[tokenUuid].releaseTimelock > 0) {
-      require(block.number >= _nftState[tokenUuid].releaseTimelock, "CP: E-302");
+      require(block.number >= _nftState[tokenUuid].releaseTimelock, "CP:E-302");
     }
     if (_nftState[tokenUuid].tempLockExpiry > 0) {
-      require(block.number >= _nftState[tokenUuid].tempLockExpiry, "CP: E-303");
+      require(block.number >= _nftState[tokenUuid].tempLockExpiry, "CP:E-303");
     }
 
     // Release Particle to Receiver
@@ -518,11 +519,14 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
   )
     external
     override
-    onlyWhitelistedForBasket(contractAddress)
     basketEnabled(basketManagerId)
     nonReentrant
     returns (bool success)
   {
+    require(_nftSettings[contractAddress].actionPerms.hasBit(PERM_BASKET_NFT), "CP:E-417");
+
+    _validateNftDeposit(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
+
     // Transfer ERC721 Token from Caller to Contract (reverts on fail)
     _collectNftToken(_msgSender(), nftTokenAddress, nftTokenId);
 
@@ -556,16 +560,16 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (bool success)
   {
-    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP: E-105");
+    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP:E-105");
 
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
 
     // Validate Timelock
     if (_nftState[tokenUuid].releaseTimelock > 0) {
-      require(block.number >= _nftState[tokenUuid].releaseTimelock, "CP: E-302");
+      require(block.number >= _nftState[tokenUuid].releaseTimelock, "CP:E-302");
     }
     if (_nftState[tokenUuid].tempLockExpiry > 0) {
-      require(block.number >= _nftState[tokenUuid].tempLockExpiry, "CP: E-303");
+      require(block.number >= _nftState[tokenUuid].tempLockExpiry, "CP:E-303");
     }
 
     // Release Particle to Receiver
@@ -591,50 +595,30 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     uint count = contracts.length;
     for (uint i = 0; i < count; i++) {
       address tokenContract = contracts[i];
-      setPermsForCharge(tokenContract, true);
-      setPermsForBasket(tokenContract, true);
-      setPermsForTimelockSelf(tokenContract, true);
+      _setPermsForCharge(tokenContract, true);
+      _setPermsForBasket(tokenContract, true);
+      _setPermsForTimelockSelf(tokenContract, true);
     }
   }
 
   /// @dev Update the list of NFT contracts that can be Charged
-  function setPermsForCharge(address contractAddress, bool state) public onlyOwner {
-    if (state) {
-      _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.setBit(PERM_CHARGE_NFT);
-    } else {
-      _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.clearBit(PERM_CHARGE_NFT);
-    }
-    emit WhitelistedForCharge(contractAddress, state);
+  function setPermsForCharge(address contractAddress, bool state) external onlyOwner {
+    _setPermsForCharge(contractAddress, state);
   }
 
   /// @dev Update the list of NFT contracts that can hold other NFTs
-  function setPermsForBasket(address contractAddress, bool state) public onlyOwner {
-    if (state) {
-      _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.setBit(PERM_BASKET_NFT);
-    } else {
-      _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.clearBit(PERM_BASKET_NFT);
-    }
-    emit WhitelistedForBasket(contractAddress, state);
+  function setPermsForBasket(address contractAddress, bool state) external onlyOwner {
+    _setPermsForBasket(contractAddress, state);
   }
 
   /// @dev Update the list of NFT contracts that can Timelock any NFT for Front-run Protection
-  function setPermsForTimelockAny(address contractAddress, bool state) public onlyOwner {
-    if (state) {
-      _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.setBit(PERM_TIMELOCK_ANY_NFT);
-    } else {
-      _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.clearBit(PERM_TIMELOCK_ANY_NFT);
-    }
-    emit WhitelistedForTimelockAny(contractAddress, state);
+  function setPermsForTimelockAny(address contractAddress, bool state) external onlyOwner {
+    _setPermsForTimelockAny(contractAddress, state);
   }
 
   /// @dev Update the list of NFT contracts that can Timelock their own tokens
-  function setPermsForTimelockSelf(address contractAddress, bool state) public onlyOwner {
-    if (state) {
-      _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.setBit(PERM_TIMELOCK_OWN_NFT);
-    } else {
-      _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.clearBit(PERM_TIMELOCK_OWN_NFT);
-    }
-    emit WhitelistedForTimelockSelf(contractAddress, state);
+  function setPermsForTimelockSelf(address contractAddress, bool state) external onlyOwner {
+    _setPermsForTimelockSelf(contractAddress, state);
   }
 
   function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
@@ -648,29 +632,4 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
   function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external onlyOwner {
     _withdrawERC721(receiver, tokenAddress, tokenId);
   }
-
-
-  /***********************************|
-  |             Modifiers             |
-  |__________________________________*/
-
-  modifier onlyWhitelistedForCharge(address contractAddress) {
-    require(_nftSettings[contractAddress].actionPerms.hasBit(PERM_CHARGE_NFT), "CP: E-417");
-    _;
-  }
-
-  modifier onlyWhitelistedForBasket(address contractAddress) {
-    require(_nftSettings[contractAddress].actionPerms.hasBit(PERM_BASKET_NFT), "CP: E-417");
-    _;
-  }
-
-  // modifier onlyWhitelistedForTimelockAny(address contractAddress) {
-  //   require(_nftSettings[contractAddress].actionPerms.hasBit(PERM_TIMELOCK_ANY_NFT), "CP: E-417");
-  //   _;
-  // }
-
-  // modifier onlyWhitelistedForTimelockSelf(address contractAddress) {
-  //   require(_nftSettings[contractAddress].actionPerms.hasBit(PERM_TIMELOCK_OWN_NFT), "CP: E-417");
-  //   _;
-  // }
 }

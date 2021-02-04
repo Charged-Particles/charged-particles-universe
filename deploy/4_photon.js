@@ -27,7 +27,7 @@ module.exports = async (hre) => {
     log('  - Trusted Forwarder: ', trustedForwarder);
     log(' ');
 
-    log('\n  Deploying Photon...')(alchemyTimeout);
+    await log('\n  Deploying Photon...')(alchemyTimeout);
     const Photon = await ethers.getContractFactory('Photon');
     const PhotonInstance = await upgrades.deployProxy(Photon, [trustedForwarder]);
     const photon = await PhotonInstance.deployed();
@@ -38,7 +38,7 @@ module.exports = async (hre) => {
     }
 
     // Display Contract Addresses
-    log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
+    await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
     log('  - Photon:      ', photon.address);
     log('     - Gas Cost: ', getTxGasCost({ deployTransaction: photon.deployTransaction }));
 

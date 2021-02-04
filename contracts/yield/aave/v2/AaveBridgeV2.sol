@@ -76,7 +76,7 @@ contract AaveBridgeV2 is Ownable, IAaveBridge, BlackholePrevention {
   {
     address self = address(this);
     address aTokenAddress = _getReserveInterestToken(assetToken);
-    require(_isReserveActive(assetToken), "AaveBridgeV2: E-424");
+    require(_isReserveActive(assetToken), "AaveBridgeV2:E-424");
 
     IERC20 token = IERC20(assetToken);
     IATokenV2 aToken = IATokenV2(aTokenAddress);
@@ -107,7 +107,7 @@ contract AaveBridgeV2 is Ownable, IAaveBridge, BlackholePrevention {
     override
   {
     address self = address(this);
-    require(_isReserveActive(assetToken), "AaveBridgeV2: E-424");
+    require(_isReserveActive(assetToken), "AaveBridgeV2:E-424");
 
     // Redeem aTokens for Asset Tokens
     lendingPool.withdraw(assetToken, assetAmount, self);
@@ -140,7 +140,7 @@ contract AaveBridgeV2 is Ownable, IAaveBridge, BlackholePrevention {
   |__________________________________*/
 
   function _sendToken(address to, address token, uint256 amount) internal {
-    require(IERC20(token).transfer(to, amount), "AaveBridgeV2: E-401");
+    require(IERC20(token).transfer(to, amount), "AaveBridgeV2:E-401");
   }
 
   function _getReserveInterestToken(address assetToken) internal view returns (address aTokenAddress) {

@@ -278,10 +278,10 @@ contract AaveSmartWallet is SmartWalletBase {
     IERC20 rewardsToken = IERC20(rewardsTokenAddress);
 
     uint256 walletBalance = rewardsToken.balanceOf(self);
-    require(walletBalance >= rewardsAmount, "AaveSmartWallet: E-411");
+    require(walletBalance >= rewardsAmount, "AaveSmartWallet:E-411");
 
     // Transfer Rewards to Receiver
-    require(rewardsToken.transfer(receiver, rewardsAmount), "AaveSmartWallet: E-401");
+    require(rewardsToken.transfer(receiver, rewardsAmount), "AaveSmartWallet:E-401");
     return rewardsAmount;
   }
 
@@ -322,6 +322,6 @@ contract AaveSmartWallet is SmartWalletBase {
   }
 
   function _sendToken(address to, address token, uint256 amount) internal {
-    require(IERC20(token).transfer(to, amount), "AaveSmartWallet: E-401");
+    require(IERC20(token).transfer(to, amount), "AaveSmartWallet:E-401");
   }
 }
