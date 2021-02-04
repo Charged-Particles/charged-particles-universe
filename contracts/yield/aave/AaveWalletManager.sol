@@ -36,7 +36,7 @@ contract AaveWalletManager is WalletManagerBase {
   using SafeMath for uint256;
 
   event AaveBridgeSet(address indexed aaveBridge);
-  event WhitelistedRewardsTokenSet(address indexed rewardsToken, bool state);
+  event ValidRewardsTokenSet(address indexed rewardsToken, bool state);
 
   address internal _aaveBridge;
   uint256 internal _referralCode;
@@ -357,9 +357,9 @@ contract AaveWalletManager is WalletManagerBase {
     _referralCode = referralCode;
   }
 
-  function setWhitelistedRewardsToken(address rewardsToken, bool state) external onlyOwner {
+  function setValidRewardsToken(address rewardsToken, bool state) external onlyOwner {
     rewardsTokenWhitelist[rewardsToken] = state;
-    emit WhitelistedRewardsTokenSet(rewardsToken, state);
+    emit ValidRewardsTokenSet(rewardsToken, state);
   }
 
 

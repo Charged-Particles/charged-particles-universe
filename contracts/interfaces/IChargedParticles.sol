@@ -47,11 +47,19 @@ interface IChargedParticles {
 
   function setDischargeApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setReleaseApproval(address contractAddress, uint256 tokenId, address operator) external;
+  function setBreakBondApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setTimelockApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setApprovalForAll(address contractAddress, uint256 tokenId, address operator) external;
 
+  function setPermsForRestrictCharge(address contractAddress, uint256 tokenId, bool state) external;
+  function setPermsForAllowDischarge(address contractAddress, uint256 tokenId, bool state) external;
+  function setPermsForAllowRelease(address contractAddress, uint256 tokenId, bool state) external;
+  function setPermsForRestrictBond(address contractAddress, uint256 tokenId, bool state) external;
+  function setPermsForAllowBreakBond(address contractAddress, uint256 tokenId, bool state) external;
+
   function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
   function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
+  function isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
   function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
 
   function baseParticleMass(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
@@ -273,6 +281,12 @@ interface IChargedParticles {
     address indexed owner,
     address operator
   );
+  event BreakBondApproval(
+    address indexed contractAddress,
+    uint256 indexed tokenId,
+    address indexed owner,
+    address operator
+  );
   event TimelockApproval(
     address indexed contractAddress,
     uint256 indexed tokenId,
@@ -297,8 +311,14 @@ interface IChargedParticles {
     uint256 unlockBlock
   );
 
-  event WhitelistedForCharge(address indexed contractAddress, bool state);
-  event WhitelistedForBasket(address indexed contractAddress, bool state);
-  event WhitelistedForTimelockAny(address indexed contractAddress, bool state);
-  event WhitelistedForTimelockSelf(address indexed contractAddress, bool state);
+  event PermsSetForCharge(address indexed contractAddress, bool state);
+  event PermsSetForBasket(address indexed contractAddress, bool state);
+  event PermsSetForTimelockAny(address indexed contractAddress, bool state);
+  event PermsSetForTimelockSelf(address indexed contractAddress, bool state);
+
+  event PermsSetForRestrictCharge(address indexed contractAddress, uint256 indexed tokenId, bool state);
+  event PermsSetForAllowDischarge(address indexed contractAddress, uint256 indexed tokenId, bool state);
+  event PermsSetForAllowRelease(address indexed contractAddress, uint256 indexed tokenId, bool state);
+  event PermsSetForRestrictBond(address indexed contractAddress, uint256 indexed tokenId, bool state);
+  event PermsSetForAllowBreakBond(address indexed contractAddress, uint256 indexed tokenId, bool state);
 }

@@ -24,35 +24,35 @@
 pragma solidity 0.6.12;
 
 library Bitwise {
-  function negate(uint256 a) internal pure returns (uint256) {
+  function negate(uint32 a) internal pure returns (uint32) {
     return a ^ maxInt();
   }
 
-  function shiftLeft(uint256 a, uint256 n) internal pure returns (uint256) {
-    return a * 2 ** n;
+  function shiftLeft(uint32 a, uint32 n) internal pure returns (uint32) {
+    return a * uint32(2) ** n;
   }
 
-  function shiftRight(uint256 a, uint256 n) internal pure returns (uint256) {
-    return a / 2 ** n;
+  function shiftRight(uint32 a, uint32 n) internal pure returns (uint32) {
+    return a / uint32(2) ** n;
   }
 
-  function maxInt() internal pure returns (uint256) {
-    return uint256(-1);
+  function maxInt() internal pure returns (uint32) {
+    return uint32(-1);
   }
 
   // Get bit value at position
-  function hasBit(uint256 a, uint256 n) internal pure returns (bool) {
+  function hasBit(uint32 a, uint32 n) internal pure returns (bool) {
     return a & shiftLeft(0x01, n) != 0;
   }
 
   // Set bit value at position
-  function setBit(uint256 a, uint256 n) internal pure returns (uint256) {
+  function setBit(uint32 a, uint32 n) internal pure returns (uint32) {
     return a | shiftLeft(0x01, n);
   }
 
   // Set the bit into state "false"
-  function clearBit(uint256 a, uint256 n) internal pure returns (uint256) {
-    uint256 mask = negate(shiftLeft(0x01, n));
+  function clearBit(uint32 a, uint32 n) internal pure returns (uint32) {
+    uint32 mask = negate(shiftLeft(0x01, n));
     return a & mask;
   }
 }
