@@ -83,6 +83,7 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
   function addToBasket(address contractAddress, uint256 tokenId)
     external
     override
+    onlyBasketManager
     returns (bool)
   {
     require(!_nftContractTokens[contractAddress].contains(tokenId), "GenericSmartBasket: E-425");

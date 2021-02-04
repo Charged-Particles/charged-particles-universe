@@ -41,7 +41,7 @@ module.exports = async (hre) => {
 
     log('  Deploying ChargedParticles...')(alchemyTimeout);
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
-    const ChargedParticlesInstance = await upgrades.deployProxy(ChargedParticles, [trustedForwarder]);
+    const ChargedParticlesInstance = await upgrades.deployProxy(ChargedParticles, [trustedForwarder], { unsafeAllowCustomTypes: true });
     const chargedParticles = await ChargedParticlesInstance.deployed();
     deployData['ChargedParticles'] = {
       abi: getContractAbi('ChargedParticles'),

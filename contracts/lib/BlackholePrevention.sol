@@ -35,10 +35,15 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 contract BlackholePrevention {
   using Address for address payable;
 
+  event WithdrawStuckEther(address indexed receiver, uint256 amount);
+  event WithdrawStuckERC20(address indexed receiver, address indexed tokenAddress, uint256 amount);
+  event WithdrawStuckERC721(address indexed receiver, address indexed tokenAddress, uint256 indexed tokenId);
+
   function _withdrawEther(address payable receiver, uint256 amount) internal virtual {
     require(receiver != address(0x0), "BHP: E-403");
     if (address(this).balance >= amount) {
       receiver.sendValue(amount);
+      emit WithdrawStuckEther(receiver, amount);
     }
   }
 
@@ -46,6 +51,7 @@ contract BlackholePrevention {
     require(receiver != address(0x0), "BHP: E-403");
     if (IERC20(tokenAddress).balanceOf(address(this)) >= amount) {
       IERC20(tokenAddress).transfer(receiver, amount);
+      emit WithdrawStuckERC20(receiver, tokenAddress, amount);
     }
   }
 
@@ -53,6 +59,7 @@ contract BlackholePrevention {
     require(receiver != address(0x0), "BHP: E-403");
     if (IERC721(tokenAddress).ownerOf(tokenId) == address(this)) {
       IERC721(tokenAddress).transferFrom(address(this), receiver, tokenId);
+      emit WithdrawStuckERC721(receiver, tokenAddress, tokenId);
     }
   }
 }
