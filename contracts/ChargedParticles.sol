@@ -254,7 +254,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     }
   }
 
-  /// @notice Allows the owner or operator of the Token to collect or transfer a specific amount the interest
+  /// @notice Allows the owner or operator of the Token to collect or transfer a specific amount of the interest
   ///         generated from the token without removing the underlying Asset that is held within the token.
   /// @param receiver             The Address to Receive the Discharged Asset Tokens
   /// @param contractAddress      The Address to the Contract of the Token to Discharge

@@ -96,7 +96,10 @@ contract Ion is ERC20Permit, Ownable, BlackholePrevention {
       locked[account] = amount;
     }
 
-    _approveLock(account, _msgSender(), _lockAllowances[account][_msgSender()].sub(additional, "ION: E-409"));
+    if (account != _msgSender()) {
+      _approveLock(account, _msgSender(), _lockAllowances[account][_msgSender()].sub(additional, "ION: E-409"));
+    }
+
     return true;
   }
 

@@ -28,7 +28,7 @@ Codes:
     E-109 - ONLY_WALLET_MGR
     E-110 - only proton
     E-111 - approval to current owner, approve to caller
-    E-112 -
+    E-112 - amount exceeds approval limit
 
 
   2. Find, Inequalities & Range
