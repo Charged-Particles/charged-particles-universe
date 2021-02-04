@@ -106,7 +106,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      * @dev See {IERC721-balanceOf}.
      */
     function balanceOf(address owner) public view override returns (uint256) {
-        require(owner != address(0), "ERC721: E-403");
+        require(owner != address(0), "ERC721:E-403");
 
         return _holderTokens[owner].length();
     }
@@ -115,7 +115,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      * @dev See {IERC721-ownerOf}.
      */
     function ownerOf(uint256 tokenId) public view override returns (address) {
-        return _tokenOwners.get(tokenId, "ERC721: E-405");
+        return _tokenOwners.get(tokenId, "ERC721:E-405");
     }
 
     /**
@@ -136,7 +136,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      * @dev See {IERC721Metadata-tokenURI}.
      */
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        require(_exists(tokenId), "ERC721: E-405");
+        require(_exists(tokenId), "ERC721:E-405");
         return _tokenURIs[tokenId];
     }
 
@@ -168,9 +168,9 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      */
     function approve(address to, uint256 tokenId) public virtual override {
         address owner = ownerOf(tokenId);
-        require(to != owner, "ERC721: E-111");
+        require(to != owner, "ERC721:E-111");
 
-        require(_msgSender() == owner || isApprovedForAll(owner, _msgSender()), "ERC721: E-105");
+        require(_msgSender() == owner || isApprovedForAll(owner, _msgSender()), "ERC721:E-105");
 
         _approve(to, tokenId);
     }
@@ -179,7 +179,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      * @dev See {IERC721-getApproved}.
      */
     function getApproved(uint256 tokenId) public view override returns (address) {
-        require(_exists(tokenId), "ERC721: E-405");
+        require(_exists(tokenId), "ERC721:E-405");
 
         return _tokenApprovals[tokenId];
     }
@@ -188,7 +188,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      * @dev See {IERC721-setApprovalForAll}.
      */
     function setApprovalForAll(address operator, bool approved) public virtual override {
-        require(operator != _msgSender(), "ERC721: E-111");
+        require(operator != _msgSender(), "ERC721:E-111");
 
         _operatorApprovals[_msgSender()][operator] = approved;
         emit ApprovalForAll(_msgSender(), operator, approved);
@@ -206,7 +206,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      */
     function transferFrom(address from, address to, uint256 tokenId) public virtual override {
         //solhint-disable-next-line max-line-length
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: E-105");
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721:E-105");
 
         _transfer(from, to, tokenId);
     }
@@ -222,7 +222,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      * @dev See {IERC721-safeTransferFrom}.
      */
     function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) public virtual override {
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: E-105");
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721:E-105");
         _safeTransfer(from, to, tokenId, _data);
     }
 
@@ -246,7 +246,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      */
     function _safeTransfer(address from, address to, uint256 tokenId, bytes memory _data) internal virtual {
         _transfer(from, to, tokenId);
-        require(_checkOnERC721Received(from, to, tokenId, _data), "ERC721: E-402");
+        require(_checkOnERC721Received(from, to, tokenId, _data), "ERC721:E-402");
     }
 
     /**
@@ -269,7 +269,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      * - `tokenId` must exist.
      */
     function _isApprovedOrOwner(address spender, uint256 tokenId) internal view returns (bool) {
-        require(_exists(tokenId), "ERC721: E-405");
+        require(_exists(tokenId), "ERC721:E-405");
         address owner = ownerOf(tokenId);
         return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
     }
@@ -280,7 +280,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      */
     function _safeMint(address to, uint256 tokenId, bytes memory _data) internal virtual {
         _mint(to, tokenId);
-        require(_checkOnERC721Received(address(0), to, tokenId, _data), "ERC721: E-402");
+        require(_checkOnERC721Received(address(0), to, tokenId, _data), "ERC721:E-402");
     }
 
     /**
@@ -296,8 +296,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      * Emits a {Transfer} event.
      */
     function _mint(address to, uint256 tokenId) internal virtual {
-        require(to != address(0), "ERC721: E-403");
-        require(!_exists(tokenId), "ERC721: E-407");
+        require(to != address(0), "ERC721:E-403");
+        require(!_exists(tokenId), "ERC721:E-407");
 
         _holderTokens[to].add(tokenId);
 
@@ -319,7 +319,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      */
     function _transfer(address from, address to, uint256 tokenId) internal virtual {
         require(ownerOf(tokenId) == from, "ERC721: transfer of token that is not own");
-        require(to != address(0), "ERC721: E-403");
+        require(to != address(0), "ERC721:E-403");
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
@@ -340,7 +340,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      * - `tokenId` must exist.
      */
     function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
-        require(_exists(tokenId), "ERC721: E-405");
+        require(_exists(tokenId), "ERC721:E-405");
         _tokenURIs[tokenId] = _tokenURI;
     }
 
@@ -366,7 +366,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
             from,
             tokenId,
             _data
-        ), "ERC721: E-402");
+        ), "ERC721:E-402");
         bytes4 retval = abi.decode(returndata, (bytes4));
         return (retval == _ERC721_RECEIVED);
     }

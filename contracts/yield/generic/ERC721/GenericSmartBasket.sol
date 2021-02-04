@@ -24,10 +24,12 @@
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../../../interfaces/ISmartBasket.sol";
 import "../../../lib/BlackholePrevention.sol";
+import "../../../lib/NftTokenType.sol";
 
 
 /**
@@ -37,14 +39,12 @@ import "../../../lib/BlackholePrevention.sol";
 contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receiver {
   using EnumerableSet for EnumerableSet.UintSet;
   using EnumerableSet for EnumerableSet.AddressSet;
+  using NftTokenType for address;
 
   address internal _basketManager;
 
-  // NFT Contract Address held in Basket
-  EnumerableSet.AddressSet internal _nftContracts;
-
   // NFT contract address => Token Ids in Basket
-  mapping (address => EnumerableSet.UintSet) internal _nftContractTokens;
+  mapping (address => mapping(uint256 => EnumerableSet.UintSet)) internal _nftContractTokens;
 
 
   /***********************************|
@@ -52,7 +52,7 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
   |__________________________________*/
 
   function initialize() public {
-    require(_basketManager == address(0x0), "GenericSmartBasket: E-002");
+    require(_basketManager == address(0x0), "GenericSmartBasket:E-002");
     _basketManager = msg.sender;
   }
 
@@ -61,24 +61,14 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
   |              Public               |
   |__________________________________*/
 
-  function getTokenContractCount() external view override returns (uint256) {
-    return _nftContracts.length();
-  }
-  function getTokenContractByIndex(uint256 index) external view override returns (address) {
-    return _nftContracts.at(index);
-  }
-
-  function getTokenCountByContract(address contractAddress) external view override returns (uint256) {
-    return _nftContractTokens[contractAddress].length();
-  }
-  function getTokenByContractByIndex(address contractAddress, uint256 index) external view override returns (uint256) {
-    return _nftContractTokens[contractAddress].at(index);
+  function getTokenCountByType(address contractAddress, uint256 tokenId) external view override returns (uint256) {
+    uint256 nftType = contractAddress.getTokenType(tokenId);
+    return _nftContractTokens[contractAddress][nftType].length();
   }
 
   function onERC721Received(address, address, uint256, bytes calldata) external override returns (bytes4) {
     return IERC721Receiver(0).onERC721Received.selector;
   }
-
 
   function addToBasket(address contractAddress, uint256 tokenId)
     external
@@ -86,12 +76,10 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
     onlyBasketManager
     returns (bool)
   {
-    require(!_nftContractTokens[contractAddress].contains(tokenId), "GenericSmartBasket: E-425");
+    uint256 nftType = contractAddress.getTokenType(tokenId);
+    require(!_nftContractTokens[contractAddress][nftType].contains(tokenId), "GenericSmartBasket:E-425");
 
-    if (!_nftContracts.contains(contractAddress)) {
-      _nftContracts.add(contractAddress);
-    }
-    bool added = _nftContractTokens[contractAddress].add(tokenId);
+    bool added = _nftContractTokens[contractAddress][nftType].add(tokenId);
     if (added) {
       // NFT should have been Transferred into here via Charged-Particles
       added = (IERC721(contractAddress).ownerOf(tokenId) == address(this));
@@ -105,13 +93,11 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
     onlyBasketManager
     returns (bool)
   {
-    require(_nftContractTokens[contractAddress].contains(tokenId), "GenericSmartBasket: E-426");
+    uint256 nftType = contractAddress.getTokenType(tokenId);
+    require(_nftContractTokens[contractAddress][nftType].contains(tokenId), "GenericSmartBasket:E-426");
 
-    bool removed = _nftContractTokens[contractAddress].remove(tokenId);
+    bool removed = _nftContractTokens[contractAddress][nftType].remove(tokenId);
     if (removed) {
-      if (_nftContractTokens[contractAddress].length() == 0) {
-        _nftContracts.remove(contractAddress);
-      }
       IERC721(contractAddress).safeTransferFrom(address(this), receiver, tokenId);
     }
     return removed;
@@ -157,7 +143,7 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
 
   /// @dev Throws if called by any account other than the basket manager
   modifier onlyBasketManager() {
-    require(_basketManager == msg.sender, "GenericSmartBasket: E-109");
+    require(_basketManager == msg.sender, "GenericSmartBasket:E-109");
     _;
   }
 }

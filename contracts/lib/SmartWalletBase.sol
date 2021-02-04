@@ -51,7 +51,7 @@ abstract contract SmartWalletBase is ISmartWallet, BlackholePrevention {
   |__________________________________*/
 
   function initializeBase() public {
-    require(_walletManager == address(0x0), "SmartWalletBase: E-002");
+    require(_walletManager == address(0x0), "SmartWalletBase:E-002");
     _walletManager = msg.sender;
   }
 
@@ -126,7 +126,7 @@ abstract contract SmartWalletBase is ISmartWallet, BlackholePrevention {
 
   /// @dev Throws if called by any account other than the wallet manager
   modifier onlyWalletManager() {
-    require(_walletManager == msg.sender, "SmartWalletBase: E-109");
+    require(_walletManager == msg.sender, "SmartWalletBase:E-109");
     _;
   }
 }

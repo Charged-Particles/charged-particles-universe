@@ -83,55 +83,11 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     return _totalTokens[uuid].current();
   }
 
-  function getTokenContractCount(
-    address contractAddress,
-    uint256 tokenId
-  )
-    external
-    view
-    override
-    returns (uint256)
-  {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
-    address basket = _baskets[uuid];
-    return GenericSmartBasket(basket).getTokenContractCount();
-  }
-
-  function getTokenContractByIndex(
-    address contractAddress,
-    uint256 tokenId,
-    uint256 index
-  )
-    external
-    view
-    override
-    returns (address)
-  {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
-    address basket = _baskets[uuid];
-    return GenericSmartBasket(basket).getTokenContractByIndex(index);
-  }
-
-  function getTokenCountByContract(
-    address contractAddress,
-    uint256 tokenId,
-    address basketTokenAddress
-  )
-    external
-    view
-    override
-    returns (uint256)
-  {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
-    address basket = _baskets[uuid];
-    return GenericSmartBasket(basket).getTokenCountByContract(basketTokenAddress);
-  }
-
-  function getTokenByContractByIndex(
+  function getTokenCountByType(
     address contractAddress,
     uint256 tokenId,
     address basketTokenAddress,
-    uint256 index
+    uint256 basketTokenId
   )
     external
     view
@@ -140,9 +96,8 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address basket = _baskets[uuid];
-    return GenericSmartBasket(basket).getTokenByContractByIndex(basketTokenAddress, index);
+    return GenericSmartBasket(basket).getTokenCountByType(basketTokenAddress, basketTokenId);
   }
-
 
   function addToBasket(
     address contractAddress,
@@ -183,7 +138,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
   {
     uint256 uuid = _getTokenUUID(contractAddress, tokenId);
     address basket = _baskets[uuid];
-    require(basket != address(0x0), "GenericBasketManager: E-403");
+    require(basket != address(0x0), "GenericBasketManager:E-403");
 
     removed = GenericSmartBasket(basket).removeFromBasket(receiver, basketTokenAddress, basketTokenId);
 
@@ -322,13 +277,13 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
 
   /// @dev Throws if called by any account other than the Controller contract
   modifier onlyController() {
-    require(_controller == msg.sender, "GenericBasketManager: E-108");
+    require(_controller == msg.sender, "GenericBasketManager:E-108");
     _;
   }
 
   // Throws if called by any account other than the Charged Particles Escrow Controller.
   modifier whenNotPaused() {
-    require(_paused != true, "GenericBasketManager: E-101");
+    require(_paused != true, "GenericBasketManager:E-101");
     _;
   }
 

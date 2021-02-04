@@ -28,7 +28,7 @@ Codes:
     E-109 - ONLY_WALLET_MGR
     E-110 - only proton
     E-111 - approval to current owner, approve to caller
-    E-112 - amount exceeds approval limit
+    E-112 - caller must be source contract
 
 
   2. Find, Inequalities & Range
@@ -47,7 +47,7 @@ Codes:
     E-300 - [--Unused--]
     E-301 - release time is before current time
     E-302 - TOKEN_TIMELOCKED
-    E-303 -
+    E-303 - TOKEN_TEMP_LOCKED
     E-304 -
     E-305 -
     E-306 -
@@ -83,3 +83,4 @@ Codes:
     E-424 - INVALID_ASSET
     E-425 - token already exists in basket
     E-426 - token does not exist in basket
+    E-427 - exceeds max allowance

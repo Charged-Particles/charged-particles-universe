@@ -57,6 +57,9 @@ describe("Charged Particles", () => {
   let newGenericBasketManager;
   let ethSender;
 
+  // Deploy Data from Internal Contracts
+  let ddProton;
+
   // Accounts
   let trustedForwarder;
   let daiSigner;
@@ -109,6 +112,8 @@ describe("Charged Particles", () => {
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const GenericBasketManagerInstance = await GenericBasketManager.deploy();
     newGenericBasketManager = await GenericBasketManagerInstance.deployed();
+
+    ddProton = getDeployData('Proton', chainId);
   });
 
   afterEach(async () => {
@@ -123,15 +128,10 @@ describe("Charged Particles", () => {
     it('should have enabled "aave" and "generic" as wallet managers', async () => {
       expect(await chargedParticles.isWalletManagerEnabled('aave')).to.equal(true);
       expect(await chargedParticles.isWalletManagerEnabled('generic')).to.equal(true);
-      expect(await chargedParticles.getWalletManagerCount()).to.equal(2);
-      expect(await chargedParticles.getWalletManagerByIndex(0)).to.equal('generic');
-      expect(await chargedParticles.getWalletManagerByIndex(1)).to.equal('aave');
     });
 
     it('should have enabled "generic" as a basket manager', async () => {
       expect(await chargedParticles.isNftBasketEnabled('generic')).to.equal(true);
-      expect(await chargedParticles.getNftBasketCount()).to.equal(1);
-      expect(await chargedParticles.getNftBasketByIndex(0)).to.equal('generic');
     });
   });
 
@@ -139,18 +139,6 @@ describe("Charged Particles", () => {
     it('should return the NFT creator address', async () => {
       await erc721chargeable.mock.creatorOf.withArgs(TEST_TOKEN_ID).returns(user3);
       expect(await chargedParticles.isTokenCreator(erc721chargeable.address, TEST_TOKEN_ID, user3)).to.equal(true);
-    });
-  });
-
-  describe('getTokenUUID', async () => {
-    it('should compute correct Token UUID', async () => {
-      expect(await chargedParticles.getTokenUUID(TEST_ADDRESS, TEST_TOKEN_ID)).to.equal(TEST_TOKEN_UUID);
-    });
-  });
-
-  describe('getOwnerUUID', async () => {
-    it('should compute correct Owner UUID', async () => {
-      expect(await chargedParticles.getOwnerUUID('generic', TEST_ADDRESS)).to.equal(TEST_OWNER_UUID);
     });
   });
 
@@ -173,7 +161,7 @@ describe("Charged Particles", () => {
 
       const annuitiesBasisPoints = toBN('100'); // 1%
       await expect(chargedParticles.connect(signer2).setCreatorConfigs(erc721chargeable.address, TEST_TOKEN_ID, user1, annuitiesBasisPoints))
-        .to.be.revertedWith('CP: E-104');
+        .to.be.revertedWith('CP:E-104');
     });
 
     it('should allow the creator to redirect interest annuities', async () => {
@@ -191,7 +179,7 @@ describe("Charged Particles", () => {
       await erc721chargeable.mock.creatorOf.withArgs(TEST_TOKEN_ID).returns(user1);
 
       await expect(chargedParticles.connect(signer2).setCreatorAnnuitiesRedirect(erc721chargeable.address, TEST_TOKEN_ID, user3))
-        .to.be.revertedWith('CP: E-104');
+        .to.be.revertedWith('CP:E-104');
     });
   });
 
@@ -293,30 +281,228 @@ describe("Charged Particles", () => {
       expect(await chargedParticles.isContractOwner(erc721chargeable.address, user1));
     });
 
-    it('should allow the external NFT contract owner to configure integration settings', async () => {
-      await expect(chargedParticles.connect(signer1).setExternalContractConfigs(erc721chargeable.address, 'newGeneric', 'newGeneric', daiAddress, assetDepositMin, assetDepositMax)).to.emit(chargedParticles, 'TokenContractConfigsSet').withArgs(
-        erc721chargeable.address,
-        'newGeneric',
-        'newGeneric',
-        daiAddress,
-        assetDepositMin,
-        assetDepositMax
-      );
-    });
-    
-    it('should allow the Charged Particles admin to configure external NFT contract integration settings', async () => {
-      await expect(chargedParticles.connect(signerD).setExternalContractConfigs(erc721chargeable.address, 'newGeneric', 'newGeneric', daiAddress, assetDepositMin, assetDepositMax)).to.emit(chargedParticles, 'TokenContractConfigsSet').withArgs(
-        erc721chargeable.address,
-        'newGeneric',
-        'newGeneric',
-        daiAddress,
-        assetDepositMin,
-        assetDepositMax
-      );
+    describe('setRequiredWalletManager', async () => {
+      it('should allow the external NFT contract owner to configure', async () => {
+        await expect(chargedParticles.connect(signer1).setRequiredWalletManager(
+          erc721chargeable.address,
+          'newGeneric'
+        ))
+          .to.emit(chargedParticles, 'RequiredWalletManagerSet')
+          .withArgs(
+            erc721chargeable.address,
+            'newGeneric',
+          );
+      });
+
+      it('should allow the Charged Particles admin to configure external NFT contract', async () => {
+        await expect(chargedParticles.connect(signerD).setRequiredWalletManager(
+          erc721chargeable.address,
+          'newGeneric'
+        ))
+          .to.emit(chargedParticles, 'RequiredWalletManagerSet')
+          .withArgs(
+            erc721chargeable.address,
+            'newGeneric'
+          );
+      });
+
+      it('should not allow anyone else to configure external NFT contract', async () => {
+        await expect(chargedParticles.connect(signer2).setRequiredWalletManager(
+          erc721chargeable.address,
+          'newGeneric'
+        ))
+          .to.be.revertedWith('CP:E-103');
+      });
     });
 
-    it('should not allow anyone else to configure external NFT contract integration settings', async () => {
-      await expect(chargedParticles.connect(signer2).setExternalContractConfigs(erc721chargeable.address, 'newGeneric', 'newGeneric', daiAddress, assetDepositMin, assetDepositMax)).to.be.revertedWith('CP: E-103');
+    describe('setRequiredBasketManager', async () => {
+      it('should allow the external NFT contract owner to configure', async () => {
+        await expect(chargedParticles.connect(signer1).setRequiredBasketManager(
+          erc721chargeable.address,
+          'newGeneric'
+        ))
+          .to.emit(chargedParticles, 'RequiredBasketManagerSet')
+          .withArgs(
+            erc721chargeable.address,
+            'newGeneric',
+          );
+      });
+
+      it('should allow the Charged Particles admin to configure external NFT contract', async () => {
+        await expect(chargedParticles.connect(signerD).setRequiredBasketManager(
+          erc721chargeable.address,
+          'newGeneric'
+        ))
+          .to.emit(chargedParticles, 'RequiredBasketManagerSet')
+          .withArgs(
+            erc721chargeable.address,
+            'newGeneric'
+          );
+      });
+
+      it('should not allow anyone else to configure external NFT contract', async () => {
+        await expect(chargedParticles.connect(signer2).setRequiredBasketManager(
+          erc721chargeable.address,
+          'newGeneric'
+        ))
+          .to.be.revertedWith('CP:E-103');
+      });
+    });
+
+    describe('setAssetTokenRestrictions', async () => {
+      it('should allow the external NFT contract owner to configure', async () => {
+        await expect(chargedParticles.connect(signer1).setAssetTokenRestrictions(
+          erc721chargeable.address,
+          true
+        ))
+          .to.emit(chargedParticles, 'AssetTokenRestrictionsSet')
+          .withArgs(
+            erc721chargeable.address,
+            true
+          );
+      });
+
+      it('should allow the Charged Particles admin to configure external NFT contract', async () => {
+        await expect(chargedParticles.connect(signerD).setAssetTokenRestrictions(
+          erc721chargeable.address,
+          true
+        ))
+          .to.emit(chargedParticles, 'AssetTokenRestrictionsSet')
+          .withArgs(
+            erc721chargeable.address,
+            true
+          );
+      });
+
+      it('should not allow anyone else to configure external NFT contract', async () => {
+        await expect(chargedParticles.connect(signer2).setAssetTokenRestrictions(
+          erc721chargeable.address,
+          true
+        ))
+          .to.be.revertedWith('CP:E-103');
+      });
+    });
+
+    describe('setAllowedAssetToken', async () => {
+      it('should allow the external NFT contract owner to configure', async () => {
+        await expect(chargedParticles.connect(signer1).setAllowedAssetToken(
+          erc721chargeable.address,
+          daiAddress,
+          true
+        ))
+          .to.emit(chargedParticles, 'AllowedAssetTokenSet')
+          .withArgs(
+            erc721chargeable.address,
+            daiAddress,
+            true
+          );
+      });
+
+      it('should allow the Charged Particles admin to configure external NFT contract', async () => {
+        await expect(chargedParticles.connect(signerD).setAllowedAssetToken(
+          erc721chargeable.address,
+          daiAddress,
+          true
+        ))
+          .to.emit(chargedParticles, 'AllowedAssetTokenSet')
+          .withArgs(
+            erc721chargeable.address,
+            daiAddress,
+            true
+          );
+      });
+
+      it('should not allow anyone else to configure external NFT contract', async () => {
+        await expect(chargedParticles.connect(signer2).setAllowedAssetToken(
+          erc721chargeable.address,
+          daiAddress,
+          true
+        ))
+          .to.be.revertedWith('CP:E-103');
+      });
+    });
+
+    describe('setAssetTokenLimits', async () => {
+      it('should allow the external NFT contract owner to configure', async () => {
+        await expect(chargedParticles.connect(signer1).setAssetTokenLimits(
+          erc721chargeable.address,
+          daiAddress,
+          assetDepositMin,
+          assetDepositMax
+        ))
+          .to.emit(chargedParticles, 'AssetTokenLimitsSet')
+          .withArgs(
+            erc721chargeable.address,
+            daiAddress,
+            assetDepositMin,
+            assetDepositMax
+          );
+      });
+
+      it('should allow the Charged Particles admin to configure external NFT contract', async () => {
+        await expect(chargedParticles.connect(signerD).setAssetTokenLimits(
+          erc721chargeable.address,
+          daiAddress,
+          assetDepositMin,
+          assetDepositMax
+        ))
+          .to.emit(chargedParticles, 'AssetTokenLimitsSet')
+          .withArgs(
+            erc721chargeable.address,
+            daiAddress,
+            assetDepositMin,
+            assetDepositMax
+          );
+      });
+
+      it('should not allow anyone else to configure external NFT contract', async () => {
+        await expect(chargedParticles.connect(signer2).setAssetTokenLimits(
+          erc721chargeable.address,
+          daiAddress,
+          assetDepositMin,
+          assetDepositMax
+        ))
+          .to.be.revertedWith('CP:E-103');
+      });
+    });
+
+    describe('setMaxNfts', async () => {
+      it('should allow the external NFT contract owner to configure', async () => {
+        await expect(chargedParticles.connect(signer1).setMaxNfts(
+          erc721chargeable.address,
+          ddProton.address,
+          toBN('1')
+        ))
+          .to.emit(chargedParticles, 'MaxNftsSet')
+          .withArgs(
+            erc721chargeable.address,
+            ddProton.address,
+            toBN('1')
+          );
+      });
+
+      it('should allow the Charged Particles admin to configure external NFT contract', async () => {
+        await expect(chargedParticles.connect(signerD).setMaxNfts(
+          erc721chargeable.address,
+          ddProton.address,
+          toBN('1')
+        ))
+          .to.emit(chargedParticles, 'MaxNftsSet')
+          .withArgs(
+            erc721chargeable.address,
+            ddProton.address,
+            toBN('1')
+          );
+      });
+
+      it('should not allow anyone else to configure external NFT contract', async () => {
+        await expect(chargedParticles.connect(signer2).setMaxNfts(
+          erc721chargeable.address,
+          ddProton.address,
+          toBN('1')
+        ))
+          .to.be.revertedWith('CP:E-103');
+      });
     });
   });
 

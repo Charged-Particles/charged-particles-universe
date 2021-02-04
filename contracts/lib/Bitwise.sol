@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// ISmartBasket.sol -- Part of the Charged Particles Protocol
+// Bitwise.sol -- Part of the Charged Particles Protocol
 // Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,20 +21,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-pragma solidity >=0.6.0;
+pragma solidity 0.6.12;
 
-/**
- * @title Charged Particles Smart Basket
- * @dev Manages holding and transferring NFTs within an NFT (if any),
- */
-interface ISmartBasket {
-  function getTokenCountByType(address contractAddress, uint256 tokenId) external view returns (uint256);
+library Bitwise {
+  function negate(uint256 a) internal pure returns (uint256) {
+    return a ^ maxInt();
+  }
 
-  function addToBasket(address contractAddress, uint256 tokenId) external returns (bool);
-  function removeFromBasket(address receiver, address contractAddress, uint256 tokenId) external returns (bool);
-  function executeForAccount(address contractAddress, uint256 ethValue, bytes memory encodedParams) external returns (bytes memory);
+  function shiftLeft(uint256 a, uint256 n) internal pure returns (uint256) {
+    return a * 2 ** n;
+  }
 
-  function withdrawEther(address payable receiver, uint256 amount) external;
-  function withdrawERC20(address payable receiver, address tokenAddress, uint256 amount) external;
-  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external;
+  function shiftRight(uint256 a, uint256 n) internal pure returns (uint256) {
+    return a / 2 ** n;
+  }
+
+  function maxInt() internal pure returns (uint256) {
+    return uint256(-1);
+  }
+
+  // Get bit value at position
+  function hasBit(uint256 a, uint256 n) internal pure returns (bool) {
+    return a & shiftLeft(0x01, n) != 0;
+  }
+
+  // Set bit value at position
+  function setBit(uint256 a, uint256 n) internal pure returns (uint256) {
+    return a | shiftLeft(0x01, n);
+  }
+
+  // Set the bit into state "false"
+  function clearBit(uint256 a, uint256 n) internal pure returns (uint256) {
+    uint256 mask = negate(shiftLeft(0x01, n));
+    return a & mask;
+  }
 }

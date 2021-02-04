@@ -118,27 +118,27 @@ describe("Universe", () => {
   describe('Events', async () => {
     it('should only allow ChargedParticles to call specific events', async () => {
       await expect(universe.connect(signer1).onEnergize(user1, user2, TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, toWei('1')))
-        .to.be.revertedWith('Universe: E-108');
+        .to.be.revertedWith('Universe:E-108');
 
       await expect(universe.connect(signer1).onDischarge(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, toWei('1'), toWei('1')))
-        .to.be.revertedWith('Universe: E-108');
+        .to.be.revertedWith('Universe:E-108');
 
       await expect(universe.connect(signer1).onDischargeForCreator(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, daiAddress, toWei('1')))
-        .to.be.revertedWith('Universe: E-108');
+        .to.be.revertedWith('Universe:E-108');
 
       await expect(universe.connect(signer1).onRelease(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, toWei('1'), toWei('1'), toWei('1')))
-        .to.be.revertedWith('Universe: E-108');
+        .to.be.revertedWith('Universe:E-108');
 
       await expect(universe.connect(signer1).onCovalentBond(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, '1'))
-        .to.be.revertedWith('Universe: E-108');
+        .to.be.revertedWith('Universe:E-108');
 
       await expect(universe.connect(signer1).onCovalentBreak(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, '1'))
-        .to.be.revertedWith('Universe: E-108');
+        .to.be.revertedWith('Universe:E-108');
     });
 
     it('should only allow Proton to call specific events', async () => {
       await expect(universe.connect(signer1).onProtonSale(TEST_ADDRESS, TEST_TOKEN_ID, user2, user3, toWei('1'), user1, toWei('1')))
-        .to.be.revertedWith('Universe: E-110');
+        .to.be.revertedWith('Universe:E-110');
     });
   });
 
@@ -157,10 +157,10 @@ describe("Universe", () => {
 
     it('should not allow setting ChargedParticles to a non-contract address', async () => {
       await expect(universe.connect(signerD).setChargedParticles(AddressZero))
-        .to.be.revertedWith('Universe: E-417');
+        .to.be.revertedWith('Universe:E-417');
 
       await expect(universe.connect(signerD).setChargedParticles(TEST_ADDRESS))
-        .to.be.revertedWith('Universe: E-417');
+        .to.be.revertedWith('Universe:E-417');
     });
 
 
@@ -178,10 +178,10 @@ describe("Universe", () => {
 
     it('should not allow setting Cation to a non-contract address', async () => {
       await expect(universe.connect(signerD).setCation(AddressZero, toWei('1')))
-        .to.be.revertedWith('Universe: E-417');
+        .to.be.revertedWith('Universe:E-417');
 
       await expect(universe.connect(signerD).setCation(TEST_ADDRESS, toWei('1')))
-        .to.be.revertedWith('Universe: E-417');
+        .to.be.revertedWith('Universe:E-417');
     });
 
 
@@ -199,10 +199,10 @@ describe("Universe", () => {
 
     it('should not allow setting Proton to a non-contract address', async () => {
       await expect(universe.connect(signerD).setProtonToken(AddressZero))
-        .to.be.revertedWith('Universe: E-417');
+        .to.be.revertedWith('Universe:E-417');
 
       await expect(universe.connect(signerD).setProtonToken(TEST_ADDRESS))
-        .to.be.revertedWith('Universe: E-417');
+        .to.be.revertedWith('Universe:E-417');
     });
   });
 

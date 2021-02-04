@@ -190,7 +190,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       energizedParticleId,
       'aave',
       daiAddress
-    )).to.be.revertedWith("CP: E-302");
+    )).to.be.revertedWith("CP:E-302");
 
     await setNetworkAfterBlockNumber(blockNumberTimelock);
 
@@ -285,13 +285,13 @@ describe("[INTEGRATION] Charged Particles", () => {
     signer1 = ethers.provider.getSigner(user1);
     signer2 = ethers.provider.getSigner(user2);
 
-    await expect(ion.connect(signer2).lock(user1, await ion.balanceOf(user1), blocks)).to.be.revertedWith("ION: E-409");
+    await expect(ion.connect(signer2).lock(user1, await ion.balanceOf(user1), blocks)).to.be.revertedWith("ION:E-409");
 
     await ion.connect(signer1).increaseLockAllowance(user2, await ion.balanceOf(user1));
 
     await ion.connect(signer2).lock(user1, await ion.balanceOf(user1), blocks);
 
-    await expect(ion.connect(signer1).transfer(user3, await ion.balanceOf(user1))).to.be.revertedWith("ION: E-409");
+    await expect(ion.connect(signer1).transfer(user3, await ion.balanceOf(user1))).to.be.revertedWith("ION:E-409");
 
     await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + blocks);
 
@@ -427,7 +427,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       'aave',
       daiAddress,
       toWei('5')
-    )).to.be.revertedWith('AaveWalletManager: E-412');
+    )).to.be.revertedWith('AaveWalletManager:E-412');
   });
 
   it("can order to release more than the wallet holds, but receive only the wallet amount", async () => {

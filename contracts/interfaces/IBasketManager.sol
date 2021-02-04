@@ -37,12 +37,7 @@ interface IBasketManager {
   function isPaused() external view returns (bool);
 
   function getTokenTotalCount(address contractAddress, uint256 tokenId) external view returns (uint256);
-
-  function getTokenContractCount(address contractAddress, uint256 tokenId) external view returns (uint256);
-  function getTokenContractByIndex(address contractAddress, uint256 tokenId, uint256 index) external view returns (address);
-
-  function getTokenCountByContract(address contractAddress, uint256 tokenId, address basketTokenAddress) external view returns (uint256);
-  function getTokenByContractByIndex(address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 index) external view returns (uint256);
+  function getTokenCountByType(address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 basketTokenId) external view returns (uint256);
 
   function addToBasket(address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 basketTokenId) external returns (bool);
   function removeFromBasket(address receiver, address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 basketTokenId) external returns (bool);

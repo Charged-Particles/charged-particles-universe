@@ -27,7 +27,7 @@ module.exports = async (hre) => {
     log('  - Owner:       ', protocolOwner);
     log(' ');
 
-    log('\n  Deploying GenericWalletManager...')(alchemyTimeout);
+    await log('\n  Deploying GenericWalletManager...')(alchemyTimeout);
     const GenericWalletManager = await hre.ethers.getContractFactory('GenericWalletManager');
     const GenericWalletManagerInstance = await GenericWalletManager.deploy();
     const genericWalletManager = await GenericWalletManagerInstance.deployed();
@@ -37,7 +37,7 @@ module.exports = async (hre) => {
       deployTransaction: genericWalletManager.deployTransaction,
     }
 
-    log('  Deploying GenericBasketManager...')(alchemyTimeout);
+    await log('  Deploying GenericBasketManager...')(alchemyTimeout);
     const GenericBasketManager = await hre.ethers.getContractFactory('GenericBasketManager');
     const GenericBasketManagerInstance = await GenericBasketManager.deploy();
     const genericBasketManager = await GenericBasketManagerInstance.deployed();
@@ -48,7 +48,7 @@ module.exports = async (hre) => {
     }
 
     // Display Contract Addresses
-    log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
+    await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
     log('  - GenericWalletManager:  ', genericWalletManager.address);
     log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
     log('  - GenericBasketManager:  ', genericBasketManager.address);

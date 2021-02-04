@@ -26,7 +26,7 @@ module.exports = async (hre) => {
     log('  - Owner:       ', protocolOwner);
     log(' ');
 
-    log('\n  Deploying Proton NFT...')(alchemyTimeout);
+    await log('\n  Deploying Proton NFT...')(alchemyTimeout);
     const Proton = await ethers.getContractFactory('Proton');
     const ProtonInstance = await Proton.deploy();
     const proton = await ProtonInstance.deployed();
@@ -37,7 +37,7 @@ module.exports = async (hre) => {
     }
 
     // Display Contract Addresses
-    log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
+    await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
     log('  - Proton:      ', proton.address);
     log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
 

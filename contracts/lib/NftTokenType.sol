@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// ISmartBasket.sol -- Part of the Charged Particles Protocol
+// NftTokenType.sol -- Part of the Charged Particles Protocol
 // Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,20 +21,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-pragma solidity >=0.6.0;
+pragma solidity 0.6.12;
 
-/**
- * @title Charged Particles Smart Basket
- * @dev Manages holding and transferring NFTs within an NFT (if any),
- */
-interface ISmartBasket {
-  function getTokenCountByType(address contractAddress, uint256 tokenId) external view returns (uint256);
+import "@openzeppelin/contracts/introspection/IERC165.sol";
 
-  function addToBasket(address contractAddress, uint256 tokenId) external returns (bool);
-  function removeFromBasket(address receiver, address contractAddress, uint256 tokenId) external returns (bool);
-  function executeForAccount(address contractAddress, uint256 ethValue, bytes memory encodedParams) external returns (bytes memory);
+library NftTokenType {
+  bytes4 constant internal INTERFACE_SIGNATURE_ERC721 = 0x80ac58cd;
+  bytes4 constant internal INTERFACE_SIGNATURE_ERC1155 = 0xd9b67a26;
 
-  function withdrawEther(address payable receiver, uint256 amount) external;
-  function withdrawERC20(address payable receiver, address tokenAddress, uint256 amount) external;
-  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external;
+  uint256 constant internal TYPE_MASK = uint256(uint128(~0)) << 128;
+  uint256 constant internal TYPE_NFT_BIT = 1 << 255;
+
+  function getTokenType(address contractAddress, uint256 tokenId) internal view returns (uint256) {
+    IERC165 tokenInterface = IERC165(contractAddress);
+    bool is1155 = tokenInterface.supportsInterface(INTERFACE_SIGNATURE_ERC1155);
+
+    if (!is1155 || (tokenId & TYPE_NFT_BIT != TYPE_NFT_BIT)) { return 0; }
+
+    return tokenId & TYPE_MASK;
+  }
 }
