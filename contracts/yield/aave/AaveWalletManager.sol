@@ -56,13 +56,13 @@ contract AaveWalletManager is WalletManagerBase {
   |__________________________________*/
 
   function isReserveActive(address contractAddress, uint256 tokenId, address assetToken) external view override returns (bool) {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] == address(0x0)) { return false; }
     return AaveSmartWallet(_wallets[uuid]).isReserveActive(assetToken);
   }
 
   function getReserveInterestToken(address contractAddress, uint256 tokenId, address assetToken) external view override returns (address) {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] == address(0x0)) { return address(0x0); }
     return AaveSmartWallet(_wallets[uuid]).getReserveInterestToken(assetToken);
   }
@@ -74,7 +74,7 @@ contract AaveWalletManager is WalletManagerBase {
     * @return  The Principal-Balance of the Smart-Wallet
     */
   function getPrincipal(address contractAddress, uint256 tokenId, address assetToken) external override returns (uint256) {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] == address(0x0)) { return 0; }
     return AaveSmartWallet(_wallets[uuid]).getPrincipal(assetToken);
   }
@@ -91,7 +91,7 @@ contract AaveWalletManager is WalletManagerBase {
     override
     returns (uint256 creatorInterest, uint256 ownerInterest)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] != address(0x0)) {
       return AaveSmartWallet(_wallets[uuid]).getInterest(assetToken);
     }
@@ -104,13 +104,13 @@ contract AaveWalletManager is WalletManagerBase {
     * @return  The Available Balance of the Token
     */
   function getTotal(address contractAddress, uint256 tokenId, address assetToken) external override returns (uint256) {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] == address(0x0)) { return 0; }
     return AaveSmartWallet(_wallets[uuid]).getTotal(assetToken);
   }
 
   function getRewards(address contractAddress, uint256 tokenId, address _rewardToken) external override returns (uint256) {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] == address(0x0)) { return 0; }
     return AaveSmartWallet(_wallets[uuid]).getRewards(_rewardToken);
   }
@@ -131,7 +131,7 @@ contract AaveWalletManager is WalletManagerBase {
     onlyController
     returns (uint256 yieldTokensAmount)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
 
     // Deposit into Smart-Wallet
@@ -153,7 +153,7 @@ contract AaveWalletManager is WalletManagerBase {
     onlyController
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
     require(wallet != address(0x0), "AaveWalletManager:E-403");
 
@@ -180,7 +180,7 @@ contract AaveWalletManager is WalletManagerBase {
     onlyController
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
     require(wallet != address(0x0), "AaveWalletManager:E-403");
 
@@ -207,7 +207,7 @@ contract AaveWalletManager is WalletManagerBase {
     onlyController
     returns (uint256 receiverAmount)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
     require(wallet != address(0x0), "AaveWalletManager:E-403");
 
@@ -233,7 +233,7 @@ contract AaveWalletManager is WalletManagerBase {
     onlyController
     returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
     require(wallet != address(0x0), "AaveWalletManager:E-403");
 
@@ -258,7 +258,7 @@ contract AaveWalletManager is WalletManagerBase {
     onlyController
     returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
     require(wallet != address(0x0), "AaveWalletManager:E-403");
 
@@ -284,7 +284,7 @@ contract AaveWalletManager is WalletManagerBase {
     onlyController
     returns (uint256 amount)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
     require(wallet != address(0x0), "AaveWalletManager:E-403");
     require(rewardsTokenWhitelist[rewardsToken], "AaveWalletManager:E-423");
@@ -308,7 +308,7 @@ contract AaveWalletManager is WalletManagerBase {
     onlyController
     returns (bytes memory)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
     return AaveSmartWallet(wallet).executeForAccount(externalAddress, ethValue, encodedParams);
   }
@@ -324,7 +324,7 @@ contract AaveWalletManager is WalletManagerBase {
     onlyController
     returns (address)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
 
     // Create Smart-Wallet if none exists

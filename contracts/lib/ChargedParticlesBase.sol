@@ -31,13 +31,13 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 
-import "../interfaces/IERC721Chargeable.sol";
 import "../interfaces/IUniverse.sol";
 import "../interfaces/IChargedParticles.sol";
 import "../interfaces/IWalletManager.sol";
 import "../interfaces/IBasketManager.sol";
 
 import "../lib/Bitwise.sol";
+import "../lib/TokenInfo.sol";
 import "../lib/RelayRecipient.sol";
 
 
@@ -54,6 +54,7 @@ abstract contract ChargedParticlesBase is
   IERC721ReceiverUpgradeable
 {
   using SafeMathUpgradeable for uint256;
+  using TokenInfo for address;
   using Bitwise for uint32;
 
   //
@@ -156,182 +157,6 @@ abstract contract ChargedParticlesBase is
 
 
   /***********************************|
-  |         Public Functions          |
-  |__________________________________*/
-
-  function getTokenLockExpiry(address contractAddress, uint256 tokenId) external virtual override view returns (uint256 lockExpiry) {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-
-    if (_nftState[tokenUuid].dischargeTimelock > block.number) {
-      lockExpiry = _nftState[tokenUuid].dischargeTimelock;
-    }
-
-    if (_nftState[tokenUuid].releaseTimelock > block.number) {
-      lockExpiry = _nftState[tokenUuid].releaseTimelock;
-    }
-
-    if (_nftState[tokenUuid].tempLockExpiry > block.number) {
-      lockExpiry = _nftState[tokenUuid].tempLockExpiry;
-    }
-  }
-
-  function isTokenCreator(address contractAddress, uint256 tokenId, address account) external virtual override view returns (bool) {
-    return _isTokenCreator(contractAddress, tokenId, account);
-  }
-
-  function getCreatorAnnuities(address contractAddress, uint256 tokenId) external virtual override view returns (address creator, uint256 annuityPct) {
-    return _getCreatorAnnuity(contractAddress, tokenId);
-  }
-
-  function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external virtual override view returns (address) {
-    return _getCreatorAnnuitiesRedirect(contractAddress, tokenId);
-  }
-
-  function isWalletManagerEnabled(string calldata walletManagerId) external virtual override view returns (bool) {
-    return _isWalletManagerEnabled(walletManagerId);
-  }
-
-  function getWalletManager(string calldata walletManagerId) external virtual override view returns (address) {
-    return address(_ftWalletManager[walletManagerId]);
-  }
-
-  function isNftBasketEnabled(string calldata basketId) external virtual override view returns (bool) {
-    return _isNftBasketEnabled(basketId);
-  }
-
-  function getBasketManager(string calldata basketId) external virtual override view returns (address) {
-    return address(_nftBasketManager[basketId]);
-  }
-
-  function onERC721Received(address, address, uint256, bytes calldata) external virtual override returns (bytes4) {
-    return IERC721ReceiverUpgradeable(0).onERC721Received.selector;
-  }
-
-  /// @notice Checks if an operator is allowed to Discharge a specific Token
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the operator to check
-  /// @return True if the operator is Approved
-  function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external virtual override view returns (bool) {
-    return _isApprovedForDischarge(contractAddress, tokenId, operator);
-  }
-
-  /// @notice Checks if an operator is allowed to Release a specific Token
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the operator to check
-  /// @return True if the operator is Approved
-  function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external virtual override view returns (bool) {
-    return _isApprovedForRelease(contractAddress, tokenId, operator);
-  }
-
-  /// @notice Checks if an operator is allowed to Break Covalent Bonds on a specific Token
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the operator to check
-  /// @return True if the operator is Approved
-  function isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) external virtual override view returns (bool) {
-    return _isApprovedForBreakBond(contractAddress, tokenId, operator);
-  }
-
-  /// @notice Checks if an operator is allowed to Timelock a specific Token
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the operator to check
-  /// @return True if the operator is Approved
-  function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external virtual override view returns (bool) {
-    return _isApprovedForTimelock(contractAddress, tokenId, operator);
-  }
-
-  /// @notice Gets the Amount of Asset Tokens that have been Deposited into the Particle
-  /// representing the Mass of the Particle.
-  /// @param contractAddress      The Address to the Contract of the Token
-  /// @param tokenId              The ID of the Token
-  /// @param walletManagerId  The Liquidity-Provider ID to check the Asset balance of
-  /// @param assetToken           The Address of the Asset Token to check
-  /// @return The Amount of underlying Assets held within the Token
-  function baseParticleMass(
-    address contractAddress,
-    uint256 tokenId,
-    string calldata walletManagerId,
-    address assetToken
-  )
-    external
-    virtual
-    override
-    managerEnabled(walletManagerId)
-    returns (uint256)
-  {
-    return _baseParticleMass(contractAddress, tokenId, walletManagerId, assetToken);
-  }
-
-  /// @notice Gets the amount of Interest that the Particle has generated representing
-  /// the Charge of the Particle
-  /// @param contractAddress      The Address to the Contract of the Token
-  /// @param tokenId              The ID of the Token
-  /// @param walletManagerId  The Liquidity-Provider ID to check the Interest balance of
-  /// @param assetToken           The Address of the Asset Token to check
-  /// @return The amount of interest the Token has generated (in Asset Token)
-  function currentParticleCharge(
-    address contractAddress,
-    uint256 tokenId,
-    string calldata walletManagerId,
-    address assetToken
-  )
-    external
-    virtual
-    override
-    managerEnabled(walletManagerId)
-    returns (uint256)
-  {
-    return _currentParticleCharge(contractAddress, tokenId, walletManagerId, assetToken);
-  }
-
-  /// @notice Gets the amount of LP Tokens that the Particle has generated representing
-  /// the Kinetics of the Particle
-  /// @param contractAddress      The Address to the Contract of the Token
-  /// @param tokenId              The ID of the Token
-  /// @param walletManagerId  The Liquidity-Provider ID to check the Kinetics balance of
-  /// @param assetToken           The Address of the Asset Token to check
-  /// @return The amount of LP tokens that have been generated
-  function currentParticleKinetics(
-    address contractAddress,
-    uint256 tokenId,
-    string calldata walletManagerId,
-    address assetToken
-  )
-    external
-    virtual
-    override
-    managerEnabled(walletManagerId)
-    returns (uint256)
-  {
-    return _currentParticleKinetics(contractAddress, tokenId, walletManagerId, assetToken);
-  }
-
-  /// @notice Gets the total amount of ERC721 Tokens that the Particle holds
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param basketManagerId  The ID of the BasketManager to check the token balance of
-  /// @return The total amount of ERC721 tokens that are held  within the Particle
-  function currentParticleCovalentBonds(
-    address contractAddress,
-    uint256 tokenId,
-    string calldata basketManagerId
-  )
-    external
-    view
-    virtual
-    override
-    basketEnabled(basketManagerId)
-    returns (uint256)
-  {
-    return _currentParticleCovalentBonds(contractAddress, tokenId, basketManagerId);
-  }
-
-
-
-  /***********************************|
   |     Register Contract Settings    |
   |(For External Contract Integration)|
   |__________________________________*/
@@ -344,7 +169,7 @@ abstract contract ChargedParticlesBase is
   /// @param account          The Account to check if it is the Owner of the specified Contract
   /// @return True if the account is the Owner of the _contract
   function isContractOwner(address contractAddress, address account) external override virtual view returns (bool) {
-    return _isContractOwner(contractAddress, account);
+    return contractAddress.isContractOwner(account);
   }
 
   /// @notice Sets a Required Wallet-Manager for External NFT Contracts (otherwise set to "none" to allow any Wallet-Manager)
@@ -519,10 +344,10 @@ abstract contract ChargedParticlesBase is
     virtual
     override
   {
-    require(_isTokenContractOrCreator(contractAddress, tokenId, creator, _msgSender()), "CP:E-104");
+    require(contractAddress.isTokenContractOrCreator(tokenId, creator, _msgSender()), "CP:E-104");
     require(annuityPercent <= MAX_ANNUITIES, "CP:E-421");
 
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
 
     // Update Configs for External Token Creator
     _creatorSettings[tokenUuid].annuityPercent = annuityPercent;
@@ -544,8 +369,8 @@ abstract contract ChargedParticlesBase is
     virtual
     override
   {
-    require(_isTokenCreator(contractAddress, tokenId, _msgSender()), "CP:E-104");
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    require(contractAddress.isTokenCreator(tokenId, _msgSender()), "CP:E-104");
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     _creatorSettings[tokenUuid].annuityRedirect = receiver;
     emit TokenCreatorAnnuitiesRedirected(contractAddress, tokenId, receiver);
   }
@@ -592,6 +417,35 @@ abstract contract ChargedParticlesBase is
     _tempLockExpiryBlocks = numBlocks;
   }
 
+  function enableNftContracts(address[] calldata contracts) external onlyOwner {
+    uint count = contracts.length;
+    for (uint i = 0; i < count; i++) {
+      address tokenContract = contracts[i];
+      _setPermsForCharge(tokenContract, true);
+      _setPermsForBasket(tokenContract, true);
+      _setPermsForTimelockSelf(tokenContract, true);
+    }
+  }
+
+  /// @dev Update the list of NFT contracts that can be Charged
+  function setPermsForCharge(address contractAddress, bool state) external onlyOwner {
+    _setPermsForCharge(contractAddress, state);
+  }
+
+  /// @dev Update the list of NFT contracts that can hold other NFTs
+  function setPermsForBasket(address contractAddress, bool state) external onlyOwner {
+    _setPermsForBasket(contractAddress, state);
+  }
+
+  /// @dev Update the list of NFT contracts that can Timelock any NFT for Front-run Protection
+  function setPermsForTimelockAny(address contractAddress, bool state) external onlyOwner {
+    _setPermsForTimelockAny(contractAddress, state);
+  }
+
+  /// @dev Update the list of NFT contracts that can Timelock their own tokens
+  function setPermsForTimelockSelf(address contractAddress, bool state) external onlyOwner {
+    _setPermsForTimelockSelf(contractAddress, state);
+  }
 
   /***********************************|
   |         Private Functions         |
@@ -599,7 +453,7 @@ abstract contract ChargedParticlesBase is
 
   /// @dev See {ChargedParticles-getCreatorAnnuitiesRedirect}.
   function _getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) internal view virtual returns (address) {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     return _creatorSettings[tokenUuid].annuityRedirect;
   }
 
@@ -613,33 +467,24 @@ abstract contract ChargedParticlesBase is
     return (address(_nftBasketManager[basketId]) != address(0x0) && !_nftBasketManager[basketId].isPaused());
   }
 
-  function _getTokenUUID(address contractAddress, uint256 tokenId) internal pure virtual returns (uint256) {
-    return uint256(keccak256(abi.encodePacked(contractAddress, tokenId)));
-  }
-
-  function _getTokenOwner(address contractAddress, uint256 tokenId) internal view virtual returns (address) {
-    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
-    return tokenInterface.ownerOf(tokenId);
-  }
-
   /// @dev See {ChargedParticles-isApprovedForDischarge}.
   function _isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) internal view virtual returns (bool) {
-    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    address tokenOwner = contractAddress.getTokenOwner(tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     return contractAddress == operator || tokenOwner == operator || _nftState[tokenUuid].dischargeApproval[tokenOwner] == operator;
   }
 
   /// @dev See {ChargedParticles-isApprovedForRelease}.
   function _isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) internal view virtual returns (bool) {
-    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    address tokenOwner = contractAddress.getTokenOwner(tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     return contractAddress == operator || tokenOwner == operator || _nftState[tokenUuid].releaseApproval[tokenOwner] == operator;
   }
 
   /// @dev See {ChargedParticles-isApprovedForBreakBond}.
   function _isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) internal view virtual returns (bool) {
-    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    address tokenOwner = contractAddress.getTokenOwner(tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     return contractAddress == operator || tokenOwner == operator || _nftState[tokenUuid].breakBondApproval[tokenOwner] == operator;
   }
 
@@ -648,63 +493,9 @@ abstract contract ChargedParticlesBase is
     if (_nftSettings[operator].actionPerms.hasBit(PERM_TIMELOCK_ANY_NFT)) { return true; }
     if (_nftSettings[operator].actionPerms.hasBit(PERM_TIMELOCK_OWN_NFT) && contractAddress == operator) { return true; }
 
-    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    address tokenOwner = contractAddress.getTokenOwner(tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     return tokenOwner == operator || _nftState[tokenUuid].timelockApproval[tokenOwner] == operator;
-  }
-
-  /// @dev Checks if an External NFT contract is vald
-  /// @param contractAddress  The Address to the Contract of the NFT
-  /// @return True if the contract follows current standards
-  function isValidExternalContract(address contractAddress) internal view virtual returns (bool) {
-    bytes32 codehash;
-    bytes32 accountHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470;
-    // solhint-disable-next-line no-inline-assembly
-    assembly { codehash := extcodehash(contractAddress) }
-    return (codehash != accountHash && codehash != 0x0);
-  }
-
-  /// @dev Checks if an account is the Owner of an External NFT contract
-  /// @param contractAddress  The Address to the Contract of the NFT to check
-  /// @param account          The Address of the Account to check
-  /// @return True if the account owns the contract
-  function _isContractOwner(address contractAddress, address account) internal view virtual returns (bool) {
-    address contractOwner = IERC721Chargeable(contractAddress).owner();
-    return contractOwner != address(0x0) && contractOwner == account;
-  }
-
-  /// @dev Checks if an account is the Creator of a Proton-based NFT
-  /// @param contractAddress  The Address to the Contract of the Proton-based NFT to check
-  /// @param tokenId          The Token ID of the Proton-based NFT to check
-  /// @param sender           The Address of the Account to check
-  /// @return True if the account is the creator of the Proton-based NFT
-  function _isTokenCreator(address contractAddress, uint256 tokenId, address sender) internal view virtual returns (bool) {
-    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
-    address tokenCreator = tokenInterface.creatorOf(tokenId);
-    return (sender == tokenCreator);
-  }
-
-  /// @dev Checks if an account is the Creator of a Proton-based NFT or the Contract itself
-  /// @param contractAddress  The Address to the Contract of the Proton-based NFT to check
-  /// @param tokenId          The Token ID of the Proton-based NFT to check
-  /// @param sender           The Address of the Account to check
-  /// @return True if the account is the creator of the Proton-based NFT or the Contract itself
-  function _isTokenContractOrCreator(address contractAddress, uint256 tokenId, address creator, address sender) internal view virtual returns (bool) {
-    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
-    address tokenCreator = tokenInterface.creatorOf(tokenId);
-    if (sender == contractAddress && creator == tokenCreator) { return true; }
-    return (sender == tokenCreator);
-  }
-
-  /// @dev Checks if an account is the Owner or Operator of an External NFT
-  /// @param contractAddress  The Address to the Contract of the External NFT to check
-  /// @param tokenId          The Token ID of the External NFT to check
-  /// @param sender           The Address of the Account to check
-  /// @return True if the account is the Owner or Operator of the External NFT
-  function _isErc721OwnerOrOperator(address contractAddress, uint256 tokenId, address sender) internal view virtual returns (bool) {
-    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
-    address tokenOwner = tokenInterface.ownerOf(tokenId);
-    return (sender == tokenOwner || tokenInterface.isApprovedForAll(tokenOwner, sender));
   }
 
   /// @notice Sets an Operator as Approved to Discharge a specific Token
@@ -721,7 +512,7 @@ abstract contract ChargedParticlesBase is
   )
     internal
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     _nftState[tokenUuid].dischargeApproval[tokenOwner] = operator;
     emit DischargeApproval(contractAddress, tokenId, tokenOwner, operator);
   }
@@ -740,7 +531,7 @@ abstract contract ChargedParticlesBase is
   )
     internal
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     _nftState[tokenUuid].releaseApproval[tokenOwner] = operator;
     emit ReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
   }
@@ -759,7 +550,7 @@ abstract contract ChargedParticlesBase is
   )
     internal
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     _nftState[tokenUuid].breakBondApproval[tokenOwner] = operator;
     emit BreakBondApproval(contractAddress, tokenId, tokenOwner, operator);
   }
@@ -778,7 +569,7 @@ abstract contract ChargedParticlesBase is
   )
     internal
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     _nftState[tokenUuid].timelockApproval[tokenOwner] = operator;
     emit TimelockApproval(contractAddress, tokenId, tokenOwner, operator);
   }
@@ -825,7 +616,7 @@ abstract contract ChargedParticlesBase is
 
   /// @dev Updates Restrictions on Energizing an NFT
   function _setPermsForRestrictCharge(address contractAddress, uint256 tokenId, bool state) internal {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (state) {
       _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.setBit(PERM_RESTRICT_ENERGIZE_FROM_ALL);
     } else {
@@ -836,7 +627,7 @@ abstract contract ChargedParticlesBase is
 
   /// @dev Updates Allowance on Discharging an NFT by Anyone
   function _setPermsForAllowDischarge(address contractAddress, uint256 tokenId, bool state) internal {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (state) {
       _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.setBit(PERM_ALLOW_DISCHARGE_FROM_ALL);
     } else {
@@ -847,7 +638,7 @@ abstract contract ChargedParticlesBase is
 
   /// @dev Updates Allowance on Discharging an NFT by Anyone
   function _setPermsForAllowRelease(address contractAddress, uint256 tokenId, bool state) internal {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (state) {
       _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.setBit(PERM_ALLOW_RELEASE_FROM_ALL);
     } else {
@@ -858,7 +649,7 @@ abstract contract ChargedParticlesBase is
 
   /// @dev Updates Restrictions on Covalent Bonds on an NFT
   function _setPermsForRestrictBond(address contractAddress, uint256 tokenId, bool state) internal {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (state) {
       _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.setBit(PERM_RESTRICT_BOND_FROM_ALL);
     } else {
@@ -869,7 +660,7 @@ abstract contract ChargedParticlesBase is
 
   /// @dev Updates Allowance on Breaking Covalent Bonds on an NFT by Anyone
   function _setPermsForAllowBreakBond(address contractAddress, uint256 tokenId, bool state) internal {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (state) {
       _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.setBit(PERM_ALLOW_BREAK_BOND_FROM_ALL);
     } else {
@@ -894,9 +685,9 @@ abstract contract ChargedParticlesBase is
     internal
     virtual
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (_nftState[tokenUuid].actionPerms.hasBit(PERM_RESTRICT_ENERGIZE_FROM_ALL)) {
-      require(_isErc721OwnerOrOperator(contractAddress, tokenId, _msgSender()), "CP:E-105");
+      require(contractAddress.isErc721OwnerOrOperator(tokenId, _msgSender()), "CP:E-105");
     }
 
     // Valid Wallet Manager?
@@ -945,9 +736,9 @@ abstract contract ChargedParticlesBase is
     virtual
     view
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (_nftState[tokenUuid].actionPerms.hasBit(PERM_RESTRICT_BOND_FROM_ALL)) {
-      require(_isErc721OwnerOrOperator(contractAddress, tokenId, _msgSender()), "CP:E-105");
+      require(contractAddress.isErc721OwnerOrOperator(tokenId, _msgSender()), "CP:E-105");
     }
 
     uint256 maxNfts = _nftSettings[contractAddress].maxNfts[nftTokenAddress];
@@ -1030,8 +821,8 @@ abstract contract ChargedParticlesBase is
     virtual
     returns (address creator, uint256 annuityPct)
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
-    creator = IERC721Chargeable(contractAddress).creatorOf(tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
+    creator = contractAddress.getTokenCreator(tokenId);
     annuityPct = _creatorSettings[tokenUuid].annuityPercent;
   }
 
@@ -1142,17 +933,17 @@ abstract contract ChargedParticlesBase is
   |__________________________________*/
 
   modifier onlyValidExternalContract(address contractAddress) {
-    require(isValidExternalContract(contractAddress), "CP:E-420");
+    require(contractAddress.isContract(), "CP:E-420");
     _;
   }
 
   modifier onlyContractOwnerOrAdmin(address contractAddress, address sender) {
-    require(sender == owner() || _isContractOwner(contractAddress, sender), "CP:E-103");
+    require(sender == owner() || contractAddress.isContractOwner(sender), "CP:E-103");
     _;
   }
 
   modifier onlyErc721OwnerOrOperator(address contractAddress, uint256 tokenId, address sender) {
-    require(_isErc721OwnerOrOperator(contractAddress, tokenId, sender), "CP:E-105");
+    require(contractAddress.isErc721OwnerOrOperator(tokenId, sender), "CP:E-105");
     _;
   }
 

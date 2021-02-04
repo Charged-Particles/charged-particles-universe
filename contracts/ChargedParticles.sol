@@ -49,6 +49,176 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
   |         Public Functions          |
   |__________________________________*/
 
+  function getTokenLockExpiry(address contractAddress, uint256 tokenId) external virtual override view returns (uint256 lockExpiry) {
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
+
+    if (_nftState[tokenUuid].dischargeTimelock > block.number) {
+      lockExpiry = _nftState[tokenUuid].dischargeTimelock;
+    }
+
+    if (_nftState[tokenUuid].releaseTimelock > block.number) {
+      lockExpiry = _nftState[tokenUuid].releaseTimelock;
+    }
+
+    if (_nftState[tokenUuid].tempLockExpiry > block.number) {
+      lockExpiry = _nftState[tokenUuid].tempLockExpiry;
+    }
+  }
+
+  function isTokenCreator(address contractAddress, uint256 tokenId, address account) external virtual override view returns (bool) {
+    return contractAddress.isTokenCreator(tokenId, account);
+  }
+
+  function getCreatorAnnuities(address contractAddress, uint256 tokenId) external virtual override view returns (address creator, uint256 annuityPct) {
+    return _getCreatorAnnuity(contractAddress, tokenId);
+  }
+
+  function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external virtual override view returns (address) {
+    return _getCreatorAnnuitiesRedirect(contractAddress, tokenId);
+  }
+
+  function isWalletManagerEnabled(string calldata walletManagerId) external virtual override view returns (bool) {
+    return _isWalletManagerEnabled(walletManagerId);
+  }
+
+  function getWalletManager(string calldata walletManagerId) external virtual override view returns (address) {
+    return address(_ftWalletManager[walletManagerId]);
+  }
+
+  function isNftBasketEnabled(string calldata basketId) external virtual override view returns (bool) {
+    return _isNftBasketEnabled(basketId);
+  }
+
+  function getBasketManager(string calldata basketId) external virtual override view returns (address) {
+    return address(_nftBasketManager[basketId]);
+  }
+
+  function onERC721Received(address, address, uint256, bytes calldata) external virtual override returns (bytes4) {
+    return IERC721ReceiverUpgradeable(0).onERC721Received.selector;
+  }
+
+  /// @notice Checks if an operator is allowed to Discharge a specific Token
+  /// @param contractAddress  The Address to the Contract of the Token
+  /// @param tokenId          The ID of the Token
+  /// @param operator         The Address of the operator to check
+  /// @return True if the operator is Approved
+  function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external virtual override view returns (bool) {
+    return _isApprovedForDischarge(contractAddress, tokenId, operator);
+  }
+
+  /// @notice Checks if an operator is allowed to Release a specific Token
+  /// @param contractAddress  The Address to the Contract of the Token
+  /// @param tokenId          The ID of the Token
+  /// @param operator         The Address of the operator to check
+  /// @return True if the operator is Approved
+  function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external virtual override view returns (bool) {
+    return _isApprovedForRelease(contractAddress, tokenId, operator);
+  }
+
+  /// @notice Checks if an operator is allowed to Break Covalent Bonds on a specific Token
+  /// @param contractAddress  The Address to the Contract of the Token
+  /// @param tokenId          The ID of the Token
+  /// @param operator         The Address of the operator to check
+  /// @return True if the operator is Approved
+  function isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) external virtual override view returns (bool) {
+    return _isApprovedForBreakBond(contractAddress, tokenId, operator);
+  }
+
+  /// @notice Checks if an operator is allowed to Timelock a specific Token
+  /// @param contractAddress  The Address to the Contract of the Token
+  /// @param tokenId          The ID of the Token
+  /// @param operator         The Address of the operator to check
+  /// @return True if the operator is Approved
+  function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external virtual override view returns (bool) {
+    return _isApprovedForTimelock(contractAddress, tokenId, operator);
+  }
+
+  /// @notice Gets the Amount of Asset Tokens that have been Deposited into the Particle
+  /// representing the Mass of the Particle.
+  /// @param contractAddress      The Address to the Contract of the Token
+  /// @param tokenId              The ID of the Token
+  /// @param walletManagerId  The Liquidity-Provider ID to check the Asset balance of
+  /// @param assetToken           The Address of the Asset Token to check
+  /// @return The Amount of underlying Assets held within the Token
+  function baseParticleMass(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken
+  )
+    external
+    virtual
+    override
+    managerEnabled(walletManagerId)
+    returns (uint256)
+  {
+    return _baseParticleMass(contractAddress, tokenId, walletManagerId, assetToken);
+  }
+
+  /// @notice Gets the amount of Interest that the Particle has generated representing
+  /// the Charge of the Particle
+  /// @param contractAddress      The Address to the Contract of the Token
+  /// @param tokenId              The ID of the Token
+  /// @param walletManagerId  The Liquidity-Provider ID to check the Interest balance of
+  /// @param assetToken           The Address of the Asset Token to check
+  /// @return The amount of interest the Token has generated (in Asset Token)
+  function currentParticleCharge(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken
+  )
+    external
+    virtual
+    override
+    managerEnabled(walletManagerId)
+    returns (uint256)
+  {
+    return _currentParticleCharge(contractAddress, tokenId, walletManagerId, assetToken);
+  }
+
+  /// @notice Gets the amount of LP Tokens that the Particle has generated representing
+  /// the Kinetics of the Particle
+  /// @param contractAddress      The Address to the Contract of the Token
+  /// @param tokenId              The ID of the Token
+  /// @param walletManagerId  The Liquidity-Provider ID to check the Kinetics balance of
+  /// @param assetToken           The Address of the Asset Token to check
+  /// @return The amount of LP tokens that have been generated
+  function currentParticleKinetics(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken
+  )
+    external
+    virtual
+    override
+    managerEnabled(walletManagerId)
+    returns (uint256)
+  {
+    return _currentParticleKinetics(contractAddress, tokenId, walletManagerId, assetToken);
+  }
+
+  /// @notice Gets the total amount of ERC721 Tokens that the Particle holds
+  /// @param contractAddress  The Address to the Contract of the Token
+  /// @param tokenId          The ID of the Token
+  /// @param basketManagerId  The ID of the BasketManager to check the token balance of
+  /// @return The total amount of ERC721 tokens that are held  within the Particle
+  function currentParticleCovalentBonds(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId
+  )
+    external
+    view
+    virtual
+    override
+    basketEnabled(basketManagerId)
+    returns (uint256)
+  {
+    return _currentParticleCovalentBonds(contractAddress, tokenId, basketManagerId);
+  }
+
   /// @notice Sets an Operator as Approved to Discharge a specific Token
   /// This allows an operator to withdraw the interest-portion only
   /// @param contractAddress  The Address to the Contract of the Token
@@ -63,7 +233,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     override
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
+    address tokenOwner = contractAddress.getTokenOwner(tokenId);
     require(operator != tokenOwner, "CP:E-106");
     _setDischargeApproval(contractAddress, tokenId, tokenOwner, operator);
   }
@@ -82,7 +252,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     override
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
+    address tokenOwner = contractAddress.getTokenOwner(tokenId);
     require(operator != tokenOwner, "CP:E-106");
     _setReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
   }
@@ -101,7 +271,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     override
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
+    address tokenOwner = contractAddress.getTokenOwner(tokenId);
     require(operator != tokenOwner, "CP:E-106");
     _setBreakBondApproval(contractAddress, tokenId, tokenOwner, operator);
   }
@@ -120,7 +290,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     override
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
+    address tokenOwner = contractAddress.getTokenOwner(tokenId);
     require(operator != tokenOwner, "CP:E-106");
     _setTimelockApproval(contractAddress, tokenId, tokenOwner, operator);
   }
@@ -138,7 +308,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     override
     onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
+    address tokenOwner = contractAddress.getTokenOwner(tokenId);
     require(operator != tokenOwner, "CP:E-106");
     _setDischargeApproval(contractAddress, tokenId, tokenOwner, operator);
     _setReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
@@ -208,7 +378,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     external
     override
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "CP:E-105");
     require(block.number >= _nftState[tokenUuid].dischargeTimelock, "CP:E-302");
 
@@ -229,7 +399,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     external
     override
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "CP:E-105");
     require(block.number >= _nftState[tokenUuid].releaseTimelock, "CP:E-302");
 
@@ -252,7 +422,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
   {
     require(msg.sender == contractAddress, "CP:E-112");
 
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     uint256 unlockBlock;
     if (isLocked && _nftState[tokenUuid].tempLockExpiry == 0) {
       unlockBlock = _tempLockExpiryBlocks.add(block.number);
@@ -339,7 +509,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (!_nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_DISCHARGE_FROM_ALL)) {
       require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "CP:E-105");
     }
@@ -385,7 +555,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (!_nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_DISCHARGE_FROM_ALL)) {
       require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "CP:E-105");
     }
@@ -438,7 +608,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     returns (uint256 receiverAmount)
   {
     address sender = _msgSender();
-    require(_isTokenCreator(contractAddress, tokenId, sender), "CP:E-104");
+    require(contractAddress.isTokenCreator(tokenId, sender), "CP:E-104");
 
     receiverAmount = _ftWalletManager[walletManagerId].dischargeAmountForCreator(
       receiver,
@@ -481,7 +651,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (!_nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_RELEASE_FROM_ALL)) {
       require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP:E-105");
     }
@@ -534,7 +704,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (!_nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_RELEASE_FROM_ALL)) {
       require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP:E-105");
     }
@@ -629,7 +799,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (bool success)
   {
-    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (!_nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_BREAK_BOND_FROM_ALL)) {
       require(_isApprovedForBreakBond(contractAddress, tokenId, _msgSender()), "CP:E-105");
     }
@@ -657,39 +827,11 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     }
   }
 
+
   /***********************************|
   |          Only Admin/DAO           |
+  |      (blackhole prevention)       |
   |__________________________________*/
-
-  function enableNftContracts(address[] calldata contracts) external onlyOwner {
-    uint count = contracts.length;
-    for (uint i = 0; i < count; i++) {
-      address tokenContract = contracts[i];
-      _setPermsForCharge(tokenContract, true);
-      _setPermsForBasket(tokenContract, true);
-      _setPermsForTimelockSelf(tokenContract, true);
-    }
-  }
-
-  /// @dev Update the list of NFT contracts that can be Charged
-  function setPermsForCharge(address contractAddress, bool state) external onlyOwner {
-    _setPermsForCharge(contractAddress, state);
-  }
-
-  /// @dev Update the list of NFT contracts that can hold other NFTs
-  function setPermsForBasket(address contractAddress, bool state) external onlyOwner {
-    _setPermsForBasket(contractAddress, state);
-  }
-
-  /// @dev Update the list of NFT contracts that can Timelock any NFT for Front-run Protection
-  function setPermsForTimelockAny(address contractAddress, bool state) external onlyOwner {
-    _setPermsForTimelockAny(contractAddress, state);
-  }
-
-  /// @dev Update the list of NFT contracts that can Timelock their own tokens
-  function setPermsForTimelockSelf(address contractAddress, bool state) external onlyOwner {
-    _setPermsForTimelockSelf(contractAddress, state);
-  }
 
   function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
     _withdrawEther(receiver, amount);

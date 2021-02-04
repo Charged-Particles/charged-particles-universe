@@ -28,6 +28,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "../../../interfaces/IBasketManager.sol";
 import "../../../interfaces/ISmartBasket.sol";
 import "../../../lib/BlackholePrevention.sol";
+import "../../../lib/TokenInfo.sol";
 import "./GenericSmartBasket.sol";
 
 /**
@@ -36,6 +37,7 @@ import "./GenericSmartBasket.sol";
  */
 contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
   using Counters for Counters.Counter;
+  using TokenInfo for address;
 
   event ControllerSet(address indexed controller);
   event PausedStateSet(bool isPaused);
@@ -79,7 +81,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     override
     returns (uint256)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     return _totalTokens[uuid].current();
   }
 
@@ -94,7 +96,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     override
     returns (uint256)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
     return GenericSmartBasket(basket).getTokenCountByType(basketTokenAddress, basketTokenId);
   }
@@ -111,7 +113,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     whenNotPaused
     returns (bool added)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
 
     added = GenericSmartBasket(basket).addToBasket(basketTokenAddress, basketTokenId);
@@ -136,7 +138,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     onlyController
     returns (bool removed)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
     require(basket != address(0x0), "GenericBasketManager:E-403");
 
@@ -156,7 +158,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     onlyController
     returns (bytes memory)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
     return GenericSmartBasket(basket).executeForAccount(externalAddress, ethValue, encodedParams);
   }
@@ -167,7 +169,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     onlyController
     returns (address)
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
 
     // Create Smart-Basket if none exists
@@ -207,7 +209,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     override
     onlyOwner
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
     _withdrawEther(receiver, amount);
     return ISmartBasket(basket).withdrawEther(receiver, amount);
@@ -219,7 +221,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     override
     onlyOwner
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
     _withdrawERC20(receiver, tokenAddress, amount);
     return ISmartBasket(basket).withdrawERC20(receiver, tokenAddress, amount);
@@ -231,7 +233,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     override
     onlyOwner
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
     _withdrawERC721(receiver, nftTokenAddress, nftTokenId);
     return ISmartBasket(basket).withdrawERC721(receiver, nftTokenAddress, nftTokenId);
