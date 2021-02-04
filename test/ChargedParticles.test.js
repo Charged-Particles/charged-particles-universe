@@ -235,6 +235,32 @@ describe("Charged Particles", () => {
     });
   });
 
+  describe('Token Break-Bond Approvals', async () => {
+
+    beforeEach(async() => {
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+    });
+
+    it('should confirm operator approval for break-bond', async () => {
+      expect(await chargedParticles.isApprovedForBreakBond(erc721chargeable.address, TEST_TOKEN_ID, user1)).to.be.true;
+    });
+
+    it('should allow the NFT owner to set an operator for break-bond', async () => {
+      await chargedParticles.connect(signer1).setBreakBondApproval(erc721chargeable.address, TEST_TOKEN_ID, user2);
+      expect(await chargedParticles.isApprovedForBreakBond(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.true;
+    });
+
+    it('should allow the NFT operator to set an operator for break-bond', async () => {
+      await erc721chargeable.mock.isApprovedForAll.withArgs(user1, user2).returns(true);
+      await chargedParticles.connect(signer2).setBreakBondApproval(erc721chargeable.address, TEST_TOKEN_ID, user3);
+      expect(await chargedParticles.isApprovedForBreakBond(erc721chargeable.address, TEST_TOKEN_ID, user3)).to.be.true;
+    });
+
+    it('should not allow anyone else to set an operator for break-bond', async () => {
+      expect(await chargedParticles.isApprovedForBreakBond(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.false;
+    });
+  });
+
   describe('Token Timelock Approvals', async () => {
 
     beforeEach(async() => {
@@ -510,9 +536,9 @@ describe("Charged Particles", () => {
   describe('Contract Configurations', async () => {
     it('should allow the contract owner to update the whitelist of supported NFTs', async () => {
       expect(await chargedParticles.connect(signerD).enableNftContracts([erc721chargeable.address]))
-      .to.emit(chargedParticles, 'WhitelistedForCharge').withArgs(erc721chargeable.address, true)
-      .and.to.emit(chargedParticles, 'WhitelistedForBasket').withArgs(erc721chargeable.address, true)
-      .and.to.emit(chargedParticles, 'WhitelistedForTimelockSelf').withArgs(erc721chargeable.address, true);
+      .to.emit(chargedParticles, 'PermsSetForCharge').withArgs(erc721chargeable.address, true)
+      .and.to.emit(chargedParticles, 'PermsSetForBasket').withArgs(erc721chargeable.address, true)
+      .and.to.emit(chargedParticles, 'PermsSetForTimelockSelf').withArgs(erc721chargeable.address, true);
     });
 
     it('should allow the contract owner to set the Universe contract', async () => {

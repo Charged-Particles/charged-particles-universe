@@ -87,6 +87,25 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     _setReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
+  /// @notice Sets an Operator as Approved to Break Covalent Bonds on a specific Token
+  /// This allows an operator to withdraw Basket NFTs
+  /// @param contractAddress  The Address to the Contract of the Token
+  /// @param tokenId          The ID of the Token
+  /// @param operator         The Address of the Operator to Approve
+  function setBreakBondApproval(
+    address contractAddress,
+    uint256 tokenId,
+    address operator
+  )
+    external
+    override
+    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+  {
+    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
+    require(operator != tokenOwner, "CP:E-106");
+    _setBreakBondApproval(contractAddress, tokenId, tokenOwner, operator);
+  }
+
   /// @notice Sets an Operator as Approved to Timelock a specific Token
   /// This allows an operator to timelock the principal or interest
   /// @param contractAddress  The Address to the Contract of the Token
@@ -123,7 +142,53 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     require(operator != tokenOwner, "CP:E-106");
     _setDischargeApproval(contractAddress, tokenId, tokenOwner, operator);
     _setReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
+    _setBreakBondApproval(contractAddress, tokenId, tokenOwner, operator);
     _setTimelockApproval(contractAddress, tokenId, tokenOwner, operator);
+  }
+
+  /// @dev Updates Restrictions on Energizing an NFT
+  function setPermsForRestrictCharge(address contractAddress, uint256 tokenId, bool state)
+    external
+    override
+    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+  {
+    _setPermsForRestrictCharge(contractAddress, tokenId, state);
+  }
+
+  /// @dev Updates Allowance on Discharging an NFT by Anyone
+  function setPermsForAllowDischarge(address contractAddress, uint256 tokenId, bool state)
+    external
+    override
+    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+  {
+    _setPermsForAllowDischarge(contractAddress, tokenId, state);
+  }
+
+  /// @dev Updates Allowance on Discharging an NFT by Anyone
+  function setPermsForAllowRelease(address contractAddress, uint256 tokenId, bool state)
+    external
+    override
+    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+  {
+    _setPermsForAllowRelease(contractAddress, tokenId, state);
+  }
+
+  /// @dev Updates Restrictions on Covalent Bonds on an NFT
+  function setPermsForRestrictBond(address contractAddress, uint256 tokenId, bool state)
+    external
+    override
+    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+  {
+    _setPermsForRestrictBond(contractAddress, tokenId, state);
+  }
+
+  /// @dev Updates Allowance on Breaking Covalent Bonds on an NFT by Anyone
+  function setPermsForAllowBreakBond(address contractAddress, uint256 tokenId, bool state)
+    external
+    override
+    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+  {
+    _setPermsForAllowBreakBond(contractAddress, tokenId, state);
   }
 
 
@@ -274,9 +339,10 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "CP:E-105");
-
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    if (!_nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_DISCHARGE_FROM_ALL)) {
+      require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "CP:E-105");
+    }
 
     // Validate Timelock
     if (_nftState[tokenUuid].dischargeTimelock > 0) {
@@ -319,9 +385,10 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "CP:E-105");
-
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    if (!_nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_DISCHARGE_FROM_ALL)) {
+      require(_isApprovedForDischarge(contractAddress, tokenId, _msgSender()), "CP:E-105");
+    }
 
     // Validate Timelock
     if (_nftState[tokenUuid].dischargeTimelock > 0) {
@@ -414,9 +481,10 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP:E-105");
-
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    if (!_nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_RELEASE_FROM_ALL)) {
+      require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP:E-105");
+    }
 
     // Validate Timelock
     if (_nftState[tokenUuid].releaseTimelock > 0) {
@@ -466,9 +534,10 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
-    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP:E-105");
-
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    if (!_nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_RELEASE_FROM_ALL)) {
+      require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP:E-105");
+    }
 
     // Validate Timelock
     if (_nftState[tokenUuid].releaseTimelock > 0) {
@@ -560,9 +629,10 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (bool success)
   {
-    require(_isApprovedForRelease(contractAddress, tokenId, _msgSender()), "CP:E-105");
-
     uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    if (!_nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_BREAK_BOND_FROM_ALL)) {
+      require(_isApprovedForBreakBond(contractAddress, tokenId, _msgSender()), "CP:E-105");
+    }
 
     // Validate Timelock
     if (_nftState[tokenUuid].releaseTimelock > 0) {

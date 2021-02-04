@@ -54,7 +54,7 @@ abstract contract ChargedParticlesBase is
   IERC721ReceiverUpgradeable
 {
   using SafeMathUpgradeable for uint256;
-  using Bitwise for uint256;
+  using Bitwise for uint32;
 
   //
   // Particle Terminology
@@ -83,18 +83,26 @@ abstract contract ChargedParticlesBase is
   // uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
   uint256 constant internal MAX_ANNUITIES = 1e4;      // 10000  (100%)
 
-  uint256 constant internal PERM_CHARGE_NFT        = 1;    // NFT Contracts that can have assets Deposited into them (Charged)
-  uint256 constant internal PERM_BASKET_NFT        = 2;    // NFT Contracts that can have other NFTs Deposited into them
-  uint256 constant internal PERM_TIMELOCK_ANY_NFT  = 4;    // NFT Contracts that can timelock any NFT on behalf of users (primarily used for Front-run Protection)
-  uint256 constant internal PERM_TIMELOCK_OWN_NFT  = 8;    // NFT Contracts that can timelock their own NFTs on behalf of their users
-  uint256 constant internal PERM_RESTRICTED_ASSETS = 16;   // NFT Contracts that have restricted deposits to specific assets
+  // NftSettings - actionPerms
+  uint32 constant internal PERM_CHARGE_NFT        = 1;    // NFT Contracts that can have assets Deposited into them (Charged)
+  uint32 constant internal PERM_BASKET_NFT        = 2;    // NFT Contracts that can have other NFTs Deposited into them
+  uint32 constant internal PERM_TIMELOCK_ANY_NFT  = 4;    // NFT Contracts that can timelock any NFT on behalf of users (primarily used for Front-run Protection)
+  uint32 constant internal PERM_TIMELOCK_OWN_NFT  = 8;    // NFT Contracts that can timelock their own NFTs on behalf of their users
+  uint32 constant internal PERM_RESTRICTED_ASSETS = 16;   // NFT Contracts that have restricted deposits to specific assets
+
+  // NftState - actionPerms
+  uint32 constant internal PERM_RESTRICT_ENERGIZE_FROM_ALL = 1;  // NFTs that have Restrictions on Energize
+  uint32 constant internal PERM_ALLOW_DISCHARGE_FROM_ALL   = 2;  // NFTs that allow Discharge by anyone
+  uint32 constant internal PERM_ALLOW_RELEASE_FROM_ALL     = 4;  // NFTs that allow Release by anyone
+  uint32 constant internal PERM_RESTRICT_BOND_FROM_ALL     = 8;  // NFTs that have Restrictions on Covalent Bonds
+  uint32 constant internal PERM_ALLOW_BREAK_BOND_FROM_ALL  = 16; // NFTs that allow Breaking Covalent Bonds by anyone
 
   // Current Settings for External NFT Token Contracts;
-  //  - Any user can add any whitelisted ERC721 or ERC1155 token as a Charged Particle without Limits,
+  //  - Any user can add any ERC721 or ERC1155 token as a Charged Particle without Limits,
   //    unless the Owner of the ERC721 or ERC1155 token contract registers the token
   //    and sets the Custom Settings for their token(s)
   struct NftSettings {
-    uint256 actionPerms;
+    uint32 actionPerms;
 
     string requiredWalletManager;
     string requiredBasketManager;
@@ -115,12 +123,15 @@ abstract contract ChargedParticlesBase is
   }
 
   struct NftState {
+    uint32 actionPerms;
+
     uint256 dischargeTimelock;
     uint256 releaseTimelock;
     uint256 tempLockExpiry;
 
     mapping (address => address) dischargeApproval;
     mapping (address => address) releaseApproval;
+    mapping (address => address) breakBondApproval;
     mapping (address => address) timelockApproval;
   }
 
@@ -212,6 +223,15 @@ abstract contract ChargedParticlesBase is
   /// @return True if the operator is Approved
   function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external virtual override view returns (bool) {
     return _isApprovedForRelease(contractAddress, tokenId, operator);
+  }
+
+  /// @notice Checks if an operator is allowed to Break Covalent Bonds on a specific Token
+  /// @param contractAddress  The Address to the Contract of the Token
+  /// @param tokenId          The ID of the Token
+  /// @param operator         The Address of the operator to check
+  /// @return True if the operator is Approved
+  function isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) external virtual override view returns (bool) {
+    return _isApprovedForBreakBond(contractAddress, tokenId, operator);
   }
 
   /// @notice Checks if an operator is allowed to Timelock a specific Token
@@ -616,6 +636,13 @@ abstract contract ChargedParticlesBase is
     return contractAddress == operator || tokenOwner == operator || _nftState[tokenUuid].releaseApproval[tokenOwner] == operator;
   }
 
+  /// @dev See {ChargedParticles-isApprovedForBreakBond}.
+  function _isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) internal view virtual returns (bool) {
+    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    return contractAddress == operator || tokenOwner == operator || _nftState[tokenUuid].breakBondApproval[tokenOwner] == operator;
+  }
+
   /// @dev See {ChargedParticles-isApprovedForTimelock}.
   function _isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) internal view virtual returns (bool) {
     if (_nftSettings[operator].actionPerms.hasBit(PERM_TIMELOCK_ANY_NFT)) { return true; }
@@ -718,6 +745,25 @@ abstract contract ChargedParticlesBase is
     emit ReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
+  /// @notice Sets an Operator as Approved to Break Covalent Bonds on a specific Token
+  /// This allows an operator to withdraw Basket NFTs
+  /// @param contractAddress  The Address to the Contract of the Token
+  /// @param tokenId          The ID of the Token
+  /// @param tokenOwner       The Owner Address of the Token
+  /// @param operator         The Address of the Operator to Approve
+  function _setBreakBondApproval(
+    address contractAddress,
+    uint256 tokenId,
+    address tokenOwner,
+    address operator
+  )
+    internal
+  {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    _nftState[tokenUuid].breakBondApproval[tokenOwner] = operator;
+    emit BreakBondApproval(contractAddress, tokenId, tokenOwner, operator);
+  }
+
   /// @notice Sets an Operator as Approved to Timelock a specific Token
   /// This allows an operator to timelock the principal or interest
   /// @param contractAddress  The Address to the Contract of the Token
@@ -744,7 +790,7 @@ abstract contract ChargedParticlesBase is
     } else {
       _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.clearBit(PERM_CHARGE_NFT);
     }
-    emit WhitelistedForCharge(contractAddress, state);
+    emit PermsSetForCharge(contractAddress, state);
   }
 
   /// @dev Update the list of NFT contracts that can hold other NFTs
@@ -754,7 +800,7 @@ abstract contract ChargedParticlesBase is
     } else {
       _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.clearBit(PERM_BASKET_NFT);
     }
-    emit WhitelistedForBasket(contractAddress, state);
+    emit PermsSetForBasket(contractAddress, state);
   }
 
   /// @dev Update the list of NFT contracts that can Timelock any NFT for Front-run Protection
@@ -764,7 +810,7 @@ abstract contract ChargedParticlesBase is
     } else {
       _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.clearBit(PERM_TIMELOCK_ANY_NFT);
     }
-    emit WhitelistedForTimelockAny(contractAddress, state);
+    emit PermsSetForTimelockAny(contractAddress, state);
   }
 
   /// @dev Update the list of NFT contracts that can Timelock their own tokens
@@ -774,7 +820,62 @@ abstract contract ChargedParticlesBase is
     } else {
       _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.clearBit(PERM_TIMELOCK_OWN_NFT);
     }
-    emit WhitelistedForTimelockSelf(contractAddress, state);
+    emit PermsSetForTimelockSelf(contractAddress, state);
+  }
+
+  /// @dev Updates Restrictions on Energizing an NFT
+  function _setPermsForRestrictCharge(address contractAddress, uint256 tokenId, bool state) internal {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    if (state) {
+      _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.setBit(PERM_RESTRICT_ENERGIZE_FROM_ALL);
+    } else {
+      _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.clearBit(PERM_RESTRICT_ENERGIZE_FROM_ALL);
+    }
+    emit PermsSetForRestrictCharge(contractAddress, tokenId, state);
+  }
+
+  /// @dev Updates Allowance on Discharging an NFT by Anyone
+  function _setPermsForAllowDischarge(address contractAddress, uint256 tokenId, bool state) internal {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    if (state) {
+      _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.setBit(PERM_ALLOW_DISCHARGE_FROM_ALL);
+    } else {
+      _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.clearBit(PERM_ALLOW_DISCHARGE_FROM_ALL);
+    }
+    emit PermsSetForAllowDischarge(contractAddress, tokenId, state);
+  }
+
+  /// @dev Updates Allowance on Discharging an NFT by Anyone
+  function _setPermsForAllowRelease(address contractAddress, uint256 tokenId, bool state) internal {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    if (state) {
+      _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.setBit(PERM_ALLOW_RELEASE_FROM_ALL);
+    } else {
+      _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.clearBit(PERM_ALLOW_RELEASE_FROM_ALL);
+    }
+    emit PermsSetForAllowRelease(contractAddress, tokenId, state);
+  }
+
+  /// @dev Updates Restrictions on Covalent Bonds on an NFT
+  function _setPermsForRestrictBond(address contractAddress, uint256 tokenId, bool state) internal {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    if (state) {
+      _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.setBit(PERM_RESTRICT_BOND_FROM_ALL);
+    } else {
+      _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.clearBit(PERM_RESTRICT_BOND_FROM_ALL);
+    }
+    emit PermsSetForRestrictBond(contractAddress, tokenId, state);
+  }
+
+  /// @dev Updates Allowance on Breaking Covalent Bonds on an NFT by Anyone
+  function _setPermsForAllowBreakBond(address contractAddress, uint256 tokenId, bool state) internal {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    if (state) {
+      _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.setBit(PERM_ALLOW_BREAK_BOND_FROM_ALL);
+    } else {
+      _nftState[tokenUuid].actionPerms = _nftState[tokenUuid].actionPerms.clearBit(PERM_ALLOW_BREAK_BOND_FROM_ALL);
+    }
+    emit PermsSetForAllowBreakBond(contractAddress, tokenId, state);
   }
 
   /// @dev Validates a Deposit according to the rules set by the Token Contract
@@ -793,13 +894,9 @@ abstract contract ChargedParticlesBase is
     internal
     virtual
   {
-    IWalletManager lpWalletMgr = _ftWalletManager[walletManagerId];
-    uint256 existingBalance = lpWalletMgr.getPrincipal(contractAddress, tokenId, assetToken);
-    uint256 newBalance = assetAmount.add(existingBalance);
-
-    // Validate Deposit Cap
-    if (_depositCap > 0) {
-      require(newBalance <= _depositCap, "CP:E-408");
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    if (_nftState[tokenUuid].actionPerms.hasBit(PERM_RESTRICT_ENERGIZE_FROM_ALL)) {
+      require(_isErc721OwnerOrOperator(contractAddress, tokenId, _msgSender()), "CP:E-105");
     }
 
     // Valid Wallet Manager?
@@ -811,6 +908,15 @@ abstract contract ChargedParticlesBase is
     // Valid Asset?
     if (_nftSettings[contractAddress].actionPerms.hasBit(PERM_RESTRICTED_ASSETS)) {
       require(_nftSettings[contractAddress].allowedAssetTokens[assetToken], "CP:E-424");
+    }
+
+    IWalletManager lpWalletMgr = _ftWalletManager[walletManagerId];
+    uint256 existingBalance = lpWalletMgr.getPrincipal(contractAddress, tokenId, assetToken);
+    uint256 newBalance = assetAmount.add(existingBalance);
+
+    // Validate Deposit Cap
+    if (_depositCap > 0) {
+      require(newBalance <= _depositCap, "CP:E-408");
     }
 
     // Valid Amount for Deposit?
@@ -839,6 +945,11 @@ abstract contract ChargedParticlesBase is
     virtual
     view
   {
+    uint256 tokenUuid = _getTokenUUID(contractAddress, tokenId);
+    if (_nftState[tokenUuid].actionPerms.hasBit(PERM_RESTRICT_BOND_FROM_ALL)) {
+      require(_isErc721OwnerOrOperator(contractAddress, tokenId, _msgSender()), "CP:E-105");
+    }
+
     uint256 maxNfts = _nftSettings[contractAddress].maxNfts[nftTokenAddress];
     if (maxNfts > 0) {
       IBasketManager basketMgr = _nftBasketManager[basketManagerId];
