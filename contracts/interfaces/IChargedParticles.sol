@@ -32,10 +32,9 @@ interface IChargedParticles {
   |             Public API            |
   |__________________________________*/
 
-  function isTokenCreator(address contractAddress, uint256 tokenId, address account) external view returns (bool);
+  // function isTokenCreator(address contractAddress, uint256 tokenId, address account) external view returns (bool);
   function getTokenLockExpiry(address contractAddress, uint256 tokenId) external view returns (uint256 lockExpiry);
-  function getCreatorAnnuities(address contractAddress, uint256 tokenId) external view returns (address creator, uint256 annuityPct);
-  function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external view returns (address);
+  function getSettingsAddress() external view returns (address settingsAddress);
 
   // ERC20
   function isWalletManagerEnabled(string calldata walletManagerId) external view returns (bool);
@@ -44,6 +43,20 @@ interface IChargedParticles {
   // ERC721
   function isNftBasketEnabled(string calldata basketId) external view returns (bool);
   function getBasketManager(string calldata basketId) external view returns (address);
+
+  function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
+  function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
+  function isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
+  function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
+
+  function baseParticleMass(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
+  function currentParticleCharge(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
+  function currentParticleKinetics(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
+  function currentParticleCovalentBonds(address contractAddress, uint256 tokenId, string calldata basketManagerId) external view returns (uint256);
+
+  /***********************************|
+  |      Only NFT Owner/Operator      |
+  |__________________________________*/
 
   function setDischargeApproval(address contractAddress, uint256 tokenId, address operator) external;
   function setReleaseApproval(address contractAddress, uint256 tokenId, address operator) external;
@@ -57,16 +70,6 @@ interface IChargedParticles {
   function setPermsForRestrictBond(address contractAddress, uint256 tokenId, bool state) external;
   function setPermsForAllowBreakBond(address contractAddress, uint256 tokenId, bool state) external;
 
-  function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
-  function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
-  function isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
-  function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
-
-  function baseParticleMass(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
-  function currentParticleCharge(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
-  function currentParticleKinetics(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
-  function currentParticleCovalentBonds(address contractAddress, uint256 tokenId, string calldata basketManagerId) external view returns (uint256);
-
   function setDischargeTimelock(
     address contractAddress,
     uint256 tokenId,
@@ -79,64 +82,14 @@ interface IChargedParticles {
     uint256 unlockBlock
   ) external;
 
+  /***********************************|
+  |         Only NFT Contract         |
+  |__________________________________*/
+
   function setTemporaryLock(
     address contractAddress,
     uint256 tokenId,
     bool isLocked
-  ) external;
-
-  /***********************************|
-  |     Register Contract Settings    |
-  |(For External Contract Integration)|
-  |__________________________________*/
-
-  function isContractOwner(address contractAddress, address account) external view returns (bool);
-
-  function setRequiredWalletManager(
-    address contractAddress,
-    string calldata walletManager
-  ) external;
-
-  function setRequiredBasketManager(
-    address contractAddress,
-    string calldata basketManager
-  ) external;
-
-  function setAssetTokenRestrictions(
-    address contractAddress,
-    bool restrictionsEnabled
-  ) external;
-
-  function setAllowedAssetToken(
-    address contractAddress,
-    address assetToken,
-    bool isAllowed
-  ) external;
-
-  function setAssetTokenLimits(
-    address contractAddress,
-    address assetToken,
-    uint256 depositMin,
-    uint256 depositMax
-  ) external;
-
-  function setMaxNfts(
-    address contractAddress,
-    address nftTokenAddress,
-    uint256 maxNfts
-  ) external;
-
-  function setCreatorConfigs(
-    address contractAddress,
-    uint256 tokenId,
-    address creator,
-    uint256 annuityPercent
-  ) external;
-
-  function setCreatorAnnuitiesRedirect(
-    address contractAddress,
-    uint256 tokenId,
-    address receiver
   ) external;
 
   /***********************************|
@@ -216,105 +169,19 @@ interface IChargedParticles {
   |          Particle Events          |
   |__________________________________*/
 
-  event UniverseSet(
-    address indexed universeAddress
-  );
-  event WalletManagerRegistered(
-    string indexed walletManagerId,
-    address indexed walletManager
-  );
-  event BasketManagerRegistered(
-    string indexed basketId,
-    address indexed basketManager
-  );
-  event DepositCapSet(
-    uint256 depositCap
-  );
-  event RequiredWalletManagerSet(
-    address indexed contractAddress,
-    string walletManager
-  );
-  event RequiredBasketManagerSet(
-    address indexed contractAddress,
-    string basketManager
-  );
-  event AssetTokenRestrictionsSet(
-    address indexed contractAddress,
-    bool restrictionsEnabled
-  );
-  event AllowedAssetTokenSet(
-    address indexed contractAddress,
-    address assetToken,
-    bool isAllowed
-  );
-  event AssetTokenLimitsSet(
-    address indexed contractAddress,
-    address assetToken,
-    uint256 assetDepositMin,
-    uint256 assetDepositMax
-  );
-  event MaxNftsSet(
-    address indexed contractAddress,
-    address indexed nftTokenAddress,
-    uint256 maxNfts
-  );
-  event TokenCreatorConfigsSet(
-    address indexed contractAddress,
-    uint256 indexed tokenId,
-    address indexed creatorAddress,
-    uint256 annuityPercent
-  );
-  event TokenCreatorAnnuitiesRedirected(
-    address indexed contractAddress,
-    uint256 indexed tokenId,
-    address indexed redirectAddress
-  );
-  event DischargeApproval(
-    address indexed contractAddress,
-    uint256 indexed tokenId,
-    address indexed owner,
-    address operator
-  );
-  event ReleaseApproval(
-    address indexed contractAddress,
-    uint256 indexed tokenId,
-    address indexed owner,
-    address operator
-  );
-  event BreakBondApproval(
-    address indexed contractAddress,
-    uint256 indexed tokenId,
-    address indexed owner,
-    address operator
-  );
-  event TimelockApproval(
-    address indexed contractAddress,
-    uint256 indexed tokenId,
-    address indexed owner,
-    address operator
-  );
-  event TokenDischargeTimelock(
-    address indexed contractAddress,
-    uint256 indexed tokenId,
-    address indexed operator,
-    uint256 unlockBlock
-  );
-  event TokenReleaseTimelock(
-    address indexed contractAddress,
-    uint256 indexed tokenId,
-    address indexed operator,
-    uint256 unlockBlock
-  );
-  event TokenTempLock(
-    address indexed contractAddress,
-    uint256 indexed tokenId,
-    uint256 unlockBlock
-  );
+  event UniverseSet(address indexed universeAddress);
+  event ChargedSettingsSet(address indexed settingsAddress);
+  event WalletManagerRegistered(string indexed walletManagerId, address indexed walletManager);
+  event BasketManagerRegistered(string indexed basketId, address indexed basketManager);
 
-  event PermsSetForCharge(address indexed contractAddress, bool state);
-  event PermsSetForBasket(address indexed contractAddress, bool state);
-  event PermsSetForTimelockAny(address indexed contractAddress, bool state);
-  event PermsSetForTimelockSelf(address indexed contractAddress, bool state);
+  event DischargeApproval(address indexed contractAddress, uint256 indexed tokenId, address indexed owner, address operator);
+  event ReleaseApproval(address indexed contractAddress, uint256 indexed tokenId, address indexed owner, address operator);
+  event BreakBondApproval(address indexed contractAddress, uint256 indexed tokenId, address indexed owner, address operator);
+  event TimelockApproval(address indexed contractAddress, uint256 indexed tokenId, address indexed owner, address operator);
+
+  event TokenDischargeTimelock(address indexed contractAddress, uint256 indexed tokenId, address indexed operator, uint256 unlockBlock);
+  event TokenReleaseTimelock(address indexed contractAddress, uint256 indexed tokenId, address indexed operator, uint256 unlockBlock);
+  event TokenTempLock(address indexed contractAddress, uint256 indexed tokenId, uint256 unlockBlock);
 
   event PermsSetForRestrictCharge(address indexed contractAddress, uint256 indexed tokenId, bool state);
   event PermsSetForAllowDischarge(address indexed contractAddress, uint256 indexed tokenId, bool state);

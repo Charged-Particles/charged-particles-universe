@@ -49,6 +49,10 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
   |         Public Functions          |
   |__________________________________*/
 
+  function getSettingsAddress() external view virtual override returns (address settingsAddress) {
+    return address(_settings);
+  }
+
   function getTokenLockExpiry(address contractAddress, uint256 tokenId) external virtual override view returns (uint256 lockExpiry) {
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
 
@@ -63,18 +67,6 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     if (_nftState[tokenUuid].tempLockExpiry > block.number) {
       lockExpiry = _nftState[tokenUuid].tempLockExpiry;
     }
-  }
-
-  function isTokenCreator(address contractAddress, uint256 tokenId, address account) external virtual override view returns (bool) {
-    return contractAddress.isTokenCreator(tokenId, account);
-  }
-
-  function getCreatorAnnuities(address contractAddress, uint256 tokenId) external virtual override view returns (address creator, uint256 annuityPct) {
-    return _getCreatorAnnuity(contractAddress, tokenId);
-  }
-
-  function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external virtual override view returns (address) {
-    return _getCreatorAnnuitiesRedirect(contractAddress, tokenId);
   }
 
   function isWalletManagerEnabled(string calldata walletManagerId) external virtual override view returns (bool) {
@@ -425,7 +417,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     uint256 unlockBlock;
     if (isLocked && _nftState[tokenUuid].tempLockExpiry == 0) {
-      unlockBlock = _tempLockExpiryBlocks.add(block.number);
+      unlockBlock = block.number.add(_settings.getTempLockExpiryBlocks());
       _nftState[tokenUuid].tempLockExpiry = unlockBlock;
     }
     if (!isLocked) {
@@ -434,6 +426,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
 
     emit TokenTempLock(contractAddress, tokenId, unlockBlock);
   }
+
 
   /***********************************|
   |        Energize Particles         |
@@ -467,8 +460,6 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (uint256 yieldTokensAmount)
   {
-    require(_nftSettings[contractAddress].actionPerms.hasBit(PERM_CHARGE_NFT), "CP:E-417");
-
     _validateDeposit(contractAddress, tokenId, walletManagerId, assetToken, assetAmount);
 
     // Transfer ERC20 Token from Caller to Contract (reverts on fail)
@@ -483,6 +474,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     }
   }
 
+
   /***********************************|
   |        Discharge Particles        |
   |__________________________________*/
@@ -492,7 +484,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
   /// @param receiver             The Address to Receive the Discharged Asset Tokens
   /// @param contractAddress      The Address to the Contract of the Token to Discharge
   /// @param tokenId              The ID of the Token to Discharge
-  /// @param walletManagerId  The LP of the Assets to Discharge from the Token
+  /// @param walletManagerId      The Wallet Manager of the Assets to Discharge from the Token
   /// @param assetToken           The Address of the Asset Token being discharged
   /// @return creatorAmount Amount of Asset Token discharged to the Creator
   /// @return receiverAmount Amount of Asset Token discharged to the Receiver
@@ -522,7 +514,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
       require(block.number >= _nftState[tokenUuid].tempLockExpiry, "CP:E-303");
     }
 
-    address creatorRedirect = _creatorSettings[tokenUuid].annuityRedirect;
+    address creatorRedirect = _settings.getCreatorAnnuitiesRedirect(contractAddress, tokenId);
     (creatorAmount, receiverAmount) = _ftWalletManager[walletManagerId].discharge(receiver, contractAddress, tokenId, assetToken, creatorRedirect);
 
     // Signal to Universe Controller
@@ -536,7 +528,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
   /// @param receiver             The Address to Receive the Discharged Asset Tokens
   /// @param contractAddress      The Address to the Contract of the Token to Discharge
   /// @param tokenId              The ID of the Token to Discharge
-  /// @param walletManagerId  The LP of the Assets to Discharge from the Token
+  /// @param walletManagerId  The Wallet Manager of the Assets to Discharge from the Token
   /// @param assetToken           The Address of the Asset Token being discharged
   /// @param assetAmount          The specific amount of Asset Token to Discharge from the Token
   /// @return creatorAmount Amount of Asset Token discharged to the Creator
@@ -568,7 +560,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
       require(block.number >= _nftState[tokenUuid].tempLockExpiry, "CP:E-303");
     }
 
-    address creatorRedirect = _creatorSettings[tokenUuid].annuityRedirect;
+    address creatorRedirect = _settings.getCreatorAnnuitiesRedirect(contractAddress, tokenId);
     (creatorAmount, receiverAmount) = _ftWalletManager[walletManagerId].dischargeAmount(
       receiver,
       contractAddress,
@@ -589,7 +581,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
   /// @param receiver             The Address to Receive the Discharged Asset Tokens
   /// @param contractAddress      The Address to the Contract of the Token to Discharge
   /// @param tokenId              The ID of the Token to Discharge
-  /// @param walletManagerId  The LP of the Assets to Discharge from the Token
+  /// @param walletManagerId  The Wallet Manager of the Assets to Discharge from the Token
   /// @param assetToken           The Address of the Asset Token being discharged
   /// @param assetAmount          The specific amount of Asset Token to Discharge from the Particle
   /// @return receiverAmount      Amount of Asset Token discharged to the Receiver
@@ -634,7 +626,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
   /// @param receiver             The Address to Receive the Released Asset Tokens
   /// @param contractAddress      The Address to the Contract of the Token to Release
   /// @param tokenId              The ID of the Token to Release
-  /// @param walletManagerId  The LP of the Assets to Release from the Token
+  /// @param walletManagerId  The Wallet Manager of the Assets to Release from the Token
   /// @param assetToken           The Address of the Asset Token being released
   /// @return creatorAmount Amount of Asset Token released to the Creator
   /// @return receiverAmount Amount of Asset Token released to the Receiver (includes principalAmount)
@@ -666,7 +658,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
 
     // Release Particle to Receiver
     uint256 principalAmount;
-    address creatorRedirect = _creatorSettings[tokenUuid].annuityRedirect;
+    address creatorRedirect = _settings.getCreatorAnnuitiesRedirect(contractAddress, tokenId);
     (principalAmount, creatorAmount, receiverAmount) = _ftWalletManager[walletManagerId].release(
       receiver,
       contractAddress,
@@ -685,7 +677,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
   /// @param receiver             The Address to Receive the Released Asset Tokens
   /// @param contractAddress      The Address to the Contract of the Token to Release
   /// @param tokenId              The ID of the Token to Release
-  /// @param walletManagerId  The LP of the Assets to Release from the Token
+  /// @param walletManagerId      The Wallet Manager of the Assets to Release from the Token
   /// @param assetToken           The Address of the Asset Token being released
   /// @param assetAmount          The specific amount of Asset Token to Release from the Particle
   /// @return creatorAmount Amount of Asset Token released to the Creator
@@ -719,7 +711,7 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
 
     // Release Particle to Receiver
     uint256 principalAmount;
-    address creatorRedirect = _creatorSettings[tokenUuid].annuityRedirect;
+    address creatorRedirect = _settings.getCreatorAnnuitiesRedirect(contractAddress, tokenId);
     (principalAmount, creatorAmount, receiverAmount) = _ftWalletManager[walletManagerId].releaseAmount(
       receiver,
       contractAddress,
@@ -762,8 +754,6 @@ contract ChargedParticles is ChargedParticlesBase, BlackholePrevention {
     nonReentrant
     returns (bool success)
   {
-    require(_nftSettings[contractAddress].actionPerms.hasBit(PERM_BASKET_NFT), "CP:E-417");
-
     _validateNftDeposit(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
 
     // Transfer ERC721 Token from Caller to Contract (reverts on fail)

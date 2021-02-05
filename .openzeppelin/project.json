@@ -3,6 +3,7 @@
   "contracts": {
     "Universe": "Universe",
     "ChargedParticles": "ChargedParticles",
+    "ChargedSettings": "ChargedSettings",
     "Photon": "Photon",
     "GenericWalletManager": "GenericWalletManager",
     "GenericBasketManager": "GenericBasketManager",

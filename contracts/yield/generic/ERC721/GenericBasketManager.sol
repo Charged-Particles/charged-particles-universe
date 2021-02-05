@@ -188,7 +188,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
   |__________________________________*/
 
   /**
-    * @dev Sets the Paused-state of the Wallet Manager
+    * @dev Sets the Paused-state of the Basket Manager
     */
   function setPausedState(bool paused) external onlyOwner {
     _paused = paused;

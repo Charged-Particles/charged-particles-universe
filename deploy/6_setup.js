@@ -24,6 +24,7 @@ module.exports = async (hre) => {
     const tempLockExpiryBlocks = presets.ChargedParticles.tempLockExpiryBlocks;
 
     const ddUniverse = getDeployData('Universe', chainId);
+    const ddChargedSettings = getDeployData('ChargedSettings', chainId);
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
     const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
     const ddAaveBridgeV1 = getDeployData('AaveBridgeV1', chainId);
@@ -45,13 +46,17 @@ module.exports = async (hre) => {
     log('  - Trusted Forwarder: ', trustedForwarder);
     log(' ');
 
-    log('  Loading ChargedParticles from: ', ddChargedParticles.address);
-    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
-    const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
-
     log('  Loading Universe from: ', ddUniverse.address);
     const Universe = await ethers.getContractFactory('Universe');
     const universe = await Universe.attach(ddUniverse.address);
+
+    log('  Loading ChargedSettings from: ', ddChargedSettings.address);
+    const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
+    const chargedSettings = await ChargedSettings.attach(ddChargedSettings.address);
+
+    log('  Loading ChargedParticles from: ', ddChargedParticles.address);
+    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
+    const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
     log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
@@ -86,14 +91,20 @@ module.exports = async (hre) => {
     await log(`\n  - [TX-${txCount++}] Universe: Registering ChargedParticles`)(alchemyTimeout);
     await universe.setChargedParticles(ddChargedParticles.address);
 
+    await log(`  - [TX-${txCount++}] ChargedSettings: Registering ChargedParticles`)(alchemyTimeout);
+    await chargedSettings.setController(ddChargedParticles.address);
+
     await log(`  - [TX-${txCount++}] ChargedParticles: Registering Universe`)(alchemyTimeout);
     await chargedParticles.setUniverse(ddUniverse.address);
 
+    await log(`  - [TX-${txCount++}] ChargedParticles: Registering ChargedSettings`)(alchemyTimeout);
+    await chargedParticles.setChargedSettings(ddChargedSettings.address);
+
     await log(`  - [TX-${txCount++}] ChargedParticles: Setting Deposit Cap`)(alchemyTimeout);
-    await chargedParticles.setDepositCap(depositCap);
+    await chargedSettings.setDepositCap(depositCap);
 
     await log(`  - [TX-${txCount++}] ChargedParticles: Setting Temp-Lock Expiry Blocks`)(alchemyTimeout);
-    await chargedParticles.setTempLockExpiryBlocks(tempLockExpiryBlocks);
+    await chargedSettings.setTempLockExpiryBlocks(tempLockExpiryBlocks);
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,11 +159,14 @@ module.exports = async (hre) => {
     await log(`  - [TX-${txCount++}] Proton: Registering Universe`)(alchemyTimeout);
     await proton.setUniverse(ddUniverse.address);
 
+    await log(`  - [TX-${txCount++}] Proton: Registering ChargedSettings`)(alchemyTimeout);
+    await proton.setChargedSettings(ddChargedSettings.address);
+
     await log(`  - [TX-${txCount++}] Proton: Registering ChargedParticles`)(alchemyTimeout);
     await proton.setChargedParticles(ddChargedParticles.address);
 
-    await log(`  - [TX-${txCount++}] ChargedParticles: Enabling Proton for Charge`)(alchemyTimeout);
-    await chargedParticles.enableNftContracts([ddProton.address]);
+    await log(`  - [TX-${txCount++}] ChargedSettings: Enabling Proton for Charge`)(alchemyTimeout);
+    await chargedSettings.enableNftContracts([ddProton.address]);
 
     await log(`  - [TX-${txCount++}] Universe: Registering Proton`)(alchemyTimeout);
     await universe.setProtonToken(ddProton.address);

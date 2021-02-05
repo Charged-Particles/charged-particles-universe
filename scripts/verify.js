@@ -31,14 +31,17 @@ async function run() {
 
   // Upgradeable Contracts; need to get implementation adderss from `.openzeppelin/__network__.json`
   let universeAddress = null;
+  let chargedSettingsAddress = null;
   let chargedParticlesAddress = null;
   if (networkName === 'kovan') {
     universeAddress = '0xeC08CB0f69E2095CF27eCB6E9D4BB60b430334Ad';
+    chargedSettingsAddress = '';
     chargedParticlesAddress = '0x0cFAAD8cD948A0BAe647615ecc8DfeFD0294a5f2';
   }
 
   // Protocol
   await verifyContract('Universe', networkName, universeAddress);
+  await verifyContract('ChargedSettings', networkName, chargedSettingsAddress);
   await verifyContract('ChargedParticles', networkName, chargedParticlesAddress);
   await verifyContract('Photon', networkName);
   await verifyContract('Ion', networkName);

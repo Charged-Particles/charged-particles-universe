@@ -33,6 +33,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "../interfaces/IUniverse.sol";
+import "../interfaces/IChargedSettings.sol";
 import "../interfaces/IChargedParticles.sol";
 
 import "../lib/BlackholePrevention.sol";
@@ -48,6 +49,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   uint256 constant internal MAX_ROYALTIES = 8e3;      // 8000   (80%)
 
   event UniverseSet(address indexed universe);
+  event ChargedSettingsSet(address indexed chargedSettings);
   event ChargedParticlesSet(address indexed chargedParticles);
   event SalePriceSet(uint256 indexed tokenId, uint256 salePrice);
   event CreatorRoyaltiesSet(uint256 indexed tokenId, uint256 royaltiesPct);
@@ -55,6 +57,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   event ProtonSold(uint256 indexed tokenId, address indexed oldOwner, address indexed newOwner, uint256 salePrice, address creator, uint256 creatorRoyalties);
 
   IUniverse internal _universe;
+  IChargedSettings internal _chargedSettings;
   IChargedParticles internal _chargedParticles;
 
   Counters.Counter internal _tokenIds;
@@ -256,6 +259,12 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     emit ChargedParticlesSet(chargedParticles);
   }
 
+  /// @dev Setup the Charged-Settings Controller
+  function setChargedSettings(address settings) external onlyOwner {
+    _chargedSettings = IChargedSettings(settings);
+    emit ChargedSettingsSet(settings);
+  }
+
   function setTrustedForwarder(address _trustedForwarder) external onlyOwner {
     trustedForwarder = _trustedForwarder;
   }
@@ -353,7 +362,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     }
 
     if (annuityPercent > 0) {
-      _chargedParticles.setCreatorConfigs(
+      _chargedSettings.setCreatorConfigs(
         address(this),
         newTokenId,
         creator,
@@ -394,7 +403,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
       }
 
       if (annuityPercent > 0) {
-        _chargedParticles.setCreatorConfigs(
+        _chargedSettings.setCreatorConfigs(
           self,
           newTokenId,
           creator,
