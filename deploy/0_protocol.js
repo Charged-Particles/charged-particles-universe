@@ -39,6 +39,16 @@ module.exports = async (hre) => {
       deployTransaction: universe.deployTransaction,
     }
 
+    await log('  Deploying ChargedState...')(alchemyTimeout);
+    const ChargedState = await ethers.getContractFactory('ChargedState');
+    const ChargedStateInstance = await upgrades.deployProxy(ChargedState, [trustedForwarder], { unsafeAllowCustomTypes: true });
+    const chargedState = await ChargedStateInstance.deployed();
+    deployData['ChargedState'] = {
+      abi: getContractAbi('ChargedState'),
+      address: chargedState.address,
+      deployTransaction: chargedState.deployTransaction,
+    }
+
     await log('  Deploying ChargedSettings...')(alchemyTimeout);
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     const ChargedSettingsInstance = await upgrades.deployProxy(ChargedSettings, [trustedForwarder], { unsafeAllowCustomTypes: true });
@@ -63,6 +73,8 @@ module.exports = async (hre) => {
     await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
     log('  - Universe:         ', universe.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
+    log('  - ChargedState:     ', chargedState.address);
+    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedState.deployTransaction }));
     log('  - ChargedSettings:  ', chargedSettings.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedSettings.deployTransaction }));
     log('  - ChargedParticles: ', chargedParticles.address);

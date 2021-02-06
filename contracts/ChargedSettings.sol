@@ -85,11 +85,12 @@ contract ChargedSettings is
     address annuityRedirect;
   }
 
-  // The Controller Contract Address
-  address internal _controller;
-
   uint256 internal _depositCap;
   uint256 internal _tempLockExpiryBlocks;
+
+  // Wallet/Basket Managers (by Unique Manager ID)
+  mapping (string => IWalletManager) internal _ftWalletManager;
+  mapping (string => IBasketManager) internal _nftBasketManager;
 
   // Settings for individual NFTs set by NFT Creator (by Token UUID)
   mapping (uint256 => CreatorSettings) internal _creatorSettings;
@@ -122,6 +123,22 @@ contract ChargedSettings is
   /// @return True if the account is the Owner of the _contract
   function isContractOwner(address contractAddress, address account) external view override virtual returns (bool) {
     return contractAddress.isContractOwner(account);
+  }
+
+  function isWalletManagerEnabled(string calldata walletManagerId) external virtual override view returns (bool) {
+    return _isWalletManagerEnabled(walletManagerId);
+  }
+
+  function getWalletManager(string calldata walletManagerId) external virtual override view returns (IWalletManager) {
+    return _ftWalletManager[walletManagerId];
+  }
+
+  function isNftBasketEnabled(string calldata basketId) external virtual override view returns (bool) {
+    return _isNftBasketEnabled(basketId);
+  }
+
+  function getBasketManager(string calldata basketId) external virtual override view returns (IBasketManager) {
+    return _nftBasketManager[basketId];
   }
 
 
@@ -217,7 +234,7 @@ contract ChargedSettings is
   /// @param tokenId          The token ID of the Proton-based NFT to configure
   /// @param creator          The creator of the Proton-based NFT
   /// @param annuityPercent   The percentage of interest-annuities to reserve for the creator
-  function setCreatorConfigs(
+  function setCreatorAnnuities(
     address contractAddress,
     uint256 tokenId,
     address creator,
@@ -246,13 +263,19 @@ contract ChargedSettings is
   /// @notice Sets a Custom Receiver Address for the Creator Annuities
   /// @param contractAddress  The Address to the Proton-based NFT to configure
   /// @param tokenId          The token ID of the Proton-based NFT to configure
+  /// @param creator          The creator of the Proton-based NFT
   /// @param receiver         The receiver of the Creator interest-annuities
-  function setCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId, address receiver)
+  function setCreatorAnnuitiesRedirect(
+    address contractAddress,
+    uint256 tokenId,
+    address creator,
+    address receiver
+  )
     external
     virtual
     override
   {
-    require(contractAddress.isTokenCreator(tokenId, _msgSender()), "CP:E-104");
+    require(contractAddress.isTokenContractOrCreator(tokenId, creator, _msgSender()), "CP:E-104");
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     _creatorSettings[tokenUuid].annuityRedirect = receiver;
     emit TokenCreatorAnnuitiesRedirected(contractAddress, tokenId, receiver);
@@ -426,14 +449,6 @@ contract ChargedSettings is
   |          Only Admin/DAO           |
   |__________________________________*/
 
-  /**
-    * @dev Connects to the Charged Particles Controller
-    */
-  function setController(address controller) external override virtual onlyOwner {
-    _controller = controller;
-    emit ControllerSet(controller);
-  }
-
   function setDepositCap(uint256 cap) external virtual onlyOwner {
     _depositCap = cap;
     emit DepositCapSet(cap);
@@ -441,6 +456,28 @@ contract ChargedSettings is
 
   function setTempLockExpiryBlocks(uint256 numBlocks) external virtual onlyOwner {
     _tempLockExpiryBlocks = numBlocks;
+  }
+
+  /// @dev Register Contracts as wallet managers with a unique liquidity provider ID
+  function registerWalletManager(string calldata walletManagerId, address walletManager) external virtual onlyOwner {
+    // Validate wallet manager
+    IWalletManager newWalletMgr = IWalletManager(walletManager);
+    require(newWalletMgr.isPaused() != true, "CP:E-418");
+
+    // Register LP ID
+    _ftWalletManager[walletManagerId] = newWalletMgr;
+    emit WalletManagerRegistered(walletManagerId, walletManager);
+  }
+
+  /// @dev Register Contracts as basket managers with a unique basket ID
+  function registerBasketManager(string calldata basketId, address basketManager) external virtual onlyOwner {
+    // Validate basket manager
+    IBasketManager newBasketMgr = IBasketManager(basketManager);
+    require(newBasketMgr.isPaused() != true, "CP:E-418");
+
+    // Register Basket ID
+    _nftBasketManager[basketId] = newBasketMgr;
+    emit BasketManagerRegistered(basketId, basketManager);
   }
 
   function enableNftContracts(address[] calldata contracts) external override virtual onlyOwner {
@@ -499,15 +536,15 @@ contract ChargedSettings is
   |      (blackhole prevention)       |
   |__________________________________*/
 
-  function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
+  function withdrawEther(address payable receiver, uint256 amount) external virtual onlyOwner {
     _withdrawEther(receiver, amount);
   }
 
-  function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external onlyOwner {
+  function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external virtual onlyOwner {
     _withdrawERC20(receiver, tokenAddress, amount);
   }
 
-  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external onlyOwner {
+  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external virtual onlyOwner {
     _withdrawERC721(receiver, tokenAddress, tokenId);
   }
 
@@ -516,8 +553,18 @@ contract ChargedSettings is
   |         Private Functions         |
   |__________________________________*/
 
+  /// @dev See {ChargedParticles-isWalletManagerEnabled}.
+  function _isWalletManagerEnabled(string calldata walletManagerId) internal view virtual returns (bool) {
+    return (address(_ftWalletManager[walletManagerId]) != address(0x0) && !_ftWalletManager[walletManagerId].isPaused());
+  }
+
+  /// @dev See {ChargedParticles-isNftBasketEnabled}.
+  function _isNftBasketEnabled(string calldata basketId) internal view virtual returns (bool) {
+    return (address(_nftBasketManager[basketId]) != address(0x0) && !_nftBasketManager[basketId].isPaused());
+  }
+
   /// @dev Update the list of NFT contracts that can be Charged
-  function _setPermsForCharge(address contractAddress, bool state) internal {
+  function _setPermsForCharge(address contractAddress, bool state) internal virtual {
     if (state) {
       _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.setBit(PERM_CHARGE_NFT);
     } else {
@@ -527,7 +574,7 @@ contract ChargedSettings is
   }
 
   /// @dev Update the list of NFT contracts that can hold other NFTs
-  function _setPermsForBasket(address contractAddress, bool state) internal {
+  function _setPermsForBasket(address contractAddress, bool state) internal virtual {
     if (state) {
       _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.setBit(PERM_BASKET_NFT);
     } else {
@@ -537,7 +584,7 @@ contract ChargedSettings is
   }
 
   /// @dev Update the list of NFT contracts that can Timelock any NFT for Front-run Protection
-  function _setPermsForTimelockAny(address contractAddress, bool state) internal {
+  function _setPermsForTimelockAny(address contractAddress, bool state) internal virtual {
     if (state) {
       _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.setBit(PERM_TIMELOCK_ANY_NFT);
     } else {
@@ -547,7 +594,7 @@ contract ChargedSettings is
   }
 
   /// @dev Update the list of NFT contracts that can Timelock their own tokens
-  function _setPermsForTimelockSelf(address contractAddress, bool state) internal {
+  function _setPermsForTimelockSelf(address contractAddress, bool state) internal virtual {
     if (state) {
       _nftSettings[contractAddress].actionPerms = _nftSettings[contractAddress].actionPerms.setBit(PERM_TIMELOCK_OWN_NFT);
     } else {
@@ -587,12 +634,6 @@ contract ChargedSettings is
   /***********************************|
   |             Modifiers             |
   |__________________________________*/
-
-  /// @dev Throws if called by any account other than the Controller contract
-  modifier onlyController() {
-    require(_controller == msg.sender, "WalletManagerBase:E-108");
-    _;
-  }
 
   modifier onlyValidExternalContract(address contractAddress) {
     require(contractAddress.isContract(), "CP:E-420");

@@ -23,6 +23,9 @@
 
 pragma solidity >=0.6.0;
 
+import "./IWalletManager.sol";
+import "./IBasketManager.sol";
+
 /**
  * @notice Interface for Charged Settings
  */
@@ -42,12 +45,20 @@ interface IChargedSettings {
   function getNftAssetRequirements(address contractAddress, address nftTokenAddress) external view
     returns (string memory requiredBasketManager, bool basketEnabled, uint256 maxNfts);
 
+  // ERC20
+  function isWalletManagerEnabled(string calldata walletManagerId) external view returns (bool);
+  function getWalletManager(string calldata walletManagerId) external view returns (IWalletManager);
+
+  // ERC721
+  function isNftBasketEnabled(string calldata basketId) external view returns (bool);
+  function getBasketManager(string calldata basketId) external view returns (IBasketManager);
+
   /***********************************|
   |         Only NFT Creator          |
   |__________________________________*/
 
-  function setCreatorConfigs(address contractAddress, uint256 tokenId, address creator, uint256 annuityPercent) external;
-  function setCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId, address receiver) external;
+  function setCreatorAnnuities(address contractAddress, uint256 tokenId, address creator, uint256 annuityPercent) external;
+  function setCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId, address creator, address receiver) external;
 
 
   /***********************************|
@@ -65,7 +76,6 @@ interface IChargedSettings {
   |          Only Admin/DAO           |
   |__________________________________*/
 
-  function setController(address controller) external;
   function enableNftContracts(address[] calldata contracts) external;
   function setPermsForCharge(address contractAddress, bool state) external;
   function setPermsForBasket(address contractAddress, bool state) external;
@@ -76,8 +86,10 @@ interface IChargedSettings {
   |          Particle Events          |
   |__________________________________*/
 
-  event ControllerSet(address indexed controller);
   event DepositCapSet(uint256 depositCap);
+
+  event WalletManagerRegistered(string indexed walletManagerId, address indexed walletManager);
+  event BasketManagerRegistered(string indexed basketId, address indexed basketManager);
 
   event RequiredWalletManagerSet(address indexed contractAddress, string walletManager);
   event RequiredBasketManagerSet(address indexed contractAddress, string basketManager);

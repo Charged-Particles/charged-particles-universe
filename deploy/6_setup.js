@@ -24,6 +24,7 @@ module.exports = async (hre) => {
     const tempLockExpiryBlocks = presets.ChargedParticles.tempLockExpiryBlocks;
 
     const ddUniverse = getDeployData('Universe', chainId);
+    const ddChargedState = getDeployData('ChargedState', chainId);
     const ddChargedSettings = getDeployData('ChargedSettings', chainId);
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
     const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
@@ -49,6 +50,10 @@ module.exports = async (hre) => {
     log('  Loading Universe from: ', ddUniverse.address);
     const Universe = await ethers.getContractFactory('Universe');
     const universe = await Universe.attach(ddUniverse.address);
+
+    log('  Loading ChargedState from: ', ddChargedState.address);
+    const ChargedState = await ethers.getContractFactory('ChargedState');
+    const chargedState = await ChargedState.attach(ddChargedState.address);
 
     log('  Loading ChargedSettings from: ', ddChargedSettings.address);
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
@@ -91,11 +96,14 @@ module.exports = async (hre) => {
     await log(`\n  - [TX-${txCount++}] Universe: Registering ChargedParticles`)(alchemyTimeout);
     await universe.setChargedParticles(ddChargedParticles.address);
 
-    await log(`  - [TX-${txCount++}] ChargedSettings: Registering ChargedParticles`)(alchemyTimeout);
-    await chargedSettings.setController(ddChargedParticles.address);
-
     await log(`  - [TX-${txCount++}] ChargedParticles: Registering Universe`)(alchemyTimeout);
     await chargedParticles.setUniverse(ddUniverse.address);
+
+    await log(`  - [TX-${txCount++}] ChargedState: Registering ChargedSettings`)(alchemyTimeout);
+    await chargedState.setChargedSettings(ddChargedSettings.address);
+
+    await log(`  - [TX-${txCount++}] ChargedParticles: Registering ChargedState`)(alchemyTimeout);
+    await chargedParticles.setChargedState(ddChargedState.address);
 
     await log(`  - [TX-${txCount++}] ChargedParticles: Registering ChargedSettings`)(alchemyTimeout);
     await chargedParticles.setChargedSettings(ddChargedSettings.address);
@@ -115,13 +123,13 @@ module.exports = async (hre) => {
     await genericWalletManager.setController(ddChargedParticles.address);
 
     await log(`  - [TX-${txCount++}] GenericWalletManager: Registering Generic Wallet Manager with ChargedParticles`)(alchemyTimeout);
-    await chargedParticles.registerWalletManager('generic', ddGenericWalletManager.address);
+    await chargedSettings.registerWalletManager('generic', ddGenericWalletManager.address);
 
     await log(`  - [TX-${txCount++}] GenericBasketManager: Setting Charged Particles as Controller`)(alchemyTimeout);
     await genericBasketManager.setController(ddChargedParticles.address);
 
     await log(`  - [TX-${txCount++}] GenericBasketManager: Registering Generic Basket Manager with ChargedParticles`)(alchemyTimeout);
-    await chargedParticles.registerBasketManager('generic', ddGenericBasketManager.address);
+    await chargedSettings.registerBasketManager('generic', ddGenericBasketManager.address);
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -149,7 +157,7 @@ module.exports = async (hre) => {
     }
 
     await log(`  - [TX-${txCount++}] AaveWalletManager: Registering Aave as LP with ChargedParticles`)(alchemyTimeout);
-    await chargedParticles.registerWalletManager('aave', ddAaveWalletManager.address);
+    await chargedSettings.registerWalletManager('aave', ddAaveWalletManager.address);
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

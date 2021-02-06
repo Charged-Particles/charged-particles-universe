@@ -362,7 +362,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     }
 
     if (annuityPercent > 0) {
-      _chargedSettings.setCreatorConfigs(
+      _chargedSettings.setCreatorAnnuities(
         address(this),
         newTokenId,
         creator,
@@ -403,7 +403,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
       }
 
       if (annuityPercent > 0) {
-        _chargedSettings.setCreatorConfigs(
+        _chargedSettings.setCreatorAnnuities(
           self,
           newTokenId,
           creator,

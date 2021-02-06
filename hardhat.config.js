@@ -99,6 +99,7 @@ module.exports = {
       flat: true,
       only: [
         'Universe',
+        'ChargedState',
         'ChargedSettings',
         'ChargedParticles',
         'AaveWalletManager',

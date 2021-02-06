@@ -35,7 +35,7 @@ const TEST_TOKEN_ID = '1337';
 
 let overrides = { gasLimit: 20000000 }
 
-describe("Charged Particles", () => {
+describe("Charged State", () => {
   let chainId;
 
   // External contracts
@@ -123,24 +123,117 @@ describe("Charged Particles", () => {
     });
   });
 
+  describe('Token Discharge Approvals', async () => {
+
+    beforeEach(async() => {
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+    });
+
+    it('should confirm operator approval for discharge', async () => {
+      expect(await chargedState.isApprovedForDischarge(erc721chargeable.address, TEST_TOKEN_ID, user1)).to.be.true;
+    });
+
+    it('should allow the NFT owner to set an operator for discharge', async () => {
+      await chargedState.connect(signer1).setDischargeApproval(erc721chargeable.address, TEST_TOKEN_ID, user2);
+      expect(await chargedState.isApprovedForDischarge(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.true;
+    });
+
+    it('should allow the NFT operator to set an operator for discharge', async () => {
+      await erc721chargeable.mock.isApprovedForAll.withArgs(user1, user2).returns(true);
+      await chargedState.connect(signer2).setDischargeApproval(erc721chargeable.address, TEST_TOKEN_ID, user3);
+      expect(await chargedState.isApprovedForDischarge(erc721chargeable.address, TEST_TOKEN_ID, user3)).to.be.true;
+    });
+
+    it('should not allow anyone else to set an operator for discharge', async () => {
+      expect(await chargedState.isApprovedForDischarge(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.false;
+    });
+  });
+
+  describe('Token Release Approvals', async () => {
+
+    beforeEach(async() => {
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+    });
+
+    it('should confirm operator approval for release', async () => {
+      expect(await chargedState.isApprovedForRelease(erc721chargeable.address, TEST_TOKEN_ID, user1)).to.be.true;
+    });
+
+    it('should allow the NFT owner to set an operator for release', async () => {
+      await chargedState.connect(signer1).setReleaseApproval(erc721chargeable.address, TEST_TOKEN_ID, user2);
+      expect(await chargedState.isApprovedForRelease(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.true;
+    });
+
+    it('should allow the NFT operator to set an operator for release', async () => {
+      await erc721chargeable.mock.isApprovedForAll.withArgs(user1, user2).returns(true);
+      await chargedState.connect(signer2).setReleaseApproval(erc721chargeable.address, TEST_TOKEN_ID, user3);
+      expect(await chargedState.isApprovedForRelease(erc721chargeable.address, TEST_TOKEN_ID, user3)).to.be.true;
+    });
+
+    it('should not allow anyone else to set an operator for release', async () => {
+      expect(await chargedState.isApprovedForRelease(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.false;
+    });
+  });
+
+  describe('Token Break-Bond Approvals', async () => {
+
+    beforeEach(async() => {
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+    });
+
+    it('should confirm operator approval for break-bond', async () => {
+      expect(await chargedState.isApprovedForBreakBond(erc721chargeable.address, TEST_TOKEN_ID, user1)).to.be.true;
+    });
+
+    it('should allow the NFT owner to set an operator for break-bond', async () => {
+      await chargedState.connect(signer1).setBreakBondApproval(erc721chargeable.address, TEST_TOKEN_ID, user2);
+      expect(await chargedState.isApprovedForBreakBond(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.true;
+    });
+
+    it('should allow the NFT operator to set an operator for break-bond', async () => {
+      await erc721chargeable.mock.isApprovedForAll.withArgs(user1, user2).returns(true);
+      await chargedState.connect(signer2).setBreakBondApproval(erc721chargeable.address, TEST_TOKEN_ID, user3);
+      expect(await chargedState.isApprovedForBreakBond(erc721chargeable.address, TEST_TOKEN_ID, user3)).to.be.true;
+    });
+
+    it('should not allow anyone else to set an operator for break-bond', async () => {
+      expect(await chargedState.isApprovedForBreakBond(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.false;
+    });
+  });
+
+  describe('Token Timelock Approvals', async () => {
+
+    beforeEach(async() => {
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
+    });
+
+    it('should confirm operator approval for timelock', async () => {
+      expect(await chargedState.isApprovedForTimelock(erc721chargeable.address, TEST_TOKEN_ID, user1)).to.be.true;
+    });
+
+    it('should allow the NFT owner to set an operator for timelock', async () => {
+      await chargedState.connect(signer1).setTimelockApproval(erc721chargeable.address, TEST_TOKEN_ID, user2);
+      expect(await chargedState.isApprovedForTimelock(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.true;
+    });
+
+    it('should allow the NFT operator to set an operator for timelock', async () => {
+      await erc721chargeable.mock.isApprovedForAll.withArgs(user1, user2).returns(true);
+      await chargedState.connect(signer2).setTimelockApproval(erc721chargeable.address, TEST_TOKEN_ID, user3);
+      expect(await chargedState.isApprovedForTimelock(erc721chargeable.address, TEST_TOKEN_ID, user3)).to.be.true;
+    });
+
+    it('should not allow anyone else to set an operator for timelock', async () => {
+      expect(await chargedState.isApprovedForTimelock(erc721chargeable.address, TEST_TOKEN_ID, user2)).to.be.false;
+    });
+  });
+
+
 
   describe('Contract Configurations', async () => {
-    it('should allow the contract owner to set the Universe contract', async () => {
-      expect(await chargedParticles.connect(signerD).setUniverse(universe.address))
-        .to.emit(chargedParticles, 'UniverseSet')
-        .withArgs(universe.address);
-    });
-
     it('should allow the contract owner to set the ChargedSettings contract', async () => {
-      expect(await chargedParticles.connect(signerD).setChargedSettings(chargedSettings.address))
-        .to.emit(chargedParticles, 'ChargedSettingsSet')
+      expect(await chargedState.connect(signerD).setChargedSettings(chargedSettings.address))
+        .to.emit(chargedState, 'ChargedSettingsSet')
         .withArgs(chargedSettings.address);
-    });
-
-    it('should allow the contract owner to set the ChargedState contract', async () => {
-      expect(await chargedParticles.connect(signerD).setChargedState(chargedState.address))
-        .to.emit(chargedParticles, 'ChargedStateSet')
-        .withArgs(chargedState.address);
     });
   });
 

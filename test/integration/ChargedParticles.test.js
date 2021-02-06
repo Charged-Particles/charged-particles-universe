@@ -88,6 +88,8 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     // Connect to Internal Contracts
     const Universe = await ethers.getContractFactory('Universe');
+    const ChargedState = await ethers.getContractFactory('ChargedState');
+    const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
@@ -97,6 +99,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     const IonTimelock = await ethers.getContractFactory('IonTimelock');
 
     universe = Universe.attach(getDeployData('Universe', chainId).address);
+    chargedState = ChargedState.attach(getDeployData('ChargedState', chainId).address);
+    chargedSettings = ChargedSettings.attach(getDeployData('ChargedSettings', chainId).address);
     chargedParticles = ChargedParticles.attach(getDeployData('ChargedParticles', chainId).address);
     aaveWalletManager = AaveWalletManager.attach(getDeployData('AaveWalletManager', chainId).address);
     genericWalletManager = GenericWalletManager.attach(getDeployData('GenericWalletManager', chainId).address);
@@ -176,7 +180,7 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     const blockNumberTimelock = (await getNetworkBlockNumber()).add(toBN('10'));
 
-    await chargedParticles.connect(signer2).setDischargeTimelock(
+    await chargedState.connect(signer2).setDischargeTimelock(
       proton.address,
       energizedParticleId,
       blockNumberTimelock

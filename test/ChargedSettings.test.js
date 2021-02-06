@@ -46,8 +46,10 @@ describe("Charged Settings", () => {
   let daiAddress;
 
   // Internal contracts
-  let chargedSettings;
   let universe;
+  let chargedState;
+  let chargedSettings;
+  let chargedParticles;
   let ethSender;
 
   // Deploy Data from Internal Contracts
@@ -96,10 +98,25 @@ describe("Charged Settings", () => {
     erc721chargeable = await deployMockContract(signerD, IERC721Chargeable.abi, overrides);
 
     // Connect to Internal Contracts
-    const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
-    chargedSettings = ChargedSettings.attach(getDeployData('ChargedSettings', chainId).address);
     const Universe = await ethers.getContractFactory('Universe');
     universe = Universe.attach(getDeployData('Universe', chainId).address);
+
+    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
+    chargedParticles = ChargedParticles.attach(getDeployData('ChargedParticles', chainId).address);
+
+    const ChargedState = await ethers.getContractFactory('ChargedState');
+    chargedState = ChargedState.attach(getDeployData('ChargedState', chainId).address);
+
+    const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
+    chargedSettings = ChargedSettings.attach(getDeployData('ChargedSettings', chainId).address);
+
+    const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
+    const GenericWalletManagerInstance = await GenericWalletManager.deploy();
+    newGenericWalletManager = await GenericWalletManagerInstance.deployed();
+
+    const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
+    const GenericBasketManagerInstance = await GenericBasketManager.deploy();
+    newGenericBasketManager = await GenericBasketManagerInstance.deployed();
 
     ddChargedParticles = getDeployData('ChargedParticles', chainId);
     ddProton = getDeployData('Proton', chainId);
@@ -113,12 +130,23 @@ describe("Charged Settings", () => {
     });
   });
 
+  describe('Wallet Managers', async () => {
+    it('should have enabled "aave" and "generic" as wallet managers', async () => {
+      expect(await chargedSettings.isWalletManagerEnabled('aave')).to.equal(true);
+      expect(await chargedSettings.isWalletManagerEnabled('generic')).to.equal(true);
+    });
+
+    it('should have enabled "generic" as a basket manager', async () => {
+      expect(await chargedSettings.isNftBasketEnabled('generic')).to.equal(true);
+    });
+  });
+
   describe('Creator Annuities', async () => {
     it('should allow the creator to set interest annuities', async () => {
       await erc721chargeable.mock.creatorOf.withArgs(TEST_TOKEN_ID).returns(user1);
 
       const annuitiesBasisPoints = toBN('5000'); // 50%
-      let tx = chargedSettings.connect(signer1).setCreatorConfigs(erc721chargeable.address, TEST_TOKEN_ID, user1, annuitiesBasisPoints);
+      let tx = chargedSettings.connect(signer1).setCreatorAnnuities(erc721chargeable.address, TEST_TOKEN_ID, user1, annuitiesBasisPoints);
       await expect(tx)
         .to.emit(chargedSettings, 'TokenCreatorConfigsSet')
         .withArgs(erc721chargeable.address, TEST_TOKEN_ID, user1, annuitiesBasisPoints);
@@ -131,14 +159,14 @@ describe("Charged Settings", () => {
       await erc721chargeable.mock.creatorOf.withArgs(TEST_TOKEN_ID).returns(user1);
 
       const annuitiesBasisPoints = toBN('100'); // 1%
-      await expect(chargedSettings.connect(signer2).setCreatorConfigs(erc721chargeable.address, TEST_TOKEN_ID, user1, annuitiesBasisPoints))
+      await expect(chargedSettings.connect(signer2).setCreatorAnnuities(erc721chargeable.address, TEST_TOKEN_ID, user1, annuitiesBasisPoints))
         .to.be.revertedWith('CP:E-104');
     });
 
     it('should allow the creator to redirect interest annuities', async () => {
       await erc721chargeable.mock.creatorOf.withArgs(TEST_TOKEN_ID).returns(user1);
 
-      let tx = chargedSettings.connect(signer1).setCreatorAnnuitiesRedirect(erc721chargeable.address, TEST_TOKEN_ID, user3);
+      let tx = chargedSettings.connect(signer1).setCreatorAnnuitiesRedirect(erc721chargeable.address, TEST_TOKEN_ID, user1, user3);
       await expect(tx)
         .to.emit(chargedSettings, 'TokenCreatorAnnuitiesRedirected')
         .withArgs(erc721chargeable.address, TEST_TOKEN_ID, user3);
@@ -149,7 +177,7 @@ describe("Charged Settings", () => {
     it('should not allow anyone else to redirect interest annuities', async () => {
       await erc721chargeable.mock.creatorOf.withArgs(TEST_TOKEN_ID).returns(user1);
 
-      await expect(chargedSettings.connect(signer2).setCreatorAnnuitiesRedirect(erc721chargeable.address, TEST_TOKEN_ID, user3))
+      await expect(chargedSettings.connect(signer2).setCreatorAnnuitiesRedirect(erc721chargeable.address, TEST_TOKEN_ID, user1, user3))
         .to.be.revertedWith('CP:E-104');
     });
   });
@@ -407,10 +435,16 @@ describe("Charged Settings", () => {
       .and.to.emit(chargedSettings, 'PermsSetForTimelockSelf').withArgs(erc721chargeable.address, true);
     });
 
-    it('should allow the contract owner to set the Charged Particles contract', async () => {
-      expect(await chargedSettings.connect(signerD).setController(ddChargedParticles.address))
-        .to.emit(chargedSettings, 'ControllerSet')
-        .withArgs(ddChargedParticles.address);
+    it('should allow the contract owner to register new wallet managers', async () => {
+      expect(await chargedSettings.connect(signerD).registerWalletManager('newGeneric', newGenericWalletManager.address))
+        .to.emit(chargedSettings, 'WalletManagerRegistered')
+        .withArgs('newGeneric', newGenericWalletManager.address);
+    });
+
+    it('should allow the contract owner to register new basket managers', async () => {
+      expect(await chargedSettings.connect(signerD).registerBasketManager('newGeneric', newGenericBasketManager.address))
+        .to.emit(chargedSettings, 'BasketManagerRegistered')
+        .withArgs('newGeneric', newGenericBasketManager.address);
     });
   });
 
