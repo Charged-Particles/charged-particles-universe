@@ -14,7 +14,7 @@ const txOverrides = (options = {}) => ({gasLimit: 15000000, ...options});
 
 const log = (...args) => {
   console.log(...args);
-  return async (delay = 0) => (delay && await sleep(delay));
+  return async (delay = 0) => (delay && await sleep(delay * 1000));
 };
 
 const chainIdByName = (chainName) => {

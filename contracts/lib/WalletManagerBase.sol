@@ -28,6 +28,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "../interfaces/IWalletManager.sol";
 import "../interfaces/ISmartWallet.sol";
+import "../lib/TokenInfo.sol";
 import "./BlackholePrevention.sol";
 
 
@@ -36,6 +37,7 @@ import "./BlackholePrevention.sol";
  * @dev Non-upgradeable Contract
  */
 abstract contract WalletManagerBase is Ownable, BlackholePrevention, IWalletManager {
+  using TokenInfo for address;
 
   event ControllerSet(address indexed controller);
   event PausedStateSet(bool isPaused);
@@ -87,7 +89,7 @@ abstract contract WalletManagerBase is Ownable, BlackholePrevention, IWalletMana
     override
     onlyOwner
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
     _withdrawEther(receiver, amount);
     return ISmartWallet(wallet).withdrawEther(receiver, amount);
@@ -99,7 +101,7 @@ abstract contract WalletManagerBase is Ownable, BlackholePrevention, IWalletMana
     override
     onlyOwner
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
     _withdrawERC20(receiver, tokenAddress, amount);
     return ISmartWallet(wallet).withdrawERC20(receiver, tokenAddress, amount);
@@ -111,7 +113,7 @@ abstract contract WalletManagerBase is Ownable, BlackholePrevention, IWalletMana
     override
     onlyOwner
   {
-    uint256 uuid = _getTokenUUID(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
     _withdrawERC721(receiver, nftTokenAddress, nftTokenId);
     return ISmartWallet(wallet).withdrawERC721(receiver, nftTokenAddress, nftTokenId);

@@ -22,6 +22,8 @@ module.exports = async (hre) => {
     const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
 
     const ddUniverse = getDeployData('Universe', chainId);
+    const ddChargedState = getDeployData('ChargedState', chainId);
+    const ddChargedSettings = getDeployData('ChargedSettings', chainId);
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
     const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
     const ddAaveBridgeV1 = getDeployData('AaveBridgeV1', chainId);
@@ -42,13 +44,21 @@ module.exports = async (hre) => {
     log('  - Trusted Forwarder: ', trustedForwarder);
     log(' ');
 
-    log('  Loading ChargedParticles from: ', ddChargedParticles.address);
-    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
-    const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
-
     log('  Loading Universe from: ', ddUniverse.address);
     const Universe = await ethers.getContractFactory('Universe');
     const universe = await Universe.attach(ddUniverse.address);
+
+    log('  Loading ChargedState from: ', ddChargedState.address);
+    const ChargedState = await ethers.getContractFactory('ChargedState');
+    const chargedState = await ChargedState.attach(ddChargedState.address);
+
+    log('  Loading ChargedSettings from: ', ddChargedSettings.address);
+    const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
+    const chargedSettings = await ChargedSettings.attach(ddChargedSettings.address);
+
+    log('  Loading ChargedParticles from: ', ddChargedParticles.address);
+    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
+    const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
     log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
@@ -76,6 +86,12 @@ module.exports = async (hre) => {
 
     await log(`  - Universe: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     await universe.transferOwnership(owner);
+
+    await log(`  - ChargedState: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await chargedState.transferOwnership(owner);
+
+    await log(`  - ChargedSettings: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await chargedSettings.transferOwnership(owner);
 
     await log(`  - ChargedParticles: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     await chargedParticles.transferOwnership(owner);
