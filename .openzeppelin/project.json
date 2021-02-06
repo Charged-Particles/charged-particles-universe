@@ -2,8 +2,9 @@
   "manifestVersion": "2.2",
   "contracts": {
     "Universe": "Universe",
-    "ChargedParticles": "ChargedParticles",
+    "ChargedState": "ChargedState",
     "ChargedSettings": "ChargedSettings",
+    "ChargedParticles": "ChargedParticles",
     "Photon": "Photon",
     "GenericWalletManager": "GenericWalletManager",
     "GenericBasketManager": "GenericBasketManager",
