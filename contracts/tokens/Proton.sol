@@ -291,16 +291,16 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   |         Private Functions         |
   |__________________________________*/
 
-  function _setSalePrice(uint256 tokenId, uint256 salePrice)
-    internal
-  {
+  function _setSalePrice(uint256 tokenId, uint256 salePrice) internal {
+    // Temp-Lock/Unlock NFT
+    //  prevents front-running the sale and draining the value of the NFT just before sale
+    _chargedState.setTemporaryLock(address(this), tokenId, (salePrice > 0));
+
     _tokenSalePrice[tokenId] = salePrice;
     emit SalePriceSet(tokenId, salePrice);
   }
 
-  function _setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct)
-    internal
-  {
+  function _setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct) internal {
     require(royaltiesPct <= MAX_ROYALTIES, "Proton:E-421");
     _tokenCreatorRoyaltiesPct[tokenId] = royaltiesPct;
     emit CreatorRoyaltiesSet(tokenId, royaltiesPct);
@@ -463,6 +463,9 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     if (address(_universe) != address(0)) {
       _universe.onProtonSale(address(this), tokenId, oldOwner, newOwner, salePrice, royaltiesReceiver, creatorAmount);
     }
+
+    // Unlock NFT
+    _chargedState.setTemporaryLock(address(this), tokenId, false);
 
     // Transfer Token
     _transfer(oldOwner, newOwner, tokenId);
