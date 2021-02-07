@@ -33,6 +33,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "../interfaces/IUniverse.sol";
+import "../interfaces/IChargedState.sol";
 import "../interfaces/IChargedSettings.sol";
 import "../interfaces/IChargedParticles.sol";
 
@@ -49,6 +50,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   uint256 constant internal MAX_ROYALTIES = 8e3;      // 8000   (80%)
 
   event UniverseSet(address indexed universe);
+  event ChargedStateSet(address indexed chargedState);
   event ChargedSettingsSet(address indexed chargedSettings);
   event ChargedParticlesSet(address indexed chargedParticles);
   event SalePriceSet(uint256 indexed tokenId, uint256 salePrice);
@@ -57,6 +59,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   event ProtonSold(uint256 indexed tokenId, address indexed oldOwner, address indexed newOwner, uint256 salePrice, address creator, uint256 creatorRoyalties);
 
   IUniverse internal _universe;
+  IChargedState internal _chargedState;
   IChargedSettings internal _chargedSettings;
   IChargedParticles internal _chargedParticles;
 
@@ -257,6 +260,12 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   function setChargedParticles(address chargedParticles) external onlyOwner {
     _chargedParticles = IChargedParticles(chargedParticles);
     emit ChargedParticlesSet(chargedParticles);
+  }
+
+  /// @dev Setup the Charged-State Controller
+  function setChargedState(address stateController) external virtual onlyOwner {
+    _chargedState = IChargedState(stateController);
+    emit ChargedStateSet(stateController);
   }
 
   /// @dev Setup the Charged-Settings Controller

@@ -167,6 +167,9 @@ module.exports = async (hre) => {
     await log(`  - [TX-${txCount++}] Proton: Registering Universe`)(alchemyTimeout);
     await proton.setUniverse(ddUniverse.address);
 
+    await log(`  - [TX-${txCount++}] Proton: Registering ChargedState`)(alchemyTimeout);
+    await proton.setChargedState(ddChargedState.address);
+
     await log(`  - [TX-${txCount++}] Proton: Registering ChargedSettings`)(alchemyTimeout);
     await proton.setChargedSettings(ddChargedSettings.address);
 
