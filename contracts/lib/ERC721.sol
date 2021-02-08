@@ -28,7 +28,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
     /**
      * @dev Emitted when `tokenId` token is transfered from `from` to `to`.
      */
-    event TransferBatch(address indexed from, address indexed to, uint256[] tokenIds);
+    event TransferBatch(address indexed from, address indexed to, uint256 startTokenId, uint256 count);
 
     // Equals to `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`
     // which can be also obtained as `IERC721Receiver(0).onERC721Received.selector`
@@ -284,6 +284,15 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
     }
 
     /**
+     * @dev Same as {xref-ERC721-_safeMint-address-uint256-}[`_safeMint`], with an additional `data` parameter which is
+     * forwarded in {IERC721Receiver-onERC721Received} to contract recipients.
+     */
+    function _safeMintBatch(address to, uint256 startTokenId, uint256 count, bytes memory _data) internal virtual {
+        _mintBatch(to, startTokenId, count);
+        require(_checkOnERC721Received(address(0), to, startTokenId, _data), "ERC721:E-402");
+    }
+
+    /**
      * @dev Mints `tokenId` and transfers it to `to`.
      *
      * WARNING: Usage of this method is discouraged, use {_safeMint} whenever possible
@@ -304,6 +313,31 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
         _tokenOwners.set(tokenId, to);
 
         emit Transfer(address(0), to, tokenId);
+    }
+
+    /**
+     * @dev Mints `tokenId` and transfers it to `to`.
+     *
+     * WARNING: Usage of this method is discouraged, use {_safeMint} whenever possible
+     *
+     * Requirements:
+     *
+     * - `tokenId` must not exist.
+     * - `to` cannot be the zero address.
+     *
+     * Emits a {Transfer} event.
+     */
+    function _mintBatch(address to, uint256 startTokenId, uint256 count) internal virtual {
+        require(to != address(0), "ERC721:E-403");
+        require(!_exists(startTokenId), "ERC721:E-407");
+
+        for (uint i = 0; i < count; i++) {
+          uint256 tokenId = startTokenId.add(i);
+          _holderTokens[to].add(tokenId);
+          _tokenOwners.set(tokenId, to);
+        }
+
+        emit TransferBatch(address(0), to, startTokenId, count);
     }
 
     /**

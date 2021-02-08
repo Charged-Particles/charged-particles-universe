@@ -97,10 +97,63 @@ const presets = {
     tempLockExpiryBlocks: toBN('5760'), // 1 Day == 86400 / 15
     maxDeposit: toWei('10000') // Temporary limit; remove after launch proves successful
   },
+  Lepton: {
+    maxMintPerTx: toWei('500'),
+    types: [
+      {
+        name        : '',
+        tokenUri    : '',
+        price       : toWei('0.2'),
+        supply      : toBN('2000'),
+        multiplier  : toBN('120'),  // 1.2%
+        bonus       : toBN('0'),
+      },
+      {
+        name        : '',
+        tokenUri    : '',
+        price       : toWei('0.3'),
+        supply      : toBN('1500'),
+        multiplier  : toBN('130'),  // 1.3%
+        bonus       : toBN('1'),
+      },
+      {
+        name        : '',
+        tokenUri    : '',
+        price       : toWei('0.65'),
+        supply      : toBN('1000'),
+        multiplier  : toBN('150'),  // 1.5%
+        bonus       : toBN('2'),
+      },
+      {
+        name        : '',
+        tokenUri    : '',
+        price       : toWei('1.2'),
+        supply      : toBN('750'),
+        multiplier  : toBN('180'),  // 1.8%
+        bonus       : toBN('4'),
+      },
+      {
+        name        : '',
+        tokenUri    : '',
+        price       : toWei('2.5'),
+        supply      : toBN('500'),
+        multiplier  : toBN('230'),  // 2.3%
+        bonus       : toBN('8'),
+      },
+      {
+        name        : '',
+        tokenUri    : '',
+        price       : toWei('15'),
+        supply      : toBN('100'),
+        multiplier  : toBN('310'),  // 3.1%
+        bonus       : toBN('16'),
+      },
+    ]
+  },
   Ion: {
     universeMaxSupply: toWei('40000000'), // 40% of 100 Million (Community Liquidity Mining Portion)
     rewardsForAssetTokens: [
-      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI
+      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI (50% of Interest in ION)
     ],
     timelocks: [
       {

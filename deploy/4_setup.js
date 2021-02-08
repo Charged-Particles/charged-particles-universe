@@ -3,6 +3,7 @@ const {
   chainIdByName,
   getDeployData,
   log,
+  toBN,
   presets,
 } = require("../js-helpers/deploy");
 
@@ -19,7 +20,8 @@ module.exports = async (hre) => {
     const lendingPoolProviderV1 = presets.Aave.v1.lendingPoolProvider[chainId];
     const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
     const referralCode = presets.Aave.referralCode[chainId];
-    const ionMaxSuppy = presets.Ion.universeMaxSupply;
+    const ionMaxSupply = presets.Ion.universeMaxSupply;
+    const leptonMaxMint = presets.Lepton.maxMintPerTx;
     const depositCap = presets.ChargedParticles.maxDeposit;
     const tempLockExpiryBlocks = presets.ChargedParticles.tempLockExpiryBlocks;
 
@@ -34,6 +36,7 @@ module.exports = async (hre) => {
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddPhoton = getDeployData('Photon', chainId);
     const ddProton = getDeployData('Proton', chainId);
+    const ddLepton = getDeployData('Lepton', chainId);
     const ddIon = getDeployData('Ion', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
@@ -82,6 +85,10 @@ module.exports = async (hre) => {
     log('  Loading Proton from: ', ddProton.address);
     const Proton = await ethers.getContractFactory('Proton');
     const proton = await Proton.attach(ddProton.address);
+
+    log('  Loading Lepton from: ', ddLepton.address);
+    const Lepton = await ethers.getContractFactory('Lepton');
+    const lepton = await Lepton.attach(ddLepton.address);
 
     log('  Loading Ion from: ', ddIon.address);
     const Ion = await ethers.getContractFactory('Ion');
@@ -181,6 +188,34 @@ module.exports = async (hre) => {
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Setup Lepton
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    await log(`  - [TX-${txCount++}] Lepton: Setting Max Mint per Transaction`)(alchemyTimeout);
+    await lepton.setMaxMintPerTx(leptonMaxMint);
+
+    await log(`  - [TX-${txCount++}] Universe: Registering Lepton`)(alchemyTimeout);
+    await universe.setLeptonToken(ddLepton.address);
+
+    await log(`  - [TX-${txCount++}] ChargedParticles: Setting Max Leptons per Proton`)(alchemyTimeout);
+    await chargedSettings.setMaxNfts(ddProton.address, ddLepton.address, toBN('1'));
+
+    let leptonType;
+    for (let i = 0; i < presets.Lepton.types.length; i++) {
+      leptonType = presets.Lepton.types[i];
+
+      await log(`  - [TX-${txCount++}] Lepton: Adding Lepton Type: ${leptonType.name}`)(alchemyTimeout);
+      await lepton.addLeptonType(
+        leptonType.tokenUri,
+        leptonType.price,
+        leptonType.supply,
+        leptonType.multiplier,
+        leptonType.bonus,
+      );
+    }
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Ion
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -188,7 +223,7 @@ module.exports = async (hre) => {
     await ion.setUniverse(ddUniverse.address);
 
     await log(`  - [TX-${txCount++}] Universe: Registering Ion`)(alchemyTimeout);
-    await universe.setCation(ddIon.address, ionMaxSuppy);
+    await universe.setCation(ddIon.address, ionMaxSupply);
 
     let assetTokenId;
     let assetTokenAddress;

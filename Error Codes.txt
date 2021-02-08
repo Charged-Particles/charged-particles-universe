@@ -84,3 +84,5 @@ Codes:
     E-425 - token already exists in basket
     E-426 - token does not exist in basket
     E-427 - exceeds max allowance
+    E-428 - token type not found
+    E-429 - minting restricted to limited amount

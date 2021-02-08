@@ -32,9 +32,12 @@ interface IUniverse {
   event ChargedParticlesSet(address indexed chargedParticles);
   event CationSet(address indexed token, uint256 maxSupply);
   event ProtonTokenSet(address indexed protonToken);
+  event LeptonTokenSet(address indexed leptonToken);
+  event QuarkTokenSet(address indexed quarkToken);
+  event BosonTokenSet(address indexed bosonToken);
   event EsaMultiplierSet(address indexed assetToken, uint256 multiplier);
-  event ElectrostaticAttraction(address indexed account, address cationSource, uint256 energy);
-  event MetallicBond(address indexed account, address cationSource, uint256 energy);
+  event ElectrostaticAttraction(address indexed account, address cationSource, uint256 energy, uint256 multiplier);
+  event ElectrostaticDischarge(address indexed account, address cationSource, uint256 energy);
 
   function onEnergize(
     address sender,
