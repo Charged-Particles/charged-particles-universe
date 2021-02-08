@@ -48,6 +48,7 @@ interface ILepton {
 
   event MaxMintPerTxSet(uint256 maxAmount);
   event LeptonTypeAdded(string tokenUri, uint256 price, uint32 supply, uint32 multiplier, uint32 bonus, uint256 upperBounds);
+  event LeptonTypeUpdated(uint256 leptonIndex, string tokenUri, uint256 price, uint32 supply, uint32 multiplier, uint32 bonus, uint256 upperBounds);
   event LeptonMinted(address indexed receiver, uint256 indexed tokenId, uint256 price, uint32 multiplier);
   event LeptonBatchMinted(address indexed receiver, uint256 indexed tokenId, uint256 count, uint256 price, uint32 multiplier);
   event PausedStateSet(bool isPaused);

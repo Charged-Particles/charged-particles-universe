@@ -1,9 +1,9 @@
 {
   "manifestVersion": "3.1",
   "impls": {
-    "bd1416c63596343ff5c8395ce847874b2aff5644a5df2cfb2d980337f656a19b": {
-      "address": "0xB23d6A919D3887D6616b890CaE61A6EA67d78B43",
-      "txHash": "0x8d2799c0f7fc3175ab2f8ad6c73055710dd502a32501f827a638e002b2d1edf7",
+    "9bde93c42ab3e00981708478ee8ed786562a9d6ec5bdda29202e4d5eecf3f82f": {
+      "address": "0x21a681A855928f2bAC91d28dB2Abb49A8FaA1c6e",
+      "txHash": "0x23a1e5ac9bd78c8217dda02a9c62f04dd22116d84807441094ae644eacc9d527",
       "layout": {
         "storage": [
           {
@@ -40,49 +40,73 @@
             "contract": "Universe",
             "label": "chargedParticles",
             "type": "t_address",
-            "src": "contracts/Universe.sol:49"
+            "src": "contracts/Universe.sol:50"
           },
           {
             "contract": "Universe",
             "label": "proton",
             "type": "t_address",
-            "src": "contracts/Universe.sol:50"
+            "src": "contracts/Universe.sol:51"
+          },
+          {
+            "contract": "Universe",
+            "label": "lepton",
+            "type": "t_address",
+            "src": "contracts/Universe.sol:52"
+          },
+          {
+            "contract": "Universe",
+            "label": "quark",
+            "type": "t_address",
+            "src": "contracts/Universe.sol:53"
+          },
+          {
+            "contract": "Universe",
+            "label": "boson",
+            "type": "t_address",
+            "src": "contracts/Universe.sol:54"
           },
           {
             "contract": "Universe",
             "label": "cationMaxSupply",
             "type": "t_uint256",
-            "src": "contracts/Universe.sol:55"
+            "src": "contracts/Universe.sol:59"
           },
           {
             "contract": "Universe",
             "label": "totalCationDischarged",
             "type": "t_uint256",
-            "src": "contracts/Universe.sol:56"
+            "src": "contracts/Universe.sol:60"
           },
           {
             "contract": "Universe",
             "label": "cationSource",
             "type": "t_contract(IERC20Upgradeable)1350",
-            "src": "contracts/Universe.sol:59"
+            "src": "contracts/Universe.sol:63"
           },
           {
             "contract": "Universe",
             "label": "esaMultiplier",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/Universe.sol:62"
+            "src": "contracts/Universe.sol:66"
           },
           {
             "contract": "Universe",
             "label": "esaLevel",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/Universe.sol:65"
+            "src": "contracts/Universe.sol:69"
           },
           {
             "contract": "Universe",
             "label": "referralSource",
             "type": "t_mapping(t_address,t_address)",
-            "src": "contracts/Universe.sol:68"
+            "src": "contracts/Universe.sol:72"
+          },
+          {
+            "contract": "Universe",
+            "label": "bondedLeptonMass",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/Universe.sol:75"
           }
         ],
         "types": {
@@ -101,6 +125,9 @@
           "t_mapping(t_address,t_address)": {
             "label": "mapping(address => address)"
           },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"
           },
@@ -114,8 +141,8 @@
       }
     },
     "9a9d819f14ab863e8cce6b89a7c0a0e901623634a6fb81c7788dc009646875c2": {
-      "address": "0x7B1730EB2bf2706202DA79b96ec7Bd6d19A00885",
-      "txHash": "0xd724356b194490998bd3c64b56799cefcfda856883c175d5cb865452eb00c33b",
+      "address": "0x77602c31773386E31F86449ff2B72A089eA308ba",
+      "txHash": "0xbc5feb67fc1e4dbd5678082d3719f9a60a259cb5264915aa5dc782ad2ad98239",
       "layout": {
         "storage": [
           {
@@ -169,7 +196,7 @@
           {
             "contract": "ChargedState",
             "label": "_chargedSettings",
-            "type": "t_contract(IChargedSettings)13359",
+            "type": "t_contract(IChargedSettings)13544",
             "src": "contracts/ChargedState.sol:76"
           },
           {
@@ -180,7 +207,7 @@
           }
         ],
         "types": {
-          "t_contract(IChargedSettings)13359": {
+          "t_contract(IChargedSettings)13544": {
             "label": "contract IChargedSettings"
           },
           "t_mapping(t_uint256,t_struct(NftState)10236_storage)": {
@@ -252,8 +279,8 @@
       }
     },
     "c9797cb4e958e913632a7d958938c60d928b0d01734748a046acec1810d486e1": {
-      "address": "0x32813c0d4AE1F2148C06472f105c8D5dcbdAAd97",
-      "txHash": "0xd9ad9b568e5e189aebdb4496a61c4726e68c6d3ea37b3a5eef2934ce165a7731",
+      "address": "0x42C131a651473923a8da3FbDa482497B341A652b",
+      "txHash": "0x6356d8f91f80db23b24870859fd84ac18033b4c89a581ead034b1d18f90f6c2c",
       "layout": {
         "storage": [
           {
@@ -319,13 +346,13 @@
           {
             "contract": "ChargedSettings",
             "label": "_ftWalletManager",
-            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)14632)",
+            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)14942)",
             "src": "contracts/ChargedSettings.sol:92"
           },
           {
             "contract": "ChargedSettings",
             "label": "_nftBasketManager",
-            "type": "t_mapping(t_string_memory_ptr,t_contract(IBasketManager)12826)",
+            "type": "t_mapping(t_string_memory_ptr,t_contract(IBasketManager)13011)",
             "src": "contracts/ChargedSettings.sol:93"
           },
           {
@@ -345,19 +372,19 @@
           "t_uint256": {
             "label": "uint256"
           },
-          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)14632)": {
+          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)14942)": {
             "label": "mapping(string => contract IWalletManager)"
           },
           "t_string_storage": {
             "label": "string"
           },
-          "t_contract(IWalletManager)14632": {
+          "t_contract(IWalletManager)14942": {
             "label": "contract IWalletManager"
           },
-          "t_mapping(t_string_memory_ptr,t_contract(IBasketManager)12826)": {
+          "t_mapping(t_string_memory_ptr,t_contract(IBasketManager)13011)": {
             "label": "mapping(string => contract IBasketManager)"
           },
-          "t_contract(IBasketManager)12826": {
+          "t_contract(IBasketManager)13011": {
             "label": "contract IBasketManager"
           },
           "t_mapping(t_uint256,t_struct(CreatorSettings)8894_storage)": {
@@ -437,8 +464,8 @@
       }
     },
     "fb1c370c33b9f377351b11e34edbf19f5534638a0ae7d6de84b15605831e8898": {
-      "address": "0xFf55bacE475503c048A33149906b34d2485E8889",
-      "txHash": "0x95bb5a00d52f2817df8d765d4dde7c11c21ac75eaa3e8e73a439ae66207e4ed4",
+      "address": "0xb2Badf71F58D0bbcDD049c574e832eA9b2400d71",
+      "txHash": "0xdbe9e098494b1e6f997503abb7c4aa62474c64b8021eeeb6e90bcb8669f6ad13",
       "layout": {
         "storage": [
           {
@@ -492,30 +519,30 @@
           {
             "contract": "ChargedParticles",
             "label": "_universe",
-            "type": "t_contract(IUniverse)14293",
+            "type": "t_contract(IUniverse)14603",
             "src": "contracts/ChargedParticles.sol:89"
           },
           {
             "contract": "ChargedParticles",
             "label": "_chargedState",
-            "type": "t_contract(IChargedState)13734",
+            "type": "t_contract(IChargedState)13919",
             "src": "contracts/ChargedParticles.sol:90"
           },
           {
             "contract": "ChargedParticles",
             "label": "_chargedSettings",
-            "type": "t_contract(IChargedSettings)13359",
+            "type": "t_contract(IChargedSettings)13544",
             "src": "contracts/ChargedParticles.sol:91"
           }
         ],
         "types": {
-          "t_contract(IUniverse)14293": {
+          "t_contract(IUniverse)14603": {
             "label": "contract IUniverse"
           },
-          "t_contract(IChargedState)13734": {
+          "t_contract(IChargedState)13919": {
             "label": "contract IChargedState"
           },
-          "t_contract(IChargedSettings)13359": {
+          "t_contract(IChargedSettings)13544": {
             "label": "contract IChargedSettings"
           },
           "t_address": {
@@ -537,8 +564,8 @@
       }
     },
     "a41d0b31403254ff8acd9575c7e336e910fe42bc4075e3bbb737408d0a2e4d9a": {
-      "address": "0x7b0f8e0b262DFF1B29749A186024A3bAfb049c75",
-      "txHash": "0x5ae1ffb19e9cb699eb337850be623725d1654c0fc15942a04fbe3aef9887d61a",
+      "address": "0xa84F46D86540C79Cbdd974deFcb35427aaAf9797",
+      "txHash": "0x6031216c62946fac034bc8b5862265df63b28abe955c47475e74cf37fca29e13",
       "layout": {
         "storage": [
           {
@@ -596,7 +623,7 @@
     }
   },
   "admin": {
-    "address": "0x3Fef1ce55a6970c6d0f00dF191a48110B5857E9A",
-    "txHash": "0xb18d7837ae3cf3e14b343173e3d839e6fe917645e02ba01b62adc010953ec28c"
+    "address": "0xDA9d5062Bd8B652d1863557bABF7BB04070e35FA",
+    "txHash": "0x20fc7e82e8409af7b627f0eb423cab6f70d793c8732fcb18c972d5f9456668f7"
   }
 }

@@ -116,6 +116,27 @@ contract Lepton is ILepton, ERC721, Ownable, ReentrancyGuard, BlackholePreventio
     emit LeptonTypeAdded(tokenUri, price, supply, multiplier, bonus, _maxSupply);
   }
 
+  function updateLeptonType(
+    uint256 leptonIndex,
+    string calldata tokenUri,
+    uint256 price,
+    uint32 supply,
+    uint32 multiplier,
+    uint32 bonus
+  )
+    external
+    virtual
+    onlyOwner
+  {
+    _leptonTypes[leptonIndex].tokenUri = tokenUri;
+    _leptonTypes[leptonIndex].price = price;
+    _leptonTypes[leptonIndex].supply = supply;
+    _leptonTypes[leptonIndex].multiplier = multiplier;
+    _leptonTypes[leptonIndex].bonus = bonus;
+
+    emit LeptonTypeUpdated(leptonIndex, tokenUri, price, supply, multiplier, bonus, _maxSupply);
+  }
+
   function setMaxMintPerTx(uint256 maxAmount) external virtual  onlyOwner {
     _maxMintPerTx = maxAmount;
     emit MaxMintPerTxSet(maxAmount);

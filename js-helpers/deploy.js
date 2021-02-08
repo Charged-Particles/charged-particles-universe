@@ -101,7 +101,7 @@ const presets = {
     maxMintPerTx: toWei('500'),
     types: [
       {
-        name        : '',
+        name        : 'Electron Neutrino',
         tokenUri    : '',
         price       : toWei('0.2'),
         supply      : toBN('2000'),
@@ -109,7 +109,7 @@ const presets = {
         bonus       : toBN('0'),
       },
       {
-        name        : '',
+        name        : 'Muon Neutrino',
         tokenUri    : '',
         price       : toWei('0.3'),
         supply      : toBN('1500'),
@@ -117,7 +117,7 @@ const presets = {
         bonus       : toBN('1'),
       },
       {
-        name        : '',
+        name        : 'Tau Neutrino',
         tokenUri    : '',
         price       : toWei('0.65'),
         supply      : toBN('1000'),
@@ -125,7 +125,7 @@ const presets = {
         bonus       : toBN('2'),
       },
       {
-        name        : '',
+        name        : 'Electron',
         tokenUri    : '',
         price       : toWei('1.2'),
         supply      : toBN('750'),
@@ -133,7 +133,7 @@ const presets = {
         bonus       : toBN('4'),
       },
       {
-        name        : '',
+        name        : 'Muon',
         tokenUri    : '',
         price       : toWei('2.5'),
         supply      : toBN('500'),
@@ -141,7 +141,7 @@ const presets = {
         bonus       : toBN('8'),
       },
       {
-        name        : '',
+        name        : 'Tau',
         tokenUri    : '',
         price       : toWei('15'),
         supply      : toBN('100'),
