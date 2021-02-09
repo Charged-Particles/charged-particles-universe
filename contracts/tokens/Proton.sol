@@ -51,9 +51,9 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   event UniverseSet(address indexed universe);
   event ChargedSettingsSet(address indexed chargedSettings);
   event ChargedParticlesSet(address indexed chargedParticles);
+  event PausedStateSet(bool isPaused);
   event SalePriceSet(uint256 indexed tokenId, uint256 salePrice);
   event CreatorRoyaltiesSet(uint256 indexed tokenId, uint256 royaltiesPct);
-  event PausedStateSet(bool isPaused);
   event FeesWithdrawn(address indexed receiver, uint256 amount);
   event ProtonSold(uint256 indexed tokenId, address indexed oldOwner, address indexed newOwner, uint256 salePrice, address creator, uint256 creatorRoyalties);
 

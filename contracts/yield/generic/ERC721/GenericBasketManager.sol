@@ -39,9 +39,6 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
   using Counters for Counters.Counter;
   using TokenInfo for address;
 
-  event ControllerSet(address indexed controller);
-  event PausedStateSet(bool isPaused);
-
   // The Controller Contract Address
   address internal _controller;
 

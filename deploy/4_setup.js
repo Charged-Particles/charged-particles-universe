@@ -66,10 +66,6 @@ module.exports = async (hre) => {
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
     const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
-    log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
-    const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
-    const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
-
     log('  Loading GenericWalletManager from: ', ddGenericWalletManager.address);
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const genericWalletManager = await GenericWalletManager.attach(ddGenericWalletManager.address);
@@ -77,6 +73,10 @@ module.exports = async (hre) => {
     log('  Loading GenericBasketManager from: ', ddGenericBasketManager.address);
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const genericBasketManager = await GenericBasketManager.attach(ddGenericBasketManager.address);
+
+    log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
+    const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
+    const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
 
     log('  Loading Photon from: ', ddPhoton.address);
     const Photon = await ethers.getContractFactory('Photon');
