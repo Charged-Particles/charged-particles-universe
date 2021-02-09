@@ -33,6 +33,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "../interfaces/IUniverse.sol";
+import "../interfaces/IChargedState.sol";
 import "../interfaces/IChargedSettings.sol";
 import "../interfaces/IChargedParticles.sol";
 
@@ -49,6 +50,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   uint256 constant internal MAX_ROYALTIES = 8e3;      // 8000   (80%)
 
   event UniverseSet(address indexed universe);
+  event ChargedStateSet(address indexed chargedState);
   event ChargedSettingsSet(address indexed chargedSettings);
   event ChargedParticlesSet(address indexed chargedParticles);
   event PausedStateSet(bool isPaused);
@@ -58,6 +60,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   event ProtonSold(uint256 indexed tokenId, address indexed oldOwner, address indexed newOwner, uint256 salePrice, address creator, uint256 creatorRoyalties);
 
   IUniverse internal _universe;
+  IChargedState internal _chargedState;
   IChargedSettings internal _chargedSettings;
   IChargedParticles internal _chargedParticles;
 
@@ -276,6 +279,12 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     emit ChargedParticlesSet(chargedParticles);
   }
 
+  /// @dev Setup the Charged-State Controller
+  function setChargedState(address stateController) external virtual onlyOwner {
+    _chargedState = IChargedState(stateController);
+    emit ChargedStateSet(stateController);
+  }
+
   /// @dev Setup the Charged-Settings Controller
   function setChargedSettings(address settings) external onlyOwner {
     _chargedSettings = IChargedSettings(settings);
@@ -308,16 +317,16 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   |         Private Functions         |
   |__________________________________*/
 
-  function _setSalePrice(uint256 tokenId, uint256 salePrice)
-    internal
-  {
+  function _setSalePrice(uint256 tokenId, uint256 salePrice) internal {
+    // Temp-Lock/Unlock NFT
+    //  prevents front-running the sale and draining the value of the NFT just before sale
+    _chargedState.setTemporaryLock(address(this), tokenId, (salePrice > 0));
+
     _tokenSalePrice[tokenId] = salePrice;
     emit SalePriceSet(tokenId, salePrice);
   }
 
-  function _setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct)
-    internal
-  {
+  function _setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct) internal {
     require(royaltiesPct <= MAX_ROYALTIES, "Proton:E-421");
     _tokenCreatorRoyaltiesPct[tokenId] = royaltiesPct;
     emit CreatorRoyaltiesSet(tokenId, royaltiesPct);
@@ -480,6 +489,9 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     if (address(_universe) != address(0)) {
       _universe.onProtonSale(address(this), tokenId, oldOwner, newOwner, salePrice, royaltiesReceiver, creatorAmount);
     }
+
+    // Unlock NFT
+    _chargedState.setTemporaryLock(address(this), tokenId, false);
 
     // Transfer Token
     _transfer(oldOwner, newOwner, tokenId);
