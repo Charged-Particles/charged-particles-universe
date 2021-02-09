@@ -86,3 +86,4 @@ Codes:
     E-427 - exceeds max allowance
     E-428 - token type not found
     E-429 - minting restricted to limited amount
+    E-430 - only 1 lepton per NFT allowed

@@ -115,6 +115,9 @@ module.exports = async (hre) => {
     await log(`  - [TX-${txCount++}] ChargedParticles: Registering ChargedSettings`)(alchemyTimeout);
     await chargedParticles.setChargedSettings(ddChargedSettings.address);
 
+    await log(`  - [TX-${txCount++}] ChargedParticles: Registering Lepton`)(alchemyTimeout);
+    await chargedParticles.setLeptonToken(ddLepton.address);
+
     await log(`  - [TX-${txCount++}] ChargedParticles: Setting Deposit Cap`)(alchemyTimeout);
     await chargedSettings.setDepositCap(depositCap);
 
@@ -199,9 +202,6 @@ module.exports = async (hre) => {
 
     await log(`  - [TX-${txCount++}] Universe: Registering Lepton`)(alchemyTimeout);
     await universe.setLeptonToken(ddLepton.address);
-
-    await log(`  - [TX-${txCount++}] ChargedParticles: Setting Max Leptons per Proton`)(alchemyTimeout);
-    await chargedSettings.setMaxNfts(ddProton.address, ddLepton.address, toBN('1'));
 
     let leptonType;
     for (let i = 0; i < presets.Lepton.types.length; i++) {

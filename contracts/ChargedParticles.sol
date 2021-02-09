@@ -89,6 +89,7 @@ contract ChargedParticles is
   IUniverse internal _universe;
   IChargedState internal _chargedState;
   IChargedSettings internal _chargedSettings;
+  address internal _lepton;
 
   /***********************************|
   |          Initialization           |
@@ -562,6 +563,11 @@ contract ChargedParticles is
     emit UniverseSet(universe);
   }
 
+  function setLeptonToken(address token) external virtual onlyOwner {
+    _lepton = token;
+    emit LeptonTokenSet(token);
+  }
+
 
   /***********************************|
   |          Only Admin/DAO           |
@@ -708,10 +714,17 @@ contract ChargedParticles is
         require(keccak256(abi.encodePacked(requiredBasketManager)) == keccak256(abi.encodePacked(basketManagerId)), "CP:E-419");
     }
 
-    if (maxNfts > 0) {
+    if (maxNfts > 0 || _lepton == nftTokenAddress) {
       IBasketManager basketMgr = _chargedSettings.getBasketManager(basketManagerId);
       uint256 tokenCountByType = basketMgr.getTokenCountByType(contractAddress, tokenId, nftTokenAddress, nftTokenId);
-      require(maxNfts > tokenCountByType, "CP:E-427");
+
+      if (maxNfts > 0) {
+        require(maxNfts > tokenCountByType, "CP:E-427");
+      }
+
+      if (_lepton == nftTokenAddress) {
+        require(tokenCountByType == 0, "CP:E-430");
+      }
     }
   }
 
