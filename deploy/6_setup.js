@@ -51,6 +51,10 @@ module.exports = async (hre) => {
     const Universe = await ethers.getContractFactory('Universe');
     const universe = await Universe.attach(ddUniverse.address);
 
+    log('  Loading ChargedParticles from: ', ddChargedParticles.address);
+    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
+    const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
+
     log('  Loading ChargedState from: ', ddChargedState.address);
     const ChargedState = await ethers.getContractFactory('ChargedState');
     const chargedState = await ChargedState.attach(ddChargedState.address);
@@ -59,14 +63,6 @@ module.exports = async (hre) => {
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     const chargedSettings = await ChargedSettings.attach(ddChargedSettings.address);
 
-    log('  Loading ChargedParticles from: ', ddChargedParticles.address);
-    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
-    const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
-
-    log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
-    const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
-    const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
-
     log('  Loading GenericWalletManager from: ', ddGenericWalletManager.address);
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const genericWalletManager = await GenericWalletManager.attach(ddGenericWalletManager.address);
@@ -74,6 +70,10 @@ module.exports = async (hre) => {
     log('  Loading GenericBasketManager from: ', ddGenericBasketManager.address);
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const genericBasketManager = await GenericBasketManager.attach(ddGenericBasketManager.address);
+
+    log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
+    const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
+    const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
 
     log('  Loading Photon from: ', ddPhoton.address);
     const Photon = await ethers.getContractFactory('Photon');
@@ -166,6 +166,9 @@ module.exports = async (hre) => {
 
     await log(`  - [TX-${txCount++}] Proton: Registering Universe`)(alchemyTimeout);
     await proton.setUniverse(ddUniverse.address);
+
+    await log(`  - [TX-${txCount++}] Proton: Registering ChargedState`)(alchemyTimeout);
+    await proton.setChargedState(ddChargedState.address);
 
     await log(`  - [TX-${txCount++}] Proton: Registering ChargedSettings`)(alchemyTimeout);
     await proton.setChargedSettings(ddChargedSettings.address);
