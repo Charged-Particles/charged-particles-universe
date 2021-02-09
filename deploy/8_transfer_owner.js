@@ -31,6 +31,7 @@ module.exports = async (hre) => {
     const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddProton = getDeployData('Proton', chainId);
+    const ddLepton = getDeployData('Lepton', chainId);
     const ddIon = getDeployData('Ion', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
@@ -76,6 +77,10 @@ module.exports = async (hre) => {
     const Proton = await ethers.getContractFactory('Proton');
     const proton = await Proton.attach(ddProton.address);
 
+    log('  Loading Lepton from: ', ddLepton.address);
+    const Lepton = await ethers.getContractFactory('Lepton');
+    const lepton = await Lepton.attach(ddLepton.address);
+
     log('  Loading Ion from: ', ddIon.address);
     const Ion = await ethers.getContractFactory('Ion');
     const ion = await Ion.attach(ddIon.address);
@@ -107,6 +112,9 @@ module.exports = async (hre) => {
 
     await log(`  - Proton: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     await proton.transferOwnership(owner);
+
+    await log(`  - Lepton: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await lepton.transferOwnership(owner);
 
     await log(`  - Ion: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     await ion.transferOwnership(owner);

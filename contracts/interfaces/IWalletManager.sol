@@ -30,6 +30,8 @@ pragma solidity >=0.6.0;
  */
 interface IWalletManager {
 
+  event ControllerSet(address indexed controller);
+  event PausedStateSet(bool isPaused);
   event NewSmartWallet(address indexed contractAddress, uint256 indexed tokenId, address indexed smartWallet, address creator, uint256 annuityPct);
   event WalletEnergized(address indexed contractAddress, uint256 indexed tokenId, address indexed assetToken, uint256 assetAmount, uint256 yieldTokensAmount);
   event WalletDischarged(address indexed contractAddress, uint256 indexed tokenId, address indexed assetToken, uint256 creatorAmount, uint256 receiverAmount);

@@ -25,7 +25,6 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
@@ -33,6 +32,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol"
 
 import "./interfaces/IUniverse.sol";
 import "./interfaces/IChargedParticles.sol";
+import "./interfaces/ILepton.sol";
+import "./lib/TokenInfo.sol";
 import "./lib/BlackholePrevention.sol";
 
 
@@ -42,12 +43,15 @@ import "./lib/BlackholePrevention.sol";
  */
 contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrevention {
   using SafeMathUpgradeable for uint256;
-  using AddressUpgradeable for address;
+  using TokenInfo for address;
   using SafeERC20Upgradeable for IERC20Upgradeable;
 
   // The ChargedParticles Contract Address
   address public chargedParticles;
   address public proton;
+  address public lepton;
+  address public quark;
+  address public boson;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
 
@@ -67,6 +71,9 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   // Energizing Account => Referral Source
   mapping (address => address) internal referralSource;
 
+  // NFT Token UUID => Bonded Lepton Mass
+  mapping (uint256 => uint256) internal bondedLeptonMass;
+
 
   /***********************************|
   |          Initialization           |
@@ -81,10 +88,14 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   |         Public Functions          |
   |__________________________________*/
 
-  function conductMetallicBond(uint256 amount) public returns (uint256 positiveEnergy) {
-    require(esaLevel[msg.sender] > 0, "Universe:E-411");
+  function getStaticCharge(address account) external view returns (uint256 positiveEnergy) {
+    return esaLevel[account];
+  }
+
+  function conductElectrostaticDischarge(address account, uint256 amount) external returns (uint256 positiveEnergy) {
+    require(esaLevel[account] > 0, "Universe:E-411");
     require(cationSource.balanceOf(address(this)) > 0, "Universe:E-413");
-    return _conductMetallicBond(msg.sender, amount);
+    return _conductElectrostaticDischarge(account, amount);
   }
 
 
@@ -123,8 +134,9 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     onlyChargedParticles
   {
     if (esaMultiplier[assetToken] > 0 && receiverEnergy > 0) {
+      uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
       address nftOwner = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
-      _electrostaticAttraction(nftOwner, assetToken, creatorEnergy.add(receiverEnergy));
+      _electrostaticAttraction(tokenUuid, nftOwner, assetToken, creatorEnergy.add(receiverEnergy));
     }
   }
 
@@ -132,7 +144,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     address contractAddress,
     uint256 tokenId,
     string calldata,
-    address,
+    address /* creator */,
     address assetToken,
     uint256 receiverEnergy
   )
@@ -141,8 +153,9 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     onlyChargedParticles
   {
     if (esaMultiplier[assetToken] > 0 && receiverEnergy > 0) {
+      uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
       address nftOwner = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
-      _electrostaticAttraction(nftOwner, assetToken, receiverEnergy);
+      _electrostaticAttraction(tokenUuid, nftOwner, assetToken, receiverEnergy);
     }
   }
 
@@ -161,15 +174,16 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   {
     uint256 totalEnergy = creatorEnergy.add(receiverEnergy);
     if (esaMultiplier[assetToken] > 0 && totalEnergy > principalAmount) {
+      uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
       address nftOwner = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
-      _electrostaticAttraction(nftOwner, assetToken, totalEnergy.sub(principalAmount));
+      _electrostaticAttraction(tokenUuid, nftOwner, assetToken, totalEnergy.sub(principalAmount));
     }
   }
 
   function onCovalentBond(
     address contractAddress,
     uint256 tokenId,
-    string calldata managerId,
+    string calldata /* managerId */,
     address nftTokenAddress,
     uint256 nftTokenId
   )
@@ -177,21 +191,27 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    // no-op
+    if (lepton != address(0x0) && nftTokenAddress == lepton) {
+      uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
+      bondedLeptonMass[tokenUuid] = ILepton(nftTokenAddress).getMultiplier(nftTokenId);
+    }
   }
 
   function onCovalentBreak(
     address contractAddress,
     uint256 tokenId,
-    string calldata managerId,
+    string calldata /* managerId */,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 /* nftTokenId */
   )
     external
     override
     onlyChargedParticles
   {
-    // no-op
+    if (lepton != address(0x0) && nftTokenAddress == lepton) {
+      uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
+      delete bondedLeptonMass[tokenUuid];
+    }
   }
 
   function onProtonSale(
@@ -249,6 +269,39 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     emit ProtonTokenSet(token);
   }
 
+  function setLeptonToken(
+    address token
+  )
+    external
+    onlyOwner
+    onlyValidContractAddress(token)
+  {
+    lepton = token;
+    emit LeptonTokenSet(token);
+  }
+
+  function setQuarkToken(
+    address token
+  )
+    external
+    onlyOwner
+    onlyValidContractAddress(token)
+  {
+    quark = token;
+    emit QuarkTokenSet(token);
+  }
+
+  function setBosonToken(
+    address token
+  )
+    external
+    onlyOwner
+    onlyValidContractAddress(token)
+  {
+    boson = token;
+    emit BosonTokenSet(token);
+  }
+
   function setEsaMultiplier(
     address assetToken,
     uint256 multiplier
@@ -278,21 +331,25 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   |         Private Functions         |
   |__________________________________*/
 
-  function _electrostaticAttraction(address receiver, address assetToken, uint256 baseAmount) internal {
+  function _electrostaticAttraction(uint256 tokenUuid, address receiver, address assetToken, uint256 baseAmount) internal {
     if (address(cationSource) == address(0x0) || receiver == address(0x0)) { return; }
-    if (totalCationDischarged == cationMaxSupply) { return; }
+    if (totalCationDischarged >= cationMaxSupply) { return; }
 
     uint256 energy = baseAmount.mul(esaMultiplier[assetToken]).div(PERCENTAGE_SCALE);
+    uint256 bondedMass = bondedLeptonMass[tokenUuid];
+    if (bondedMass > 0) {
+      energy = energy.mul(bondedMass.add(PERCENTAGE_SCALE)).div(PERCENTAGE_SCALE);
+    }
     if (totalCationDischarged.add(energy) > cationMaxSupply) {
       energy = cationMaxSupply.sub(totalCationDischarged);
     }
     totalCationDischarged = totalCationDischarged.add(energy);
     esaLevel[receiver] = esaLevel[receiver].add(energy);
 
-    emit ElectrostaticAttraction(receiver, address(cationSource), energy);
+    emit ElectrostaticAttraction(receiver, address(cationSource), energy, bondedMass);
   }
 
-  function _conductMetallicBond(address account, uint256 energy) internal returns (uint256) {
+  function _conductElectrostaticDischarge(address account, uint256 energy) internal returns (uint256) {
     uint256 electrostaticAttraction = esaLevel[account];
     if (energy > electrostaticAttraction) {
       energy = electrostaticAttraction;
@@ -306,7 +363,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     esaLevel[account] = esaLevel[account].sub(energy);
     cationSource.safeTransfer(account, energy);
 
-    emit MetallicBond(account, address(cationSource), energy);
+    emit ElectrostaticDischarge(account, address(cationSource), energy);
     return energy;
   }
 

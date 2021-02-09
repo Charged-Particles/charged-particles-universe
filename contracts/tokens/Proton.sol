@@ -53,6 +53,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   event ChargedStateSet(address indexed chargedState);
   event ChargedSettingsSet(address indexed chargedSettings);
   event ChargedParticlesSet(address indexed chargedParticles);
+  event PausedStateSet(bool isPaused);
   event SalePriceSet(uint256 indexed tokenId, uint256 salePrice);
   event CreatorRoyaltiesSet(uint256 indexed tokenId, uint256 royaltiesPct);
   event FeesWithdrawn(address indexed receiver, uint256 amount);
@@ -71,6 +72,8 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
 
   mapping (uint256 => uint256) internal _tokenSalePrice;
   mapping (uint256 => uint256) internal _tokenLastSellPrice;
+
+  bool internal _paused;
 
 
   /***********************************|
@@ -116,6 +119,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   )
     external
     nonReentrant
+    whenNotPaused
     returns (uint256 newTokenId)
   {
     newTokenId = _createChargedParticle(
@@ -136,6 +140,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     string memory tokenMetaUri
   )
     external
+    whenNotPaused
     returns (uint256 newTokenId)
   {
     newTokenId = _createProton(
@@ -155,6 +160,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     uint256 annuityPercent
   )
     external
+    whenNotPaused
     returns (uint256 newTokenId)
   {
     newTokenId = _createProton(
@@ -176,6 +182,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     uint256 salePrice
   )
     external
+    whenNotPaused
     returns (uint256 newTokenId)
   {
     newTokenId = _createProton(
@@ -196,6 +203,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     uint256[] calldata salePrices
   )
     external
+    whenNotPaused
   {
     _batchProtonsForSale(
       creator,
@@ -210,6 +218,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     external
     payable
     nonReentrant
+    whenNotPaused
     returns (bool)
   {
     return _buyProton(tokenId);
@@ -221,6 +230,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
 
   function setSalePrice(uint256 tokenId, uint256 salePrice)
     external
+    whenNotPaused
     onlyTokenOwnerOrApproved(tokenId)
   {
     _setSalePrice(tokenId, salePrice);
@@ -228,6 +238,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
 
   function setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct)
     external
+    whenNotPaused
     onlyTokenCreator(tokenId)
     onlyTokenOwnerOrApproved(tokenId)
   {
@@ -236,6 +247,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
 
   function setCreatorRoyaltiesReceiver(uint256 tokenId, address receiver)
     external
+    whenNotPaused
     onlyTokenCreator(tokenId)
   {
     _tokenCreatorRoyaltiesRedirect[tokenId] = receiver;
@@ -245,6 +257,11 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   /***********************************|
   |          Only Admin/DAO           |
   |__________________________________*/
+
+  function setPausedState(bool state) external onlyOwner {
+    _paused = state;
+    emit PausedStateSet(state);
+  }
 
   /**
     * @dev Setup the ChargedParticles Interface
@@ -546,6 +563,11 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   /***********************************|
   |             Modifiers             |
   |__________________________________*/
+
+  modifier whenNotPaused() {
+      require(!_paused, "Proton:E-101");
+      _;
+  }
 
   modifier onlyTokenOwnerOrApproved(uint256 tokenId) {
     require(_isApprovedOrOwner(_msgSender(), tokenId), "Proton:E-105");

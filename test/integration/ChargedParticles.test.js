@@ -470,7 +470,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect((await dai.balanceOf(user2)).sub(user2BalanceBefore)).to.be.above(toWei('9.9')).and.to.be.below(toWei('10.1'));
   });
 
-  it("can succesfully conduct metallic bond", async () => {
+  it("can succesfully conduct Electrostatic Discharge", async () => {
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
@@ -503,7 +503,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     const bondWeight = toWei('1');
     const user2BalanceBefore = await ion.balanceOf(user2);
 
-    await universe.connect(signer2).conductMetallicBond(bondWeight);
+    await universe.connect(signer2).conductElectrostaticDischarge(user2, bondWeight);
 
     expect(await ion.balanceOf(user2)).to.be.above(user2BalanceBefore).and.below(user2BalanceBefore.add(bondWeight));
   });

@@ -39,9 +39,6 @@ import "./BlackholePrevention.sol";
 abstract contract WalletManagerBase is Ownable, BlackholePrevention, IWalletManager {
   using TokenInfo for address;
 
-  event ControllerSet(address indexed controller);
-  event PausedStateSet(bool isPaused);
-
   // The Controller Contract Address
   address internal _controller;
 

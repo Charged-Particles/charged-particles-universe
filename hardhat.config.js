@@ -111,6 +111,7 @@ module.exports = {
         'IonTimelock',
         'Proton',
         'Photon',
+        'Lepton',
         'ERC20',
         'ERC721'
       ],
