@@ -247,8 +247,13 @@ describe("[INTEGRATION] Charged Particles", () => {
     const user2Balance2 = await ethers.provider.getBalance(user2);
 
     expect(user2Balance2.sub(user2Balance1)).to.be.equal(toWei('0.955'));
-    expect(user1Balance3.sub(user1Balance2)).to.be.equal(toWei('0.045'));
     expect(await proton.ownerOf(energizedParticleId)).to.be.equal(user3);
+
+    // Creator Royalties (not transferred at time of sale, must be claimed by receiver)
+    expect(user1Balance3.sub(user1Balance2)).to.be.equal(toWei('0'));
+    expect(await proton.connect(signer1).claimCreatorRoyalties())
+      .to.emit(proton, 'RoyaltiesClaimed')
+      .withArgs(user1, toWei('0.045'));
   });
 
   it("iontimelocks succesfully release ions to receivers", async () => {
@@ -259,7 +264,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     const releaseTimes = await Promise.all(timelocks.map(async timelock => await timelock.nextReleaseTime()));
 
     await Promise.all(timelocks.map(async timelock => {
-      await expect(timelock.release()).to.not.emit(timelock, 'PortionReleased');
+      await expect(timelock.release('0', '0')).to.not.emit(timelock, 'PortionReleased');
     }));
 
     const maxReleaseTime = max(releaseTimes);
@@ -267,7 +272,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     await setNetworkAfterTimestamp(Number(maxReleaseTime.toString()));
 
     await Promise.all(timelocks.map(async timelock => {
-      await expect(timelock.release()).to.emit(timelock, 'PortionReleased');
+      await expect(timelock.release('0', '0')).to.emit(timelock, 'PortionReleased');
     }));
 
     await Promise.all(receivers.map(async (receiver, i) => {
@@ -282,7 +287,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     const maxReleaseTime = max(await Promise.all(timelocks.map(async timelock => await timelock.nextReleaseTime())));
     await setNetworkAfterTimestamp(Number(maxReleaseTime.toString()));
     await Promise.all(timelocks.map(async timelock => {
-      await timelock.release();
+      await timelock.release('0', '0');
     }));
     user1 = receivers[0];
     user2 = receivers[1];

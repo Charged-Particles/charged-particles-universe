@@ -33,6 +33,7 @@ contract IonTimelock is IIonTimelock {
   using SafeERC20 for IERC20;
 
   IERC20 public token;
+  address public funder;
   address public receiver;
   Portion[] public portions;
 
@@ -41,11 +42,13 @@ contract IonTimelock is IIonTimelock {
   |          Initialization           |
   |__________________________________*/
 
-  constructor (address _receiver, address _token) public {
+  constructor (address _funder, address _receiver, address _token) public {
+    require(_funder != address(0x0), "IonTimelock:E-403");
     require(_receiver != address(0x0), "IonTimelock:E-403");
     require(_token != address(0x0), "IonTimelock:E-403");
 
     token = IERC20(_token);
+    funder = _funder;
     receiver = _receiver;
   }
 
@@ -54,7 +57,13 @@ contract IonTimelock is IIonTimelock {
   |              Public               |
   |__________________________________*/
 
-  function addPortions(uint256[] memory amounts, uint256[] memory releaseTimes) public override returns (bool) {
+  function addPortions(uint256[] memory amounts, uint256[] memory releaseTimes)
+    external
+    virtual
+    override
+    returns (bool)
+  {
+    require(msg.sender == funder, "IonTimelock:E-103");
     require(amounts.length == releaseTimes.length, "IonTimelock:E-202");
 
     uint256 totalAmount;
@@ -84,7 +93,13 @@ contract IonTimelock is IIonTimelock {
   /**
     * @return releaseTime The time when the next portion of tokens will be released.
     */
-  function nextReleaseTime() public view override returns (uint256 releaseTime) {
+  function nextReleaseTime()
+    external
+    view
+    virtual
+    override
+    returns (uint256 releaseTime)
+  {
     uint256 portionCount = portions.length;
     for (uint i = 0; i < portionCount; i++) {
       // solhint-disable-next-line not-rely-on-time
@@ -98,7 +113,13 @@ contract IonTimelock is IIonTimelock {
   /**
     * @return releaseAmount The next amount that will be released.
     */
-  function nextReleaseAmount() public view override returns (uint256 releaseAmount) {
+  function nextReleaseAmount()
+    external
+    view
+    virtual
+    override
+    returns (uint256 releaseAmount)
+  {
     uint256 portionCount = portions.length;
     for (uint i = 0; i < portionCount; i++) {
       // solhint-disable-next-line not-rely-on-time
@@ -112,9 +133,16 @@ contract IonTimelock is IIonTimelock {
   /**
     * @notice Transfers tokens held by timelock to the receiver.
     */
-  function release() public override returns (uint256 amount) {
-    uint256 portionCount = portions.length;
-    for (uint i = 0; i < portionCount; i++) {
+  function release(uint256 numPortions, uint256 indexOffset)
+    external
+    virtual
+    override
+    returns (uint256 amount)
+  {
+    require(numPortions <= portions.length, "IonTimelock:E-201");
+
+    uint256 portionCount = numPortions > 0 ? numPortions : portions.length;
+    for (uint i = indexOffset; i < portionCount; i++) {
       // solhint-disable-next-line not-rely-on-time
       if (!portions[i].claimed && portions[i].releaseTime <= block.timestamp) {
         amount = amount.add(portions[i].amount);
@@ -127,5 +155,31 @@ contract IonTimelock is IIonTimelock {
     uint256 amountAvailable = token.balanceOf(address(this));
     require(amount <= amountAvailable, "IonTimelock:E-411");
     token.safeTransfer(receiver, amount);
+  }
+
+  /**
+    * @notice Transfers tokens held by timelock to the receiver.
+    */
+  function releasePortion(uint256 portionIndex)
+    external
+    virtual
+    override
+    returns (uint256 amount)
+  {
+    require(portionIndex >= 0 && portionIndex < portions.length, "IonTimelock:E-201");
+
+    Portion memory _portion = portions[portionIndex];
+    require(!_portion.claimed, "IonTimelock:E-431");
+    // solhint-disable-next-line not-rely-on-time
+    require(_portion.releaseTime <= block.timestamp, "IonTimelock:E-302");
+
+    amount = _portion.amount;
+    portions[portionIndex].claimed = true;
+
+    uint256 amountAvailable = token.balanceOf(address(this));
+    require(amount <= amountAvailable, "IonTimelock:E-411");
+    token.safeTransfer(receiver, amount);
+
+    emit PortionReleased(_portion.amount, _portion.releaseTime);
   }
 }
