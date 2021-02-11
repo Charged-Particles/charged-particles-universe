@@ -55,7 +55,7 @@ module.exports = async (hre) => {
     const _deployTimelock = async (timelockData) => {
       await log('\n  Deploying Ion Timelock for Receiver: ', timelockData.receiver)(alchemyTimeout);
 
-      const ionTimelockInstance = await IonTimelock.deploy(timelockData.receiver, ionAddress);
+      const ionTimelockInstance = await IonTimelock.deploy(ionAddress, timelockData.receiver, ionAddress);
       const ionTimelockDeployed = await ionTimelockInstance.deployed();
 
       log('  - IonTimelock: ', ionTimelockDeployed.address);

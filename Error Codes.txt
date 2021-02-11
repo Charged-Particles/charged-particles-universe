@@ -19,7 +19,7 @@ Codes:
     E-100 - [--Unused--]
     E-101 - PAUSED
     E-102 - NOT_OWNER, transfer of token that is not own
-    E-103 - NOT_OWNER_OR_ADMIN
+    E-103 - NOT_OWNER_OR_ADMIN, NOT FUNDER
     E-104 - NOT_TOKEN_CREATOR, NOT_CREATOR
     E-105 - INVALID_OPERATOR, NOT_TOKEN_OPERATOR, NOT_OWNER_OR_OPERATOR, transfer caller is not owner nor approved, approve caller is not owner nor approved for all
     E-106 - CANNOT_BE_SELF
@@ -87,3 +87,4 @@ Codes:
     E-428 - token type not found
     E-429 - minting restricted to limited amount
     E-430 - only 1 lepton per NFT allowed
+    E-431 - portion already claimed

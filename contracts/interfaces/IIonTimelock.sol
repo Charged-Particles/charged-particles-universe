@@ -38,7 +38,8 @@ interface IIonTimelock {
   function addPortions(uint256[] memory amounts, uint256[] memory releaseTimes) external returns (bool);
   function nextReleaseTime() external view returns (uint256 releaseTime);
   function nextReleaseAmount() external view returns (uint256 releaseAmount);
-  function release() external returns (uint256 amount);
+  function release(uint256 numPortions, uint256 indexOffset) external returns (uint256 amount);
+  function releasePortion(uint256 portionIndex) external returns (uint256 amount);
 
   event PortionsAdded(uint256[] amounts, uint256[] releaseTimes);
   event PortionReleased(uint256 amounts, uint256 releaseTime);
