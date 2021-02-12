@@ -26,9 +26,9 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/SafeCast.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
 
 import "./IATokenV2.sol";
 import "./ILendingPoolV2.sol";
@@ -40,7 +40,7 @@ import "../../../lib/BlackholePrevention.sol";
 contract AaveBridgeV2 is Ownable, IAaveBridge, BlackholePrevention {
   using SafeMath for uint256;
   using SafeCast for uint256;
-  using Address for address payable;
+  using SafeERC20 for IERC20;
   using ReserveLogic for ReserveLogic.ReserveData;
 
   ILendingPoolAddressesProviderV2 public provider;
@@ -76,7 +76,7 @@ contract AaveBridgeV2 is Ownable, IAaveBridge, BlackholePrevention {
   {
     address self = address(this);
     address aTokenAddress = _getReserveInterestToken(assetToken);
-    require(_isReserveActive(assetToken), "AaveBridgeV2:E-424");
+    require(_isReserveActive(assetToken), "ABV2:E-424");
 
     IERC20 token = IERC20(assetToken);
     IATokenV2 aToken = IATokenV2(aTokenAddress);
@@ -107,7 +107,7 @@ contract AaveBridgeV2 is Ownable, IAaveBridge, BlackholePrevention {
     override
   {
     address self = address(this);
-    require(_isReserveActive(assetToken), "AaveBridgeV2:E-424");
+    require(_isReserveActive(assetToken), "ABV2:E-424");
 
     // Redeem aTokens for Asset Tokens
     lendingPool.withdraw(assetToken, assetAmount, self);
@@ -140,7 +140,7 @@ contract AaveBridgeV2 is Ownable, IAaveBridge, BlackholePrevention {
   |__________________________________*/
 
   function _sendToken(address to, address token, uint256 amount) internal {
-    require(IERC20(token).transfer(to, amount), "AaveBridgeV2:E-401");
+    IERC20(token).safeTransfer(to, amount);
   }
 
   function _getReserveInterestToken(address assetToken) internal view returns (address aTokenAddress) {

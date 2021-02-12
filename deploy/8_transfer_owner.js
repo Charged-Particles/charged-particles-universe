@@ -18,21 +18,17 @@ module.exports = async (hre) => {
 
     if (chainId !== 1) { return; } // Only for Mainnet
 
-    const lendingPoolProviderV1 = presets.Aave.v1.lendingPoolProvider[chainId];
-    const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
-
     const ddUniverse = getDeployData('Universe', chainId);
     const ddChargedState = getDeployData('ChargedState', chainId);
     const ddChargedSettings = getDeployData('ChargedSettings', chainId);
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
     const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
-    const ddAaveBridgeV1 = getDeployData('AaveBridgeV1', chainId);
     const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
     const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
-    const ddIon = getDeployData('Ion', chainId);
+    const ddPhoton = getDeployData('Photon', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Initialization');
@@ -81,9 +77,9 @@ module.exports = async (hre) => {
     const Lepton = await ethers.getContractFactory('Lepton');
     const lepton = await Lepton.attach(ddLepton.address);
 
-    log('  Loading Ion from: ', ddIon.address);
-    const Ion = await ethers.getContractFactory('Ion');
-    const ion = await Ion.attach(ddIon.address);
+    log('  Loading Photon from: ', ddPhoton.address);
+    const Photon = await ethers.getContractFactory('Photon');
+    const photon = await Photon.attach(ddPhoton.address);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Transfer Ownership of All Contracts
@@ -116,27 +112,14 @@ module.exports = async (hre) => {
     await log(`  - Lepton: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     await lepton.transferOwnership(owner);
 
-    await log(`  - Ion: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
-    await ion.transferOwnership(owner);
+    await log(`  - Photon: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await photon.transferOwnership(owner);
 
-    if (lendingPoolProviderV2.length > 0) {
-      log('  Loading AaveBridgeV2 from: ', ddAaveBridgeV2.address);
-      const AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');
-      const aaveBridgeV2 = await AaveBridgeV2.attach(ddAaveBridgeV2.address);
-
-      await log(`  - AaveBridgeV2: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
-      await aaveBridgeV2.transferOwnership(owner);
-
-    } else {
-      if (lendingPoolProviderV1.length > 0) {
-        log('  Loading AaveBridgeV1 from: ', ddAaveBridgeV1.address);
-        const AaveBridgeV1 = await ethers.getContractFactory('AaveBridgeV1');
-        const aaveBridgeV1 = await AaveBridgeV1.attach(ddAaveBridgeV1.address);
-
-        await log(`  - AaveBridgeV1: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
-        await aaveBridgeV1.transferOwnership(owner);
-      }
-    }
+    log('  Loading AaveBridgeV2 from: ', ddAaveBridgeV2.address);
+    const AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');
+    const aaveBridgeV2 = await AaveBridgeV2.attach(ddAaveBridgeV2.address);
+    await log(`  - AaveBridgeV2: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await aaveBridgeV2.transferOwnership(owner);
 
     await log(`\n  Contract Initialization Complete!`)(alchemyTimeout);
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');

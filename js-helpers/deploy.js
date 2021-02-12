@@ -95,7 +95,9 @@ const getTxGasCost = ({deployTransaction}) => {
 const presets = {
   ChargedParticles: {
     tempLockExpiryBlocks: toBN('5760'), // 1 Day == 86400 / 15
-    maxDeposit: toWei('10000') // Temporary limit; remove after launch proves successful
+    maxDeposits: [ // Temporary limit; remove after launch proves successful
+      {assetTokenId: 'Aave.v2.dai', amount: toWei('10000')}, // DAI
+    ]
   },
   Lepton: {
     maxMintPerTx: toWei('500'),
@@ -150,10 +152,10 @@ const presets = {
       },
     ]
   },
-  Ion: {
+  Photon: {
     universeMaxSupply: toWei('40000000'), // 40% of 100 Million (Community Liquidity Mining Portion)
     rewardsForAssetTokens: [
-      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI (50% of Interest in ION)
+      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI (50% of Interest in Photon)
     ],
     timelocks: [
       {
@@ -182,34 +184,14 @@ const presets = {
       42: '',
       31337: '',
     },
-    v1: {
-      dai: {
-        1: '', // mainnet
-        3: '', // ropsten
-        4: '', // rinkeby
-        42: '', // kovan
-        31337: '', // Hardhat - Forked Mainnet
-      },
-      lendingPoolProvider: {
-        1: '', // mainnet
-        3: '', // ropsten
-        4: '', // rinkeby
-        42: '', // kovan
-        31337: '', // Hardhat - Forked Mainnet
-      }
-    },
     v2: {
       dai: {
         1: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // mainnet
-        3: '', // ropsten
-        4: '', // rinkeby
         42: '0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD', // kovan
         31337: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // Hardhat - Forked Mainnet
       },
       lendingPoolProvider: {
         1: '0xb53c1a33016b2dc2ff3653530bff1848a515c8c5', // mainnet
-        3: '', // ropsten
-        4: '', // rinkeby
         42: '0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b', // kovan
         31337: '0xb53c1a33016b2dc2ff3653530bff1848a515c8c5', // Hardhat - Forked Mainnet
       }

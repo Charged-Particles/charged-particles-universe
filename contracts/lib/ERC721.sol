@@ -352,7 +352,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      * Emits a {Transfer} event.
      */
     function _transfer(address from, address to, uint256 tokenId) internal virtual {
-        require(ownerOf(tokenId) == from, "ERC721: transfer of token that is not own");
+        require(ownerOf(tokenId) == from, "ERC721:E-102");
         require(to != address(0), "ERC721:E-403");
 
         // Clear approvals from the previous owner

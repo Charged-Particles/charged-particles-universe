@@ -40,8 +40,8 @@ module.exports = async (hre) => {
     }
 
     await log('  Deploying ChargedState...')(alchemyTimeout);
-    const ChargedState = await ethers.getContractFactory('ChargedState');
-    const ChargedStateInstance = await upgrades.deployProxy(ChargedState, [trustedForwarder], { unsafeAllowCustomTypes: true });
+    const ChargedState = await hre.ethers.getContractFactory('ChargedState');
+    const ChargedStateInstance = await ChargedState.deploy();
     const chargedState = await ChargedStateInstance.deployed();
     deployData['ChargedState'] = {
       abi: getContractAbi('ChargedState'),
@@ -50,8 +50,8 @@ module.exports = async (hre) => {
     }
 
     await log('  Deploying ChargedSettings...')(alchemyTimeout);
-    const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
-    const ChargedSettingsInstance = await upgrades.deployProxy(ChargedSettings, [trustedForwarder], { unsafeAllowCustomTypes: true });
+    const ChargedSettings = await hre.ethers.getContractFactory('ChargedSettings');
+    const ChargedSettingsInstance = await ChargedSettings.deploy();
     const chargedSettings = await ChargedSettingsInstance.deployed();
     deployData['ChargedSettings'] = {
       abi: getContractAbi('ChargedSettings'),

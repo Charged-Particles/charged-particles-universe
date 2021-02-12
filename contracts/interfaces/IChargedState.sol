@@ -34,7 +34,9 @@ interface IChargedState {
   |             Public API            |
   |__________________________________*/
 
-  function getTokenLockExpiry(address contractAddress, uint256 tokenId) external view returns (uint256 lockExpiry);
+  function getDischargeTimelockExpiry(address contractAddress, uint256 tokenId) external view returns (uint256 lockExpiry);
+  function getReleaseTimelockExpiry(address contractAddress, uint256 tokenId) external view returns (uint256 lockExpiry);
+  function getBreakBondTimelockExpiry(address contractAddress, uint256 tokenId) external view returns (uint256 lockExpiry);
 
   function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
   function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external view returns (bool);

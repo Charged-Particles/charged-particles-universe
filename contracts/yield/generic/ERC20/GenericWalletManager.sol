@@ -47,7 +47,7 @@ contract GenericWalletManager is WalletManagerBase {
   |__________________________________*/
 
   function isReserveActive(address contractAddress, uint256 tokenId, address assetToken)
-    public
+    external
     override
     view
     returns (bool)
@@ -58,7 +58,7 @@ contract GenericWalletManager is WalletManagerBase {
   }
 
   function getReserveInterestToken(address contractAddress, uint256 tokenId, address assetToken)
-    public
+    external
     override
     view
     returns (address)
@@ -75,7 +75,7 @@ contract GenericWalletManager is WalletManagerBase {
     * @return  The Available Balance of the Token
     */
   function getTotal(address contractAddress, uint256 tokenId, address assetToken)
-    public
+    external
     override
     returns (uint256)
   {
@@ -91,7 +91,7 @@ contract GenericWalletManager is WalletManagerBase {
     * @return  The Principal-Balance of the Smart-Wallet
     */
   function getPrincipal(address contractAddress, uint256 tokenId, address assetToken)
-    public
+    external
     override
     returns (uint256)
   {
@@ -108,7 +108,7 @@ contract GenericWalletManager is WalletManagerBase {
     * @return ownerInterest The NFT Owner's portion of the Interest
     */
   function getInterest(address contractAddress, uint256 tokenId, address assetToken)
-    public
+    external
     override
     returns (uint256 creatorInterest, uint256 ownerInterest)
   {
@@ -119,7 +119,7 @@ contract GenericWalletManager is WalletManagerBase {
   }
 
   function getRewards(address contractAddress, uint256 tokenId, address rewardToken)
-    public
+    external
     override
     returns (uint256)
   {
@@ -129,7 +129,7 @@ contract GenericWalletManager is WalletManagerBase {
   }
 
   function energize(address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount)
-    public
+    external
     override
     onlyController
     returns (uint256 yieldTokensAmount)
@@ -145,7 +145,7 @@ contract GenericWalletManager is WalletManagerBase {
   }
 
   function discharge(address /* receiver */, address /* contractAddress */, uint256 /* tokenId */, address /* assetToken */, address /* creatorRedirect */)
-    public
+    external
     override
     onlyController
     returns (uint256 creatorAmount, uint256 receiverAmount)
@@ -154,7 +154,7 @@ contract GenericWalletManager is WalletManagerBase {
   }
 
   function dischargeAmount(address /* receiver */, address /* contractAddress */, uint256 /* tokenId */, address /* assetToken */, uint256 /* assetAmount */, address /* creatorRedirect */)
-    public
+    external
     override
     onlyController
     returns (uint256 creatorAmount, uint256 receiverAmount)
@@ -185,14 +185,14 @@ contract GenericWalletManager is WalletManagerBase {
     address assetToken,
     address creatorRedirect
   )
-    public
+    external
     override
     onlyController
     returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount)
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "GenericWalletManager:E-403");
+    require(wallet != address(0x0), "GWM:E-403");
 
     // Release Principal + Interest
     principalAmount = GenericSmartWallet(wallet).getPrincipal(assetToken);
@@ -210,14 +210,14 @@ contract GenericWalletManager is WalletManagerBase {
     uint256 assetAmount,
     address creatorRedirect
   )
-    public
+    external
     override
     onlyController
     returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount)
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "GenericWalletManager:E-403");
+    require(wallet != address(0x0), "GWM:E-403");
 
     // Release from interest first + principal if needed
     principalAmount = GenericSmartWallet(wallet).getPrincipal(assetToken);
@@ -228,7 +228,7 @@ contract GenericWalletManager is WalletManagerBase {
   }
 
   function withdrawRewards(address receiver, address contractAddress, uint256 tokenId, address rewardsToken, uint256 rewardsAmount)
-    public
+    external
     override
     onlyController
     returns (uint256 amount)
@@ -245,7 +245,7 @@ contract GenericWalletManager is WalletManagerBase {
   }
 
   function executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes memory encodedParams)
-    public
+    external
     override
     onlyController
     returns (bytes memory)
@@ -256,7 +256,7 @@ contract GenericWalletManager is WalletManagerBase {
   }
 
   function getWalletAddressById(address contractAddress, uint256 tokenId, address creator, uint256 annuityPct)
-    public
+    external
     override
     onlyController
     returns (address)

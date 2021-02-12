@@ -86,7 +86,7 @@ interface IChargedSettings {
   |          Particle Events          |
   |__________________________________*/
 
-  event DepositCapSet(uint256 depositCap);
+  event DepositCapSet(address assetToken, uint256 depositCap);
 
   event WalletManagerRegistered(string indexed walletManagerId, address indexed walletManager);
   event BasketManagerRegistered(string indexed basketId, address indexed basketManager);

@@ -29,14 +29,14 @@ module.exports = async (hre) => {
   log('  - Trusted Forwarder: ', trustedForwarder);
   log(' ');
 
-  await log('\n  Deploying Photon...')(alchemyTimeout);
-  const Photon = await ethers.getContractFactory('Photon');
-  const PhotonInstance = await upgrades.deployProxy(Photon, [trustedForwarder]);
-  const photon = await PhotonInstance.deployed();
-  deployData['Photon'] = {
-    abi: getContractAbi('Photon'),
-    address: photon.address,
-    deployTransaction: photon.deployTransaction,
+  await log('\n  Deploying WBoson...')(alchemyTimeout);
+  const WBoson = await ethers.getContractFactory('WBoson');
+  const WBosonInstance = await WBoson.deploy();
+  const wBoson = await WBosonInstance.deployed();
+  deployData['WBoson'] = {
+    abi: getContractAbi('WBoson'),
+    address: wBoson.address,
+    deployTransaction: wBoson.deployTransaction,
   }
 
   await log('\n  Deploying Proton NFT...')(alchemyTimeout);
@@ -59,26 +59,26 @@ module.exports = async (hre) => {
     deployTransaction: lepton.deployTransaction,
   }
 
-  await log('\n  Deploying Ion FT...')(alchemyTimeout);
-  const Ion = await ethers.getContractFactory('Ion');
-  const IonInstance = await Ion.deploy();
-  const ion = await IonInstance.deployed();
-  deployData['Ion'] = {
-    abi: getContractAbi('Ion'),
-    address: ion.address,
-    deployTransaction: ion.deployTransaction,
+  await log('\n  Deploying Photon FT...')(alchemyTimeout);
+  const Photon = await ethers.getContractFactory('Photon');
+  const PhotonInstance = await Photon.deploy();
+  const photon = await PhotonInstance.deployed();
+  deployData['Photon'] = {
+    abi: getContractAbi('Photon'),
+    address: photon.address,
+    deployTransaction: photon.deployTransaction,
   }
 
   // Display Contract Addresses
   await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
-  log('  - Photon:      ', photon.address);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: photon.deployTransaction }));
+  log('  - WBoson:      ', wBoson.address);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: wBoson.deployTransaction }));
   log('  - Proton:      ', proton.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
   log('  - Lepton:      ', lepton.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
-  log('  - Ion:         ', ion.address);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ion.deployTransaction }));
+  log('  - Photon:         ', photon.address);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: photon.deployTransaction }));
 
   saveDeploymentData(chainId, deployData);
   log('\n  Contract Deployment Data saved to "deployed" directory.');

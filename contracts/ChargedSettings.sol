@@ -23,10 +23,8 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "./interfaces/IChargedSettings.sol";
 
@@ -37,17 +35,14 @@ import "./lib/BlackholePrevention.sol";
 
 /**
  * @notice Charged Particles Settings Contract
- * @dev Upgradeable Contract
  */
 contract ChargedSettings is
   IChargedSettings,
-  Initializable,
-  OwnableUpgradeable,
-  ReentrancyGuardUpgradeable,
+  Ownable,
   RelayRecipient,
   BlackholePrevention
 {
-  using SafeMathUpgradeable for uint256;
+  using SafeMath for uint256;
   using TokenInfo for address;
   using Bitwise for uint32;
 
@@ -85,7 +80,7 @@ contract ChargedSettings is
     address annuityRedirect;
   }
 
-  uint256 internal _depositCap;
+  mapping (address => uint256) internal _depositCap;
   uint256 internal _tempLockExpiryBlocks;
 
   // Wallet/Basket Managers (by Unique Manager ID)
@@ -97,17 +92,6 @@ contract ChargedSettings is
 
   // Settings for External NFT Token Contracts (by Token Contract Address)
   mapping (address => NftSettings) internal _nftSettings;
-
-
-  /***********************************|
-  |          Initialization           |
-  |__________________________________*/
-
-  function initialize(address _trustedForwarder) public initializer {
-    __Ownable_init();
-    __ReentrancyGuard_init();
-    trustedForwarder = _trustedForwarder;
-  }
 
 
   /***********************************|
@@ -207,7 +191,7 @@ contract ChargedSettings is
     energizeEnabled = _nftSettings[contractAddress].actionPerms.hasBit(PERM_CHARGE_NFT);
     restrictedAssets = _nftSettings[contractAddress].actionPerms.hasBit(PERM_RESTRICTED_ASSETS);
     validAsset = _nftSettings[contractAddress].allowedAssetTokens[assetToken];
-    depositCap = _depositCap;
+    depositCap = _depositCap[assetToken];
     depositMin = _nftSettings[contractAddress].depositMin[assetToken];
     depositMax = _nftSettings[contractAddress].depositMax[assetToken];
   }
@@ -279,6 +263,10 @@ contract ChargedSettings is
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     _creatorSettings[tokenUuid].annuityRedirect = receiver;
     emit TokenCreatorAnnuitiesRedirected(contractAddress, tokenId, receiver);
+  }
+
+  function setTrustedForwarder(address _trustedForwarder) external onlyOwner {
+    trustedForwarder = _trustedForwarder;
   }
 
 
@@ -449,9 +437,9 @@ contract ChargedSettings is
   |          Only Admin/DAO           |
   |__________________________________*/
 
-  function setDepositCap(uint256 cap) external virtual onlyOwner {
-    _depositCap = cap;
-    emit DepositCapSet(cap);
+  function setDepositCap(address assetToken, uint256 cap) external virtual onlyOwner {
+    _depositCap[assetToken] = cap;
+    emit DepositCapSet(assetToken, cap);
   }
 
   function setTempLockExpiryBlocks(uint256 numBlocks) external virtual onlyOwner {
@@ -613,7 +601,7 @@ contract ChargedSettings is
     internal
     view
     virtual
-    override(BaseRelayRecipient, ContextUpgradeable)
+    override(BaseRelayRecipient, Context)
     returns (address payable)
   {
     return BaseRelayRecipient._msgSender();
@@ -624,7 +612,7 @@ contract ChargedSettings is
     internal
     view
     virtual
-    override(BaseRelayRecipient, ContextUpgradeable)
+    override(BaseRelayRecipient, Context)
     returns (bytes memory)
   {
     return BaseRelayRecipient._msgData();

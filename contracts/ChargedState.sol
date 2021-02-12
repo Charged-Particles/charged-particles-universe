@@ -23,10 +23,8 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "./interfaces/IChargedState.sol";
 
@@ -37,17 +35,14 @@ import "./lib/BlackholePrevention.sol";
 
 /**
  * @notice Charged Particles Settings Contract
- * @dev Upgradeable Contract
  */
 contract ChargedState is
   IChargedState,
-  Initializable,
-  OwnableUpgradeable,
-  ReentrancyGuardUpgradeable,
+  Ownable,
   RelayRecipient,
   BlackholePrevention
 {
-  using SafeMathUpgradeable for uint256;
+  using SafeMath for uint256;
   using TokenInfo for address;
   using Bitwise for uint32;
 
@@ -59,12 +54,17 @@ contract ChargedState is
   uint32 constant internal PERM_RESTRICT_BOND_FROM_ALL     = 8;  // NFTs that have Restrictions on Covalent Bonds
   uint32 constant internal PERM_ALLOW_BREAK_BOND_FROM_ALL  = 16; // NFTs that allow Breaking Covalent Bonds by anyone
 
+  struct NftTimelock {
+    uint256 unlockBlock;
+    address lockedBy;
+  }
+
   struct NftState {
     uint32 actionPerms;
 
-    uint256 dischargeTimelock;
-    uint256 releaseTimelock;
-    uint256 breakBondTimelock;
+    NftTimelock dischargeTimelock;
+    NftTimelock releaseTimelock;
+    NftTimelock breakBondTimelock;
     uint256 tempLockExpiry;
 
     mapping (address => address) dischargeApproval;
@@ -80,35 +80,42 @@ contract ChargedState is
 
 
   /***********************************|
-  |          Initialization           |
-  |__________________________________*/
-
-  function initialize(address _trustedForwarder) public initializer {
-    __Ownable_init();
-    __ReentrancyGuard_init();
-    trustedForwarder = _trustedForwarder;
-  }
-
-
-  /***********************************|
   |               Public              |
   |__________________________________*/
 
-  function getTokenLockExpiry(address contractAddress, uint256 tokenId) external virtual override view returns (uint256 lockExpiry) {
+  function getDischargeTimelockExpiry(address contractAddress, uint256 tokenId) external view virtual override returns (uint256 lockExpiry) {
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
 
-    if (_nftState[tokenUuid].dischargeTimelock > block.number) {
-      lockExpiry = _nftState[tokenUuid].dischargeTimelock;
+    if (_nftState[tokenUuid].dischargeTimelock.unlockBlock > block.number) {
+      lockExpiry = _nftState[tokenUuid].dischargeTimelock.unlockBlock;
     }
-
-    if (_nftState[tokenUuid].releaseTimelock > block.number) {
-      lockExpiry = _nftState[tokenUuid].releaseTimelock;
-    }
-
-    if (_nftState[tokenUuid].tempLockExpiry > block.number) {
+    if (_nftState[tokenUuid].tempLockExpiry > block.number && _nftState[tokenUuid].tempLockExpiry > lockExpiry) {
       lockExpiry = _nftState[tokenUuid].tempLockExpiry;
     }
   }
+
+  function getReleaseTimelockExpiry(address contractAddress, uint256 tokenId) external view virtual override returns (uint256 lockExpiry) {
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
+
+    if (_nftState[tokenUuid].releaseTimelock.unlockBlock > block.number) {
+      lockExpiry = _nftState[tokenUuid].releaseTimelock.unlockBlock;
+    }
+    if (_nftState[tokenUuid].tempLockExpiry > block.number && _nftState[tokenUuid].tempLockExpiry > lockExpiry) {
+      lockExpiry = _nftState[tokenUuid].tempLockExpiry;
+    }
+  }
+
+  function getBreakBondTimelockExpiry(address contractAddress, uint256 tokenId) external view virtual override returns (uint256 lockExpiry) {
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
+
+    if (_nftState[tokenUuid].breakBondTimelock.unlockBlock > block.number) {
+      lockExpiry = _nftState[tokenUuid].breakBondTimelock.unlockBlock;
+    }
+    if (_nftState[tokenUuid].tempLockExpiry > block.number && _nftState[tokenUuid].tempLockExpiry > lockExpiry) {
+      lockExpiry = _nftState[tokenUuid].tempLockExpiry;
+    }
+  }
+
 
   /// @notice Checks if an operator is allowed to Discharge a specific Token
   /// @param contractAddress  The Address to the Contract of the Token
@@ -174,7 +181,7 @@ contract ChargedState is
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     allowFromAll = _nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_DISCHARGE_FROM_ALL);
     isApproved = _isApprovedForDischarge(contractAddress, tokenId, sender);
-    timelock = _nftState[tokenUuid].dischargeTimelock;
+    timelock = _nftState[tokenUuid].dischargeTimelock.unlockBlock;
     tempLockExpiry = _nftState[tokenUuid].tempLockExpiry;
   }
 
@@ -195,7 +202,7 @@ contract ChargedState is
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     allowFromAll = _nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_RELEASE_FROM_ALL);
     isApproved = _isApprovedForRelease(contractAddress, tokenId, sender);
-    timelock = _nftState[tokenUuid].releaseTimelock;
+    timelock = _nftState[tokenUuid].releaseTimelock.unlockBlock;
     tempLockExpiry = _nftState[tokenUuid].tempLockExpiry;
   }
 
@@ -216,7 +223,7 @@ contract ChargedState is
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     allowFromAll = _nftState[tokenUuid].actionPerms.hasBit(PERM_ALLOW_BREAK_BOND_FROM_ALL);
     isApproved = _isApprovedForBreakBond(contractAddress, tokenId, sender);
-    timelock = _nftState[tokenUuid].breakBondTimelock;
+    timelock = _nftState[tokenUuid].breakBondTimelock.unlockBlock;
     tempLockExpiry = _nftState[tokenUuid].tempLockExpiry;
   }
 
@@ -392,13 +399,25 @@ contract ChargedState is
     override
     virtual
   {
+    address sender = _msgSender();
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
-    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "CP:E-105");
-    require(block.number >= _nftState[tokenUuid].dischargeTimelock, "CP:E-302");
 
-    _nftState[tokenUuid].dischargeTimelock = unlockBlock;
+    // Clear Timelock
+    if (unlockBlock == 0 && _nftState[tokenUuid].dischargeTimelock.lockedBy == sender) {
+      delete _nftState[tokenUuid].dischargeTimelock.unlockBlock;
+      delete _nftState[tokenUuid].dischargeTimelock.lockedBy;
+    }
 
-    emit TokenDischargeTimelock(contractAddress, tokenId, _msgSender(), unlockBlock);
+    // Set Timelock
+    else {
+      require(_isApprovedForTimelock(contractAddress, tokenId, sender), "CP:E-105");
+      require(block.number >= _nftState[tokenUuid].dischargeTimelock.unlockBlock, "CP:E-302");
+
+      _nftState[tokenUuid].dischargeTimelock.unlockBlock = unlockBlock;
+      _nftState[tokenUuid].dischargeTimelock.lockedBy = sender;
+    }
+
+    emit TokenDischargeTimelock(contractAddress, tokenId, sender, unlockBlock);
   }
 
   /// @notice Sets a Timelock on the ability to Release the Assets of a Particle
@@ -414,13 +433,25 @@ contract ChargedState is
     override
     virtual
   {
+    address sender = _msgSender();
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
-    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "CP:E-105");
-    require(block.number >= _nftState[tokenUuid].releaseTimelock, "CP:E-302");
 
-    _nftState[tokenUuid].releaseTimelock = unlockBlock;
+    // Clear Timelock
+    if (unlockBlock == 0 && _nftState[tokenUuid].releaseTimelock.lockedBy == sender) {
+      delete _nftState[tokenUuid].releaseTimelock.unlockBlock;
+      delete _nftState[tokenUuid].releaseTimelock.lockedBy;
+    }
 
-    emit TokenReleaseTimelock(contractAddress, tokenId, _msgSender(), unlockBlock);
+    // Set Timelock
+    else {
+      require(_isApprovedForTimelock(contractAddress, tokenId, sender), "CP:E-105");
+      require(block.number >= _nftState[tokenUuid].releaseTimelock.unlockBlock, "CP:E-302");
+
+      _nftState[tokenUuid].releaseTimelock.unlockBlock = unlockBlock;
+      _nftState[tokenUuid].releaseTimelock.lockedBy = sender;
+    }
+
+    emit TokenReleaseTimelock(contractAddress, tokenId, sender, unlockBlock);
   }
 
   /// @notice Sets a Timelock on the ability to Break the Covalent Bond of a Particle
@@ -436,13 +467,25 @@ contract ChargedState is
     override
     virtual
   {
+    address sender = _msgSender();
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
-    require(_isApprovedForTimelock(contractAddress, tokenId, _msgSender()), "CP:E-105");
-    require(block.number >= _nftState[tokenUuid].breakBondTimelock, "CP:E-302");
 
-    _nftState[tokenUuid].breakBondTimelock = unlockBlock;
+    // Clear Timelock
+    if (unlockBlock == 0 && _nftState[tokenUuid].breakBondTimelock.lockedBy == sender) {
+      delete _nftState[tokenUuid].breakBondTimelock.unlockBlock;
+      delete _nftState[tokenUuid].breakBondTimelock.lockedBy;
+    }
 
-    emit TokenBreakBondTimelock(contractAddress, tokenId, _msgSender(), unlockBlock);
+    // Set Timelock
+    else {
+      require(_isApprovedForTimelock(contractAddress, tokenId, sender), "CP:E-105");
+      require(block.number >= _nftState[tokenUuid].breakBondTimelock.unlockBlock, "CP:E-302");
+
+      _nftState[tokenUuid].breakBondTimelock.unlockBlock = unlockBlock;
+      _nftState[tokenUuid].breakBondTimelock.lockedBy = sender;
+    }
+
+    emit TokenBreakBondTimelock(contractAddress, tokenId, sender, unlockBlock);
   }
 
 
@@ -487,6 +530,10 @@ contract ChargedState is
   function setChargedSettings(address settingsController) external virtual onlyOwner {
     _chargedSettings = IChargedSettings(settingsController);
     emit ChargedSettingsSet(settingsController);
+  }
+
+  function setTrustedForwarder(address _trustedForwarder) external onlyOwner {
+    trustedForwarder = _trustedForwarder;
   }
 
   /***********************************|
@@ -687,7 +734,7 @@ contract ChargedState is
     internal
     view
     virtual
-    override(BaseRelayRecipient, ContextUpgradeable)
+    override(BaseRelayRecipient, Context)
     returns (address payable)
   {
     return BaseRelayRecipient._msgSender();
@@ -698,7 +745,7 @@ contract ChargedState is
     internal
     view
     virtual
-    override(BaseRelayRecipient, ContextUpgradeable)
+    override(BaseRelayRecipient, Context)
     returns (bytes memory)
   {
     return BaseRelayRecipient._msgData();

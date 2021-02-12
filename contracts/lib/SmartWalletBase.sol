@@ -23,7 +23,6 @@
 
 pragma solidity >=0.6.0;
 
-import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../interfaces/ISmartWallet.sol";
 import "./BlackholePrevention.sol";
@@ -33,7 +32,6 @@ import "./BlackholePrevention.sol";
  * @dev Non-upgradeable Contract
  */
 abstract contract SmartWalletBase is ISmartWallet, BlackholePrevention {
-  using Address for address payable;
   using EnumerableSet for EnumerableSet.AddressSet;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
@@ -46,12 +44,15 @@ abstract contract SmartWalletBase is ISmartWallet, BlackholePrevention {
 
   EnumerableSet.AddressSet internal _assetTokens;
 
+  //   Asset Token => Principal Balance
+  mapping (address => uint256) internal _assetPrincipalBalance;
+
   /***********************************|
   |          Initialization           |
   |__________________________________*/
 
   function initializeBase() public {
-    require(_walletManager == address(0x0), "SmartWalletBase:E-002");
+    require(_walletManager == address(0x0), "SWB:E-002");
     _walletManager = msg.sender;
   }
 
@@ -114,6 +115,10 @@ abstract contract SmartWalletBase is ISmartWallet, BlackholePrevention {
   |         Private Functions         |
   |__________________________________*/
 
+  function _getPrincipal(address assetToken) internal view virtual returns (uint256) {
+    return _assetPrincipalBalance[assetToken];
+  }
+
   function _trackAssetToken(address assetToken) internal virtual {
     if (!_assetTokens.contains(assetToken)) {
       _assetTokens.add(assetToken);
@@ -126,7 +131,7 @@ abstract contract SmartWalletBase is ISmartWallet, BlackholePrevention {
 
   /// @dev Throws if called by any account other than the wallet manager
   modifier onlyWalletManager() {
-    require(_walletManager == msg.sender, "SmartWalletBase:E-109");
+    require(_walletManager == msg.sender, "SWB:E-109");
     _;
   }
 }

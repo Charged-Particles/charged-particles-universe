@@ -31,24 +31,20 @@ async function run() {
 
   // Upgradeable Contracts; need to get implementation adderss from `.openzeppelin/__network__.json`
   let universeAddress = null;
-  let chargedStateAddress = null;
-  let chargedSettingsAddress = null;
   let chargedParticlesAddress = null;
   if (networkName === 'kovan') {
     universeAddress = '0xeC08CB0f69E2095CF27eCB6E9D4BB60b430334Ad';
-    chargedStateAddress = '';
-    chargedSettingsAddress = '';
     chargedParticlesAddress = '0x0cFAAD8cD948A0BAe647615ecc8DfeFD0294a5f2';
   }
 
   // Protocol
   await verifyContract('Universe', networkName, universeAddress);
-  await verifyContract('ChargedState', networkName, chargedStateAddress);
-  await verifyContract('ChargedSettings', networkName, chargedSettingsAddress);
   await verifyContract('ChargedParticles', networkName, chargedParticlesAddress);
+  await verifyContract('ChargedState', networkName);
+  await verifyContract('ChargedSettings', networkName);
+  await verifyContract('WBoson', networkName);
   await verifyContract('Photon', networkName);
-  await verifyContract('Ion', networkName);
-  await verifyContract('IonTimelock', networkName);
+  await verifyContract('PhotonTimelock', networkName);
 
   // Wallet Managers
   await verifyContract('GenericWalletManager', networkName);
@@ -57,6 +53,7 @@ async function run() {
 
   // NFTs
   await verifyContract('Proton', networkName);
+  await verifyContract('Lepton', networkName);
 
   success('Done!');
 };

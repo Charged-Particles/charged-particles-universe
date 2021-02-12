@@ -24,7 +24,6 @@
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../../../interfaces/ISmartBasket.sol";
@@ -52,7 +51,7 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
   |__________________________________*/
 
   function initialize() public {
-    require(_basketManager == address(0x0), "GenericSmartBasket:E-002");
+    require(_basketManager == address(0x0), "GSB:E-002");
     _basketManager = msg.sender;
   }
 
@@ -77,7 +76,7 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
     returns (bool)
   {
     uint256 nftType = contractAddress.getTokenType(tokenId);
-    require(!_nftContractTokens[contractAddress][nftType].contains(tokenId), "GenericSmartBasket:E-425");
+    require(!_nftContractTokens[contractAddress][nftType].contains(tokenId), "GSB:E-425");
 
     bool added = _nftContractTokens[contractAddress][nftType].add(tokenId);
     if (added) {
@@ -94,7 +93,7 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
     returns (bool)
   {
     uint256 nftType = contractAddress.getTokenType(tokenId);
-    require(_nftContractTokens[contractAddress][nftType].contains(tokenId), "GenericSmartBasket:E-426");
+    require(_nftContractTokens[contractAddress][nftType].contains(tokenId), "GSB:E-426");
 
     bool removed = _nftContractTokens[contractAddress][nftType].remove(tokenId);
     if (removed) {
@@ -143,7 +142,7 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
 
   /// @dev Throws if called by any account other than the basket manager
   modifier onlyBasketManager() {
-    require(_basketManager == msg.sender, "GenericSmartBasket:E-109");
+    require(_basketManager == msg.sender, "GSB:E-109");
     _;
   }
 }
