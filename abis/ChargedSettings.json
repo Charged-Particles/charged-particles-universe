@@ -98,6 +98,12 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "depositCap",
         "type": "uint256"
@@ -641,19 +647,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_trustedForwarder",
-        "type": "address"
-      }
-    ],
-    "name": "initialize",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "contractAddress",
         "type": "address"
       },
@@ -915,6 +908,11 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "cap",
         "type": "uint256"
@@ -1065,6 +1063,19 @@
       }
     ],
     "name": "setTempLockExpiryBlocks",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_trustedForwarder",
+        "type": "address"
+      }
+    ],
+    "name": "setTrustedForwarder",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

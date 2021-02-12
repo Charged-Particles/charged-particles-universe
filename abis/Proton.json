@@ -85,6 +85,19 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
+        "name": "chargedState",
+        "type": "address"
+      }
+    ],
+    "name": "ChargedStateSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
@@ -191,6 +204,25 @@
       }
     ],
     "name": "ProtonSold",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountClaimed",
+        "type": "uint256"
+      }
+    ],
+    "name": "RoyaltiesClaimed",
     "type": "event"
   },
   {
@@ -440,6 +472,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "claimCreatorRoyalties",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -641,12 +686,31 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "getCreatorRoyalties",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
       }
     ],
-    "name": "getCreatorRoyalties",
+    "name": "getCreatorRoyaltiesPct",
     "outputs": [
       {
         "internalType": "uint256",
@@ -900,6 +964,19 @@
       }
     ],
     "name": "setChargedSettings",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "stateController",
+        "type": "address"
+      }
+    ],
+    "name": "setChargedState",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -3,6 +3,11 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_funder",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "_receiver",
         "type": "address"
       },
@@ -79,6 +84,19 @@
   },
   {
     "inputs": [],
+    "name": "funder",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "nextReleaseAmount",
     "outputs": [
       {
@@ -146,8 +164,38 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "numPortions",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indexOffset",
+        "type": "uint256"
+      }
+    ],
     "name": "release",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "portionIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "releasePortion",
     "outputs": [
       {
         "internalType": "uint256",

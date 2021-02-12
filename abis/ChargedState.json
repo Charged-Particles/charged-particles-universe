@@ -522,6 +522,30 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
+      }
+    ],
+    "name": "getBreakBondTimelockExpiry",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "lockExpiry",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
       },
       {
         "internalType": "address",
@@ -549,6 +573,30 @@
       {
         "internalType": "uint256",
         "name": "tempLockExpiry",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getDischargeTimelockExpiry",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "lockExpiry",
         "type": "uint256"
       }
     ],
@@ -612,7 +660,7 @@
         "type": "uint256"
       }
     ],
-    "name": "getTokenLockExpiry",
+    "name": "getReleaseTimelockExpiry",
     "outputs": [
       {
         "internalType": "uint256",
@@ -621,19 +669,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_trustedForwarder",
-        "type": "address"
-      }
-    ],
-    "name": "initialize",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1170,6 +1205,19 @@
       }
     ],
     "name": "setTimelockApproval",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_trustedForwarder",
+        "type": "address"
+      }
+    ],
+    "name": "setTrustedForwarder",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

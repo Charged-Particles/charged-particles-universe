@@ -18,25 +18,6 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "maxSupply",
-        "type": "uint256"
-      }
-    ],
-    "name": "CationSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
         "name": "chargedParticles",
         "type": "address"
       }
@@ -56,7 +37,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "cationSource",
+        "name": "photonSource",
         "type": "address"
       },
       {
@@ -87,7 +68,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "cationSource",
+        "name": "photonSource",
         "type": "address"
       },
       {
@@ -149,6 +130,25 @@
       }
     ],
     "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxSupply",
+        "type": "uint256"
+      }
+    ],
+    "name": "PhotonSet",
     "type": "event"
   },
   {
@@ -252,19 +252,6 @@
     "outputs": [
       {
         "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "cationSource",
-    "outputs": [
-      {
-        "internalType": "contract IERC20Upgradeable",
         "name": "",
         "type": "address"
       }
@@ -634,6 +621,19 @@
   },
   {
     "inputs": [],
+    "name": "photonSource",
+    "outputs": [
+      {
+        "internalType": "contract IERC20Upgradeable",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "proton",
     "outputs": [
       {
@@ -682,24 +682,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "maxSupply",
-        "type": "uint256"
-      }
-    ],
-    "name": "setCation",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "controller",
         "type": "address"
       }
@@ -736,6 +718,24 @@
       }
     ],
     "name": "setLeptonToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxSupply",
+        "type": "uint256"
+      }
+    ],
+    "name": "setPhoton",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

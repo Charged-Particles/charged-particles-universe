@@ -5,7 +5,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "settingsController",
+        "name": "chargedSettings",
         "type": "address"
       }
     ],
@@ -18,11 +18,24 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "stateController",
+        "name": "chargedState",
         "type": "address"
       }
     ],
     "name": "ChargedStateSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "leptonToken",
+        "type": "address"
+      }
+    ],
+    "name": "LeptonTokenSet",
     "type": "event"
   },
   {
@@ -748,6 +761,32 @@
       }
     ],
     "name": "setChargedState",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "setLeptonToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_trustedForwarder",
+        "type": "address"
+      }
+    ],
+    "name": "setTrustedForwarder",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
