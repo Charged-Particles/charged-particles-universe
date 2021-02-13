@@ -30,7 +30,7 @@ pragma solidity >=0.6.0;
 interface IUniverse {
 
   event ChargedParticlesSet(address indexed chargedParticles);
-  event PhotonSet(address indexed token, uint256 maxSupply);
+  event PhotonSet(address indexed photonToken, uint256 maxSupply);
   event ProtonTokenSet(address indexed protonToken);
   event LeptonTokenSet(address indexed leptonToken);
   event QuarkTokenSet(address indexed quarkToken);

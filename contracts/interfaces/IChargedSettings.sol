@@ -87,6 +87,7 @@ interface IChargedSettings {
   |__________________________________*/
 
   event DepositCapSet(address assetToken, uint256 depositCap);
+  event TempLockExpirySet(uint256 expiryBlocks);
 
   event WalletManagerRegistered(string indexed walletManagerId, address indexed walletManager);
   event BasketManagerRegistered(string indexed basketId, address indexed basketManager);

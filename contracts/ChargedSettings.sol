@@ -444,6 +444,7 @@ contract ChargedSettings is
 
   function setTempLockExpiryBlocks(uint256 numBlocks) external virtual onlyOwner {
     _tempLockExpiryBlocks = numBlocks;
+    emit TempLockExpirySet(numBlocks);
   }
 
   /// @dev Register Contracts as wallet managers with a unique liquidity provider ID
