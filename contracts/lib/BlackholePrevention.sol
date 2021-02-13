@@ -25,6 +25,7 @@ pragma solidity >=0.6.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
@@ -34,6 +35,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  */
 contract BlackholePrevention {
   using Address for address payable;
+  using SafeERC20 for IERC20;
 
   event WithdrawStuckEther(address indexed receiver, uint256 amount);
   event WithdrawStuckERC20(address indexed receiver, address indexed tokenAddress, uint256 amount);
@@ -50,7 +52,7 @@ contract BlackholePrevention {
   function _withdrawERC20(address payable receiver, address tokenAddress, uint256 amount) internal virtual {
     require(receiver != address(0x0), "BHP:E-403");
     if (IERC20(tokenAddress).balanceOf(address(this)) >= amount) {
-      IERC20(tokenAddress).transfer(receiver, amount);
+      IERC20(tokenAddress).safeTransfer(receiver, amount);
       emit WithdrawStuckERC20(receiver, tokenAddress, amount);
     }
   }

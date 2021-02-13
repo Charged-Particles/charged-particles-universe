@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// IonTimelock.sol -- Part of the Charged Particles Protocol
+// PhotonTimelock.sol -- Part of the Charged Particles Protocol
 // Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,9 +26,9 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-import "../interfaces/IIonTimelock.sol";
+import "../interfaces/IPhotonTimelock.sol";
 
-contract IonTimelock is IIonTimelock {
+contract PhotonTimelock is IPhotonTimelock {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
@@ -43,9 +43,9 @@ contract IonTimelock is IIonTimelock {
   |__________________________________*/
 
   constructor (address _funder, address _receiver, address _token) public {
-    require(_funder != address(0x0), "IonTimelock:E-403");
-    require(_receiver != address(0x0), "IonTimelock:E-403");
-    require(_token != address(0x0), "IonTimelock:E-403");
+    require(_funder != address(0x0), "ITL:E-403");
+    require(_receiver != address(0x0), "ITL:E-403");
+    require(_token != address(0x0), "ITL:E-403");
 
     token = IERC20(_token);
     funder = _funder;
@@ -63,8 +63,8 @@ contract IonTimelock is IIonTimelock {
     override
     returns (bool)
   {
-    require(msg.sender == funder, "IonTimelock:E-103");
-    require(amounts.length == releaseTimes.length, "IonTimelock:E-202");
+    require(msg.sender == funder, "ITL:E-103");
+    require(amounts.length == releaseTimes.length, "ITL:E-202");
 
     uint256 totalAmount;
     for (uint i = 0; i < amounts.length; i++) {
@@ -72,7 +72,7 @@ contract IonTimelock is IIonTimelock {
       uint256 amount = amounts[i];
 
       // solhint-disable-next-line not-rely-on-time
-      require(releaseTime > block.timestamp, "IonTimelock:E-301");
+      require(releaseTime > block.timestamp, "ITL:E-301");
 
       portions.push(Portion({
         amount: amount,
@@ -84,7 +84,7 @@ contract IonTimelock is IIonTimelock {
     }
 
     uint256 amountAvailable = token.balanceOf(address(this));
-    require(amountAvailable >= totalAmount, "IonTimelock:E-411");
+    require(amountAvailable >= totalAmount, "ITL:E-411");
 
     emit PortionsAdded(amounts, releaseTimes);
     return true;
@@ -139,7 +139,7 @@ contract IonTimelock is IIonTimelock {
     override
     returns (uint256 amount)
   {
-    require(numPortions <= portions.length, "IonTimelock:E-201");
+    require(numPortions <= portions.length, "ITL:E-201");
 
     uint256 portionCount = numPortions > 0 ? numPortions : portions.length;
     for (uint i = indexOffset; i < portionCount; i++) {
@@ -153,7 +153,7 @@ contract IonTimelock is IIonTimelock {
     }
 
     uint256 amountAvailable = token.balanceOf(address(this));
-    require(amount <= amountAvailable, "IonTimelock:E-411");
+    require(amount <= amountAvailable, "ITL:E-411");
     token.safeTransfer(receiver, amount);
   }
 
@@ -166,18 +166,18 @@ contract IonTimelock is IIonTimelock {
     override
     returns (uint256 amount)
   {
-    require(portionIndex >= 0 && portionIndex < portions.length, "IonTimelock:E-201");
+    require(portionIndex >= 0 && portionIndex < portions.length, "ITL:E-201");
 
     Portion memory _portion = portions[portionIndex];
-    require(!_portion.claimed, "IonTimelock:E-431");
+    require(!_portion.claimed, "ITL:E-431");
     // solhint-disable-next-line not-rely-on-time
-    require(_portion.releaseTime <= block.timestamp, "IonTimelock:E-302");
+    require(_portion.releaseTime <= block.timestamp, "ITL:E-302");
 
     amount = _portion.amount;
     portions[portionIndex].claimed = true;
 
     uint256 amountAvailable = token.balanceOf(address(this));
-    require(amount <= amountAvailable, "IonTimelock:E-411");
+    require(amount <= amountAvailable, "ITL:E-411");
     token.safeTransfer(receiver, amount);
 
     emit PortionReleased(_portion.amount, _portion.releaseTime);

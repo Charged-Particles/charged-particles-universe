@@ -30,14 +30,14 @@ pragma solidity >=0.6.0;
 interface IUniverse {
 
   event ChargedParticlesSet(address indexed chargedParticles);
-  event CationSet(address indexed token, uint256 maxSupply);
+  event PhotonSet(address indexed photonToken, uint256 maxSupply);
   event ProtonTokenSet(address indexed protonToken);
   event LeptonTokenSet(address indexed leptonToken);
   event QuarkTokenSet(address indexed quarkToken);
   event BosonTokenSet(address indexed bosonToken);
   event EsaMultiplierSet(address indexed assetToken, uint256 multiplier);
-  event ElectrostaticAttraction(address indexed account, address cationSource, uint256 energy, uint256 multiplier);
-  event ElectrostaticDischarge(address indexed account, address cationSource, uint256 energy);
+  event ElectrostaticAttraction(address indexed account, address photonSource, uint256 energy, uint256 multiplier);
+  event ElectrostaticDischarge(address indexed account, address photonSource, uint256 energy);
 
   function onEnergize(
     address sender,

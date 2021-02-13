@@ -32,6 +32,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+import "../interfaces/IProton.sol";
 import "../interfaces/IUniverse.sol";
 import "../interfaces/IChargedState.sol";
 import "../interfaces/IChargedSettings.sol";
@@ -41,24 +42,13 @@ import "../lib/BlackholePrevention.sol";
 import "../lib/RelayRecipient.sol";
 
 
-contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePrevention {
+contract Proton is IProton, ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePrevention {
   using SafeMath for uint256;
   using Address for address payable;
   using Counters for Counters.Counter;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
   uint256 constant internal MAX_ROYALTIES = 8e3;      // 8000   (80%)
-
-  event UniverseSet(address indexed universe);
-  event ChargedStateSet(address indexed chargedState);
-  event ChargedSettingsSet(address indexed chargedSettings);
-  event ChargedParticlesSet(address indexed chargedParticles);
-  event PausedStateSet(bool isPaused);
-  event SalePriceSet(uint256 indexed tokenId, uint256 salePrice);
-  event CreatorRoyaltiesSet(uint256 indexed tokenId, uint256 royaltiesPct);
-  event FeesWithdrawn(address indexed receiver, uint256 amount);
-  event ProtonSold(uint256 indexed tokenId, address indexed oldOwner, address indexed newOwner, uint256 salePrice, address creator, uint256 creatorRoyalties);
-  event RoyaltiesClaimed(address indexed receiver, uint256 amountClaimed);
 
   IUniverse internal _universe;
   IChargedState internal _chargedState;
@@ -89,33 +79,34 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   |              Public               |
   |__________________________________*/
 
-  function creatorOf(uint256 tokenId) external view virtual returns (address) {
+  function creatorOf(uint256 tokenId) external view virtual override returns (address) {
     return _tokenCreator[tokenId];
   }
 
-  function getSalePrice(uint256 tokenId) external view virtual returns (uint256) {
+  function getSalePrice(uint256 tokenId) external view virtual override returns (uint256) {
     return _tokenSalePrice[tokenId];
   }
 
-  function getLastSellPrice(uint256 tokenId) external view virtual returns (uint256) {
+  function getLastSellPrice(uint256 tokenId) external view virtual override returns (uint256) {
     return _tokenLastSellPrice[tokenId];
   }
 
-  function getCreatorRoyalties(address account) external view virtual returns (uint256) {
+  function getCreatorRoyalties(address account) external view virtual override returns (uint256) {
     return _tokenCreatorClaimableRoyalties[account];
   }
 
-  function getCreatorRoyaltiesPct(uint256 tokenId) external view virtual returns (uint256) {
+  function getCreatorRoyaltiesPct(uint256 tokenId) external view virtual override returns (uint256) {
     return _tokenCreatorRoyaltiesPct[tokenId];
   }
 
-  function getCreatorRoyaltiesReceiver(uint256 tokenId) external view virtual returns (address) {
+  function getCreatorRoyaltiesReceiver(uint256 tokenId) external view virtual override returns (address) {
     return _creatorRoyaltiesReceiver(tokenId);
   }
 
   function claimCreatorRoyalties()
     external
     virtual
+    override
     nonReentrant
     whenNotPaused
     returns (uint256)
@@ -135,6 +126,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   )
     external
     virtual
+    override
     nonReentrant
     whenNotPaused
     returns (uint256 newTokenId)
@@ -158,6 +150,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   )
     external
     virtual
+    override
     whenNotPaused
     returns (uint256 newTokenId)
   {
@@ -179,6 +172,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   )
     external
     virtual
+    override
     whenNotPaused
     returns (uint256 newTokenId)
   {
@@ -202,6 +196,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   )
     external
     virtual
+    override
     whenNotPaused
     returns (uint256 newTokenId)
   {
@@ -224,6 +219,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   )
     external
     virtual
+    override
     whenNotPaused
   {
     _batchProtonsForSale(
@@ -239,6 +235,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     external
     payable
     virtual
+    override
     nonReentrant
     whenNotPaused
     returns (bool)
@@ -253,6 +250,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   function setSalePrice(uint256 tokenId, uint256 salePrice)
     external
     virtual
+    override
     whenNotPaused
     onlyTokenOwnerOrApproved(tokenId)
   {
@@ -262,6 +260,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   function setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct)
     external
     virtual
+    override
     whenNotPaused
     onlyTokenCreator(tokenId)
     onlyTokenOwnerOrApproved(tokenId)
@@ -272,6 +271,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   function setCreatorRoyaltiesReceiver(uint256 tokenId, address receiver)
     external
     virtual
+    override
     whenNotPaused
     onlyTokenCreator(tokenId)
   {
@@ -283,7 +283,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   |          Only Admin/DAO           |
   |__________________________________*/
 
-  function setPausedState(bool state) external onlyOwner {
+  function setPausedState(bool state) external virtual onlyOwner {
     _paused = state;
     emit PausedStateSet(state);
   }
@@ -291,7 +291,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   /**
     * @dev Setup the ChargedParticles Interface
     */
-  function setUniverse(address universe) external onlyOwner {
+  function setUniverse(address universe) external virtual onlyOwner {
     _universe = IUniverse(universe);
     emit UniverseSet(universe);
   }
@@ -299,7 +299,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   /**
     * @dev Setup the ChargedParticles Interface
     */
-  function setChargedParticles(address chargedParticles) external onlyOwner {
+  function setChargedParticles(address chargedParticles) external virtual onlyOwner {
     _chargedParticles = IChargedParticles(chargedParticles);
     emit ChargedParticlesSet(chargedParticles);
   }
@@ -311,12 +311,12 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   }
 
   /// @dev Setup the Charged-Settings Controller
-  function setChargedSettings(address settings) external onlyOwner {
+  function setChargedSettings(address settings) external virtual onlyOwner {
     _chargedSettings = IChargedSettings(settings);
     emit ChargedSettingsSet(settings);
   }
 
-  function setTrustedForwarder(address _trustedForwarder) external onlyOwner {
+  function setTrustedForwarder(address _trustedForwarder) external virtual onlyOwner {
     trustedForwarder = _trustedForwarder;
   }
 
@@ -352,7 +352,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   }
 
   function _setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct) internal virtual {
-    require(royaltiesPct <= MAX_ROYALTIES, "Proton:E-421");
+    require(royaltiesPct <= MAX_ROYALTIES, "PRT:E-421");
     _tokenCreatorRoyaltiesPct[tokenId] = royaltiesPct;
     emit CreatorRoyaltiesSet(tokenId, royaltiesPct);
   }
@@ -379,7 +379,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     virtual
     returns (uint256 newTokenId)
   {
-    require(address(_chargedParticles) != address(0x0), "Proton:E-107");
+    require(address(_chargedParticles) != address(0x0), "PRT:E-107");
 
     newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent, 0, 0);
 
@@ -434,7 +434,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     internal
     virtual
   {
-    require(tokenMetaUris.length == salePrices.length, "Proton:E-202");
+    require(tokenMetaUris.length == salePrices.length, "PRT:E-202");
     address self = address(this);
 
     uint256 count = tokenMetaUris.length;
@@ -497,8 +497,8 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     returns (bool)
   {
     uint256 salePrice = _tokenSalePrice[tokenId];
-    require(salePrice > 0, "Proton:E-416");
-    require(msg.value >= salePrice, "Proton:E-414");
+    require(salePrice > 0, "PRT:E-416");
+    require(msg.value >= salePrice, "PRT:E-414");
 
     uint256 ownerAmount = salePrice;
     uint256 creatorAmount;
@@ -547,7 +547,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     */
   function _claimCreatorRoyalties(address receiver) internal virtual returns (uint256) {
     uint256 claimableAmount = _tokenCreatorClaimableRoyalties[receiver];
-    require(claimableAmount > 0, "Proton:E-411");
+    require(claimableAmount > 0, "PRT:E-411");
 
     delete _tokenCreatorClaimableRoyalties[receiver];
     payable(receiver).sendValue(claimableAmount);
@@ -562,9 +562,9 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
     */
   function _collectAssetToken(address from, address assetToken, uint256 assetAmount) internal virtual {
     uint256 _userAssetBalance = IERC20(assetToken).balanceOf(from);
-    require(assetAmount <= _userAssetBalance, "Proton:E-411");
+    require(assetAmount <= _userAssetBalance, "PRT:E-411");
     // Be sure to Approve this Contract to transfer your Asset Token
-    require(IERC20(assetToken).transferFrom(from, address(this), assetAmount), "Proton:E-401");
+    require(IERC20(assetToken).transferFrom(from, address(this), assetAmount), "PRT:E-401");
   }
 
   function _refundOverpayment(uint256 threshold) internal virtual {
@@ -576,6 +576,7 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
 
   function _transfer(address from, address to, uint256 tokenId) internal virtual override {
     _tokenSalePrice[tokenId] = 0;
+    _chargedState.setTemporaryLock(address(this), tokenId, false);
     super._transfer(from, to, tokenId);
   }
 
@@ -612,17 +613,17 @@ contract Proton is ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePr
   |__________________________________*/
 
   modifier whenNotPaused() {
-      require(!_paused, "Proton:E-101");
+      require(!_paused, "PRT:E-101");
       _;
   }
 
   modifier onlyTokenOwnerOrApproved(uint256 tokenId) {
-    require(_isApprovedOrOwner(_msgSender(), tokenId), "Proton:E-105");
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "PRT:E-105");
     _;
   }
 
   modifier onlyTokenCreator(uint256 tokenId) {
-    require(_tokenCreator[tokenId] == _msgSender(), "Proton:E-104");
+    require(_tokenCreator[tokenId] == _msgSender(), "PRT:E-104");
     _;
   }
 }

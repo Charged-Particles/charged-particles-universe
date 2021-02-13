@@ -76,11 +76,11 @@ contract ChargedParticles is
   //   Proton                 - NFTs minted from the Charged Particle Accelerator
   //                            - A proton is a subatomic particle, symbol p or p⁺, with a positive electric charge of +1e elementary
   //                              charge and a mass slightly less than that of a neutron.
-  //   Photon                 - Membership Classification
-  //                            - The photon is a type of elementary particle. It is the quantum of the electromagnetic field including
+  //   WBoson                 - Membership Classification
+  //                            - The wBoson is a type of elementary particle. It is the quantum of the electromagnetic field including
   //                              electromagnetic radiation such as light and radio waves, and the force carrier for the electromagnetic force.
-  //                              Photons are massless, so they always move at the speed of light in vacuum.
-  //   Ion                    - Platform Governance Token
+  //                              WBosons are massless, so they always move at the speed of light in vacuum.
+  //   Photon                    - Platform Governance Token
   //                            - A charged subatomic particle. An atom or group of atoms that carries a positive or negative electric charge
   //                              as a result of having lost or gained one or more electrons.
   //
@@ -232,6 +232,7 @@ contract ChargedParticles is
     address referrer
   )
     external
+    virtual
     override
     managerEnabled(walletManagerId)
     nonReentrant
@@ -273,6 +274,7 @@ contract ChargedParticles is
     address assetToken
   )
     external
+    virtual
     override
     managerEnabled(walletManagerId)
     nonReentrant
@@ -281,7 +283,13 @@ contract ChargedParticles is
     _validateDischarge(contractAddress, tokenId);
 
     address creatorRedirect = _chargedSettings.getCreatorAnnuitiesRedirect(contractAddress, tokenId);
-    (creatorAmount, receiverAmount) = _chargedSettings.getWalletManager(walletManagerId).discharge(receiver, contractAddress, tokenId, assetToken, creatorRedirect);
+    (creatorAmount, receiverAmount) = _chargedSettings.getWalletManager(walletManagerId).discharge(
+      receiver,
+      contractAddress,
+      tokenId,
+      assetToken,
+      creatorRedirect
+    );
 
     // Signal to Universe Controller
     if (address(_universe) != address(0)) {
@@ -308,6 +316,7 @@ contract ChargedParticles is
     uint256 assetAmount
   )
     external
+    virtual
     override
     managerEnabled(walletManagerId)
     nonReentrant
@@ -349,6 +358,7 @@ contract ChargedParticles is
     uint256 assetAmount
   )
     external
+    virtual
     override
     managerEnabled(walletManagerId)
     nonReentrant
@@ -393,6 +403,7 @@ contract ChargedParticles is
     address assetToken
   )
     external
+    virtual
     override
     managerEnabled(walletManagerId)
     nonReentrant
@@ -436,6 +447,7 @@ contract ChargedParticles is
     uint256 assetAmount
   )
     external
+    virtual
     override
     managerEnabled(walletManagerId)
     nonReentrant
@@ -483,6 +495,7 @@ contract ChargedParticles is
     uint256 nftTokenId
   )
     external
+    virtual
     override
     basketEnabled(basketManagerId)
     nonReentrant
@@ -518,6 +531,7 @@ contract ChargedParticles is
     uint256 nftTokenId
   )
     external
+    virtual
     override
     basketEnabled(basketManagerId)
     nonReentrant
@@ -566,6 +580,10 @@ contract ChargedParticles is
   function setLeptonToken(address token) external virtual onlyOwner {
     _lepton = token;
     emit LeptonTokenSet(token);
+  }
+
+  function setTrustedForwarder(address _trustedForwarder) external onlyOwner {
+    trustedForwarder = _trustedForwarder;
   }
 
 
@@ -695,8 +713,8 @@ contract ChargedParticles is
     uint256 nftTokenId
   )
     internal
-    virtual
     view
+    virtual
   {
     if (_chargedState.isCovalentBondRestricted(contractAddress, tokenId)) {
       require(contractAddress.isErc721OwnerOrOperator(tokenId, _msgSender()), "CP:E-105");

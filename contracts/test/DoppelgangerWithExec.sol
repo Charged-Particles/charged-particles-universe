@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0
+
 pragma solidity >=0.6.0 <0.7.0;
 
 /* solium-disable security/no-inline-assembly */
@@ -17,6 +19,9 @@ contract DoppelgangerWithExec {
             return;
         }
         __internal__mockReturn(mockCall.returnValue);
+    }
+
+    receive() external payable {
     }
 
     function __waffle__mockReverts(bytes memory data) public {

@@ -16,12 +16,12 @@ module.exports = async (hre) => {
   const chainId = chainIdByName(network.name);
   const alchemyTimeout = chainId === 31337 ? 0 : 1;
 
-  const ionMaxSuppy = presets.Ion.universeMaxSupply;
+  const photonMaxSupply = presets.Photon.universeMaxSupply;
 
-  const ddIon = getDeployData('Ion', chainId);
+  const ddPhoton = getDeployData('Photon', chainId);
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-  log('Charged Particles: Universe Ions ');
+  log('Charged Particles: Universe Photons ');
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
   log('  Using Network: ', chainNameById(chainId));
@@ -30,16 +30,16 @@ module.exports = async (hre) => {
   log('  - Owner:       ', protocolOwner);
   log(' ');
 
-  log('  Loading Ion from: ', ddIon.address);
-  const Ion = await ethers.getContractFactory('Ion');
-  const ion = await Ion.attach(ddIon.address);
+  log('  Loading Photon from: ', ddPhoton.address);
+  const Photon = await ethers.getContractFactory('Photon');
+  const photon = await Photon.attach(ddPhoton.address);
 
-  await log(`  - Ion: Minting to Universe`)(alchemyTimeout);
-  await ion.mintToUniverse(ionMaxSuppy);
+  await log(`  - Photon: Minting to Universe`)(alchemyTimeout);
+  await photon.mintToUniverse(photonMaxSupply);
 
 
-  log('\n  Contract Universe Ion Minting Complete!');
+  log('\n  Contract Universe Photon Minting Complete!');
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
-module.exports.tags = ['ion-universe']
+module.exports.tags = ['photon-universe']

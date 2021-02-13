@@ -25,10 +25,10 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
 
 import "./interfaces/IUniverse.sol";
 import "./interfaces/IChargedParticles.sol";
@@ -56,11 +56,11 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
 
   // Positive Charge
-  uint256 internal cationMaxSupply;
-  uint256 internal totalCationDischarged;
+  uint256 internal photonMaxSupply;
+  uint256 internal totalPhotonDischarged;
 
   // Source of Positive Charge
-  IERC20Upgradeable public cationSource;
+  IERC20Upgradeable public photonSource;
 
   //   Asset Token => Electrostatic Attraction Multiplier
   mapping (address => uint256) internal esaMultiplier;
@@ -88,13 +88,13 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   |         Public Functions          |
   |__________________________________*/
 
-  function getStaticCharge(address account) external view returns (uint256 positiveEnergy) {
+  function getStaticCharge(address account) external view virtual returns (uint256 positiveEnergy) {
     return esaLevel[account];
   }
 
-  function conductElectrostaticDischarge(address account, uint256 amount) external returns (uint256 positiveEnergy) {
-    require(esaLevel[account] > 0, "Universe:E-411");
-    require(cationSource.balanceOf(address(this)) > 0, "Universe:E-413");
+  function conductElectrostaticDischarge(address account, uint256 amount) external virtual returns (uint256 positiveEnergy) {
+    require(esaLevel[account] > 0, "UNI:E-411");
+    require(photonSource.balanceOf(address(this)) > 0, "UNI:E-413");
     return _conductElectrostaticDischarge(account, amount);
   }
 
@@ -113,6 +113,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     uint256 /* assetAmount */
   )
     external
+    virtual
     override
     onlyChargedParticles
   {
@@ -130,6 +131,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     uint256 receiverEnergy
   )
     external
+    virtual
     override
     onlyChargedParticles
   {
@@ -149,6 +151,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     uint256 receiverEnergy
   )
     external
+    virtual
     override
     onlyChargedParticles
   {
@@ -169,6 +172,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     uint256 receiverEnergy
   )
     external
+    virtual
     override
     onlyChargedParticles
   {
@@ -188,6 +192,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     uint256 nftTokenId
   )
     external
+    virtual
     override
     onlyChargedParticles
   {
@@ -205,6 +210,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     uint256 /* nftTokenId */
   )
     external
+    virtual
     override
     onlyChargedParticles
   {
@@ -224,6 +230,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     uint256 creatorRoyalties
   )
     external
+    virtual
     override
     onlyProton
   {
@@ -238,6 +245,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     address controller
   )
     external
+    virtual
     onlyOwner
     onlyValidContractAddress(controller)
   {
@@ -245,23 +253,25 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     emit ChargedParticlesSet(controller);
   }
 
-  function setCation(
+  function setPhoton(
     address token,
     uint256 maxSupply
   )
     external
+    virtual
     onlyOwner
     onlyValidContractAddress(token)
   {
-    cationSource = IERC20Upgradeable(token);
-    cationMaxSupply = maxSupply;
-    emit CationSet(token, maxSupply);
+    photonSource = IERC20Upgradeable(token);
+    photonMaxSupply = maxSupply;
+    emit PhotonSet(token, maxSupply);
   }
 
   function setProtonToken(
     address token
   )
     external
+    virtual
     onlyOwner
     onlyValidContractAddress(token)
   {
@@ -273,6 +283,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     address token
   )
     external
+    virtual
     onlyOwner
     onlyValidContractAddress(token)
   {
@@ -284,6 +295,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     address token
   )
     external
+    virtual
     onlyOwner
     onlyValidContractAddress(token)
   {
@@ -295,6 +307,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     address token
   )
     external
+    virtual
     onlyOwner
     onlyValidContractAddress(token)
   {
@@ -307,21 +320,22 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     uint256 multiplier
   )
     external
+    virtual
     onlyOwner
   {
     esaMultiplier[assetToken] = multiplier;
     emit EsaMultiplierSet(assetToken, multiplier);
   }
 
-  function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
+  function withdrawEther(address payable receiver, uint256 amount) external virtual onlyOwner {
     _withdrawEther(receiver, amount);
   }
 
-  function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external onlyOwner {
+  function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external virtual onlyOwner {
     _withdrawERC20(receiver, tokenAddress, amount);
   }
 
-  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external onlyOwner {
+  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external virtual onlyOwner {
     _withdrawERC721(receiver, tokenAddress, tokenId);
   }
 
@@ -331,39 +345,39 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   |         Private Functions         |
   |__________________________________*/
 
-  function _electrostaticAttraction(uint256 tokenUuid, address receiver, address assetToken, uint256 baseAmount) internal {
-    if (address(cationSource) == address(0x0) || receiver == address(0x0)) { return; }
-    if (totalCationDischarged >= cationMaxSupply) { return; }
+  function _electrostaticAttraction(uint256 tokenUuid, address receiver, address assetToken, uint256 baseAmount) internal virtual {
+    if (address(photonSource) == address(0x0) || receiver == address(0x0)) { return; }
+    if (totalPhotonDischarged >= photonMaxSupply) { return; }
 
     uint256 energy = baseAmount.mul(esaMultiplier[assetToken]).div(PERCENTAGE_SCALE);
     uint256 bondedMass = bondedLeptonMass[tokenUuid];
     if (bondedMass > 0) {
       energy = energy.mul(bondedMass.add(PERCENTAGE_SCALE)).div(PERCENTAGE_SCALE);
     }
-    if (totalCationDischarged.add(energy) > cationMaxSupply) {
-      energy = cationMaxSupply.sub(totalCationDischarged);
+    if (totalPhotonDischarged.add(energy) > photonMaxSupply) {
+      energy = photonMaxSupply.sub(totalPhotonDischarged);
     }
-    totalCationDischarged = totalCationDischarged.add(energy);
+    totalPhotonDischarged = totalPhotonDischarged.add(energy);
     esaLevel[receiver] = esaLevel[receiver].add(energy);
 
-    emit ElectrostaticAttraction(receiver, address(cationSource), energy, bondedMass);
+    emit ElectrostaticAttraction(receiver, address(photonSource), energy, bondedMass);
   }
 
-  function _conductElectrostaticDischarge(address account, uint256 energy) internal returns (uint256) {
+  function _conductElectrostaticDischarge(address account, uint256 energy) internal virtual returns (uint256) {
     uint256 electrostaticAttraction = esaLevel[account];
     if (energy > electrostaticAttraction) {
       energy = electrostaticAttraction;
     }
 
-    uint256 bondable = cationSource.balanceOf(address(this));
+    uint256 bondable = photonSource.balanceOf(address(this));
     if (energy > bondable) {
       energy = bondable;
     }
 
     esaLevel[account] = esaLevel[account].sub(energy);
-    cationSource.safeTransfer(account, energy);
+    photonSource.safeTransfer(account, energy);
 
-    emit ElectrostaticDischarge(account, address(cationSource), energy);
+    emit ElectrostaticDischarge(account, address(photonSource), energy);
     return energy;
   }
 
@@ -373,19 +387,19 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
 
   /// @dev Throws if called by any non-account
   modifier onlyValidContractAddress(address account) {
-    require(account != address(0x0) && account.isContract(), "Universe:E-417");
+    require(account != address(0x0) && account.isContract(), "UNI:E-417");
     _;
   }
 
   /// @dev Throws if called by any account other than the Charged Particles contract
   modifier onlyChargedParticles() {
-    require(chargedParticles == msg.sender, "Universe:E-108");
+    require(chargedParticles == msg.sender, "UNI:E-108");
     _;
   }
 
   /// @dev Throws if called by any account other than the Proton NFT contract
   modifier onlyProton() {
-    require(proton == msg.sender, "Universe:E-110");
+    require(proton == msg.sender, "UNI:E-110");
     _;
   }
 }

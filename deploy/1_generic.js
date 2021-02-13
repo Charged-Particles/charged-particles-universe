@@ -50,9 +50,9 @@ module.exports = async (hre) => {
     // Display Contract Addresses
     await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
     log('  - GenericWalletManager:  ', genericWalletManager.address);
-    log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
+    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
     log('  - GenericBasketManager:  ', genericBasketManager.address);
-    log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: genericBasketManager.deployTransaction }));
+    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericBasketManager.deployTransaction }));
 
     saveDeploymentData(chainId, deployData);
     log('\n  Contract Deployment Data saved to "deployed" directory.');

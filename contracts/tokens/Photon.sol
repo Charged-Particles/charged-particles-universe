@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// Photon.sol  -- Part of the Charged Particles Protocol
+// Photon.sol -- Part of the Charged Particles Protocol
 // Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,78 +22,161 @@
 // SOFTWARE.
 
 pragma solidity 0.6.12;
-pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/GSN/ContextUpgradeable.sol";
+import "erc20permit/contracts/ERC20Permit.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
+import "../interfaces/IUniverse.sol";
+import "../interfaces/IPhotonTimelock.sol";
 import "../lib/BlackholePrevention.sol";
-import "../lib/RelayRecipient.sol";
 
-// Charged Particles Membership
-contract Photon is Initializable, ContextUpgradeable, RelayRecipient, BlackholePrevention {
-  using AddressUpgradeable for address;
 
-  event PhotonUpdated(address indexed owner, string photonURI);
-  event PhotonTransferred(address indexed oldOwner, address indexed newPhoton, string photonURI);
+contract Photon is ERC20Permit, Ownable, BlackholePrevention {
 
-  mapping (address => string) private _photonURIs;
+  event LockApproval(address indexed owner, address indexed operator, uint256 amount);
+
+  IUniverse internal _universe;
+
+  // Hard-Cap at 100 Million
+  uint256 public cap = 1e8 ether;
+
+  mapping (address => uint256) public locked;
+  mapping (address => uint256) public lockedUntil;
+  mapping (address => mapping (address => uint256)) internal _lockAllowances;
+
+
+  // Manual TODO after Launch:
+  //  Owner - Mint Portions to Universe which will distribute to Internal Team/Advisors via TokenTimelock
+  //  Owner - Mint Portions to Universe for Community Distribution
 
 
   /***********************************|
   |          Initialization           |
   |__________________________________*/
 
-  function initialize(address _trustedForwarder) public initializer {
-    __Context_init_unchained();
-    trustedForwarder = _trustedForwarder;
+  constructor() public ERC20Permit("Charged Particles - PHOTON", "PHOTON") {}
+
+
+  /***********************************|
+  |              Staking              |
+  |__________________________________*/
+
+  function lockAllowance(address owner, address operator) external view returns (uint256) {
+    return _lockAllowances[owner][operator];
+  }
+
+  function approveLock(address operator, uint256 amount) external returns (bool) {
+    _approveLock(_msgSender(), operator, amount);
+    return true;
+  }
+
+  function increaseLockAllowance(address operator, uint256 addedAmount) external returns (bool) {
+    _approveLock(_msgSender(), operator, _lockAllowances[_msgSender()][operator].add(addedAmount));
+    return true;
+  }
+
+  function decreaseLockAllowance(address operator, uint256 subtractedAmount) external returns (bool) {
+    _approveLock(_msgSender(), operator, _lockAllowances[_msgSender()][operator].sub(subtractedAmount, "Photon:E-409"));
+    return true;
+  }
+
+  function lock(address account, uint256 amount, uint256 blocks) external returns (bool) {
+    // Set number of blocks until unlocked
+    // Cannot be changed once locked
+    if (lockedUntil[account] <= block.number) { // unlocked
+      lockedUntil[account] = blocks.add(block.number);
+      locked[account] = 0;
+    }
+
+    // Set amount locked
+    // Can be increased while locked
+    uint256 additional = amount;
+    if (locked[account] < amount) {
+      additional = amount.sub(locked[account]);
+      locked[account] = amount;
+    }
+
+    if (account != _msgSender()) {
+      _approveLock(account, _msgSender(), _lockAllowances[account][_msgSender()].sub(additional, "Photon:E-409"));
+    }
+
+    return true;
   }
 
 
   /***********************************|
-  |              Public               |
+  |          Only Admin/DAO           |
   |__________________________________*/
 
-  function photonURI(address photon) external view returns (string memory) {
-    return _photonURIs[photon];
+  /**
+    * @dev Setup the Universe Controller
+    */
+  function setUniverse(address universe) external onlyOwner {
+    _universe = IUniverse(universe);
   }
 
-  function setPhotonURI(string calldata uri) external {
-    address photon = _msgSender();
-    _photonURIs[photon] = uri;
-    emit PhotonUpdated(photon, uri);
+  function mintToUniverse(uint256 amount) external onlyOwner returns (bool) {
+    require(address(_universe) != address(0x0), "Photon:E-404");
+    _mint(address(_universe), amount);
   }
 
-  function transfer(address receiver) external {
-    address sender = _msgSender();
-    require(bytes(_photonURIs[sender]).length > 0, "Photon:E-422");
+  function mintToTimelock(address photonTimelock, uint256[] memory amounts, uint256[] memory releaseTimes) external onlyOwner {
+    require(address(photonTimelock) != address(0x0), "Photon:E-403");
 
-    _photonURIs[receiver] = _photonURIs[sender];
-    delete _photonURIs[sender];
-    emit PhotonTransferred(sender, receiver, _photonURIs[receiver]);
+    uint256 totalAmount;
+    for (uint i = 0; i < amounts.length; i++) {
+      totalAmount = totalAmount.add(amounts[i]);
+    }
+
+    _mint(address(photonTimelock), totalAmount);
+    require(IPhotonTimelock(photonTimelock).addPortions(amounts, releaseTimes), "Photon:E-406");
   }
 
 
   /***********************************|
-  |          GSN/MetaTx Relay         |
+  |          Only Admin/DAO           |
+  |      (blackhole prevention)       |
   |__________________________________*/
 
-  /// @dev See {BaseRelayRecipient-_msgSender}.
-  function _msgSender()
-    internal view
-    override(BaseRelayRecipient, ContextUpgradeable)
-    returns (address payable)
-  {
-    return BaseRelayRecipient._msgSender();
+  function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
+    _withdrawEther(receiver, amount);
   }
 
-  /// @dev See {BaseRelayRecipient-_msgData}.
-  function _msgData()
-    internal view
-    override(BaseRelayRecipient, ContextUpgradeable)
-    returns (bytes memory)
-  {
-    return BaseRelayRecipient._msgData();
+  function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external onlyOwner {
+    _withdrawERC20(receiver, tokenAddress, amount);
+  }
+
+  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external onlyOwner {
+    _withdrawERC721(receiver, tokenAddress, tokenId);
+  }
+
+
+  /***********************************|
+  |         Private Functions         |
+  |__________________________________*/
+
+  function _approveLock(address owner, address operator, uint256 amount) internal {
+    require(owner != address(0), "Photon:E-403");
+    require(operator != address(0), "Photon:E-403");
+
+    _lockAllowances[owner][operator] = amount;
+    emit LockApproval(owner, operator, amount);
+  }
+
+
+  function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {
+    super._beforeTokenTransfer(from, to, amount);
+
+    // Minting tokens; enforce hard-cap
+    if (from == address(0)) {
+      require(totalSupply().add(amount) <= cap, "Photon:E-408");
+    }
+
+    // Locked tokens
+    if (from != address(0) && lockedUntil[from] > block.number) {
+      uint256 fromBalance = balanceOf(from);
+      uint256 transferable = (fromBalance > locked[from]) ? fromBalance.sub(locked[from]) : 0;
+      require(transferable >= amount, "Photon:E-409");
+    }
   }
 }

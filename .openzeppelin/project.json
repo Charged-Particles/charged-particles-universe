@@ -8,11 +8,10 @@
     "GenericWalletManager": "GenericWalletManager",
     "GenericBasketManager": "GenericBasketManager",
     "AaveWalltManager": "AaveWalletManager",
-    "AaveBridgeV1": "AaveBridgeV1",
     "AaveBridgeV2": "AaveBridgeV2",
-    "Ion": "Ion",
-    "IonTimelock": "IonTimelock",
     "Photon": "Photon",
+    "PhotonTimelock": "PhotonTimelock",
+    "WBoson": "WBoson",
     "Proton": "Proton",
     "Lepton": "Lepton"
   },

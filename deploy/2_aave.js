@@ -16,8 +16,6 @@ module.exports = async (hre) => {
 
     const chainId = chainIdByName(network.name);
     const alchemyTimeout = chainId === 31337 ? 0 : 1;
-
-    const lendingPoolProviderV1 = presets.Aave.v1.lendingPoolProvider[chainId];
     const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
 
 
@@ -41,64 +39,23 @@ module.exports = async (hre) => {
       deployTransaction: aaveWalletManager.deployTransaction,
     }
 
-    let AaveBridgeV1;
-    let AaveBridgeV1Instance;
-    let aaveBridgeV1;
-    if (lendingPoolProviderV1.length > 0) {
-      await log('\n  Deploying AaveBridgeV1 with LP Provider: ', lendingPoolProviderV1)(alchemyTimeout);
-      AaveBridgeV1 = await ethers.getContractFactory('AaveBridgeV1');
-      AaveBridgeV1Instance = await AaveBridgeV1.deploy(lendingPoolProviderV1);
-      aaveBridgeV1 = await AaveBridgeV1Instance.deployed();
-      deployData['AaveBridgeV1'] = {
-        abi: getContractAbi('AaveBridgeV1'),
-        address: aaveBridgeV1.address,
-        lendingPoolProvider: lendingPoolProviderV1,
-        deployTransaction: aaveBridgeV1.deployTransaction,
-      }
-    } else {
-      deployData['AaveBridgeV1'] = {
-        abi: [],
-        address: 0x0,
-        lendingPoolProvider: 0x0,
-        deployTransaction: {},
-      }
-    }
-
-    let AaveBridgeV2;
-    let AaveBridgeV2Instance;
-    let aaveBridgeV2;
-    if (lendingPoolProviderV2.length > 0) {
-      await log('\n  Deploying AaveBridgeV2 with LP Provider: ', lendingPoolProviderV2)(alchemyTimeout);
-      AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');
-      AaveBridgeV2Instance = await AaveBridgeV2.deploy(lendingPoolProviderV2);
-      aaveBridgeV2 = await AaveBridgeV2Instance.deployed();
-      deployData['AaveBridgeV2'] = {
-        abi: getContractAbi('AaveBridgeV2'),
-        address: aaveBridgeV2.address,
-        lendingPoolProvider: lendingPoolProviderV2,
-        deployTransaction: aaveBridgeV2.deployTransaction,
-      }
-    } else {
-      deployData['AaveBridgeV2'] = {
-        abi: [],
-        address: 0x0,
-        lendingPoolProvider: 0x0,
-        deployTransaction: {},
-      }
+    await log('\n  Deploying AaveBridgeV2 with LP Provider: ', lendingPoolProviderV2)(alchemyTimeout);
+    const AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');
+    const AaveBridgeV2Instance = await AaveBridgeV2.deploy(lendingPoolProviderV2);
+    const aaveBridgeV2 = await AaveBridgeV2Instance.deployed();
+    deployData['AaveBridgeV2'] = {
+      abi: getContractAbi('AaveBridgeV2'),
+      address: aaveBridgeV2.address,
+      lendingPoolProvider: lendingPoolProviderV2,
+      deployTransaction: aaveBridgeV2.deployTransaction,
     }
 
     // Display Contract Addresses
     await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
     log('  - AaveWalletManager:  ', aaveWalletManager.address);
     log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: aaveWalletManager.deployTransaction }));
-    if (lendingPoolProviderV1.length > 0) {
-      log('  - AaveBridgeV1:       ', aaveBridgeV1.address);
-      log('     - Gas Cost:        ', getTxGasCost({deployTransaction: aaveBridgeV1.deployTransaction}));
-    }
-    if (lendingPoolProviderV2.length > 0) {
-      log('  - AaveBridgeV2:       ', aaveBridgeV2.address);
-      log('     - Gas Cost:        ', getTxGasCost({deployTransaction: aaveBridgeV2.deployTransaction}));
-    }
+    log('  - AaveBridgeV2:       ', aaveBridgeV2.address);
+    log('     - Gas Cost:        ', getTxGasCost({deployTransaction: aaveBridgeV2.deployTransaction}));
 
     saveDeploymentData(chainId, deployData);
     log('\n  Contract Deployment Data saved to "deployed" directory.');

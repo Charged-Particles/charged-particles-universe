@@ -24,8 +24,8 @@
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "../../../lib/SmartWalletBase.sol";
 
 
@@ -35,10 +35,7 @@ import "../../../lib/SmartWalletBase.sol";
  */
 contract GenericSmartWallet is SmartWalletBase {
   using SafeMath for uint256;
-  using SafeCast for uint256;
-
-  // Asset Token => Principal Balance
-  mapping (address => uint256) internal _assetPrincipalBalance;
+  using SafeERC20 for IERC20;
 
   /***********************************|
   |          Initialization           |
@@ -121,7 +118,7 @@ contract GenericSmartWallet is SmartWalletBase {
     receiverAmount = _getPrincipal(assetToken);
     // Track Principal
     _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].sub(receiverAmount);
-    IERC20(assetToken).transfer(receiver, receiverAmount);
+    IERC20(assetToken).safeTransfer(receiver, receiverAmount);
   }
 
   function withdrawAmount(address receiver, address /* creatorRedirect */, address assetToken, uint256 assetAmount)
@@ -137,7 +134,7 @@ contract GenericSmartWallet is SmartWalletBase {
     }
     // Track Principal
     _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].sub(receiverAmount);
-    IERC20(assetToken).transfer(receiver, receiverAmount);
+    IERC20(assetToken).safeTransfer(receiver, receiverAmount);
   }
 
   function withdrawAmountForCreator(
@@ -163,19 +160,11 @@ contract GenericSmartWallet is SmartWalletBase {
     IERC20 rewardsToken = IERC20(rewardsTokenAddress);
 
     uint256 walletBalance = rewardsToken.balanceOf(self);
-    require(walletBalance >= rewardsAmount, "GenericSmartWallet:E-411");
+    require(walletBalance >= rewardsAmount, "GSW:E-411");
 
     // Transfer Rewards to Receiver
-    require(rewardsToken.transfer(receiver, rewardsAmount), "GenericSmartWallet:E-401");
+    rewardsToken.safeTransfer(receiver, rewardsAmount);
     return rewardsAmount;
-  }
-
-  /***********************************|
-  |         Private Functions         |
-  |__________________________________*/
-
-  function _getPrincipal(address assetToken) internal view returns (uint256) {
-    return _assetPrincipalBalance[assetToken];
   }
 
 }

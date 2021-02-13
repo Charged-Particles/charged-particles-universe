@@ -24,8 +24,8 @@
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 import "../../interfaces/IAaveBridge.sol";
 import "../../lib/SmartWalletBase.sol";
@@ -36,14 +36,11 @@ import "../../lib/SmartWalletBase.sol";
  */
 contract AaveSmartWallet is SmartWalletBase {
   using SafeMath for uint256;
-  using SafeCast for uint256;
+  using SafeERC20 for IERC20;
 
   uint256 constant internal RAY = 1e27;
 
   IAaveBridge internal _bridge;
-
-  //   Asset Token => Principal Balance
-  mapping (address => uint256) internal _assetPrincipalBalance;
 
 
   /***********************************|
@@ -278,19 +275,15 @@ contract AaveSmartWallet is SmartWalletBase {
     IERC20 rewardsToken = IERC20(rewardsTokenAddress);
 
     uint256 walletBalance = rewardsToken.balanceOf(self);
-    require(walletBalance >= rewardsAmount, "AaveSmartWallet:E-411");
+    require(walletBalance >= rewardsAmount, "ASW:E-411");
 
     // Transfer Rewards to Receiver
-    require(rewardsToken.transfer(receiver, rewardsAmount), "AaveSmartWallet:E-401");
+    rewardsToken.safeTransfer(receiver, rewardsAmount);
     return rewardsAmount;
   }
 
   function _getTotal(address assetToken) internal view returns (uint256) {
     return _bridge.getTotalBalance(address(this), assetToken);
-  }
-
-  function _getPrincipal(address assetToken) internal view returns (uint256) {
-    return _assetPrincipalBalance[assetToken];
   }
 
   function _getInterest(address assetToken) internal view returns (uint256 creatorInterest, uint256 ownerInterest) {
@@ -322,6 +315,6 @@ contract AaveSmartWallet is SmartWalletBase {
   }
 
   function _sendToken(address to, address token, uint256 amount) internal {
-    require(IERC20(token).transfer(to, amount), "AaveSmartWallet:E-401");
+    IERC20(token).safeTransfer(to, amount);
   }
 }

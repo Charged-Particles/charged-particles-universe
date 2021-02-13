@@ -27,6 +27,7 @@ import "../lib/ERC721.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "../interfaces/ILepton.sol";
@@ -35,6 +36,7 @@ import "../lib/BlackholePrevention.sol";
 
 contract Lepton is ILepton, ERC721, Ownable, ReentrancyGuard, BlackholePrevention {
   using SafeMath for uint256;
+  using Address for address payable;
   using Counters for Counters.Counter;
 
   Counters.Counter internal _tokenIds;
@@ -171,10 +173,10 @@ contract Lepton is ILepton, ERC721, Ownable, ReentrancyGuard, BlackholePreventio
   |__________________________________*/
 
   function _mintLepton(address receiver) internal virtual returns (uint256 newTokenId) {
-    require(_typeIndex < _leptonTypes.length, "Lepton:E-408");
+    require(_typeIndex < _leptonTypes.length, "LPT:E-408");
 
     Classification memory lepton = _leptonTypes[_typeIndex];
-    require(msg.value >= lepton.price, "Lepton:E-414");
+    require(msg.value >= lepton.price, "LPT:E-414");
 
     _tokenIds.increment();
     newTokenId = _tokenIds.current();
@@ -194,8 +196,8 @@ contract Lepton is ILepton, ERC721, Ownable, ReentrancyGuard, BlackholePreventio
   }
 
   function _batchMintLepton(address receiver, uint256 count) internal virtual {
-    require(_typeIndex < _leptonTypes.length, "Lepton:E-408");
-    require(_maxMintPerTx == 0 || count <= _maxMintPerTx, "Lepton:E-429");
+    require(_typeIndex < _leptonTypes.length, "LPT:E-408");
+    require(_maxMintPerTx == 0 || count <= _maxMintPerTx, "LPT:E-429");
 
     Classification memory lepton = _leptonTypes[_typeIndex];
 
@@ -206,7 +208,7 @@ contract Lepton is ILepton, ERC721, Ownable, ReentrancyGuard, BlackholePreventio
     }
 
     uint256 salePrice = lepton.price.mul(count);
-    require(msg.value >= salePrice, "Lepton:E-414");
+    require(msg.value >= salePrice, "LPT:E-414");
 
     _safeMintBatch(receiver, startTokenId.add(1), count, "");
 
@@ -241,7 +243,7 @@ contract Lepton is ILepton, ERC721, Ownable, ReentrancyGuard, BlackholePreventio
   |__________________________________*/
 
   modifier whenNotPaused() {
-      require(!_paused, "Lepton:E-101");
+      require(!_paused, "LPT:E-101");
       _;
   }
 }
