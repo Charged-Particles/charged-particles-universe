@@ -713,7 +713,6 @@ contract ChargedParticles is
     uint256 nftTokenId
   )
     internal
-    view
     virtual
   {
     if (_chargedState.isCovalentBondRestricted(contractAddress, tokenId)) {
