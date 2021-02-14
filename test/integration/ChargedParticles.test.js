@@ -588,7 +588,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       callValue: price.toString()
     });
 
-    const multiplier = Number((await lepton.getMultiplier(leptonId)).toString()) / 100;
+    const multiplier = Number((await lepton.getMultiplier(leptonId)).toString()) / 1e4;
 
     await lepton.connect(signer3).approve(chargedParticles.address, leptonId);
 
@@ -620,7 +620,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     console.log(Number(photonBalance2.sub(photonBalance1).toString()));
     console.log(Number(multiplier.toString()));
 
-    expect(Number(photonBalance4.sub(photonBalance3).toString()) / Number(photonBalance2.sub(photonBalance1).toString()) / Number(multiplier.toString())).to.be.above(0.9).and.below(1.1);
+    expect(Number(photonBalance4.sub(photonBalance3).toString()) / Number(photonBalance2.sub(photonBalance1).toString()) - Number(multiplier.toString())).to.be.above(0.9).and.below(1.1);
   });
 
   it("should not allow to charge a proton with a lepton multiple times", async () => {
