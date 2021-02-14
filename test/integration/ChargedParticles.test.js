@@ -538,6 +538,9 @@ describe("[INTEGRATION] Charged Particles", () => {
       ],
     });
 
+    // need to wait for the same amount of time as in the case where the lepton is charged with, otherwise, Aave will render a smaller interest amount
+    await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + 2);
+
     await chargedParticles.connect(signer2).releaseParticle(
       user2,
       proton.address,
@@ -560,6 +563,19 @@ describe("[INTEGRATION] Charged Particles", () => {
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
 
+    await lepton.connect(signerD).setPausedState(false);
+    const price = await lepton.getNextPrice();
+
+    const leptonId = await callAndReturn({
+      contractInstance: lepton,
+      contractMethod: 'mintLepton',
+      contractCaller: signer3,
+      contractParams: [],
+      callValue: price.toString()
+    });
+
+    const multiplier = Number((await lepton.getMultiplier(leptonId)).toString()) / 1e4;
+
     const protonId2 = await callAndReturn({
       contractInstance: proton,
       contractMethod: 'createChargedParticle',
@@ -575,20 +591,6 @@ describe("[INTEGRATION] Charged Particles", () => {
         annuityPct,                   // annuityPercent
       ],
     });
-
-    await lepton.connect(signerD).setPausedState(false);
-
-    const price = await lepton.getNextPrice();
-
-    const leptonId = await callAndReturn({
-      contractInstance: lepton,
-      contractMethod: 'mintLepton',
-      contractCaller: signer3,
-      contractParams: [],
-      callValue: price.toString()
-    });
-
-    const multiplier = Number((await lepton.getMultiplier(leptonId)).toString()) / 1e4;
 
     await lepton.connect(signer3).approve(chargedParticles.address, leptonId);
 
