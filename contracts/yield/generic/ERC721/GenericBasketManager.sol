@@ -89,12 +89,10 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     uint256 basketTokenId
   )
     external
-    view
     override
     returns (uint256)
   {
-    uint256 uuid = contractAddress.getTokenUUID(tokenId);
-    address basket = _baskets[uuid];
+    address basket = getBasketAddressById(contractAddress, tokenId);
     return GenericSmartBasket(basket).getTokenCountByType(basketTokenAddress, basketTokenId);
   }
 

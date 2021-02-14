@@ -62,7 +62,7 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
 
   function getTokenCountByType(address contractAddress, uint256 tokenId) external view override returns (uint256) {
     uint256 nftType = contractAddress.getTokenType(tokenId);
-    return EnumerableSet.length(_nftContractTokens[contractAddress][nftType]);
+    return _nftContractTokens[contractAddress][nftType].length();
   }
 
   function onERC721Received(address, address, uint256, bytes calldata) external override returns (bytes4) {

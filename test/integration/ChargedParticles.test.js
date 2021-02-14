@@ -576,9 +576,9 @@ describe("[INTEGRATION] Charged Particles", () => {
       ],
     });
 
-    const price = await lepton.getNextPrice();
-
     await lepton.connect(signerD).setPausedState(false);
+
+    const price = await lepton.getNextPrice();
 
     const leptonId = await callAndReturn({
       contractInstance: lepton,
@@ -621,6 +621,70 @@ describe("[INTEGRATION] Charged Particles", () => {
     console.log(Number(multiplier.toString()));
 
     expect(Number(photonBalance4.sub(photonBalance3).toString()) / Number(photonBalance2.sub(photonBalance1).toString()) / Number(multiplier.toString())).to.be.above(0.9).and.below(1.1);
+  });
+
+  it("should not allow to charge a proton with a lepton multiple times", async () => {
+    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+
+    await dai.connect(daiSigner).transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    const protonId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'aave',                       // walletManagerId
+        daiAddress,                   // assetToken
+        toWei('10'),                  // assetAmount
+        annuityPct,                   // annuityPercent
+      ],
+    });
+
+    await lepton.connect(signerD).setPausedState(false);
+
+    const price1 = await lepton.getNextPrice();
+
+    const leptonId1 = await callAndReturn({
+      contractInstance: lepton,
+      contractMethod: 'mintLepton',
+      contractCaller: signer3,
+      contractParams: [],
+      callValue: price1.toString()
+    });
+
+    const price2 = await lepton.getNextPrice();
+
+    const leptonId2 = await callAndReturn({
+      contractInstance: lepton,
+      contractMethod: 'mintLepton',
+      contractCaller: signer3,
+      contractParams: [],
+      callValue: price2.toString()
+    });
+
+    await lepton.connect(signer3).approve(chargedParticles.address, leptonId1);
+    await lepton.connect(signer3).approve(chargedParticles.address, leptonId2);
+
+    await chargedParticles.connect(signer3).covalentBond(
+      proton.address,
+      protonId,
+      'generic',
+      lepton.address,
+      leptonId1
+    );
+
+    await expect(chargedParticles.connect(signer3).covalentBond(
+      proton.address,
+      protonId,
+      'generic',
+      lepton.address,
+      leptonId2
+    )).to.be.revertedWith('CP:E-430');
   });
 
 });
