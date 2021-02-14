@@ -223,11 +223,15 @@ module.exports = async (hre) => {
       await universe.setLeptonToken(ddLepton.address)
     );
 
+    await executeTx('5-c', 'ChargedParticles: Registering Lepton', async () =>
+      await chargedSettings.enableNftContracts([ddProton.address, ddLepton.address])
+    );
+
     let leptonType;
     for (let i = 0; i < presets.Lepton.types.length; i++) {
       leptonType = presets.Lepton.types[i];
 
-      await executeTx(`5-c-${i}`, `Lepton: Adding Lepton Type: ${leptonType.name}`, async () =>
+      await executeTx(`5-d-${i}`, `Lepton: Adding Lepton Type: ${leptonType.name}`, async () =>
         await lepton.addLeptonType(
           leptonType.tokenUri,
           leptonType.price,
