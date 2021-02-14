@@ -7,6 +7,7 @@ const {
 
 const {
   getDeployData,
+  toEth,
   toWei,
   toBN,
   presets
@@ -112,6 +113,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     photon = Photon.attach(getDeployData('Photon', chainId).address);
     timelocks = Object.values(getDeployData('PhotonTimelocks', chainId))
       .map(photonTimelock => (PhotonTimelock.attach(photonTimelock.address)));
+
+    await lepton.connect(signerD).setPausedState(false);
   });
 
   afterEach(async () => {
@@ -517,10 +520,11 @@ describe("[INTEGRATION] Charged Particles", () => {
   });
 
   it("charging a proton with a lepton should multiply photon return", async () => {
+    const assetAmount10 = toWei('10');
+    const assetAmount20 = toWei('20');
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
-
-    await dai.connect(daiSigner).transfer(user1, toWei('10'));
-    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+    await dai.connect(daiSigner).transfer(user1, assetAmount20);
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, assetAmount20);
 
     const protonId1 = await callAndReturn({
       contractInstance: proton,
@@ -533,7 +537,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
         'aave',                       // walletManagerId
         daiAddress,                   // assetToken
-        toWei('10'),                  // assetAmount
+        assetAmount10,                  // assetAmount
         annuityPct,                   // annuityPercent
       ],
     });
@@ -557,11 +561,6 @@ describe("[INTEGRATION] Charged Particles", () => {
     const photonBalance2 = await photon.balanceOf(user2);
 
     expect(photonBalance2).to.be.above(photonBalance1).and.below(photonBalance1.add(bondWeight));
-
-    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
-
-    await dai.connect(daiSigner).transfer(user1, toWei('10'));
-    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
 
     await lepton.connect(signerD).setPausedState(false);
     const price = await lepton.getNextPrice();
@@ -587,7 +586,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
         'aave',                       // walletManagerId
         daiAddress,                   // assetToken
-        toWei('10'),                  // assetAmount
+        assetAmount10,                  // assetAmount
         annuityPct,                   // annuityPercent
       ],
     });
@@ -617,10 +616,6 @@ describe("[INTEGRATION] Charged Particles", () => {
     const photonBalance4 = await photon.balanceOf(user2);
     
     expect(photonBalance4).to.be.above(photonBalance3).and.below(photonBalance3.add(bondWeight));
-
-    console.log(Number(photonBalance4.sub(photonBalance3).toString()));
-    console.log(Number(photonBalance2.sub(photonBalance1).toString()));
-    console.log(Number(multiplier.toString()));
 
     expect(Number(photonBalance4.sub(photonBalance3).toString()) / Number(photonBalance2.sub(photonBalance1).toString()) - Number(multiplier.toString())).to.be.above(0.9).and.below(1.1);
   });

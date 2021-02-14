@@ -4,6 +4,8 @@ const path = require('path');
 const _ = require('lodash');
 const sleep = require('sleep-promise');
 
+require('./chaiMatchers');
+
 const toWei = ethers.utils.parseEther;
 const toEth = ethers.utils.formatEther;
 const toBN = ethers.BigNumber.from;
