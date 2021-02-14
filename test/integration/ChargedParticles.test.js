@@ -7,6 +7,7 @@ const {
 
 const {
   getDeployData,
+  toEth,
   toWei,
   toBN,
   presets
@@ -112,6 +113,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     photon = Photon.attach(getDeployData('Photon', chainId).address);
     timelocks = Object.values(getDeployData('PhotonTimelocks', chainId))
       .map(photonTimelock => (PhotonTimelock.attach(photonTimelock.address)));
+
+    await lepton.connect(signerD).setPausedState(false);
   });
 
   afterEach(async () => {
@@ -516,11 +519,19 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(await photon.balanceOf(user2)).to.be.above(user2BalanceBefore).and.below(user2BalanceBefore.add(bondWeight));
   });
 
-  it("charging a proton with a lepton should multiply photon return", async () => {
-    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+  it.only("charging a proton with a lepton should multiply photon return", async () => {
+    const assetAmount = toWei('10');
 
-    await dai.connect(daiSigner).transfer(user1, toWei('10'));
-    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+    //
+    // Round 1
+    //
+
+    //
+    // Create Particle without Leptons
+    //
+    await signerD.sendTransaction({ to: daiHodler, value: toWei('100') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+    await dai.connect(daiSigner).transfer(user1, assetAmount);
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, assetAmount);
 
     const protonId1 = await callAndReturn({
       contractInstance: proton,
@@ -533,32 +544,60 @@ describe("[INTEGRATION] Charged Particles", () => {
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
         'aave',                       // walletManagerId
         daiAddress,                   // assetToken
-        toWei('10'),                  // assetAmount
+        assetAmount,                  // assetAmount
         annuityPct,                   // annuityPercent
       ],
     });
 
-    await chargedParticles.connect(signer2).releaseParticle(
-      user2,
-      proton.address,
-      protonId1,
-      'aave',
-      daiAddress
-    );
-    
-    const bondWeight = toWei('1');
-    const photonBalance1 = await photon.balanceOf(user2);
+    let newBlock = (await getNetworkBlockNumber()).add(toBN('10'));
+    await setNetworkAfterBlockNumber(newBlock);
 
-    await universe.conductElectrostaticDischarge(user2, bondWeight);
+    //
+    // Release without Leptons
+    //
+    let creatorDaiBefore = await dai.balanceOf(user1);
+    let receiverDaiBefore = await dai.balanceOf(user2);
+    expect(await chargedParticles.connect(signer2).releaseParticle(user2, proton.address, protonId1, 'aave', daiAddress))
+      .to.emit(aaveWalletManager, 'WalletReleased');
+    let creatorDaiAfter = await dai.balanceOf(user1);
+    let receiverDaiAfter = await dai.balanceOf(user2);
 
-    const photonBalance2 = await photon.balanceOf(user2);
+    let creatorInterest = creatorDaiAfter.sub(creatorDaiBefore);
+    let receiverInterest = receiverDaiAfter.sub(receiverDaiBefore).sub(assetAmount);
 
-    expect(photonBalance2).to.be.above(photonBalance1).and.below(photonBalance1.add(bondWeight));
+    //
+    // Test Static Charge
+    //
+    let totalInterest = receiverInterest.add(creatorInterest);
+    let currentCharge = await universe.getStaticCharge(user2);
+    expect(currentCharge).to.equal(totalInterest.div(2));  // 50% for DAI
 
-    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+    //
+    // Test Photons Amount (no Lepton multiplier, ratio = 50%  see: 'js-helpers/deploy.js' --> rewardsForAssetTokens)
+    //
+    await universe.conductElectrostaticDischarge(user2, toWei('1')); // try to get more than we have
+    expect(await photon.balanceOf(user2)).to.be.equal(currentCharge);
 
-    await dai.connect(daiSigner).transfer(user1, toWei('10'));
-    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+    //
+    // Round 2
+    //
+
+    await dai.connect(daiSigner).transfer(user1, assetAmount);
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, assetAmount);
+
+    //
+    // Create Particle with Leptons
+    //
+    let price = await lepton.getNextPrice();
+    const leptonId = await callAndReturn({
+      contractInstance: lepton,
+      contractMethod: 'mintLepton',
+      contractCaller: signer3,
+      contractParams: [],
+      callValue: price.toString()
+    });
+
+    // const multiplier = Number((await lepton.getMultiplier(leptonId)).toString()) / 1e4;
 
     const protonId2 = await callAndReturn({
       contractInstance: proton,
@@ -571,27 +610,15 @@ describe("[INTEGRATION] Charged Particles", () => {
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
         'aave',                       // walletManagerId
         daiAddress,                   // assetToken
-        toWei('10'),                  // assetAmount
+        assetAmount,                  // assetAmount
         annuityPct,                   // annuityPercent
       ],
     });
 
-    await lepton.connect(signerD).setPausedState(false);
-
-    const price = await lepton.getNextPrice();
-
-    const leptonId = await callAndReturn({
-      contractInstance: lepton,
-      contractMethod: 'mintLepton',
-      contractCaller: signer3,
-      contractParams: [],
-      callValue: price.toString()
-    });
-
-    const multiplier = Number((await lepton.getMultiplier(leptonId)).toString()) / 1e4;
-
+    //
+    // Deposit Lepton into NFT
+    //
     await lepton.connect(signer3).approve(chargedParticles.address, leptonId);
-
     await chargedParticles.connect(signer3).covalentBond(
       proton.address,
       protonId2,
@@ -600,27 +627,35 @@ describe("[INTEGRATION] Charged Particles", () => {
       leptonId
     );
 
-    await chargedParticles.connect(signer2).releaseParticle(
-      user2,
-      proton.address,
-      protonId2,
-      'aave',
-      daiAddress
-    );
+    newBlock = (await getNetworkBlockNumber()).add(toBN('8'));
+    await setNetworkAfterBlockNumber(newBlock);
 
-    const photonBalance3 = await photon.balanceOf(user2);
+    creatorDaiBefore = await dai.balanceOf(user1);
+    receiverDaiBefore = await dai.balanceOf(user2);
+    expect(await chargedParticles.connect(signer2).releaseParticle(user2, proton.address, protonId2, 'aave', daiAddress))
+      .to.emit(aaveWalletManager, 'WalletReleased');
+    creatorDaiAfter = await dai.balanceOf(user1);
+    receiverDaiAfter = await dai.balanceOf(user2);
 
-    await universe.conductElectrostaticDischarge(user2, bondWeight);
+    creatorInterest = creatorDaiAfter.sub(creatorDaiBefore);
+    receiverInterest = receiverDaiAfter.sub(receiverDaiBefore).sub(assetAmount);
 
-    const photonBalance4 = await photon.balanceOf(user2);
-    
-    expect(photonBalance4).to.be.above(photonBalance3).and.below(photonBalance3.add(bondWeight));
+    //
+    // Test Static Charge
+    //
+    let previousCharge = currentCharge;
+    totalInterest = receiverInterest.add(creatorInterest);
+    currentCharge = await universe.getStaticCharge(user2);
 
-    console.log(Number(photonBalance4.sub(photonBalance3).toString()));
-    console.log(Number(photonBalance2.sub(photonBalance1).toString()));
-    console.log(Number(multiplier.toString()));
+    let rewardsAmount = totalInterest.mul(5000).div(10000);
+    let rewardsBoost = rewardsAmount.mul(120).div(10000);
+    expect(currentCharge).to.equal(rewardsAmount.add(rewardsBoost));  // 50% for DAI + 1.2% for Lepton
 
-    expect(Number(photonBalance4.sub(photonBalance3).toString()) / Number(photonBalance2.sub(photonBalance1).toString()) - Number(multiplier.toString())).to.be.above(0.9).and.below(1.1);
+    //
+    // Test Photons Amount (with Lepton multiplier)
+    //
+    await universe.conductElectrostaticDischarge(user2, toWei('1')); // try to get more than we have
+    expect(await photon.balanceOf(user2)).to.be.equal(previousCharge.add(currentCharge));
   });
 
   it("should not allow to charge a proton with a lepton multiple times", async () => {
