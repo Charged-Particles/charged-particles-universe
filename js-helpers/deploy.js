@@ -102,7 +102,7 @@ const presets = {
     ]
   },
   Lepton: {
-    maxMintPerTx: toWei('500'),
+    maxMintPerTx: toBN('500'),
     types: [
       {
         name        : 'Electron Neutrino',

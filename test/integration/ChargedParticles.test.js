@@ -684,4 +684,32 @@ describe("[INTEGRATION] Charged Particles", () => {
     )).to.be.revertedWith('CP:E-430');
   });
 
+  it("cannot mint more leptons in the same tx than the max allowed", async () => {
+    const testMaxMintPerTx = 3;
+    await lepton.setMaxMintPerTx(testMaxMintPerTx);
+    await expect(lepton.batchMintLepton(4, { value: toWei('1') })).to.be.revertedWith('LPT:E-429');
+  });
+
+  it("leptons switch to the next tier after minting all the available leptons in the previous tier", async () => {
+    const maxMintPerTx = presets.Lepton.maxMintPerTx;
+    await lepton.setMaxMintPerTx(maxMintPerTx);
+    const runs = Math.ceil(Number((presets.Lepton.types[0].supply.div(maxMintPerTx)).toString()));
+    const runCount = 10;
+    for (let i = 0; i < runs; i++) {
+      for (let j =0; j < runCount; j++) {
+        await lepton.batchMintLepton(maxMintPerTx.div(runCount), { value: toWei('300') });
+      }
+    }
+    expect(await lepton.getNextPrice()).to.be.equal(presets.Lepton.types[1].price);
+  });
+
+  it("can withdraw ether piled up in the lepton contract", async () => {
+    await lepton.mintLepton({ value: toWei('1') })
+    const ethToWithdraw = await ethers.provider.getBalance(lepton.address);
+    const ethBal1 = await ethers.provider.getBalance(user1);
+    await lepton.withdrawEther(user1, ethToWithdraw);
+    const ethBal2 = await ethers.provider.getBalance(user1);
+    expect(ethBal2.sub(ethBal1)).to.be.equal(ethToWithdraw);
+  });
+
 });
