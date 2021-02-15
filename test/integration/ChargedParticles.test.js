@@ -703,4 +703,13 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(await lepton.getNextPrice()).to.be.equal(presets.Lepton.types[1].price);
   });
 
+  it("can withdraw ether piled up in the lepton contract", async () => {
+    await lepton.mintLepton({ value: toWei('1') })
+    const ethToWithdraw = await ethers.provider.getBalance(lepton.address);
+    const ethBal1 = await ethers.provider.getBalance(user1);
+    await lepton.withdrawEther(user1, ethToWithdraw);
+    const ethBal2 = await ethers.provider.getBalance(user1);
+    expect(ethBal2.sub(ethBal1)).to.be.equal(ethToWithdraw);
+  });
+
 });
