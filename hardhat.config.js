@@ -77,11 +77,22 @@ module.exports = {
             url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
             // url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
             gasPrice: 10e9,
-            blockGasLimit: 12487794,
+            blockGasLimit: 12400000,
             accounts: {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
                 count: 10,
+            }
+        },
+        mainnet: {
+            url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
+            // url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+            gasPrice: 100e9,
+            blockGasLimit: 12487794,
+            accounts: {
+                mnemonic: mnemonic.mainnet,
+                initialIndex: 0,
+                count: 3,
             }
         },
     },

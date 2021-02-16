@@ -1,32 +1,35 @@
-
-const { ethers, getNamedAccounts } = require('@nomiclabs/buidler');
-const _ = require('lodash');
-
 const {
   chainNameById,
+  chainIdByName,
   getDeployData,
-} = require('../js-helpers/deploy');
+  log,
+} = require("../js-helpers/deploy");
+
+const _ = require('lodash');
 
 
-async function main() {
-  // const { log } = deployments;
-  const log = console.log;
-  const network = await ethers.provider.getNetwork();
+const _PAUSED_STATE = true;
 
-  // Named accounts, defined in buidler.config.js:
+
+module.exports = async (hre) => {
+  const { ethers, getNamedAccounts } = hre;
   const { deployer, owner } = await getNamedAccounts();
+  const network = await hre.network;
 
-  const ddAaveWalletManager = getDeployData('AaveWalletManager', network.config.chainId);
-  const ddGenericWalletManager = getDeployData('GenericWalletManager', network.config.chainId);
-  const ddGenericBasketManager = getDeployData('GenericBasketManager', network.config.chainId);
-  const ddProton = getDeployData('Proton', network.config.chainId);
-  const ddLepton = getDeployData('Lepton', network.config.chainId);
+  const chainId = chainIdByName(network.name);
+  const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
+
+  const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
+  const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
+  const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
+  const ddProton = getDeployData('Proton', chainId);
+  const ddLepton = getDeployData('Lepton', chainId);
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles: Pause All Contracts');
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-  log('  Using Network: ', chainNameById(network.config.chainId));
+  log('  Using Network: ', chainNameById(chainId));
   log('  Using Accounts:');
   log('  - Deployer:    ', deployer);
   log('  - Owner:       ', owner);
@@ -57,30 +60,24 @@ async function main() {
     // Set Paused State
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  log('  - Pausing GenericWalletManager...');
-  await genericWalletManager.setPausedState(true);
+  await log('  - Pausing GenericWalletManager...')(alchemyTimeout);
+  await genericWalletManager.setPausedState(_PAUSED_STATE);
 
-  log('  - Pausing GenericBasketManager...');
-  await genericBasketManager.setPausedState(true);
+  await log('  - Pausing GenericBasketManager...')(alchemyTimeout);
+  await genericBasketManager.setPausedState(_PAUSED_STATE);
 
-  log('  - Pausing AaveWalletManager...');
-  await aaveWalletManager.setPausedState(true);
+  await log('  - Pausing AaveWalletManager...')(alchemyTimeout);
+  await aaveWalletManager.setPausedState(_PAUSED_STATE);
 
-  log('  - Pausing Proton...');
-  await proton.setPausedState(true);
+  await log('  - Pausing Proton...')(alchemyTimeout);
+  await proton.setPausedState(_PAUSED_STATE);
 
-  log('  - Pausing Lepton...');
-  await lepton.setPausedState(true);
+  await log('  - Pausing Lepton...')(alchemyTimeout);
+  await lepton.setPausedState(_PAUSED_STATE);
 
 
   log('\n  Transaction Execution Complete!');
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
-
-main()
-  .then(() => process.exit(0))
-  .catch(error => {
-    console.error(error);
-    process.exit(1);
-  });
+module.exports.tags = ['pause-all']

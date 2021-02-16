@@ -181,8 +181,6 @@ const presets = {
   Aave: {
     referralCode: {
       1: '',
-      3: '',
-      4: '',
       42: '',
       31337: '',
     },
@@ -193,9 +191,9 @@ const presets = {
         31337: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // Hardhat - Forked Mainnet
       },
       lendingPoolProvider: {
-        1: '0xb53c1a33016b2dc2ff3653530bff1848a515c8c5', // mainnet
+        1: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // mainnet
         42: '0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b', // kovan
-        31337: '0xb53c1a33016b2dc2ff3653530bff1848a515c8c5', // Hardhat - Forked Mainnet
+        31337: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // Hardhat - Forked Mainnet
       }
     }
   }

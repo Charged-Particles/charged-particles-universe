@@ -32,6 +32,10 @@ async function run() {
   // Upgradeable Contracts; need to get implementation adderss from `.openzeppelin/__network__.json`
   let universeAddress = null;
   let chargedParticlesAddress = null;
+  if (networkName === 'mainnet') {
+    universeAddress = '0xd6ed8455903CBd94d8F432eC4059197984baA65e';
+    chargedParticlesAddress = '0x660De54CEA09838d11Df0812E2754eD8D08CD2f7';
+  }
   if (networkName === 'kovan') {
     universeAddress = '0xeC08CB0f69E2095CF27eCB6E9D4BB60b430334Ad';
     chargedParticlesAddress = '0x0cFAAD8cD948A0BAe647615ecc8DfeFD0294a5f2';

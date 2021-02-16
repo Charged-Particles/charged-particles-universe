@@ -12,10 +12,10 @@ module.exports = async (hre) => {
     const { getNamedAccounts } = hre;
     const { deployer, protocolOwner } = await getNamedAccounts();
     const network = await hre.network;
-    const alchemyTimeout = 1;
-    const deployData = {};
 
     const chainId = chainIdByName(network.name);
+    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
+    const deployData = {};
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles LP: Generic - Contract Deployment');

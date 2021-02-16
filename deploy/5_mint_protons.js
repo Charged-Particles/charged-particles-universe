@@ -21,7 +21,7 @@ module.exports = async (hre) => {
     const network = await hre.network;
 
     const chainId = chainIdByName(network.name);
-    const alchemyTimeout = chainId === 31337 ? 0 : 9;
+    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 7);
 
     const protonCreator = await ethers.provider.getSigner(initialMinter);
 

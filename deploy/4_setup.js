@@ -15,7 +15,7 @@ module.exports = async (hre) => {
     const network = await hre.network;
 
     const chainId = chainIdByName(network.name);
-    const alchemyTimeout = chainId === 31337 ? 0 : 5;
+    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 5);
 
     const executeTx = async (txId, txDesc, callback = _.noop, increaseDelay = 0) => {
       if (txId === '1-a') {
@@ -47,7 +47,7 @@ module.exports = async (hre) => {
     const ddWBoson = getDeployData('WBoson', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
-    const ddPhoton = getDeployData('Photon', chainId);
+    // const ddPhoton = getDeployData('Photon', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Initialization');
@@ -109,7 +109,7 @@ module.exports = async (hre) => {
     // Setup Charged Particles & Universe
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('1-a', 'Universe: Registering ChargedParticles', async () =>
+    await executeTx('1-a', 'Universe: Registering ChargedParticles at: ' + ddChargedParticles.address, async () =>
       await universe.setChargedParticles(ddChargedParticles.address)
     );
 
@@ -247,25 +247,27 @@ module.exports = async (hre) => {
     // Setup Photon
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('6-a', 'Photon: Registering Universe', async () =>
-      await photon.setUniverse(ddUniverse.address)
-    );
-
-    await executeTx('6-b', 'Universe: Registering Photon', async () =>
-      await universe.setPhoton(ddPhoton.address, photonMaxSupply)
-    );
-
-    let assetTokenId;
-    let assetTokenAddress;
-    let assetTokenMultiplier;
-    for (let i = 0; i < rewardsForAssetTokens.length; i++) {
-      assetTokenId = rewardsForAssetTokens[i].assetTokenId;
-      assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
-      assetTokenMultiplier = rewardsForAssetTokens[i].multiplier;
-
-      await executeTx(`6-c-${i}`, `Universe: Setting ESA Multiplier for Asset Token (${assetTokenAddress} = ${assetTokenMultiplier})`, async () =>
-        await universe.setEsaMultiplier(assetTokenAddress, assetTokenMultiplier)
+    if (chainId !== 1) { // Delayed on Mainnet
+      await executeTx('6-a', 'Photon: Registering Universe', async () =>
+        await photon.setUniverse(ddUniverse.address)
       );
+
+      await executeTx('6-b', 'Universe: Registering Photon', async () =>
+        await universe.setPhoton(ddPhoton.address, photonMaxSupply)
+      );
+
+      let assetTokenId;
+      let assetTokenAddress;
+      let assetTokenMultiplier;
+      for (let i = 0; i < rewardsForAssetTokens.length; i++) {
+        assetTokenId = rewardsForAssetTokens[i].assetTokenId;
+        assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
+        assetTokenMultiplier = rewardsForAssetTokens[i].multiplier;
+
+        await executeTx(`6-c-${i}`, `Universe: Setting ESA Multiplier for Asset Token (${assetTokenAddress} = ${assetTokenMultiplier})`, async () =>
+          await universe.setEsaMultiplier(assetTokenAddress, assetTokenMultiplier)
+        );
+      }
     }
 
 
@@ -289,21 +291,23 @@ module.exports = async (hre) => {
     // Setup GSN Trusted Forwarder
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('8-a', 'ChargedState: Set TrustedForwarder', async () =>
-      await chargedState.setTrustedForwarder(trustedForwarder)
-    );
+    if (chainId !== 1) { // Delayed on Mainnet
+      await executeTx('8-a', 'ChargedState: Set TrustedForwarder', async () =>
+        await chargedState.setTrustedForwarder(trustedForwarder)
+      );
 
-    await executeTx('8-b', 'ChargedSettings: Set TrustedForwarder', async () =>
-      await chargedSettings.setTrustedForwarder(trustedForwarder)
-    );
+      await executeTx('8-b', 'ChargedSettings: Set TrustedForwarder', async () =>
+        await chargedSettings.setTrustedForwarder(trustedForwarder)
+      );
 
-    await executeTx('8-c', 'Proton: Set TrustedForwarder', async () =>
-      await proton.setTrustedForwarder(trustedForwarder)
-    );
+      await executeTx('8-c', 'Proton: Set TrustedForwarder', async () =>
+        await proton.setTrustedForwarder(trustedForwarder)
+      );
 
-    await executeTx('8-d', 'WBoson: Set TrustedForwarder', async () =>
-      await wBoson.setTrustedForwarder(trustedForwarder)
-    );
+      await executeTx('8-d', 'WBoson: Set TrustedForwarder', async () =>
+        await wBoson.setTrustedForwarder(trustedForwarder)
+      );
+    }
 
 
     log(`\n  Contract Initialization Complete!`);

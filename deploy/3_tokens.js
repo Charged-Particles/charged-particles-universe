@@ -16,7 +16,7 @@ module.exports = async (hre) => {
   const deployData = {};
 
   const chainId = chainIdByName(network.name);
-  const alchemyTimeout = chainId === 31337 ? 0 : 2;
+  const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 3 : 2);
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles: Tokens - Contract Deployment');
@@ -59,14 +59,16 @@ module.exports = async (hre) => {
     deployTransaction: lepton.deployTransaction,
   }
 
-  await log('\n  Deploying Photon FT...')(alchemyTimeout);
-  const Photon = await ethers.getContractFactory('Photon');
-  const PhotonInstance = await Photon.deploy();
-  const photon = await PhotonInstance.deployed();
-  deployData['Photon'] = {
-    abi: getContractAbi('Photon'),
-    address: photon.address,
-    deployTransaction: photon.deployTransaction,
+  if (chainId !== 1) { // Delayed on Mainnet
+    await log('\n  Deploying Photon FT...')(alchemyTimeout);
+    const Photon = await ethers.getContractFactory('Photon');
+    const PhotonInstance = await Photon.deploy();
+    const photon = await PhotonInstance.deployed();
+    deployData['Photon'] = {
+      abi: getContractAbi('Photon'),
+      address: photon.address,
+      deployTransaction: photon.deployTransaction,
+    }
   }
 
   // Display Contract Addresses
@@ -77,8 +79,11 @@ module.exports = async (hre) => {
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
   log('  - Lepton:      ', lepton.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
-  log('  - Photon:         ', photon.address);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: photon.deployTransaction }));
+
+  if (chainId !== 1) { // Delayed on Mainnet
+    log('  - Photon:         ', photon.address);
+    log('     - Gas Cost: ', getTxGasCost({ deployTransaction: photon.deployTransaction }));
+  }
 
   saveDeploymentData(chainId, deployData);
   log('\n  Contract Deployment Data saved to "deployed" directory.');

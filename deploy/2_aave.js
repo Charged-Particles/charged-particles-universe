@@ -15,7 +15,7 @@ module.exports = async (hre) => {
     const deployData = {};
 
     const chainId = chainIdByName(network.name);
-    const alchemyTimeout = chainId === 31337 ? 0 : 1;
+    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
     const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
 
 
