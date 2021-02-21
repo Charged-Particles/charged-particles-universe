@@ -31,7 +31,7 @@ import "./lib/BlackholePrevention.sol";
 /**
  * @notice The Charged Particles Treasury Contract
  */
-contract Treasury is BlackholePrevention {
+contract Treasury is BlackholePrevention, Ownable {
 
     event TreasuryDeposit(uint256 amount);
 
