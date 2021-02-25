@@ -2,8 +2,8 @@
   "manifestVersion": "3.1",
   "impls": {
     "b5d21ce7cd92550eca391e5dc32800f08192b23af89d1c840a7ecf264e2c7234": {
-      "address": "0xD3c3aB45e54c16C497b47Fe5772940A7F611D4eB",
-      "txHash": "0x46f22a0bc4e4e18eae70cf8194b43031824a7f46da5902ace72039b169a4a3dd",
+      "address": "0x854A9E0B6Adc2d74Ab2C7f3a2FAE99Ea5356CDE6",
+      "txHash": "0x91bc7c2662dcf322e7c1c31dfb3ddeadc9639f7a1fb9d1c8eac8cecb3831b931",
       "layout": {
         "storage": [
           {
@@ -140,9 +140,9 @@
         }
       }
     },
-    "5058c638d39ad30426454ca71fe15e2820ddfeda367cd5302d199d089162492a": {
-      "address": "0x1db23027A7949172e405dA30c55dadcAfA7CF6cC",
-      "txHash": "0x0a71d38539d1ae96a3deb7fc872864fe3f794ff62adb3e7ca6dfd76804319258",
+    "04b492135b91d840de6774e8c8aaeae98e807daad75fdd61816d78c58e2529cf": {
+      "address": "0x007eCd0D21a2857E976fAdb18007E0118752A2aC",
+      "txHash": "0x24b2ddcc242e154c371862b2051c118f7c428efe8b1804c0684c29c414eee0d5",
       "layout": {
         "storage": [
           {
@@ -196,19 +196,19 @@
           {
             "contract": "ChargedParticles",
             "label": "_universe",
-            "type": "t_contract(IUniverse)15149",
+            "type": "t_contract(IUniverse)15157",
             "src": "contracts/ChargedParticles.sol:89"
           },
           {
             "contract": "ChargedParticles",
             "label": "_chargedState",
-            "type": "t_contract(IChargedState)14226",
+            "type": "t_contract(IChargedState)14234",
             "src": "contracts/ChargedParticles.sol:90"
           },
           {
             "contract": "ChargedParticles",
             "label": "_chargedSettings",
-            "type": "t_contract(IChargedSettings)13833",
+            "type": "t_contract(IChargedSettings)13841",
             "src": "contracts/ChargedParticles.sol:91"
           },
           {
@@ -219,13 +219,13 @@
           }
         ],
         "types": {
-          "t_contract(IUniverse)15149": {
+          "t_contract(IUniverse)15157": {
             "label": "contract IUniverse"
           },
-          "t_contract(IChargedState)14226": {
+          "t_contract(IChargedState)14234": {
             "label": "contract IChargedState"
           },
-          "t_contract(IChargedSettings)13833": {
+          "t_contract(IChargedSettings)13841": {
             "label": "contract IChargedSettings"
           },
           "t_address": {
@@ -248,7 +248,7 @@
     }
   },
   "admin": {
-    "address": "0xE0F391d09B15013ae35A0Bf9BC410b981bEc2380",
-    "txHash": "0x19e8ba22647e58e14999f42f6ebfb20589408d387a951e1cb8672a743f52fd4a"
+    "address": "0x57e00fe4242020F6A0A68f7Ed72215908a178312",
+    "txHash": "0x653f40d4e40a2e5fbcac3527399b22c955182a92ce646fb7eaef18db275f2426"
   }
 }

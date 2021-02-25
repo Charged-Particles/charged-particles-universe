@@ -53,7 +53,7 @@ describe("Universe", () => {
   // Internal contracts
   let universe;
   let chargedParticlesAddress;
-  let photonAddress;
+  let ionAddress;
   let protonAddress;
   let ethSender;
 
@@ -92,7 +92,7 @@ describe("Universe", () => {
     signer3 = ethers.provider.getSigner(user3);
 
     chargedParticlesAddress = getDeployData('ChargedParticles', chainId).address;
-    photonAddress = getDeployData('Photon', chainId).address;
+    ionAddress = getDeployData('Ion', chainId).address;
     protonAddress = getDeployData('Proton', chainId).address;
 
     // With Forked Mainnet
@@ -164,19 +164,19 @@ describe("Universe", () => {
     });
 
 
-    it('should allow the contract owner to set the Photon contract', async () => {
-      let tx = universe.connect(signerD).setPhoton(photonAddress, toWei('1'));
+    it('should allow the contract owner to set the Ion contract', async () => {
+      let tx = universe.connect(signerD).setPhoton(ionAddress, toWei('1'));
       await expect(tx)
         .to.emit(universe, 'PhotonSet')
-        .withArgs(photonAddress, toWei('1'));
+        .withArgs(ionAddress, toWei('1'));
     });
 
-    it('should not allow anyone else to set the Photon contract', async () => {
-      await expect(universe.connect(signer2).setPhoton(photonAddress, toWei('1')))
+    it('should not allow anyone else to set the Ion contract', async () => {
+      await expect(universe.connect(signer2).setPhoton(ionAddress, toWei('1')))
         .to.be.revertedWith('Ownable: caller is not the owner');
     });
 
-    it('should not allow setting Photon to a non-contract address', async () => {
+    it('should not allow setting Ion to a non-contract address', async () => {
       await expect(universe.connect(signerD).setPhoton(AddressZero, toWei('1')))
         .to.be.revertedWith('UNI:E-417');
 

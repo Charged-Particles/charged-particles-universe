@@ -28,7 +28,7 @@ module.exports = async (hre) => {
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
-    const ddPhoton = getDeployData('Photon', chainId);
+    const ddIon = getDeployData('Ion', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Initialization');
@@ -77,9 +77,9 @@ module.exports = async (hre) => {
     const Lepton = await ethers.getContractFactory('Lepton');
     const lepton = await Lepton.attach(ddLepton.address);
 
-    log('  Loading Photon from: ', ddPhoton.address);
-    const Photon = await ethers.getContractFactory('Photon');
-    const photon = await Photon.attach(ddPhoton.address);
+    log('  Loading Ion from: ', ddIon.address);
+    const Ion = await ethers.getContractFactory('Ion');
+    const ion = await Ion.attach(ddIon.address);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Transfer Ownership of All Contracts
@@ -112,8 +112,8 @@ module.exports = async (hre) => {
     await log(`  - Lepton: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     await lepton.transferOwnership(owner);
 
-    await log(`  - Photon: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
-    await photon.transferOwnership(owner);
+    await log(`  - Ion: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await ion.transferOwnership(owner);
 
     log('  Loading AaveBridgeV2 from: ', ddAaveBridgeV2.address);
     const AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');

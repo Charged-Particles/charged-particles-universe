@@ -501,7 +501,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "photonTimelock",
+        "name": "ionTimelock",
         "type": "address"
       },
       {

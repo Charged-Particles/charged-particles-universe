@@ -59,17 +59,15 @@ module.exports = async (hre) => {
     deployTransaction: lepton.deployTransaction,
   }
 
-  if (chainId !== 1) { // Delayed on Mainnet
-    await log('\n  Deploying Photon FT...')(alchemyTimeout);
-    const Photon = await ethers.getContractFactory('Photon');
-    const PhotonInstance = await Photon.deploy();
-    const photon = await PhotonInstance.deployed();
-    deployData['Photon'] = {
-      abi: getContractAbi('Photon'),
-      address: photon.address,
-      deployTransaction: photon.deployTransaction,
+    await log('\n  Deploying Ion FT...')(alchemyTimeout);
+    const Ion = await ethers.getContractFactory('Ion');
+    const IonInstance = await Ion.deploy();
+    const ion = await IonInstance.deployed();
+    deployData['Ion'] = {
+      abi: getContractAbi('Ion'),
+      address: ion.address,
+      deployTransaction: ion.deployTransaction,
     }
-  }
 
   // Display Contract Addresses
   await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
@@ -79,11 +77,8 @@ module.exports = async (hre) => {
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
   log('  - Lepton:      ', lepton.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
-
-  if (chainId !== 1) { // Delayed on Mainnet
-    log('  - Photon:         ', photon.address);
-    log('     - Gas Cost: ', getTxGasCost({ deployTransaction: photon.deployTransaction }));
-  }
+  log('  - Ion:         ', ion.address);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ion.deployTransaction }));
 
   saveDeploymentData(chainId, deployData);
   log('\n  Contract Deployment Data saved to "deployed" directory.');

@@ -16,7 +16,7 @@ module.exports = async (hre) => {
     const deployData = {};
 
     const chainId = chainIdByName(network.name);
-    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 3 : 1);
+    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 5 : 3);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Deployment');

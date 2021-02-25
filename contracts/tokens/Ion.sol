@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// Photon.sol -- Part of the Charged Particles Protocol
+// Ion.sol -- Part of the Charged Particles Protocol
 // Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,11 +27,11 @@ import "erc20permit/contracts/ERC20Permit.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "../interfaces/IUniverse.sol";
-import "../interfaces/IPhotonTimelock.sol";
+import "../interfaces/IIonTimelock.sol";
 import "../lib/BlackholePrevention.sol";
 
 
-contract Photon is ERC20Permit, Ownable, BlackholePrevention {
+contract Ion is ERC20Permit, Ownable, BlackholePrevention {
 
   event LockApproval(address indexed owner, address indexed operator, uint256 amount);
 
@@ -54,7 +54,7 @@ contract Photon is ERC20Permit, Ownable, BlackholePrevention {
   |          Initialization           |
   |__________________________________*/
 
-  constructor() public ERC20Permit("Charged Particles - PHOTON", "PHOTON") {}
+  constructor() public ERC20Permit("Charged Particles - ION", "ION") {}
 
 
   /***********************************|
@@ -76,7 +76,7 @@ contract Photon is ERC20Permit, Ownable, BlackholePrevention {
   }
 
   function decreaseLockAllowance(address operator, uint256 subtractedAmount) external returns (bool) {
-    _approveLock(_msgSender(), operator, _lockAllowances[_msgSender()][operator].sub(subtractedAmount, "Photon:E-409"));
+    _approveLock(_msgSender(), operator, _lockAllowances[_msgSender()][operator].sub(subtractedAmount, "Ion:E-409"));
     return true;
   }
 
@@ -97,7 +97,7 @@ contract Photon is ERC20Permit, Ownable, BlackholePrevention {
     }
 
     if (account != _msgSender()) {
-      _approveLock(account, _msgSender(), _lockAllowances[account][_msgSender()].sub(additional, "Photon:E-409"));
+      _approveLock(account, _msgSender(), _lockAllowances[account][_msgSender()].sub(additional, "Ion:E-409"));
     }
 
     return true;
@@ -116,20 +116,20 @@ contract Photon is ERC20Permit, Ownable, BlackholePrevention {
   }
 
   function mintToUniverse(uint256 amount) external onlyOwner returns (bool) {
-    require(address(_universe) != address(0x0), "Photon:E-404");
+    require(address(_universe) != address(0x0), "Ion:E-404");
     _mint(address(_universe), amount);
   }
 
-  function mintToTimelock(address photonTimelock, uint256[] memory amounts, uint256[] memory releaseTimes) external onlyOwner {
-    require(address(photonTimelock) != address(0x0), "Photon:E-403");
+  function mintToTimelock(address ionTimelock, uint256[] memory amounts, uint256[] memory releaseTimes) external onlyOwner {
+    require(address(ionTimelock) != address(0x0), "Ion:E-403");
 
     uint256 totalAmount;
     for (uint i = 0; i < amounts.length; i++) {
       totalAmount = totalAmount.add(amounts[i]);
     }
 
-    _mint(address(photonTimelock), totalAmount);
-    require(IPhotonTimelock(photonTimelock).addPortions(amounts, releaseTimes), "Photon:E-406");
+    _mint(address(ionTimelock), totalAmount);
+    require(IIonTimelock(ionTimelock).addPortions(amounts, releaseTimes), "Ion:E-406");
   }
 
 
@@ -156,8 +156,8 @@ contract Photon is ERC20Permit, Ownable, BlackholePrevention {
   |__________________________________*/
 
   function _approveLock(address owner, address operator, uint256 amount) internal {
-    require(owner != address(0), "Photon:E-403");
-    require(operator != address(0), "Photon:E-403");
+    require(owner != address(0), "Ion:E-403");
+    require(operator != address(0), "Ion:E-403");
 
     _lockAllowances[owner][operator] = amount;
     emit LockApproval(owner, operator, amount);
@@ -169,14 +169,14 @@ contract Photon is ERC20Permit, Ownable, BlackholePrevention {
 
     // Minting tokens; enforce hard-cap
     if (from == address(0)) {
-      require(totalSupply().add(amount) <= cap, "Photon:E-408");
+      require(totalSupply().add(amount) <= cap, "Ion:E-408");
     }
 
     // Locked tokens
     if (from != address(0) && lockedUntil[from] > block.number) {
       uint256 fromBalance = balanceOf(from);
       uint256 transferable = (fromBalance > locked[from]) ? fromBalance.sub(locked[from]) : 0;
-      require(transferable >= amount, "Photon:E-409");
+      require(transferable >= amount, "Ion:E-409");
     }
   }
 }

@@ -47,8 +47,8 @@ async function run() {
   await verifyContract('ChargedState', networkName);
   await verifyContract('ChargedSettings', networkName);
   await verifyContract('WBoson', networkName);
-  await verifyContract('Photon', networkName);
-  await verifyContract('PhotonTimelock', networkName);
+  await verifyContract('Ion', networkName);
+  await verifyContract('IonTimelock', networkName);
 
   // Wallet Managers
   await verifyContract('GenericWalletManager', networkName);

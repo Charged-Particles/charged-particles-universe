@@ -102,62 +102,62 @@ const presets = {
     ]
   },
   Lepton: {
-    maxMintPerTx: toBN('500'),
+    maxMintPerTx: toBN('10'),
     types: [
       {
         name        : 'Electron Neutrino',
-        tokenUri    : '',
-        price       : toWei('0.2'),
-        supply      : toBN('2000'),
-        multiplier  : toBN('120'),  // 1.2%
+        tokenUri    : 'https://ipfs.io/ipfs/QmSSuNTA5F9vhwxYHazVf8rBKY3ZFLq7yUtYtKZD32RX3L',
+        price       : toWei('0.3'),
+        supply      : toBN('721'),
+        multiplier  : toBN('110'),  // 1.1%
         bonus       : toBN('0'),
       },
       {
         name        : 'Muon Neutrino',
-        tokenUri    : '',
-        price       : toWei('0.3'),
-        supply      : toBN('1500'),
+        tokenUri    : 'https://ipfs.io/ipfs/QmToEVPsjpyBFDYWRMMDZP9x2xNpRGFYWD4TT7UKqY3dAw',
+        price       : toWei('0.9'),
+        supply      : toBN('401'),
         multiplier  : toBN('130'),  // 1.3%
         bonus       : toBN('1'),
       },
       {
         name        : 'Tau Neutrino',
-        tokenUri    : '',
-        price       : toWei('0.65'),
-        supply      : toBN('1000'),
+        tokenUri    : 'https://ipfs.io/ipfs/QmP9ive1Wufav2VHeC24JSEtA326nYVJnxTUF6qJq6qyP5  ',
+        price       : toWei('1.7'),
+        supply      : toBN('301'),
         multiplier  : toBN('150'),  // 1.5%
         bonus       : toBN('2'),
       },
       {
         name        : 'Electron',
-        tokenUri    : '',
-        price       : toWei('1.2'),
-        supply      : toBN('750'),
+        tokenUri    : 'https://ipfs.io/ipfs/QmTex8M3otqgyhKRrS75z6RSXnBkHQwQBbwWALjnQ956S1',
+        price       : toWei('2.9'),
+        supply      : toBN('201'),
         multiplier  : toBN('180'),  // 1.8%
         bonus       : toBN('4'),
       },
       {
         name        : 'Muon',
-        tokenUri    : '',
-        price       : toWei('2.5'),
-        supply      : toBN('500'),
+        tokenUri    : 'https://ipfs.io/ipfs/QmVxPucxAaVFtEucoZNKPhjcdm7STmbDC51P9fq9xsTtYM',
+        price       : toWei('5.1'),
+        supply      : toBN('88'),
         multiplier  : toBN('230'),  // 2.3%
         bonus       : toBN('8'),
       },
       {
         name        : 'Tau',
-        tokenUri    : '',
-        price       : toWei('15'),
-        supply      : toBN('100'),
+        tokenUri    : 'https://ipfs.io/ipfs/QmeaDyfTrTN1GmCqSSDWMDDZ86Y6mLzfiB8RfUifc6CEex',
+        price       : toWei('21'),
+        supply      : toBN('21'),
         multiplier  : toBN('310'),  // 3.1%
         bonus       : toBN('16'),
       },
     ]
   },
-  Photon: {
+  Ion: {
     universeMaxSupply: toWei('40000000'), // 40% of 100 Million (Community Liquidity Mining Portion)
     rewardsForAssetTokens: [
-      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI (50% of Interest in Photon)
+      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI (50% of Interest in Ion)
     ],
     timelocks: [
       {

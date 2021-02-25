@@ -520,9 +520,6 @@ contract Proton is IProton, ERC721, Ownable, RelayRecipient, ReentrancyGuard, Bl
       _universe.onProtonSale(address(this), tokenId, oldOwner, newOwner, salePrice, royaltiesReceiver, creatorAmount);
     }
 
-    // Unlock NFT
-    _chargedState.setTemporaryLock(address(this), tokenId, false);
-
     // Reserve Royalties for Creator
     if (creatorAmount > 0) {
       _tokenCreatorClaimableRoyalties[royaltiesReceiver] = _tokenCreatorClaimableRoyalties[royaltiesReceiver].add(creatorAmount);

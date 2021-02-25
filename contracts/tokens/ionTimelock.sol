@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// PhotonTimelock.sol -- Part of the Charged Particles Protocol
+// IonTimelock.sol -- Part of the Charged Particles Protocol
 // Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,9 +26,9 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-import "../interfaces/IPhotonTimelock.sol";
+import "../interfaces/IIonTimelock.sol";
 
-contract PhotonTimelock is IPhotonTimelock {
+contract IonTimelock is IIonTimelock {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
