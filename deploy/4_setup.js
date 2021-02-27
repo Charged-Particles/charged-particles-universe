@@ -47,7 +47,12 @@ module.exports = async (hre) => {
     const ddWBoson = getDeployData('WBoson', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
-    // const ddPhoton = getDeployData('Photon', chainId);
+
+    let ddPhoton;
+
+    if (chainId !== 1) { // Delayed on Mainnet
+      ddPhoton = getDeployData('Photon', chainId);
+    }
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Initialization');
@@ -100,9 +105,13 @@ module.exports = async (hre) => {
     const Lepton = await ethers.getContractFactory('Lepton');
     const lepton = await Lepton.attach(ddLepton.address);
 
-    log('  Loading Photon from: ', ddPhoton.address);
-    const Photon = await ethers.getContractFactory('Photon');
-    const photon = await Photon.attach(ddPhoton.address);
+    let photon;
+
+    if (chainId !== 1) { // Delayed on Mainnet
+      log('  Loading Photon from: ', ddPhoton.address);
+      const Photon = await ethers.getContractFactory('Photon');
+      photon = await Photon.attach(ddPhoton.address);
+    }
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

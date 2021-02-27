@@ -107,7 +107,7 @@ module.exports = async (hre) => {
     log('\n  Contract Deployments & Photon Minting Complete!');
 
     saveDeploymentData(chainId, deployData);
-    log('\n  Contract Deployment Data saved to "deployed" directory.');
+    log('\n  Contract Deployment Data saved to "deployments" directory.');
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 

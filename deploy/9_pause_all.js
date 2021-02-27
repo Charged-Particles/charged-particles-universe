@@ -7,9 +7,7 @@ const {
 
 const _ = require('lodash');
 
-
-const _PAUSED_STATE = true;
-
+let _PAUSED_STATE = true;
 
 module.exports = async (hre) => {
   const { ethers, getNamedAccounts } = hre;
@@ -18,6 +16,10 @@ module.exports = async (hre) => {
 
   const chainId = chainIdByName(network.name);
   const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
+
+  if (chainId !== 1) { // Unpause all contracts to prepare them for testing
+    _PAUSED_STATE = false;
+  }
 
   const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
   const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);

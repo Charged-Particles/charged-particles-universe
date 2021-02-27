@@ -59,11 +59,13 @@ module.exports = async (hre) => {
     deployTransaction: lepton.deployTransaction,
   }
 
+  let photon;
+
   if (chainId !== 1) { // Delayed on Mainnet
     await log('\n  Deploying Photon FT...')(alchemyTimeout);
     const Photon = await ethers.getContractFactory('Photon');
     const PhotonInstance = await Photon.deploy();
-    const photon = await PhotonInstance.deployed();
+    photon = await PhotonInstance.deployed();
     deployData['Photon'] = {
       abi: getContractAbi('Photon'),
       address: photon.address,
@@ -86,7 +88,7 @@ module.exports = async (hre) => {
   }
 
   saveDeploymentData(chainId, deployData);
-  log('\n  Contract Deployment Data saved to "deployed" directory.');
+  log('\n  Contract Deployment Data saved to "deployments" directory.');
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }

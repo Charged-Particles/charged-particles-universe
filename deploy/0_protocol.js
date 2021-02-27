@@ -29,6 +29,16 @@ module.exports = async (hre) => {
     log('  - Trusted Forwarder: ', trustedForwarder);
     log(' ');
 
+    log('  Deploying Treasury...');
+    const Treasury = await ethers.getContractFactory('Treasury');
+    const TreasuryInstance = await Treasury.deploy();
+    const treasury = await TreasuryInstance.deployed();
+    deployData['Treasury'] = {
+      abi: getContractAbi('Treasury'),
+      address: treasury.address,
+      deployTransaction: treasury.deployTransaction,
+    }
+
     log('  Deploying Universe...');
     const Universe = await ethers.getContractFactory('Universe');
     const UniverseInstance = await upgrades.deployProxy(Universe, []);
@@ -71,6 +81,8 @@ module.exports = async (hre) => {
 
     // Display Contract Addresses
     await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
+    log('  - Treasury:         ', treasury.address);
+    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: treasury.deployTransaction }));
     log('  - Universe:         ', universe.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
     log('  - ChargedState:     ', chargedState.address);
@@ -81,7 +93,7 @@ module.exports = async (hre) => {
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedParticles.deployTransaction }));
 
     saveDeploymentData(chainId, deployData);
-    log('\n  Contract Deployment Data saved to "deployed" directory.');
+    log('\n  Contract Deployment Data saved to "deployments" directory.');
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };
