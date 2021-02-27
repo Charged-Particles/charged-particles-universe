@@ -7,10 +7,8 @@ const {
 
 const _ = require('lodash');
 
-
-const _PAUSED_STATE = false;
+const _PAUSED_STATE = true;
 const _ACTION = _PAUSED_STATE ? 'Pausing' : 'Unpausing';
-
 
 module.exports = async (hre) => {
   const { ethers, getNamedAccounts } = hre;

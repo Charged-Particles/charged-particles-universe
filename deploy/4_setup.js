@@ -48,7 +48,12 @@ module.exports = async (hre) => {
     const ddWBoson = getDeployData('WBoson', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
-    const ddIon = getDeployData('Ion', chainId);
+
+    let ddIon;
+
+    if (chainId !== 1) { // Delayed on Mainnet
+      ddIon = getDeployData('Ion', chainId);
+    }
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Initialization');
@@ -101,9 +106,13 @@ module.exports = async (hre) => {
     const Lepton = await ethers.getContractFactory('Lepton');
     const lepton = await Lepton.attach(ddLepton.address);
 
-    log('  Loading Ion from: ', ddIon.address);
-    const Ion = await ethers.getContractFactory('Ion');
-    const ion = await Ion.attach(ddIon.address);
+    let ion;
+
+    if (chainId !== 1) { // Delayed on Mainnet
+      log('  Loading Ion from: ', ddIon.address);
+      const Ion = await ethers.getContractFactory('Ion');
+      ion = await Ion.attach(ddIon.address);
+    }
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -246,26 +255,27 @@ module.exports = async (hre) => {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Ion
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    await executeTx('6-a', 'Ion: Registering Universe', async () =>
-      await ion.setUniverse(ddUniverse.address)
-    );
-
-    await executeTx('6-b', 'Universe: Registering Ion', async () =>
-      await universe.setPhoton(ddIon.address, ionMaxSupply)
-    );
-
-    let assetTokenId;
-    let assetTokenAddress;
-    let assetTokenMultiplier;
-    for (let i = 0; i < rewardsForAssetTokens.length; i++) {
-      assetTokenId = rewardsForAssetTokens[i].assetTokenId;
-      assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
-      assetTokenMultiplier = rewardsForAssetTokens[i].multiplier;
-
-      await executeTx(`6-c-${i}`, `Universe: Setting ESA Multiplier for Asset Token (${assetTokenAddress} = ${assetTokenMultiplier})`, async () =>
-        await universe.setEsaMultiplier(assetTokenAddress, assetTokenMultiplier)
+    if (chainId !== 1) { // Delayed on Mainnet
+      await executeTx('6-a', 'Ion: Registering Universe', async () =>
+        await ion.setUniverse(ddUniverse.address)
       );
+
+      await executeTx('6-b', 'Universe: Registering Ion', async () =>
+        await universe.setPhoton(ddIon.address, ionMaxSupply)
+      );
+
+      let assetTokenId;
+      let assetTokenAddress;
+      let assetTokenMultiplier;
+      for (let i = 0; i < rewardsForAssetTokens.length; i++) {
+        assetTokenId = rewardsForAssetTokens[i].assetTokenId;
+        assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
+        assetTokenMultiplier = rewardsForAssetTokens[i].multiplier;
+
+        await executeTx(`6-c-${i}`, `Universe: Setting ESA Multiplier for Asset Token (${assetTokenAddress} = ${assetTokenMultiplier})`, async () =>
+          await universe.setEsaMultiplier(assetTokenAddress, assetTokenMultiplier)
+        );
+      }
     }
 
 

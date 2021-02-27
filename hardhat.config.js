@@ -109,6 +109,7 @@ module.exports = {
       clear: true,
       flat: true,
       only: [
+        'Treasury',
         'Universe',
         'ChargedState',
         'ChargedSettings',

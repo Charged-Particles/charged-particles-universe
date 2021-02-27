@@ -59,15 +59,19 @@ module.exports = async (hre) => {
     deployTransaction: lepton.deployTransaction,
   }
 
+  let ion;
+
+  if (chainId !== 1) { // Delayed on Mainnet
     await log('\n  Deploying Ion FT...')(alchemyTimeout);
     const Ion = await ethers.getContractFactory('Ion');
     const IonInstance = await Ion.deploy();
-    const ion = await IonInstance.deployed();
+    ion = await IonInstance.deployed();
     deployData['Ion'] = {
       abi: getContractAbi('Ion'),
       address: ion.address,
       deployTransaction: ion.deployTransaction,
     }
+  }
 
   // Display Contract Addresses
   await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
@@ -81,7 +85,7 @@ module.exports = async (hre) => {
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ion.deployTransaction }));
 
   saveDeploymentData(chainId, deployData);
-  log('\n  Contract Deployment Data saved to "deployed" directory.');
+  log('\n  Contract Deployment Data saved to "deployments" directory.');
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }

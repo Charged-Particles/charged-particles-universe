@@ -519,7 +519,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(await ion.balanceOf(user2)).to.be.above(user2BalanceBefore).and.below(user2BalanceBefore.add(bondWeight));
   });
 
-  it("charging a proton with a lepton should multiply ion return", async () => {
+  it("charging a proton with a lepton should multiply ion returns", async () => {
     const assetAmount10 = toWei('10');
     const assetAmount20 = toWei('20');
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
