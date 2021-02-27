@@ -195,6 +195,7 @@ contract Lepton is ILepton, ERC721, Ownable, ReentrancyGuard, BlackholePreventio
     _refundOverpayment(lepton.price);
   }
 
+
   function _batchMintLepton(address receiver, uint256 count) internal virtual {
     require(_typeIndex < _leptonTypes.length, "LPT:E-408");
     require(_maxMintPerTx == 0 || count <= _maxMintPerTx, "LPT:E-429");
@@ -221,7 +222,7 @@ contract Lepton is ILepton, ERC721, Ownable, ReentrancyGuard, BlackholePreventio
     }
 
     // Distribute Next Type
-    if (startTokenId == lepton._upperBounds) {
+    if (startTokenId >= lepton._upperBounds) {
       _typeIndex = _typeIndex.add(1);
     }
 

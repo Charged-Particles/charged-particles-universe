@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// IPhotonTimelock.sol -- Part of the Charged Particles Protocol
+// IIonTimelock.sol -- Part of the Charged Particles Protocol
 // Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,10 +24,10 @@
 pragma solidity >=0.6.0;
 
 /**
- * @title Charged Particles Photon-Timelock Interface
+ * @title Charged Particles Ion-Timelock Interface
  * @dev ...
  */
-interface IPhotonTimelock {
+interface IIonTimelock {
 
   struct Portion {
     uint256 amount;

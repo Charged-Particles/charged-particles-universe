@@ -6,6 +6,7 @@ const {
   toBN,
   presets,
 } = require("../js-helpers/deploy");
+const sleep = require('sleep-promise');
 
 const _ = require('lodash');
 
@@ -15,7 +16,7 @@ module.exports = async (hre) => {
     const network = await hre.network;
 
     const chainId = chainIdByName(network.name);
-    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 5);
+    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 7);
 
     const executeTx = async (txId, txDesc, callback = _.noop, increaseDelay = 0) => {
       if (txId === '1-a') {
@@ -30,10 +31,10 @@ module.exports = async (hre) => {
     }
 
     const referralCode = presets.Aave.referralCode[chainId];
-    const photonMaxSupply = presets.Photon.universeMaxSupply;
+    const ionMaxSupply = presets.Ion.universeMaxSupply;
     const leptonMaxMint = presets.Lepton.maxMintPerTx;
     const depositCaps = presets.ChargedParticles.maxDeposits;
-    const rewardsForAssetTokens = presets.Photon.rewardsForAssetTokens;
+    const rewardsForAssetTokens = presets.Ion.rewardsForAssetTokens;
     const tempLockExpiryBlocks = presets.ChargedParticles.tempLockExpiryBlocks;
 
     const ddUniverse = getDeployData('Universe', chainId);
@@ -48,10 +49,10 @@ module.exports = async (hre) => {
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
 
-    let ddPhoton;
+    let ddIon;
 
     if (chainId !== 1) { // Delayed on Mainnet
-      ddPhoton = getDeployData('Photon', chainId);
+      ddIon = getDeployData('Ion', chainId);
     }
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
@@ -105,12 +106,12 @@ module.exports = async (hre) => {
     const Lepton = await ethers.getContractFactory('Lepton');
     const lepton = await Lepton.attach(ddLepton.address);
 
-    let photon;
+    let ion;
 
     if (chainId !== 1) { // Delayed on Mainnet
-      log('  Loading Photon from: ', ddPhoton.address);
-      const Photon = await ethers.getContractFactory('Photon');
-      photon = await Photon.attach(ddPhoton.address);
+      log('  Loading Ion from: ', ddIon.address);
+      const Ion = await ethers.getContractFactory('Ion');
+      ion = await Ion.attach(ddIon.address);
     }
 
 
@@ -215,9 +216,9 @@ module.exports = async (hre) => {
       await chargedSettings.enableNftContracts([ddProton.address])
     );
 
-    await executeTx('4-f', 'Universe: Registering Proton', async () =>
+    await executeTx('4-f', 'Universe: Registering Proton', async () => {
       await universe.setProtonToken(ddProton.address)
-    );
+    });
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -233,7 +234,7 @@ module.exports = async (hre) => {
     );
 
     await executeTx('5-c', 'ChargedParticles: Registering Lepton', async () =>
-      await chargedSettings.enableNftContracts([ddProton.address, ddLepton.address])
+      await chargedSettings.enableNftContracts([ddProton.address])
     );
 
     let leptonType;
@@ -251,18 +252,16 @@ module.exports = async (hre) => {
       );
     }
 
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Setup Photon
+    // Setup Ion
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     if (chainId !== 1) { // Delayed on Mainnet
-      await executeTx('6-a', 'Photon: Registering Universe', async () =>
-        await photon.setUniverse(ddUniverse.address)
+      await executeTx('6-a', 'Ion: Registering Universe', async () =>
+        await ion.setUniverse(ddUniverse.address)
       );
 
-      await executeTx('6-b', 'Universe: Registering Photon', async () =>
-        await universe.setPhoton(ddPhoton.address, photonMaxSupply)
+      await executeTx('6-b', 'Universe: Registering Ion', async () =>
+        await universe.setPhoton(ddIon.address, ionMaxSupply)
       );
 
       let assetTokenId;
@@ -300,23 +299,23 @@ module.exports = async (hre) => {
     // Setup GSN Trusted Forwarder
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    if (chainId !== 1) { // Delayed on Mainnet
-      await executeTx('8-a', 'ChargedState: Set TrustedForwarder', async () =>
-        await chargedState.setTrustedForwarder(trustedForwarder)
-      );
+    // if (chainId !== 1) { // Delayed on Mainnet
+    //   await executeTx('8-a', 'ChargedState: Set TrustedForwarder', async () =>
+    //     await chargedState.setTrustedForwarder(trustedForwarder)
+    //   );
 
-      await executeTx('8-b', 'ChargedSettings: Set TrustedForwarder', async () =>
-        await chargedSettings.setTrustedForwarder(trustedForwarder)
-      );
+    //   await executeTx('8-b', 'ChargedSettings: Set TrustedForwarder', async () =>
+    //     await chargedSettings.setTrustedForwarder(trustedForwarder)
+    //   );
 
-      await executeTx('8-c', 'Proton: Set TrustedForwarder', async () =>
-        await proton.setTrustedForwarder(trustedForwarder)
-      );
+    //   await executeTx('8-c', 'Proton: Set TrustedForwarder', async () =>
+    //     await proton.setTrustedForwarder(trustedForwarder)
+    //   );
 
-      await executeTx('8-d', 'WBoson: Set TrustedForwarder', async () =>
-        await wBoson.setTrustedForwarder(trustedForwarder)
-      );
-    }
+    //   await executeTx('8-d', 'WBoson: Set TrustedForwarder', async () =>
+    //     await wBoson.setTrustedForwarder(trustedForwarder)
+    //   );
+    // }
 
 
     log(`\n  Contract Initialization Complete!`);

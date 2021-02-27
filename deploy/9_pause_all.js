@@ -7,7 +7,8 @@ const {
 
 const _ = require('lodash');
 
-let _PAUSED_STATE = true;
+const _PAUSED_STATE = true;
+const _ACTION = _PAUSED_STATE ? 'Pausing' : 'Unpausing';
 
 module.exports = async (hre) => {
   const { ethers, getNamedAccounts } = hre;
@@ -15,11 +16,9 @@ module.exports = async (hre) => {
   const network = await hre.network;
 
   const chainId = chainIdByName(network.name);
-  const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
+  const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 1 : 3);
 
-  if (chainId !== 1) { // Unpause all contracts to prepare them for testing
-    _PAUSED_STATE = false;
-  }
+  if (chainId !== 1) { return; } // Mainnet only
 
   const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
   const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
@@ -58,23 +57,23 @@ module.exports = async (hre) => {
   const lepton = await Lepton.attach(ddLepton.address);
 
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Set Paused State
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // Set Paused State
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  await log('  - Pausing GenericWalletManager...')(alchemyTimeout);
+  await log(`  - ${_ACTION} GenericWalletManager...`)(alchemyTimeout);
   await genericWalletManager.setPausedState(_PAUSED_STATE);
 
-  await log('  - Pausing GenericBasketManager...')(alchemyTimeout);
+  await log(`  - ${_ACTION} GenericBasketManager...`)(alchemyTimeout);
   await genericBasketManager.setPausedState(_PAUSED_STATE);
 
-  await log('  - Pausing AaveWalletManager...')(alchemyTimeout);
+  await log(`  - ${_ACTION} AaveWalletManager...`)(alchemyTimeout);
   await aaveWalletManager.setPausedState(_PAUSED_STATE);
 
-  await log('  - Pausing Proton...')(alchemyTimeout);
+  await log(`  - ${_ACTION} Proton...`)(alchemyTimeout);
   await proton.setPausedState(_PAUSED_STATE);
 
-  await log('  - Pausing Lepton...')(alchemyTimeout);
+  await log(`  - ${_ACTION} Lepton...`)(alchemyTimeout);
   await lepton.setPausedState(_PAUSED_STATE);
 
 

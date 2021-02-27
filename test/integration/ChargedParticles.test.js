@@ -44,7 +44,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   let genericBasketManager;
   let proton;
   let lepton;
-  let photon;
+  let ion;
   let timelocks;
 
   // Settings
@@ -98,8 +98,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const Proton = await ethers.getContractFactory('Proton');
     const Lepton = await ethers.getContractFactory('Lepton');
-    const Photon = await ethers.getContractFactory('Photon');
-    const PhotonTimelock = await ethers.getContractFactory('PhotonTimelock');
+    const Ion = await ethers.getContractFactory('Ion');
+    const IonTimelock = await ethers.getContractFactory('IonTimelock');
 
     universe = Universe.attach(getDeployData('Universe', chainId).address);
     chargedState = ChargedState.attach(getDeployData('ChargedState', chainId).address);
@@ -110,9 +110,9 @@ describe("[INTEGRATION] Charged Particles", () => {
     genericBasketManager = GenericBasketManager.attach(getDeployData('GenericBasketManager', chainId).address);
     proton = Proton.attach(getDeployData('Proton', chainId).address);
     lepton = Lepton.attach(getDeployData('Lepton', chainId).address);
-    photon = Photon.attach(getDeployData('Photon', chainId).address);
-    timelocks = Object.values(getDeployData('PhotonTimelocks', chainId))
-      .map(photonTimelock => (PhotonTimelock.attach(photonTimelock.address)));
+    ion = Ion.attach(getDeployData('Ion', chainId).address);
+    timelocks = Object.values(getDeployData('IonTimelocks', chainId))
+      .map(ionTimelock => (IonTimelock.attach(ionTimelock.address)));
 
     await lepton.connect(signerD).setPausedState(false);
   });
@@ -262,10 +262,10 @@ describe("[INTEGRATION] Charged Particles", () => {
       .withArgs(user1, toWei('0.045'));
   });
 
-  it("PhotonTimelocks succesfully release Photons to receivers", async () => {
+  it("IonTimelocks succesfully release Ions to receivers", async () => {
     const receivers = await Promise.all(timelocks.map(async timelock => await timelock.receiver()));
 
-    const balancesBefore = await Promise.all(receivers.map(async receiver => await photon.balanceOf(receiver)));
+    const balancesBefore = await Promise.all(receivers.map(async receiver => await ion.balanceOf(receiver)));
 
     const releaseTimes = await Promise.all(timelocks.map(async timelock => await timelock.nextReleaseTime()));
 
@@ -282,12 +282,12 @@ describe("[INTEGRATION] Charged Particles", () => {
     }));
 
     await Promise.all(receivers.map(async (receiver, i) => {
-      expect(await photon.balanceOf(receiver)).to.be.above(balancesBefore[i]);
+      expect(await ion.balanceOf(receiver)).to.be.above(balancesBefore[i]);
     }));
 
   });
 
-  it("Photons can only be transferred after locking block", async () => {
+  it("Ions can only be transferred after locking block", async () => {
     const blocks = 10;
     const receivers = await Promise.all(timelocks.map(async timelock => await timelock.receiver()));
     const maxReleaseTime = max(await Promise.all(timelocks.map(async timelock => await timelock.nextReleaseTime())));
@@ -300,22 +300,22 @@ describe("[INTEGRATION] Charged Particles", () => {
     signer1 = ethers.provider.getSigner(user1);
     signer2 = ethers.provider.getSigner(user2);
 
-    await expect(photon.connect(signer2).lock(user1, await photon.balanceOf(user1), blocks)).to.be.revertedWith("Photon:E-409");
+    await expect(ion.connect(signer2).lock(user1, await ion.balanceOf(user1), blocks)).to.be.revertedWith("Ion:E-409");
 
-    await photon.connect(signer1).increaseLockAllowance(user2, await photon.balanceOf(user1));
+    await ion.connect(signer1).increaseLockAllowance(user2, await ion.balanceOf(user1));
 
-    await photon.connect(signer2).lock(user1, await photon.balanceOf(user1), blocks);
+    await ion.connect(signer2).lock(user1, await ion.balanceOf(user1), blocks);
 
-    await expect(photon.connect(signer1).transfer(user3, await photon.balanceOf(user1))).to.be.revertedWith("Photon:E-409");
+    await expect(ion.connect(signer1).transfer(user3, await ion.balanceOf(user1))).to.be.revertedWith("Ion:E-409");
 
     await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + blocks);
 
-    const balance1Before = await photon.balanceOf(user1);
-    const balance3Before = await photon.balanceOf(user3);
+    const balance1Before = await ion.balanceOf(user1);
+    const balance3Before = await ion.balanceOf(user3);
 
-    await photon.connect(signer1).transfer(user3, balance1Before);
+    await ion.connect(signer1).transfer(user3, balance1Before);
 
-    expect(await photon.balanceOf(user3)).to.be.equal(balance3Before.add(balance1Before));
+    expect(await ion.balanceOf(user3)).to.be.equal(balance3Before.add(balance1Before));
   });
 
   it("generic smart wallet and manager succesfully hold erc20 tokens", async () => {
@@ -512,14 +512,14 @@ describe("[INTEGRATION] Charged Particles", () => {
     );
 
     const bondWeight = toWei('1');
-    const user2BalanceBefore = await photon.balanceOf(user2);
+    const user2BalanceBefore = await ion.balanceOf(user2);
 
     await universe.connect(signer2).conductElectrostaticDischarge(user2, bondWeight);
 
-    expect(await photon.balanceOf(user2)).to.be.above(user2BalanceBefore).and.below(user2BalanceBefore.add(bondWeight));
+    expect(await ion.balanceOf(user2)).to.be.above(user2BalanceBefore).and.below(user2BalanceBefore.add(bondWeight));
   });
 
-  it("charging a proton with a lepton should multiply proton returns", async () => {
+  it("charging a proton with a lepton should multiply ion returns", async () => {
     const assetAmount10 = toWei('10');
     const assetAmount20 = toWei('20');
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
@@ -552,15 +552,15 @@ describe("[INTEGRATION] Charged Particles", () => {
       'aave',
       daiAddress
     );
-    
+
     const bondWeight = toWei('1');
-    const photonBalance1 = await photon.balanceOf(user2);
+    const ionBalance1 = await ion.balanceOf(user2);
 
     await universe.conductElectrostaticDischarge(user2, bondWeight);
 
-    const photonBalance2 = await photon.balanceOf(user2);
+    const ionBalance2 = await ion.balanceOf(user2);
 
-    expect(photonBalance2).to.be.above(photonBalance1).and.below(photonBalance1.add(bondWeight));
+    expect(ionBalance2).to.be.above(ionBalance1).and.below(ionBalance1.add(bondWeight));
 
     await lepton.connect(signerD).setPausedState(false);
     const price = await lepton.getNextPrice();
@@ -609,15 +609,15 @@ describe("[INTEGRATION] Charged Particles", () => {
       daiAddress
     );
 
-    const photonBalance3 = await photon.balanceOf(user2);
+    const ionBalance3 = await ion.balanceOf(user2);
 
     await universe.conductElectrostaticDischarge(user2, bondWeight);
 
-    const photonBalance4 = await photon.balanceOf(user2);
-    
-    expect(photonBalance4).to.be.above(photonBalance3).and.below(photonBalance3.add(bondWeight));
+    const ionBalance4 = await ion.balanceOf(user2);
 
-    expect(Number(photonBalance4.sub(photonBalance3).toString()) / Number(photonBalance2.sub(photonBalance1).toString()) - Number(multiplier.toString())).to.be.above(0.9).and.below(1.1);
+    expect(ionBalance4).to.be.above(ionBalance3).and.below(ionBalance3.add(bondWeight));
+
+    expect(Number(ionBalance4.sub(ionBalance3).toString()) / Number(ionBalance2.sub(ionBalance1).toString()) - Number(multiplier.toString())).to.be.above(0.9).and.below(1.1);
   });
 
   it("should not allow to charge a proton with a lepton multiple times", async () => {
