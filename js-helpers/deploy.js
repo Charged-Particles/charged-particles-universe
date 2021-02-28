@@ -196,6 +196,18 @@ const presets = {
         31337: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // Hardhat - Forked Mainnet
       }
     }
+  },
+  Compound: {
+    comptroller: {
+      1: '0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B', // mainnet
+      42: '0x5eAe89DC1C671724A672ff0630122ee834098657', // kovan
+      31337: '0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B', // Hardhat - Forked Mainnet
+    },
+    lens: {
+      1: '0xd513d22422a3062Bd342Ae374b4b9c20E0a9a074', // mainnet
+      42: '0x08CcdB87966C4C7c3Ce7dA8C103c8E14627753D0', // kovan
+      31337: '0xd513d22422a3062Bd342Ae374b4b9c20E0a9a074', // Hardhat - Forked Mainnet
+    }
   }
 };
 

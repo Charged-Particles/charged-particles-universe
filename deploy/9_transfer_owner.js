@@ -22,10 +22,12 @@ module.exports = async (hre) => {
     const ddChargedState = getDeployData('ChargedState', chainId);
     const ddChargedSettings = getDeployData('ChargedSettings', chainId);
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
-    const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
-    const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
     const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
+    const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
+    const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
+    const ddCompoundWalletManager = getDeployData('CompoundWalletManager', chainId);
+    const ddCompoundBridge = getDeployData('CompoundBridge', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
     const ddIon = getDeployData('Ion', chainId);
@@ -57,10 +59,6 @@ module.exports = async (hre) => {
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
     const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
-    log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
-    const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
-    const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
-
     log('  Loading GenericWalletManager from: ', ddGenericWalletManager.address);
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const genericWalletManager = await GenericWalletManager.attach(ddGenericWalletManager.address);
@@ -68,6 +66,22 @@ module.exports = async (hre) => {
     log('  Loading GenericBasketManager from: ', ddGenericBasketManager.address);
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const genericBasketManager = await GenericBasketManager.attach(ddGenericBasketManager.address);
+
+    log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
+    const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
+    const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
+
+    log('  Loading AaveBridgeV2 from: ', ddAaveBridgeV2.address);
+    const AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');
+    const aaveBridgeV2 = await AaveBridgeV2.attach(ddAaveBridgeV2.address);
+
+    log('  Loading CompoundWalletManager from: ', ddCompoundWalletManager.address);
+    const CompoundWalletManager = await ethers.getContractFactory('CompoundWalletManager');
+    const compoundWalletManager = await CompoundWalletManager.attach(ddCompoundWalletManager.address);
+
+    log('  Loading CompoundBridge from: ', ddCompoundBridge.address);
+    const CompoundBridge = await ethers.getContractFactory('CompoundBridge');
+    const compoundBridge = await CompoundBridge.attach(ddCompoundBridge.address);
 
     log('  Loading Proton from: ', ddProton.address);
     const Proton = await ethers.getContractFactory('Proton');
@@ -106,6 +120,15 @@ module.exports = async (hre) => {
     await log(`  - AaveWalletManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     await aaveWalletManager.transferOwnership(owner);
 
+    await log(`  - AaveBridgeV2: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await aaveBridgeV2.transferOwnership(owner);
+
+    await log(`  - CompoundWalletManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await compoundWalletManager.transferOwnership(owner);
+
+    await log(`  - CompoundBridge: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await compoundBridge.transferOwnership(owner);
+
     await log(`  - Proton: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     await proton.transferOwnership(owner);
 
@@ -114,12 +137,6 @@ module.exports = async (hre) => {
 
     await log(`  - Ion: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     await ion.transferOwnership(owner);
-
-    log('  Loading AaveBridgeV2 from: ', ddAaveBridgeV2.address);
-    const AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');
-    const aaveBridgeV2 = await AaveBridgeV2.attach(ddAaveBridgeV2.address);
-    await log(`  - AaveBridgeV2: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
-    await aaveBridgeV2.transferOwnership(owner);
 
     await log(`\n  Contract Initialization Complete!`)(alchemyTimeout);
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');

@@ -118,6 +118,8 @@ module.exports = {
         'AaveBridgeV2',
         'GenericWalletManager',
         'GenericBasketManager',
+        'CompoundWalletManager',
+        'CompoundBridge',
         'Ion',
         'IonTimelock',
         'Proton',

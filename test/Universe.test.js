@@ -217,7 +217,7 @@ describe("Universe", () => {
     it('should not allow sending ETH into the contract', async () => {
       // No fallback or receive functions
       await expect(signer1.sendTransaction({to: universe.address, value: toWei('10')}))
-        .to.be.revertedWith('without a reason');
+        .to.be.revertedWith('function selector was not recognized and there\'s no fallback nor receive function');
     });
 
     it('should allow only the contract owner to release stuck ETH from the contract', async () => {
