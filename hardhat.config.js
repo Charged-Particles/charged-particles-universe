@@ -68,9 +68,9 @@ module.exports = {
             allowUnlimitedContractSize: true,
             gasPrice: 8e9,
             forking: {
-                url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-                blockNumber: 11400000,  // MUST be after Aave V2 was deployed
-                timeout: 1000000
+              url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+              blockNumber: 11400000,  // MUST be after Aave V2 was deployed
+              timeout: 1000000
             },
         },
         kovan: {
@@ -126,7 +126,8 @@ module.exports = {
         'WBoson',
         'Lepton',
         'ERC20',
-        'ERC721'
+        'ERC721',
+        'ICErc20'
       ],
     },
     namedAccounts: {

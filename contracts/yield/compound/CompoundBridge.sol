@@ -22,7 +22,6 @@
 // SOFTWARE.
 
 pragma solidity 0.6.12;
-pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -32,24 +31,22 @@ import "@openzeppelin/contracts/utils/SafeCast.sol";
 
 import "./ICErc20.sol";
 import "./IComptroller.sol";
-import "./ILens.sol";
+import "./Lens.sol";
 
 import "../../interfaces/ICompoundBridge.sol";
 import "../../lib/BlackholePrevention.sol";
 
-contract CompoundBridge is Ownable, ICompoundBridge, BlackholePrevention {
+import "hardhat/console.sol";
+
+contract CompoundBridge is Ownable, ICompoundBridge, BlackholePrevention, Lens {
   using SafeMath for uint256;
   using SafeCast for uint256;
   using SafeERC20 for IERC20;
-  using CTokenMetalogic for CTokenMetalogic.CTokenMetadata;
-  using CTokenMetalogic for CTokenMetalogic.CTokenBalances;
 
   IComptroller public comptroller;
-  ILens public lens;
 
-  constructor (address _comptroller, address _lens) public {
+  constructor (address _comptroller) public {
     comptroller = IComptroller(_comptroller);
-    lens = ILens(_lens);
   }
 
   function getReserveInterestToken(address assetToken) external view override returns (address cTokenAddress) {
@@ -63,7 +60,7 @@ contract CompoundBridge is Ownable, ICompoundBridge, BlackholePrevention {
   function getTotalBalance(address account, address assetToken) external view override returns (uint256) {
     address cToken = _getReserveInterestToken(assetToken);
     if (cToken == address(0x0)) { return 0; }
-    return uint256(lens.cTokenBalances(cToken, payable(account)).balanceOf);
+    return cTokenBalance(cToken, payable(account));
   }
 
   function deposit(
@@ -143,16 +140,16 @@ contract CompoundBridge is Ownable, ICompoundBridge, BlackholePrevention {
   |__________________________________*/
 
   function _getReserveInterestToken(address assetToken) internal view returns (address cTokenAddress) {
-    CTokenMetalogic.CTokenMetadata[] memory cTokensData = lens.cTokenMetadataAll(comptroller.getAllMarkets());
-    for (uint256 i = 0; i < cTokensData.length; i++) {
-        if (cTokensData[i].underlyingAssetAddress == assetToken) {
-            return cTokensData[i].cToken;
+    address[] memory markets = comptroller.getAllMarkets();
+    for (uint256 i = 0; i < markets.length; i++) {
+        if (cTokenUnderlying(markets[i]) == assetToken) {
+          return markets[i];
         }
     }
   }
 
   function _isReserveActive(address assetToken) internal view returns (bool) {
     address cToken = _getReserveInterestToken(assetToken);
-    return lens.cTokenMetadata(cToken).isListed;
+    return cTokenIsListed(cToken);
   }
 }
