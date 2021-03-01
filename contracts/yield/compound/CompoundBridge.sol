@@ -36,8 +36,6 @@ import "./Lens.sol";
 import "../../interfaces/ICompoundBridge.sol";
 import "../../lib/BlackholePrevention.sol";
 
-import "hardhat/console.sol";
-
 contract CompoundBridge is Ownable, ICompoundBridge, BlackholePrevention, Lens {
   using SafeMath for uint256;
   using SafeCast for uint256;
@@ -60,7 +58,11 @@ contract CompoundBridge is Ownable, ICompoundBridge, BlackholePrevention, Lens {
   function getTotalBalance(address account, address assetToken) external view override returns (uint256) {
     address cToken = _getReserveInterestToken(assetToken);
     if (cToken == address(0x0)) { return 0; }
-    return cTokenBalance(cToken, payable(account));
+    return cTokenBalanceOfUndelying(cToken, payable(account));
+  }
+  
+  function yieldExchangeRate(address assetToken, uint256 assetAmount) public view override returns(uint256) {
+    return cTokenExchangeRateForUnderlyingAmount(_getReserveInterestToken(assetToken), assetAmount);
   }
 
   function deposit(
@@ -114,6 +116,9 @@ contract CompoundBridge is Ownable, ICompoundBridge, BlackholePrevention, Lens {
 
     // Transfer back the Asset Tokens
     token.safeTransfer(receiver, assetAmount);
+
+    // Send cTokens back to Wallet
+    require(cToken.transfer(msg.sender, cToken.balanceOf(address(this))), "CB:E-428");
   }
 
 

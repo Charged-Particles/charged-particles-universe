@@ -226,15 +226,19 @@ contract CompoundSmartWallet is SmartWalletBase {
       _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].sub(fromPrincipal);
     }
 
+    ICErc20 cToken = ICErc20(_bridge.getReserveInterestToken(assetToken));
+
     // Send cTokens to Bridge
-    address _cToken = _bridge.getReserveInterestToken(assetToken);
-    ICErc20(_cToken).transfer(address(_bridge), uint(receiverAmount.add(creatorAmount)));
+    require(cToken.transfer(address(_bridge), cToken.balanceOf(address(this))), "CB:E-427");
 
     // Withdraw Assets for Creator
     if (creatorAmount > 0) {
       address receivesForCreator = (creatorRedirect != address(0x0)) ? creatorRedirect : nftCreator;
       _bridge.withdraw(receivesForCreator, assetToken, creatorAmount);
     }
+
+    // Send cTokens to Bridge
+    require(cToken.transfer(address(_bridge), cToken.balanceOf(address(this))), "CB:E-427");
 
     // Withdraw Assets for Receiver
     _bridge.withdraw(receiver, assetToken, receiverAmount);
@@ -256,9 +260,10 @@ contract CompoundSmartWallet is SmartWalletBase {
 
     nftCreatorAmountDischarged = nftCreatorAmountDischarged.add(assetAmount);
 
+    ICErc20 cToken = ICErc20(_bridge.getReserveInterestToken(assetToken));
+
     // Send cTokens to Bridge
-    address _cToken = _bridge.getReserveInterestToken(assetToken);
-    ICErc20(_cToken).transfer(address(_bridge), uint(assetAmount));
+    require(cToken.transfer(address(_bridge), cToken.balanceOf(address(this))), "CB:E-427");
 
     // Withdraw Assets for Receiver on behalf of Creator
     _bridge.withdraw(receiver, assetToken, assetAmount);

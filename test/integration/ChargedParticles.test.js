@@ -190,11 +190,14 @@ describe("[INTEGRATION] Charged Particles", () => {
       ],
     });
 
+    // Compound needs some pool changes in order for the redeem functions not to fail
     await cDai.connect(signer1).borrow(toWei('1'));
     await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + 10);
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](cDai.address, toWei('2'));
     await cDai.connect(signer1).repayBorrow(MAX_UINT); // repay amount of 'uint(-1)' means: repay in full whatever I have to repay
+
+    const balanceBefore = await dai.balanceOf(user2);
 
     await chargedParticles.connect(signer2).releaseParticle(
       user2,
@@ -204,8 +207,8 @@ describe("[INTEGRATION] Charged Particles", () => {
       daiAddress
     );
 
-    expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
-
+    const balanceAfter = await dai.balanceOf(user2);
+    expect(balanceAfter.sub(balanceBefore)).to.be.above(toWei('9.9'));
   });
 
   it("can discharge only after timelock expired", async () => {

@@ -27,7 +27,7 @@ pragma solidity >=0.6.0;
 interface ICompoundBridge {
   function getReserveInterestToken(address assetToken) external view returns (address aTokenAddress);
   function isReserveActive(address assetToken) external view returns (bool);
-
+  function yieldExchangeRate(address assetToken, uint256 assetAmount) external view returns (uint256);
   function getTotalBalance(address account, address assetToken) external view returns (uint256);
   function deposit(address assetToken, uint256 assetAmount) external returns (uint256);
   function withdraw(address receiver, address assetToken, uint256 assetAmount) external;

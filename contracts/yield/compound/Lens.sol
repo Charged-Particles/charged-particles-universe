@@ -40,9 +40,14 @@ contract Lens {
     }
   }
 
-  function cTokenBalance(address _cToken, address payable account) public view returns (uint256) {
+  function cTokenBalanceOfUndelying(address _cToken, address payable account) public view returns (uint256) {
     CToken cToken = CToken(_cToken);
     return uint256(cToken.exchangeRateStored()).mul(cToken.balanceOf(account)).div(10**18); // The exchange rate is scaled by 1e18, so we rescale it
+  }
+
+  function cTokenExchangeRateForUnderlyingAmount(address _cToken, uint256 amount) public view returns (uint256) {
+    CToken cToken = CToken(_cToken);
+    return uint256(cToken.exchangeRateStored()).mul(amount).div(10**36); // The exchange rate is scaled by 1e18, so we rescale it
   }
 
 }
