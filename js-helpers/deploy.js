@@ -102,12 +102,12 @@ const presets = {
     ]
   },
   Lepton: {
-    maxMintPerTx: toBN('10'),
+    maxMintPerTx: toBN('30'),
     types: [
       {
         name        : 'Electron Neutrino',
         tokenUri    : 'https://ipfs.io/ipfs/QmSSuNTA5F9vhwxYHazVf8rBKY3ZFLq7yUtYtKZD32RX3L',
-        price       : toWei('0.3'),
+        price       : {1: toWei('0.3'), 42: toWei('0.0000003'), 31337: toWei('0.000000003')},
         supply      : toBN('721'),
         multiplier  : toBN('110'),  // 1.1%
         bonus       : toBN('0'),
@@ -115,7 +115,7 @@ const presets = {
       {
         name        : 'Muon Neutrino',
         tokenUri    : 'https://ipfs.io/ipfs/QmToEVPsjpyBFDYWRMMDZP9x2xNpRGFYWD4TT7UKqY3dAw',
-        price       : toWei('0.9'),
+        price       : {1: toWei('0.9'), 42: toWei('0.0000009'), 31337: toWei('0.000000009')},
         supply      : toBN('401'),
         multiplier  : toBN('130'),  // 1.3%
         bonus       : toBN('1'),
@@ -123,7 +123,7 @@ const presets = {
       {
         name        : 'Tau Neutrino',
         tokenUri    : 'https://ipfs.io/ipfs/QmP9ive1Wufav2VHeC24JSEtA326nYVJnxTUF6qJq6qyP5  ',
-        price       : toWei('1.7'),
+        price       : {1: toWei('1.7'), 42: toWei('0.0000017'), 31337: toWei('0.000000017')},
         supply      : toBN('301'),
         multiplier  : toBN('150'),  // 1.5%
         bonus       : toBN('2'),
@@ -131,7 +131,7 @@ const presets = {
       {
         name        : 'Electron',
         tokenUri    : 'https://ipfs.io/ipfs/QmTex8M3otqgyhKRrS75z6RSXnBkHQwQBbwWALjnQ956S1',
-        price       : toWei('2.9'),
+        price       : {1: toWei('2.9'), 42: toWei('0.000029'), 31337: toWei('0.00000029')},
         supply      : toBN('201'),
         multiplier  : toBN('180'),  // 1.8%
         bonus       : toBN('4'),
@@ -139,7 +139,7 @@ const presets = {
       {
         name        : 'Muon',
         tokenUri    : 'https://ipfs.io/ipfs/QmVxPucxAaVFtEucoZNKPhjcdm7STmbDC51P9fq9xsTtYM',
-        price       : toWei('5.1'),
+        price       : {1: toWei('5.1'), 42: toWei('0.000051'), 31337: toWei('0.00000051')},
         supply      : toBN('88'),
         multiplier  : toBN('230'),  // 2.3%
         bonus       : toBN('8'),
@@ -147,7 +147,7 @@ const presets = {
       {
         name        : 'Tau',
         tokenUri    : 'https://ipfs.io/ipfs/QmeaDyfTrTN1GmCqSSDWMDDZ86Y6mLzfiB8RfUifc6CEex',
-        price       : toWei('21'),
+        price       : {1: toWei('21'), 42: toWei('0.00021'), 31337: toWei('0.0000021')},
         supply      : toBN('21'),
         multiplier  : toBN('310'),  // 3.1%
         bonus       : toBN('16'),

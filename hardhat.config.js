@@ -122,6 +122,7 @@ module.exports = {
         'Proton',
         'WBoson',
         'Lepton',
+        'Lepton2',
         'ERC20',
         'ERC721'
       ],

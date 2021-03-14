@@ -14,6 +14,8 @@ Codes:
     E-000 - Failure
     E-001 - Success
     E-002 - ALREADY_INIT
+    E-003 - Requires Migration
+    E-004 - Already Migrated
 
   1. Permission & Control
     E-100 - [--Unused--]

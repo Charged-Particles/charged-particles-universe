@@ -97,7 +97,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const Proton = await ethers.getContractFactory('Proton');
-    const Lepton = await ethers.getContractFactory('Lepton');
+    const Lepton = await ethers.getContractFactory('Lepton2');
     const Ion = await ethers.getContractFactory('Ion');
     const IonTimelock = await ethers.getContractFactory('IonTimelock');
 
@@ -109,7 +109,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     genericWalletManager = GenericWalletManager.attach(getDeployData('GenericWalletManager', chainId).address);
     genericBasketManager = GenericBasketManager.attach(getDeployData('GenericBasketManager', chainId).address);
     proton = Proton.attach(getDeployData('Proton', chainId).address);
-    lepton = Lepton.attach(getDeployData('Lepton', chainId).address);
+    lepton = Lepton.attach(getDeployData('Lepton2', chainId).address);
     ion = Ion.attach(getDeployData('Ion', chainId).address);
     timelocks = Object.values(getDeployData('IonTimelocks', chainId))
       .map(ionTimelock => (IonTimelock.attach(ionTimelock.address)));
@@ -617,7 +617,7 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     expect(ionBalance4).to.be.above(ionBalance3).and.below(ionBalance3.add(bondWeight));
 
-    expect(Number(ionBalance4.sub(ionBalance3).toString()) / Number(ionBalance2.sub(ionBalance1).toString()) - Number(multiplier.toString())).to.be.above(0.9).and.below(1.1);
+    expect(Number(ionBalance4.sub(ionBalance3).toString()) / Number(ionBalance2.sub(ionBalance1).toString()) - Number(multiplier.toString())).to.be.above(1.0).and.below(1.05);
   });
 
   it("should not allow to charge a proton with a lepton multiple times", async () => {
@@ -684,23 +684,32 @@ describe("[INTEGRATION] Charged Particles", () => {
     )).to.be.revertedWith('CP:E-430');
   });
 
+  it("leptons switch to the next tier after minting all the available leptons in the previous tier", async () => {
+    const maxMintPerTx = presets.Lepton.maxMintPerTx;
+    await lepton.setMaxMintPerTx(maxMintPerTx);
+
+    let supply;
+    let remainder;
+    let price;
+    let txsPerType;
+    for (let i = 0; i < 3; i++) {
+      supply = presets.Lepton.types[i].supply;
+      remainder = supply.mod(maxMintPerTx);
+      price = presets.Lepton.types[i].price[31337];
+      txsPerType = supply.sub(remainder).div(maxMintPerTx).add((remainder > 0) ? 1 : 0).toNumber();
+
+      for (let j = 0; j < txsPerType; j++) {
+        await lepton.batchMintLepton(maxMintPerTx, { value: price.mul(maxMintPerTx).add(toWei('1')) });
+      }
+
+      expect(await lepton.getNextPrice()).to.be.equal(presets.Lepton.types[i + 1].price[31337]);
+    }
+  });
+
   it("cannot mint more leptons in the same tx than the max allowed", async () => {
     const testMaxMintPerTx = 3;
     await lepton.setMaxMintPerTx(testMaxMintPerTx);
     await expect(lepton.batchMintLepton(4, { value: toWei('1') })).to.be.revertedWith('LPT:E-429');
-  });
-
-  it("leptons switch to the next tier after minting all the available leptons in the previous tier", async () => {
-    const maxMintPerTx = presets.Lepton.maxMintPerTx;
-    await lepton.setMaxMintPerTx(maxMintPerTx);
-    const runs = Math.ceil(Number((presets.Lepton.types[0].supply.div(maxMintPerTx)).toString()));
-    const runCount = 10;
-    for (let i = 0; i < runs; i++) {
-      for (let j =0; j < runCount; j++) {
-        await lepton.batchMintLepton(maxMintPerTx.div(runCount), { value: toWei('300') });
-      }
-    }
-    expect(await lepton.getNextPrice()).to.be.equal(presets.Lepton.types[1].price);
   });
 
   it("can withdraw ether piled up in the lepton contract", async () => {

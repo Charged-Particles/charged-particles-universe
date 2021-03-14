@@ -6,7 +6,6 @@ const {
   toBN,
   presets,
 } = require("../js-helpers/deploy");
-const sleep = require('sleep-promise');
 
 const _ = require('lodash');
 
@@ -18,16 +17,19 @@ module.exports = async (hre) => {
     const chainId = chainIdByName(network.name);
     const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 7);
 
-    const executeTx = async (txId, txDesc, callback = _.noop, increaseDelay = 0) => {
-      if (txId === '1-a') {
-        log(`\n`);
+    const executeTx = async (txId, txDesc, callback, increaseDelay = 0) => {
+      try {
+        if (txId === '1-a') {
+          log(`\n`);
+        }
+        await log(`  - [TX-${txId}] ${txDesc}`)(alchemyTimeout + increaseDelay);
+        await callback();
       }
-      await log(`  - [TX-${txId}] ${txDesc}`)(alchemyTimeout + increaseDelay);
-      callback().catch(async err => {
+      catch (err) {
         log(`  - Transaction ${txId} Failed: ${err}`);
         log(`  - Retrying;`);
         await executeTx(txId, txDesc, callback, 3);
-      });
+      }
     }
 
     const referralCode = presets.Aave.referralCode[chainId];
@@ -48,6 +50,7 @@ module.exports = async (hre) => {
     const ddWBoson = getDeployData('WBoson', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
+    const ddLepton2 = getDeployData('Lepton2', chainId);
     const ddIon = getDeployData('Ion', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
@@ -100,6 +103,10 @@ module.exports = async (hre) => {
     log('  Loading Lepton from: ', ddLepton.address);
     const Lepton = await ethers.getContractFactory('Lepton');
     const lepton = await Lepton.attach(ddLepton.address);
+
+    log('  Loading Lepton2 from: ', ddLepton2.address);
+    const Lepton2 = await ethers.getContractFactory('Lepton2');
+    const lepton2 = await Lepton2.attach(ddLepton2.address);
 
     log('  Loading Ion from: ', ddIon.address);
     const Ion = await ethers.getContractFactory('Ion');
@@ -225,7 +232,7 @@ module.exports = async (hre) => {
     );
 
     await executeTx('5-c', 'ChargedParticles: Registering Lepton', async () =>
-      await chargedSettings.enableNftContracts([ddProton.address])
+      await chargedSettings.enableNftContracts([ddLepton.address])
     );
 
     let leptonType;
@@ -235,7 +242,7 @@ module.exports = async (hre) => {
       await executeTx(`5-d-${i}`, `Lepton: Adding Lepton Type: ${leptonType.name}`, async () =>
         await lepton.addLeptonType(
           leptonType.tokenUri,
-          leptonType.price,
+          leptonType.price[chainId],
           leptonType.supply,
           leptonType.multiplier,
           leptonType.bonus,
@@ -306,6 +313,42 @@ module.exports = async (hre) => {
     //     await wBoson.setTrustedForwarder(trustedForwarder)
     //   );
     // }
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Setup Lepton2
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    await executeTx('9-a', 'Lepton2: Setting Max Mint per Transaction', async () =>
+      await lepton2.setMaxMintPerTx(leptonMaxMint)
+    );
+
+    await executeTx('9-b', 'ChargedParticles: Registering Lepton2', async () =>
+      await chargedSettings.enableNftContracts([ddLepton2.address])
+    );
+
+    let lepton2Type;
+    for (let i = 0; i < presets.Lepton.types.length; i++) {
+      lepton2Type = presets.Lepton.types[i];
+
+      await executeTx(`9-c-${i}`, `Lepton2: Adding Lepton Type: ${lepton2Type.name}`, async () =>
+        await lepton2.addLeptonType(
+          lepton2Type.tokenUri,
+          lepton2Type.price[chainId],
+          lepton2Type.supply,
+          lepton2Type.multiplier,
+          lepton2Type.bonus,
+        )
+      );
+    }
+
+    await executeTx('9-d', 'Universe: Switching to Lepton2', async () =>
+      await universe.setLeptonToken(ddLepton2.address)
+    );
+
+    await executeTx('9-e', 'ChargedParticles: Registering Lepton2', async () =>
+      await chargedParticles.setLeptonToken(ddLepton2.address)
+    );
 
 
     log(`\n  Contract Initialization Complete!`);
