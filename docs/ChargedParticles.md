@@ -1,9 +1,6 @@
 # `ChargedParticles`
 
 Charged Particles Contract - primary contract for interfacing with the Charged Particles protocol.
-
-Upgradeable Contract
-
 ### `getStateAddress() → address stateAddress` (external)
 
 Gets the address of the Charged-State contract, which can be used for setting and retrieving additional information about a Particle (NFT) contract. E.g. time locks on particle mass (principal) or charge (interest).
@@ -20,10 +17,16 @@ Gets the Amount of Asset Tokens that have been Deposited into the Particle repre
 
 ### `baseParticleMass(address contractAddress, uint256 tokenId, string walletManagerId, address assetToken) → uint256` (external)
 
-Gets the 
+```
+baseParticleMass(
+        address contractAddress, 
+        uint256 tokenId, 
+        string walletManagerId,
+        address assetToken
+) external returns (uint256)
+```
 
-
-
+Gets the amount of Mass (principal) for a Particle for a single asset token. E.g. Returns the amount of USDC deposited into a Particle less earned interest.
 
 ### `currentParticleCharge(address contractAddress, uint256 tokenId, string walletManagerId, address assetToken) → uint256` (external)
 
@@ -47,36 +50,35 @@ Fund Particle with Asset Token. Must be called by the account providing the Asse
 
 ### `dischargeParticle(address receiver, address contractAddress, uint256 tokenId, string walletManagerId, address assetToken) → uint256 creatorAmount, uint256 receiverAmount` (external)
 
-Allows the owner or operator of the Token to collect or transfer the interest generated from the token without removing the underlying Asset that is held within the token.
+Allows the owner or operator of the Particle to collect or transfer the Charge (interest) generated from the token without removing the Mass (principal) of the underlying asset held within the token.
 
 ### `dischargeParticleAmount(address receiver, address contractAddress, uint256 tokenId, string walletManagerId, address assetToken, uint256 assetAmount) → uint256 creatorAmount, uint256 receiverAmount` (external)
 
-Allows the owner or operator of the Token to collect or transfer a specific amount of the interest generated from the token without removing the underlying Asset that is held within the token.
+Allows the owner or operator of the Particle to collect or transfer a specific amount of the interest generated from the token without removing the Mass (principal) of the underlying asset held within the token.
 
 ### `dischargeParticleForCreator(address receiver, address contractAddress, uint256 tokenId, string walletManagerId, address assetToken, uint256 assetAmount) → uint256 receiverAmount` (external)
 
-Allows the Creator of the Token to collect or transfer a their portion of the interest (if any)
-generated from the token without removing the underlying Asset that is held within the token.
+Allows the Creator of the Particle to collect or transfer a their portion of the Charge (interest) generated from the token without removing the underlying Mass (principal) held within the token.
 
 ### `releaseParticle(address receiver, address contractAddress, uint256 tokenId, string walletManagerId, address assetToken) → uint256 creatorAmount, uint256 receiverAmount` (external)
 
-Releases the Full amount of Asset + Interest held within the Particle by LP of the Assets.
+Releases the Full amount of Mass + Charge (principal + interest) held within the Particle by LP of the Assets.
 
 ### `releaseParticleAmount(address receiver, address contractAddress, uint256 tokenId, string walletManagerId, address assetToken, uint256 assetAmount) → uint256 creatorAmount, uint256 receiverAmount` (external)
 
-Releases a partial amount of Asset + Interest held within the Particle by LP of the Assets.
+Releases a partial amount of Mass + Charge (principal + interest) held within the Particle by LP of the Assets.
 
 ### `covalentBond(address contractAddress, uint256 tokenId, string basketManagerId, address nftTokenAddress, uint256 nftTokenId) → bool success` (external)
 
-Deposit other NFT Assets into the Particle. Must be called by the account providing the Asset.Account must Approve THIS contract as Operator of Asset.
+Deposit other NFT Assets into a Particle. Must be called by the account providing the Asset.Account must Approve THIS contract as Operator of Asset.
 
 ### `breakCovalentBond(address receiver, address contractAddress, uint256 tokenId, string basketManagerId, address nftTokenAddress, uint256 nftTokenId) → bool success` (external)
 
-Release NFT (ERC721) Assets from the Particle.
+Release NFT Assets from the Particle.
 
 ---
 
-Admin / DAO functions -- exclude?
+## Admin / DAO functions -- exclude?
 
 ### `withdrawEther(address payable receiver, uint256 amount)` (external)
 
