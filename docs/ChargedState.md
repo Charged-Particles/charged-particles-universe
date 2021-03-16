@@ -1,315 +1,498 @@
-## `ChargedState`
-
-Charged Particles Settings Contract
-
-
-
-### `onlyErc721OwnerOrOperator(address contractAddress, uint256 tokenId, address sender)`
-
-
-
-
-
-
-### `getDischargeTimelockExpiry(address contractAddress, uint256 tokenId) → uint256 lockExpiry` (external)
-
-
-
-
-
-### `getReleaseTimelockExpiry(address contractAddress, uint256 tokenId) → uint256 lockExpiry` (external)
-
-
-
-
-
-### `getBreakBondTimelockExpiry(address contractAddress, uint256 tokenId) → uint256 lockExpiry` (external)
-
-
-
-
-
-### `isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) → bool` (external)
-
-Checks if an operator is allowed to Discharge a specific Token
-
-
-
-
-### `isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) → bool` (external)
-
-Checks if an operator is allowed to Release a specific Token
-
-
-
-
-### `isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) → bool` (external)
-
-Checks if an operator is allowed to Break Covalent Bonds on a specific Token
-
-
-
-
-### `isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) → bool` (external)
-
-Checks if an operator is allowed to Timelock a specific Token
-
-
-
-
-### `isEnergizeRestricted(address contractAddress, uint256 tokenId) → bool` (external)
-
-
-
-
-
-### `isCovalentBondRestricted(address contractAddress, uint256 tokenId) → bool` (external)
-
-
-
-
-
-### `getDischargeState(address contractAddress, uint256 tokenId, address sender) → bool allowFromAll, bool isApproved, uint256 timelock, uint256 tempLockExpiry` (external)
-
-
-
-
-
-### `getReleaseState(address contractAddress, uint256 tokenId, address sender) → bool allowFromAll, bool isApproved, uint256 timelock, uint256 tempLockExpiry` (external)
-
-
-
-
-
-### `getBreakBondState(address contractAddress, uint256 tokenId, address sender) → bool allowFromAll, bool isApproved, uint256 timelock, uint256 tempLockExpiry` (external)
-
-
-
-
-
-### `setDischargeApproval(address contractAddress, uint256 tokenId, address operator)` (external)
-
-Sets an Operator as Approved to Discharge a specific Token
-This allows an operator to withdraw the interest-portion only
-
-
-
-
-### `setReleaseApproval(address contractAddress, uint256 tokenId, address operator)` (external)
-
-Sets an Operator as Approved to Release a specific Token
-This allows an operator to withdraw the principal + interest
-
-
-
-
-### `setBreakBondApproval(address contractAddress, uint256 tokenId, address operator)` (external)
-
-Sets an Operator as Approved to Break Covalent Bonds on a specific Token
-This allows an operator to withdraw Basket NFTs
-
-
-
-
-### `setTimelockApproval(address contractAddress, uint256 tokenId, address operator)` (external)
-
-Sets an Operator as Approved to Timelock a specific Token
-This allows an operator to timelock the principal or interest
-
-
-
-
-### `setApprovalForAll(address contractAddress, uint256 tokenId, address operator)` (external)
-
-Sets an Operator as Approved to Discharge/Release/Timelock a specific Token
-
-
-
-
-### `setPermsForRestrictCharge(address contractAddress, uint256 tokenId, bool state)` (external)
-
-
-
-Updates Restrictions on Energizing an NFT
-
-### `setPermsForAllowDischarge(address contractAddress, uint256 tokenId, bool state)` (external)
-
-
-
-Updates Allowance on Discharging an NFT by Anyone
-
-### `setPermsForAllowRelease(address contractAddress, uint256 tokenId, bool state)` (external)
-
-
-
-Updates Allowance on Discharging an NFT by Anyone
-
-### `setPermsForRestrictBond(address contractAddress, uint256 tokenId, bool state)` (external)
-
-
-
-Updates Restrictions on Covalent Bonds on an NFT
-
-### `setPermsForAllowBreakBond(address contractAddress, uint256 tokenId, bool state)` (external)
-
-
-
-Updates Allowance on Breaking Covalent Bonds on an NFT by Anyone
-
-### `setDischargeTimelock(address contractAddress, uint256 tokenId, uint256 unlockBlock)` (external)
-
-Sets a Timelock on the ability to Discharge the Interest of a Particle
-
-
-
-
-### `setReleaseTimelock(address contractAddress, uint256 tokenId, uint256 unlockBlock)` (external)
-
-Sets a Timelock on the ability to Release the Assets of a Particle
-
-
-
-
-### `setBreakBondTimelock(address contractAddress, uint256 tokenId, uint256 unlockBlock)` (external)
-
-Sets a Timelock on the ability to Break the Covalent Bond of a Particle
-
-
-
-
-### `setTemporaryLock(address contractAddress, uint256 tokenId, bool isLocked)` (external)
-
-Sets a Temporary-Lock on the ability to Release/Discharge the Assets of a Particle
-
-
-
-
-### `setChargedSettings(address settingsController)` (external)
-
-
-
-Setup the Charged-Settings Controller
-
-### `setTrustedForwarder(address _trustedForwarder)` (external)
-
-
-
-
-
-### `withdrawEther(address payable receiver, uint256 amount)` (external)
-
-
-
-
-
-### `withdrawErc20(address payable receiver, address tokenAddress, uint256 amount)` (external)
-
-
-
-
-
-### `withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId)` (external)
-
-
-
-
-
-### `_isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) → bool` (internal)
-
-
-
-See {ChargedParticles-isApprovedForDischarge}.
-
-### `_isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) → bool` (internal)
-
-
-
-See {ChargedParticles-isApprovedForRelease}.
-
-### `_isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) → bool` (internal)
-
-
-
-See {ChargedParticles-isApprovedForBreakBond}.
-
-### `_isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) → bool` (internal)
-
-
-
-See {ChargedParticles-isApprovedForTimelock}.
-
-### `_setDischargeApproval(address contractAddress, uint256 tokenId, address tokenOwner, address operator)` (internal)
-
-Sets an Operator as Approved to Discharge a specific Token
-This allows an operator to withdraw the interest-portion only
-
-
-
-
-### `_setReleaseApproval(address contractAddress, uint256 tokenId, address tokenOwner, address operator)` (internal)
-
-Sets an Operator as Approved to Release a specific Token
-This allows an operator to withdraw the principal + interest
-
-
-
-
-### `_setBreakBondApproval(address contractAddress, uint256 tokenId, address tokenOwner, address operator)` (internal)
-
-Sets an Operator as Approved to Break Covalent Bonds on a specific Token
-This allows an operator to withdraw Basket NFTs
-
-
-
-
-### `_setTimelockApproval(address contractAddress, uint256 tokenId, address tokenOwner, address operator)` (internal)
-
-Sets an Operator as Approved to Timelock a specific Token
-This allows an operator to timelock the principal or interest
-
-
-
-
-### `_setPermsForRestrictCharge(address contractAddress, uint256 tokenId, bool state)` (internal)
-
-
-
-Updates Restrictions on Energizing an NFT
-
-### `_setPermsForAllowDischarge(address contractAddress, uint256 tokenId, bool state)` (internal)
-
-
-
-Updates Allowance on Discharging an NFT by Anyone
-
-### `_setPermsForAllowRelease(address contractAddress, uint256 tokenId, bool state)` (internal)
-
-
-
-Updates Allowance on Discharging an NFT by Anyone
-
-### `_setPermsForRestrictBond(address contractAddress, uint256 tokenId, bool state)` (internal)
-
-
-
-Updates Restrictions on Covalent Bonds on an NFT
-
-### `_setPermsForAllowBreakBond(address contractAddress, uint256 tokenId, bool state)` (internal)
-
-
-
-Updates Allowance on Breaking Covalent Bonds on an NFT by Anyone
-
-### `_msgSender() → address payable` (internal)
-
-
-
-See {BaseRelayRecipient-_msgSender}.
-
-### `_msgData() → bytes` (internal)
-
-
-
-See {BaseRelayRecipient-_msgData}.
-
-
+# `ChargedState`
+
+> Charged Particles State Contract
+## Get State Data
+
+> Get info on time locks, approvals, and permissions.
+
+#### getDischargeTimelockExpiry
+
+Gets unlock block for Discharge time lock.
+
+```
+function getDischargeTimelockExpiry(
+  address contractAddress,
+  uint256 tokenId
+) external view virtual override returns (uint256 lockExpiry)
+```
+
+| Parameter / Return Value  | Description                                   |
+|---------------------------|-----------------------------------------------|
+| contractAddress           | address of contract for Particle              |
+| tokenId                   | id of Particle to check time lock for         |
+| lockExpiry                | unlock block for Particle's Charge (interest) |
+
+#### getReleaseTimelockExpiry
+
+Gets unlock block for Release time lock.
+
+```
+function getReleaseTimelockExpiry(
+  address contractAddress,
+  uint256 tokenId
+) external view virtual override returns (uint256 lockExpiry);
+```
+
+| Parameter / Return Value  | Description                                   |
+|---------------------------|-----------------------------------------------|
+| contractAddress           | address of contract for Particle              |
+| tokenId                   | id of Particle to check time lock for         |
+| lockExpiry                | unlock block for Particle's Mass (principal)  |
+
+#### getBreakBondTimelockExpiry
+
+Gets unlock block for restrictions on withdrawing NFTs from a Particle (covalent bonds).
+
+```
+function getBreakBondTimelockExpiry(
+  address contractAddress,
+  uint256 tokenId
+) external view virtual override returns (uint256 lockExpiry);
+```
+
+| Parameter / Return Value  | Description                                        |
+|---------------------------|----------------------------------------------------|
+| contractAddress           | address of contract for Particle                   |
+| tokenId                   | id of Particle to check time lock for              |
+| lockExpiry                | unlock block for Particle's covalent bonds (NFTs)  |
+
+#### isApprovedForDischarge
+
+Checks if an operator is allowed to Discharge a specific Particle.
+
+```
+function isApprovedForDischarge(
+  address contractAddress,
+  uint256 tokenId,
+  address operator
+) external virtual override view returns (bool);`
+```
+
+| Parameter / Return Value  | Description                           |
+|---------------------------|---------------------------------------|
+| contractAddress           | address of contract for Particle      |
+| tokenId                   | id of Particle to check approval of   |
+| operator                  | address of the operator to check      |
+| return                    | True if operator approved             |
+
+#### isApprovedForRelease
+
+Checks if an operator is allowed to Release a specific Particle.
+
+```
+function isApprovedForRelease(
+  address contractAddress,
+  uint256 tokenId,
+  address operator
+) external virtual override view returns (bool);`
+```
+
+| Parameter / Return Value  | Description                           |
+|---------------------------|---------------------------------------|
+| contractAddress           | address of contract for Particle      |
+| tokenId                   | id of Particle to check approval of   |
+| operator                  | address of the operator to check      |
+| return                    | True if operator approved             |
+
+### isApprovedForBreakBond
+
+Checks if an operator is allowed to Break Covalent Bonds on a specific Particle.
+
+```
+function isApprovedForBreakBond(
+  address contractAddress,
+  uint256 tokenId,
+  address operator
+) external virtual override view returns (bool);`
+```
+
+| Parameter / Return Value  | Description                           |
+|---------------------------|---------------------------------------|
+| contractAddress           | address of contract for Particle      |
+| tokenId                   | id of Particle to check approval of   |
+| operator                  | address of the operator to check      |
+| return                    | True if operator approved             |
+
+#### isApprovedForTimelock
+
+Checks if an operator is allowed to Timelock a specific Particle.
+
+```
+function isApprovedForTimelock(
+  address contractAddress,
+  uint256 tokenId,
+  address operator
+) external virtual override view returns (bool);`
+```
+
+| Parameter / Return Value  | Description                           |
+|---------------------------|---------------------------------------|
+| contractAddress           | address of contract for Particle      |
+| tokenId                   | id of Particle to check approval of   |
+| operator                  | address of the operator to check      |
+| return                    | True if operator approved             |
+
+#### isEnergizeRestricted
+
+Checks if energizing a specific Particle is restricted.
+
+```
+function isEnergizeRestricted(
+  address contractAddress,
+  uint256 tokenId
+) external virtual override view returns (bool);'
+```
+
+| Parameter / Return Value  | Description                           |
+|---------------------------|---------------------------------------|
+| contractAddress           | address of contract for Particle      |
+| tokenId                   | id of Particle to check restriction of|
+| return                    | whether or not energizing restricted  |
+
+#### isCovalentBondRestricted
+
+Checks if covalent bonding (depositing NFTs into a Particle) for a specific Particle is restricted.
+
+```
+function isCovalentBondRestricted(
+  address contractAddress,
+  uint256 tokenId
+) external virtual override view returns (bool);
+```
+
+| Parameter / Return Value  | Description                            |
+|---------------------------|----------------------------------------|
+| contractAddress           | address of contract for Particle       |
+| tokenId                   | id of Particle to check restriction of |
+| return                    | whether or not bonding restricted      |
+
+
+#### getDischargeState
+
+Gets state of discharge settings / permissions for a Particle.
+
+```
+function getDischargeState(
+  address contractAddress, 
+  uint256 tokenId,
+  address sender
+) external view virtual override 
+  returns (
+    bool allowFromAll, 
+    bool isApproved, 
+    uint256 timelock, 
+    uint256 tempLockExpiry
+  );
+```
+
+| Parameter / Return Value  | Description                                    |
+|---------------------------|------------------------------------------------|
+| contractAddress           | address of contract for Particle               |
+| tokenId                   | id of Particle to check state of               |
+| sender                    | address of transaction sender                  |
+| allowFromAll              | whether or not all can discharge from Particle |
+| isApproved                | discharge approval status                      |
+| timelock                  | unlock block for charge (interest)             |
+| tempLockExpiry            | unlock block for temporary time lock           |
+
+
+#### getReleaseState
+
+Gets state of release settings / permissions for a Particle.
+
+```
+function getDischargeState(
+  address contractAddress, 
+  uint256 tokenId,
+  address sender
+) external view virtual override 
+  returns (
+    bool allowFromAll, 
+    bool isApproved, 
+    uint256 timelock, 
+    uint256 tempLockExpiry
+  );
+```
+
+| Parameter / Return Value  | Description                                    |
+|---------------------------|------------------------------------------------|
+| contractAddress           | address of contract for Particle               |
+| tokenId                   | id of Particle to check state of               |
+| sender                    | address of transaction sender                  |
+| allowFromAll              | whether or not all can release a Particle      |
+| isApproved                | discharge approval status                      |
+| timelock                  | unlock block for mass (principal)              |
+| tempLockExpiry            | unlock block for temporary time lock           |
+
+
+#### getBreakBondState
+
+Gets state of covalent bond breaking (releasing an NFT) settings / permissions for a Particle.
+
+```
+function getBreakBondState(
+  address contractAddress,
+  uint256 tokenId,
+  address sender
+) external view virtual override 
+  returns (
+    bool allowFromAll, 
+    bool isApproved,
+    uint256 timelock,
+    uint256 tempLockExpiry
+  );
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to check state of                    |
+| sender                    | address of transaction sender                       |
+| allowFromAll              | whether or not all can release an NFT from Particle |
+| isApproved                | discharge approval status                           |
+| timelock                  | unlock block for mass (principal)                   |
+| tempLockExpiry            | unlock block for temporary time lock                |
+
+
+## Set Permissions + Approvals
+
+> Update a Particle's permissions and approvals
+
+#### setDischargeApproval
+
+Sets an Operator as Approved to Discharge a specific Token. This allows an operator to withdraw the interest-portion only.
+
+```
+function setDischargeApproval(
+  address contractAddress,
+  uint256 tokenId,
+  address operator
+) external virtual override onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender()); 
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to set approval for                  |
+| operator                  | address of Particle operator                        |
+
+#### setReleaseApproval
+
+Sets an Operator as Approved to Release a specific Token. This allows an operator to withdraw the principal + interest.
+
+```
+function setReleaseApproval(
+  address contractAddress,
+  uint256 tokenId,
+  address operator
+) external virtual override onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle set approval for                     |
+| operator                  | address of Particle operator                        |
+
+#### setBreakBondApproval
+
+Sets an Operator as Approved to Break Covalent Bonds on a specific Token. This allows an operator to withdraw Basket NFTs.
+
+```
+function setBreakBondApproval(
+  address contractAddress,
+  uint256 tokenId,
+  address operator
+) external virtual override onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to set approval for                  |
+| operator                  | address of Particle operator                        |
+
+#### setTimelockApproval
+
+Sets an Operator as Approved to Timelock a specific Token. This allows an operator to timelock the principal or interest.
+
+```
+function setTimelockApproval(
+  address contractAddress,
+  uint256 tokenId,
+  address operator
+) external virtual override onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to set approval for                  |
+| operator                  | address of Particle operator                        |
+
+#### setApprovalForAll
+
+Sets an Operator as Approved to Discharge/Release/Timelock a specific Token.
+
+```
+function setApprovalForAll(
+  address contractAddress,
+  uint256 tokenId,
+  address operator
+) external virtual override onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to set approval for                  |
+| operator                  | address of Particle operator                        |
+
+#### setPermsForRestrictCharge
+
+Updates Restrictions on Energizing an NFT.
+
+```
+function setPermsForRestrictCharge(
+  address contractAddress,
+  uint256 tokenId,
+  bool state
+  ) external virtual override onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to set permissions for               |
+| state                     | state of restrictions                               |
+
+#### setPermsForAllowDischarge
+
+Updates Allowance on Discharging an NFT by Anyone.
+
+```
+function setPermsForAllowDischarge(
+  address contractAddress,
+  uint256 tokenId,
+  bool state
+) external virtual override onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to set permissions for               |
+| state                     | state of discharge permissions                      |
+
+#### setPermsForAllowRelease
+
+Updates Allowance on Releasing an NFT by Anyone.
+
+```
+function setPermsForAllowRelease(
+  address contractAddress,
+  uint256 tokenId,
+  bool state
+) external virtual override onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to set permissions for               |
+| state                     | state of discharge permissions                      |
+
+#### setPermsForRestrictBond
+
+Updates Restrictions on Covalent Bonds on an NFT.
+
+```
+function setPermsForRestrictBreakBond(
+  address contractAddress,
+  uint256 tokenId,
+  bool state
+) external virtual override onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to set permissions for               |
+| state                     | state of discharge permissions                      |
+
+#### setPermsForAllowBreakBond
+
+Updates Allowance on Breaking Covalent Bonds on an NFT by Anyone.
+
+```
+function setPermsForAllowBreakBond(
+  address contractAddress,
+  uint256 tokenId,
+  bool state
+) external virtual override onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to set permissions for               |
+| state                     | state of discharge permissions                      |
+
+
+## Set Timelocks
+
+> Update time locks for a particles Mass (principal), Charge (interest), or Bonds (locked NFTs)
+
+#### setDischargeTimelock
+
+Sets a Timelock on the ability to Discharge the Interest of a Particle.
+
+```
+function setDischargeTimelock(
+  address contractAddress,
+  uint256 tokenId,
+  uint256 unlockBlock
+) external override virtual;
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to set time lock for                 |
+| state                     | Ethereum Block-number to Timelock until             |
+
+#### setReleaseTimelock
+
+Sets a Timelock on the ability to Release the Assets of a Particle.
+
+```
+function setReleaseTimelock(
+  address contractAddress,
+  uint256 tokenId,
+  uint256 unlockBlock
+) external override virtual;
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to set time lock for                 |
+| unlockBlock               | Ethereum Block-number to Timelock until             |
+
+#### setBreakBondTimelock
+
+Sets a Timelock on the ability to Break the Covalent Bond of a Particle.
+
+```
+function setBreakBondTimelock(
+  address contractAddress,
+  uint256 tokenId,
+  uint256 unlockBlock
+) external override virtual;
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| contractAddress           | address of contract for Particle                    |
+| tokenId                   | id of Particle to set time lock for                 |
+| unlockBlock               | Ethereum Block-number to Timelock until             |
