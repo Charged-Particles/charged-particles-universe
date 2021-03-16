@@ -1,6 +1,6 @@
-# `ChargedParticles`
+# ChargedParticles
 
-Charged Particles Contract - primary contract for interfacing with the Charged Particles protocol.
+> Charged Particles Contract - primary contract for interfacing with the Charged Particles protocol.
 
 ## Contract Info
 #### getStateAddress
@@ -29,10 +29,10 @@ When Custom Contracts are registered, only the "owner" or operator of the Contra
 
 ```
 function onERC721Received(
-        address, 
-        address,
-        uint256, 
-        bytes calldata
+  address, 
+  address,
+  uint256, 
+  bytes calldata
 ) external virtual override returns (bytes4);
 ```
 ## Reading Particle balances
@@ -43,10 +43,10 @@ Gets the amount of Mass (principal) for a Particle for a single asset token. E.g
 
 ```
 function baseParticleMass(
-        address contractAddress, 
-        uint256 tokenId, 
-        string walletManagerId,
-        address assetToken
+  address contractAddress, 
+  uint256 tokenId, 
+  string walletManagerId,
+  address assetToken
 ) external virtual override managerEnabled(walletManagerId) returns (uint256);
 ```
 
@@ -64,10 +64,10 @@ Gets the amount of Interest that the Particle has generated representing the Cha
 
 ```
 function currentParticleCharge(
-        address contractAddress,
-        uint256 tokenId,
-        string walletManagerId, 
-        address assetToken
+  address contractAddress,
+  uint256 tokenId,
+  string walletManagerId, 
+  address assetToken
 ) external virtual override managerEnabled(walletManagerId) (uint256);
 ```
 | Parameter/Return Value  | Description                                                    |
@@ -87,10 +87,10 @@ Kinetics represent additional tokens that a lending protocol provides users in a
 
 ```
 function currentParticleKinetics(
-        address contractAddress,
-        uint256 tokenId,
-        string walletManagerId,
-        address assetToken
+  address contractAddress,
+  uint256 tokenId,
+  string walletManagerId,
+  address assetToken
 ) external virtual override managerEnabled(walletManagerId) (uint256);
 ```
 
@@ -107,10 +107,10 @@ Gets the total amount of ERC721 Tokens that the Particle holds.
 
 ```
 function currentParticleCovalentBonds(
-        address contractAddress,
-        uint256 tokenId,
-        string basketManagerId
-)  external view virtual override basketEnabled(basketManagerId) returns (uint256);
+  address contractAddress,
+  uint256 tokenId,
+  string basketManagerId
+) external view virtual override basketEnabled(basketManagerId) returns (uint256);
 ```
 
 | Parameter/Return Value  | Description                                        |
@@ -132,12 +132,12 @@ Fund Particle with Asset Token. Must be called by the account providing the Asse
 
 ```
 function energizeParticle(
-        address contractAddress,
-        uint256 tokenId,
-        string walletManagerId,
-        address assetToken,
-        uint256 assetAmount,
-        address referrer
+  address contractAddress,
+  uint256 tokenId,
+  string walletManagerId,
+  address assetToken,
+  uint256 assetAmount,
+  address referrer
 ) external virtual override managerEnabled(walletManagerId nonReentrant returns (uint256 yieldTokensAmount);
 ```
 
@@ -156,11 +156,11 @@ Allows the owner or operator of the Particle to collect or transfer the Charge (
 
 ```
 function dischargeParticle(
-        address receiver,
-        address contractAddress,
-        uint256 tokenId,
-        string walletManagerId,
-        address assetToken
+  address receiver,
+  address contractAddress,
+  uint256 tokenId,
+  string walletManagerId,
+  address assetToken
 ) external virtual override managerEnabled(walletManagerId) nonReentrant returns (uint256 creatorAmount, uint256 receiverAmount);`
 ```
 
@@ -180,12 +180,12 @@ Allows the owner or operator of the Particle to collect or transfer a specific a
 
 ```
 function dischargeParticleAmount(
-        address receiver,
-        address contractAddress,
-        uint256 tokenId,
-        string calldata walletManagerId,
-        address assetToken,
-        uint256 assetAmount
+  address receiver,
+  address contractAddress,
+  uint256 tokenId,
+  string calldata walletManagerId,
+  address assetToken,
+  uint256 assetAmount
 ) external virtual override managerEnabled(walletManagerId) nonReentrant returns (uint256 creatorAmount, uint256 receiverAmount);
 ```
 
@@ -206,12 +206,12 @@ Allows the Creator of the Particle to collect or transfer a their portion of the
 
 ```
 function dischargeParticleForCreator(
-        address receiver,
-        address contractAddress,
-        uint256 tokenId,
-        string walletManagerId,
-        address assetToken,
-        uint256 assetAmount
+  address receiver,
+  address contractAddress,
+  uint256 tokenId,
+  string walletManagerId,
+  address assetToken,
+  uint256 assetAmount
 )  external virtual override managerEnabled(walletMangerId) nonReentrant returns (uint256 receiverAmount);
 ```
 
@@ -235,11 +235,11 @@ Releases the Full amount of Mass + Charge (principal + interest) held within the
 
 ```
 function releaseParticle(
-        address receiver,
-        address contractAddress,
-        uint256 tokenId,
-        string walletManagerId,
-        address assetToken
+  address receiver,
+  address contractAddress,
+  uint256 tokenId,
+  string walletManagerId,
+  address assetToken
 ) external virtual override managerEnabled(walletMangerId) nonReentrant returns (uint256 creatorAmount, uint256 receiverAmount)
 ```
 
@@ -259,11 +259,11 @@ Releases a partial amount of Mass + Charge (principal + interest) held within th
 
 ```
 function releaseParticleAmount(
-        address receiver,
-        address contractAddress,
-        uint256 tokenId,
-        string walletManagerId,
-        address assetToken
+  address receiver,
+  address contractAddress,
+  uint256 tokenId,
+  string walletManagerId,
+  address assetToken
 ) external virtual override managerEnabled(walletMangerId) nonReentrant returns (uint256 creatorAmount, uint256 receiverAmount)
 ```
 
@@ -289,11 +289,11 @@ Deposit other NFT Assets into a Particle. Must be called by the account providin
 
 ```
 function covalentBond(
-        address contractAddress,
-        uint256 tokenId,
-        string basketManagerId,
-        address nftTokenAddress,
-        uint256 nftTokenId
+  address contractAddress,
+  uint256 tokenId,
+  string basketManagerId,
+  address nftTokenAddress,
+  uint256 nftTokenId
 ) external virtual override basketEnabled(basketManagerId) nonReentrant returns (bool success)
 ```
 
@@ -311,12 +311,12 @@ Release NFT Assets from the Particle.
 
 ```
 function breakCovalentBond(
-        address receiver,
-        address contractAddress,
-        uint256 tokenId,
-        string calldata basketManagerId,
-        address nftTokenAddress,
-        uint256 nftTokenId
+  address receiver,
+  address contractAddress,
+  uint256 tokenId,
+  string calldata basketManagerId,
+  address nftTokenAddress,
+  uint256 nftTokenId
 ) external virtual override basketEnabled(basketManagerId) nonReentrant returns (bool success)
 ```
 
