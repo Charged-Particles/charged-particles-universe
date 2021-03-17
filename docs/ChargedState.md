@@ -1,6 +1,6 @@
 # `ChargedState`
 
-> Charged Particles State Contract
+> Charged Particles State Contract. For viewing and setting permissions, approvals, and time locks on Particles.
 ## Get State Data
 
 > Get info on time locks, approvals, and permissions.

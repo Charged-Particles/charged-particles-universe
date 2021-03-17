@@ -1,262 +1,266 @@
-## `Proton`
+# Proton
 
+> Proton contract. A Proton is another name for a Particle, and is an ERC721 token.
 
+## Get Info About a Proton
 
+> Get a Proton's creator, sale price, etc.
+#### creatorOf
 
+Gets the creator of a Proton.
 
-### `whenNotPaused()`
+`function creatorOf(uint256 tokenId) external view virtual override returns (address);`
 
 
+| Parameter / Return Value  | Description             |
+|---------------------------|-------------------------|
+| tokenId                   | id of Proton            |
+| return                    | address of token creator|
 
+#### getSalePrice
 
+Gets current sale price of a Proton in Ether.
 
-### `onlyTokenOwnerOrApproved(uint256 tokenId)`
+`function getSalePrice(uint256 tokenId) external view virtual override returns (uint256);`
 
+| Parameter / Return Value  | Description             |
+|---------------------------|-------------------------|
+| tokenId                   | id of Proton            |
+| return                    | sale price in Ether     |
 
+#### getLastSellPrice
 
+Gets most recent price that Proton sold for in Ether.
 
+`function getLastSellPrice(uint256 tokenId) external view virtual override returns (uint256);`
 
-### `onlyTokenCreator(uint256 tokenId)`
+| Parameter / Return Value  | Description             |
+|---------------------------|-------------------------|
+| tokenId                   | id of Proton            |
+| return                    | sale price in Ether     |
 
 
+#### getCreatorRoyalties
 
+`function getCreatorRoyalties(address account) external view virtual override returns (uint256);`
 
+Gets creator royalties for a given creator. Royalties are how much of the sale price will be directed to the Proton's creator whenever a Proton is sold.
 
+| Parameter / Return Value  | Description                       |
+|---------------------------|-----------------------------------|
+| address                   | creator account                   |
+| return                    | royalties earned by creator       |
 
-### `creatorOf(uint256 tokenId) → address` (external)
 
+#### getCreatorRoyaltiesPct
 
+`function getCreatorRoyaltiesPct(address account) external view virtual override returns (uint256);`
 
+Gets creator royalties. Royalties are how much of the sale price will be directed to the Proton's creator whenever a Proton is sold.
 
+| Parameter / Return Value  | Description                       |
+|---------------------------|-----------------------------------|
+| tokenId                   | id of Proton                      |
+| return                    | royalty percentage on Proton sale |
 
-### `getSalePrice(uint256 tokenId) → uint256` (external)
+#### getCreatorRoyaltiesReceiver
 
+`function getCreatorRoyaltiesReceiver(uint256 tokenId) external view virtual override returns (address);`
 
+Gets creator royalties receiver. Can be either the creator or a 3rd-party, such as a charity, relative, or any other account of choice.
 
+| Parameter / Return Value  | Description                       |
+|---------------------------|-----------------------------------|
+| tokenId                   | id of Proton                      |
+| return                    | address of royalties receiver     |
 
 
-### `getLastSellPrice(uint256 tokenId) → uint256` (external)
+## Create & Interact with Proton(s)
 
+> Create various types of Protons, buy a Proton, claim royalties, etc.
 
+#### claimCreatorRoyalties()
 
+Sends royalties to creator or delegated receiver.
 
+`function claimCreatorRoyalties() external virtual override nonReentrant whenNotPaused returns (uint256);`
 
-### `getCreatorRoyalties(address account) → uint256` (external)
+#### createChargedParticle
+ 
+Create a new Charged Particle (a Proton with interest-bearing assets deposited into its wallet). 
 
-
-
-
-
-### `getCreatorRoyaltiesPct(uint256 tokenId) → uint256` (external)
-
-
-
-
-
-### `getCreatorRoyaltiesReceiver(uint256 tokenId) → address` (external)
-
-
-
-
-
-### `claimCreatorRoyalties() → uint256` (external)
-
-
-
-
-
-### `createChargedParticle(address creator, address receiver, address referrer, string tokenMetaUri, string walletManagerId, address assetToken, uint256 assetAmount, uint256 annuityPercent) → uint256 newTokenId` (external)
-
-
-
-
-
-### `createBasicProton(address creator, address receiver, string tokenMetaUri) → uint256 newTokenId` (external)
-
-
-
-
-
-### `createProton(address creator, address receiver, string tokenMetaUri, uint256 annuityPercent) → uint256 newTokenId` (external)
-
-
-
-
-
-### `createProtonForSale(address creator, address receiver, string tokenMetaUri, uint256 annuityPercent, uint256 royaltiesPercent, uint256 salePrice) → uint256 newTokenId` (external)
-
-
-
-
-
-### `batchProtonsForSale(address creator, uint256 annuityPercent, uint256 royaltiesPercent, string[] tokenMetaUris, uint256[] salePrices)` (external)
-
-
-
-
-
-### `buyProton(uint256 tokenId) → bool` (external)
-
-
-
-
-
-### `setSalePrice(uint256 tokenId, uint256 salePrice)` (external)
-
-
-
-
-
-### `setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct)` (external)
-
-
-
-
-
-### `setCreatorRoyaltiesReceiver(uint256 tokenId, address receiver)` (external)
-
-
-
-
-
-### `setPausedState(bool state)` (external)
-
-
-
-
-
-### `setUniverse(address universe)` (external)
-
-
-
-Setup the ChargedParticles Interface
-
-### `setChargedParticles(address chargedParticles)` (external)
-
-
-
-Setup the ChargedParticles Interface
-
-### `setChargedState(address stateController)` (external)
-
-
-
-Setup the Charged-State Controller
-
-### `setChargedSettings(address settings)` (external)
-
-
-
-Setup the Charged-Settings Controller
-
-### `setTrustedForwarder(address _trustedForwarder)` (external)
-
-
-
-
-
-### `withdrawEther(address payable receiver, uint256 amount)` (external)
-
-
-
-
-
-### `withdrawErc20(address payable receiver, address tokenAddress, uint256 amount)` (external)
-
-
-
-
-
-### `withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId)` (external)
-
-
-
-
-
-### `_setSalePrice(uint256 tokenId, uint256 salePrice)` (internal)
-
-
-
-
-
-### `_setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct)` (internal)
-
-
-
-
-
-### `_creatorRoyaltiesReceiver(uint256 tokenId) → address` (internal)
-
-
-
-
-
-### `_createChargedParticle(address creator, address receiver, address referrer, string tokenMetaUri, string walletManagerId, address assetToken, uint256 assetAmount, uint256 annuityPercent) → uint256 newTokenId` (internal)
-
-
-
-
-
-### `_createProton(address creator, address receiver, string tokenMetaUri, uint256 annuityPercent, uint256 royaltiesPercent, uint256 salePrice) → uint256 newTokenId` (internal)
-
-
-
-
-
-### `_batchProtonsForSale(address creator, uint256 annuityPercent, uint256 royaltiesPercent, string[] tokenMetaUris, uint256[] salePrices)` (internal)
-
-
-
-
-
-### `_chargeParticle(uint256 tokenId, string walletManagerId, address assetToken, uint256 assetAmount, address referrer)` (internal)
-
-
-
-
-
-### `_buyProton(uint256 tokenId) → bool` (internal)
-
-
-
-
-
-### `_claimCreatorRoyalties(address receiver) → uint256` (internal)
-
-
-
-Pays out the Creator Royalties of the calling account
-
-
-### `_collectAssetToken(address from, address assetToken, uint256 assetAmount)` (internal)
-
-
-
-Collects the Required Asset Token from the users wallet
-
-
-### `_refundOverpayment(uint256 threshold)` (internal)
-
-
-
-
-
-### `_transfer(address from, address to, uint256 tokenId)` (internal)
-
-
-
-
-
-### `_msgSender() → address payable` (internal)
-
-
-
-See {BaseRelayRecipient-_msgSender}.
-
-### `_msgData() → bytes` (internal)
-
-
-
-See {BaseRelayRecipient-_msgData}.
-
-
+```
+function createChargedParticle(
+  address creator,
+  address receiver,
+  address referrer,
+  string tokenMetaUri,
+  string walletManagerId,
+  address assetToken,
+  uint256 assetAmount, 
+  uint256 annuityPercent
+) external virtual override nonReentrant whenNotPaused returns (uint256 newTokenId);
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| creator                   | id of Charged Particle                              |
+| receiver                  | receiver of new Charged Particle                    |
+| referrer                  |                                                     |
+| tokenMetaUri              | URI of tokenmetadata                                |
+| walletManagerId           | id of walletManager for Charged Particle            |
+| assetToken                | interest-bearing asset to create token with         |
+| assetAmount               | amount of asset token                               |
+| annuityPercent            | percentage of charge (interest) directed to creator |
+| newTokenId                | id of new Charged Particle                          |
+
+#### createBasicProton
+
+Create a basic Proton without charge, and with annuityPercent, royaltiesPercent, and salePrice set to 0.
+
+```
+function createBasicProton(
+  address creator,
+  address receiver,
+  string tokenMetaUri
+) external virtual override whenNotPaused returns (uint256 newTokenId);
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| creator                   | id of Proton                                        |
+| receiver                  | receiver of new Proton                              |
+| tokenMetaUri              | URI of tokenmetadata                                |
+| newTokenId                | id of new Proton                                    |
+
+#### createProton
+
+Create a Proton, set its annuity percentage to a custom amount, and set royalties percentage and salePrice to 0.
+
+```
+function createProton(
+  address creator,
+  address receiver,
+  string tokenMetaUri,
+  uint256 annuityPercent
+) external virtual override whenNotPaused returns (uint256 newTokenId);
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| creator                   | address of creator                                  |
+| receiver                  | receiver of new Proton                              |
+| tokenMetaUri              | URI of tokenmetadata                                |
+| annuity percent           | percentage of interest that goes to creator         |
+| newTokenId                | id of new Proton                                    |
+
+#### createProtonForSale
+
+```
+function createProtonForSale(
+  address creator,
+  address receiver,
+  string tokenMetaUri,
+  uint256 annuityPercent,
+  uint256 royaltiesPercent,
+  uint256 salePrice
+) external virtual override whenNotPaused returns (uint256 newTokenId);
+```
+
+| Parameter / Return Value  | Description                                           |
+|---------------------------|-------------------------------------------------------|
+| creator                   | address of creator                                    |
+| receiver                  | receiver of new Proton                                |
+| tokenMetaUri              | URI of tokenmetadata                                  |
+| annuityPercent           | percentage of charge (interest) that goes to creator   |
+| royaltiesPercent         | percentage of Proton sale that goes to creator         |
+| salePrice                 | sale price of Proton                                  |
+| newTokenId                | id of new Proton                                      |
+
+#### batchProtonsForSale
+
+```
+function batchProtonsForSale(
+  address creator,
+  uint256 annuityPercent,
+  uint256 royaltiesPercent,
+  string[] calldata tokenMetaUris,
+  uint256[] calldata salePrices
+) external virtual override whenNotPaused;
+```
+
+| Parameter / Return Value  | Description                                         |
+|---------------------------|-----------------------------------------------------|
+| creator                   | address of creator                                  |
+| annuityPercent            | percentage of charge (interest) that goes to creator|
+| royaltiesPercent          | percentage of Proton sale that goes to creator                                 |
+| tokenMetaUris             | array of token metadata URIs for Protons                                |
+| salePrices             | array of sale prices for Protons                       |
+
+#### buyProton
+
+Buy a Proton.
+
+```
+function buyProton(
+  uint256 tokenId
+) external payable virutal override nonReentrant whenNotPaused returns (bool);
+```
+
+| Parameter / Return Value  | Description                                           |
+|---------------------------|-------------------------------------------------------|
+| tokenId                   | id of Proton to purchase                              |
+| return                    | true if purchase successful, false if not             |
+
+## Update Proton Settings (Only for Creator/Owner)
+
+#### setSalePrice
+
+Set the sale price for a Proton.
+
+```
+function setSalePrice(
+  uint256 tokenId, 
+  uint256 salePrice
+) external virtual override whenNotPaused onlyTokenOwnerOrApproved(tokenId);
+```
+
+| Parameter / Return Value  | Description                                           |
+|---------------------------|-------------------------------------------------------|
+| tokenId                   | id of Proton to set price for                         |
+| salePrice                 | sale price in Ether                                   |
+
+
+
+#### setRoyaltiesPct
+
+Set royalties percentage for a Proton.
+
+```
+function setRoyaltiesPct(
+  uint256 tokenId,
+  uint256 royaltiesPct
+) external virtual override whenNotPaused onlyTokenCreator(tokenId) onlyTokenOwnerOrApproved(tokenId);
+```
+
+| Parameter / Return Value  | Description                                           |
+|---------------------------|-------------------------------------------------------|
+| tokenId                   | id of Proton to set price for                         |
+| royaltiesPct              | percentage of sale directed to creator                                   |
+
+
+#### setCreatorRoyaltiesReceiver
+
+Set a receiver for Proton royalties.
+
+```
+function setCreatorRoyaltiesReceiver(
+  uint256 tokenId, 
+  address receiver
+) external virtual override whenNotPaused onlyTokenCreator(tokenId);
+```
+
+| Parameter / Return Value  | Description                                           |
+|---------------------------|-------------------------------------------------------|
+| tokenId                   | id of Proton to set recever for                       |
+| receiver                  | address of receiver                                   |
