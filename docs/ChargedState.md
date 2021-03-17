@@ -94,7 +94,7 @@ function isApprovedForRelease(
 | operator                  | address of the operator to check      |
 | return                    | True if operator approved             |
 
-### isApprovedForBreakBond
+#### isApprovedForBreakBond
 
 Checks if an operator is allowed to Break Covalent Bonds on a specific Particle.
 
