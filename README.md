@@ -24,8 +24,8 @@
 #### Production Site (Beta, Ropsten Only)
 - https://charged.fi
 
-#### Staging Site
-- https://charged-particles-stg.netlify.app/
+#### Documentation
+- https://docs.charged.fi
 
 ---
 
