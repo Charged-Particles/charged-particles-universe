@@ -1,6 +1,6 @@
 ## Charged Particles Universe - Solidity Contracts v1.0.0
 
-[![Discord](https://badgen.net/badge/definft/Charged%20Particles?icon=discord&label=discord)](https://discord.gg/Cdv6zZMKEa)
+[![Discord](https://badgen.net/badge/definft/Charged%20Particles?icon=discord&label=discord)](https://discord.gg/Syh3gjz)
 [![Twitter Follow](https://badgen.net/twitter/follow/DeFiNFT?icon=twitter)](https://twitter.com/intent/follow?screen_name=DeFiNFT)
 [![built-with openzeppelin](https://img.shields.io/badge/built%20with-OpenZeppelin-3677FF)](https://docs.openzeppelin.com/)
 
