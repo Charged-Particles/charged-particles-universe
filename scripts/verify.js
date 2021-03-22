@@ -58,6 +58,7 @@ async function run() {
   // NFTs
   await verifyContract('Proton', networkName);
   await verifyContract('Lepton', networkName);
+  await verifyContract('Lepton2', networkName);
 
   success('Done!');
 };

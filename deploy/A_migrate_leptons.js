@@ -2,13 +2,22 @@ const {
   chainNameById,
   chainIdByName,
   getDeployData,
+  getActualTxGasCost,
   log,
 } = require("../js-helpers/deploy");
 
 const _ = require('lodash');
 
 
-const _AMOUNT_TO_MIGRATE = 100;
+// 1 - Gas Cost:  0.0121224
+// 2 - Gas Cost:  0.0154279    (diff: 0.0033055)
+// 3 - Gas Cost:  0.0187334    (diff: 0.0033055)
+// 4 - Gas Cost:  0.0220389    (diff: 0.0033055)
+// 5 - Gas Cost:  0.0253444    (diff: 0.0033055)
+// ...
+// 100 - Estimated between 0.3393669 ETH  to  0.8522872 ETH
+
+const _AMOUNT_TO_MIGRATE = 5;
 
 module.exports = async (hre) => {
   const { ethers, getNamedAccounts } = hre;
@@ -39,15 +48,16 @@ module.exports = async (hre) => {
 
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  // Migrate Users
+  // Migrate Leptons
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   await log(`  - Migrating ${_AMOUNT_TO_MIGRATE} Tokens...`)(alchemyTimeout);
-  await lepton2.migrateAccounts(ddLepton.address, _AMOUNT_TO_MIGRATE);
+  const result = await lepton2.migrateAccounts(ddLepton.address, _AMOUNT_TO_MIGRATE);
+  log('     - Gas Cost: ', (await getActualTxGasCost(result)));
 
 
   log('\n  Transaction Execution Complete!');
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
-module.exports.tags = ['pause-all']
+module.exports.tags = ['migrate-leptons']

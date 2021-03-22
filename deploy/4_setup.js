@@ -235,11 +235,15 @@ module.exports = async (hre) => {
       await chargedSettings.enableNftContracts([ddLepton.address])
     );
 
+    await executeTx('5-d', 'Lepton: Unpausing', async () =>
+      await lepton.setPausedState(false)
+    );
+
     let leptonType;
     for (let i = 0; i < presets.Lepton.types.length; i++) {
       leptonType = presets.Lepton.types[i];
 
-      await executeTx(`5-d-${i}`, `Lepton: Adding Lepton Type: ${leptonType.name}`, async () =>
+      await executeTx(`5-e-${i}`, `Lepton: Adding Lepton Type: ${leptonType.name}`, async () =>
         await lepton.addLeptonType(
           leptonType.tokenUri,
           leptonType.price[chainId],

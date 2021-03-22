@@ -187,8 +187,8 @@ contract Lepton2 is ILepton, ERC721Basic, Ownable, ReentrancyGuard, BlackholePre
       require(oldSupply > _migratedCount, "LPT:E-004");
 
       uint256 endTokenId = _migratedCount.add(count);
-      if (endTokenId > _maxSupply) {
-        count = count.sub(endTokenId.sub(_maxSupply));
+      if (endTokenId > oldSupply) {
+        count = count.sub(endTokenId.sub(oldSupply));
       }
 
       for (uint256 i = 1; i <= count; i++) {

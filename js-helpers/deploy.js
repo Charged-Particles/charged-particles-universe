@@ -93,6 +93,12 @@ const getTxGasCost = ({deployTransaction}) => {
   return `${gasCost} ETH`;
 };
 
+const getActualTxGasCost = async (txData) => {
+  const txResult = await txData.wait();
+  const gasCostEst = toEth(txData.gasLimit.mul(txData.gasPrice));
+  const gasCost = toEth(txResult.gasUsed.mul(txData.gasPrice));
+  return `${gasCost} ETH Used.  (Estimated: ${gasCostEst} ETH)`;
+};
 
 const presets = {
   ChargedParticles: {
@@ -102,14 +108,14 @@ const presets = {
     ]
   },
   Lepton: {
-    maxMintPerTx: toBN('30'),
+    maxMintPerTx: toBN('25'),
     types: [
       {
         name        : 'Electron Neutrino',
         tokenUri    : 'https://ipfs.io/ipfs/QmSSuNTA5F9vhwxYHazVf8rBKY3ZFLq7yUtYtKZD32RX3L',
         price       : {1: toWei('0.3'), 42: toWei('0.0000003'), 31337: toWei('0.000000003')},
         supply      : toBN('721'),
-        multiplier  : toBN('110'),  // 1.1%
+        multiplier  : toBN('115'),  // 1.15%
         bonus       : toBN('0'),
       },
       {
@@ -117,7 +123,7 @@ const presets = {
         tokenUri    : 'https://ipfs.io/ipfs/QmToEVPsjpyBFDYWRMMDZP9x2xNpRGFYWD4TT7UKqY3dAw',
         price       : {1: toWei('0.9'), 42: toWei('0.0000009'), 31337: toWei('0.000000009')},
         supply      : toBN('401'),
-        multiplier  : toBN('130'),  // 1.3%
+        multiplier  : toBN('135'),  // 1.35%
         bonus       : toBN('1'),
       },
       {
@@ -125,7 +131,7 @@ const presets = {
         tokenUri    : 'https://ipfs.io/ipfs/QmP9ive1Wufav2VHeC24JSEtA326nYVJnxTUF6qJq6qyP5  ',
         price       : {1: toWei('1.7'), 42: toWei('0.0000017'), 31337: toWei('0.000000017')},
         supply      : toBN('301'),
-        multiplier  : toBN('150'),  // 1.5%
+        multiplier  : toBN('155'),  // 1.55%
         bonus       : toBN('2'),
       },
       {
@@ -133,7 +139,7 @@ const presets = {
         tokenUri    : 'https://ipfs.io/ipfs/QmTex8M3otqgyhKRrS75z6RSXnBkHQwQBbwWALjnQ956S1',
         price       : {1: toWei('2.9'), 42: toWei('0.000029'), 31337: toWei('0.00000029')},
         supply      : toBN('201'),
-        multiplier  : toBN('180'),  // 1.8%
+        multiplier  : toBN('185'),  // 1.85%
         bonus       : toBN('4'),
       },
       {
@@ -141,7 +147,7 @@ const presets = {
         tokenUri    : 'https://ipfs.io/ipfs/QmVxPucxAaVFtEucoZNKPhjcdm7STmbDC51P9fq9xsTtYM',
         price       : {1: toWei('5.1'), 42: toWei('0.000051'), 31337: toWei('0.00000051')},
         supply      : toBN('88'),
-        multiplier  : toBN('230'),  // 2.3%
+        multiplier  : toBN('235'),  // 2.35%
         bonus       : toBN('8'),
       },
       {
@@ -149,7 +155,7 @@ const presets = {
         tokenUri    : 'https://ipfs.io/ipfs/QmeaDyfTrTN1GmCqSSDWMDDZ86Y6mLzfiB8RfUifc6CEex',
         price       : {1: toWei('21'), 42: toWei('0.00021'), 31337: toWei('0.0000021')},
         supply      : toBN('21'),
-        multiplier  : toBN('310'),  // 3.1%
+        multiplier  : toBN('315'),  // 3.15%
         bonus       : toBN('16'),
       },
     ]
@@ -208,6 +214,7 @@ module.exports = {
   getContractAbi,
   getDeployData,
   getTxGasCost,
+  getActualTxGasCost,
   log,
   presets,
   toWei,

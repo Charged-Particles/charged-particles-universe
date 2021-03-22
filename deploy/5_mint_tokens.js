@@ -5,6 +5,7 @@ const {
   log,
   toBN,
   toWei,
+  presets,
 } = require("../js-helpers/deploy");
 
 const _ = require('lodash');
@@ -67,11 +68,13 @@ module.exports = async (hre) => {
 
     const chainId = chainIdByName(network.name);
     const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 7);
+    const leptonMaxMint = presets.Lepton.maxMintPerTx;
 
     const ddProton = getDeployData('Proton', chainId);
+    const ddLepton = getDeployData('Lepton', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-    log('Charged Particles: Mint Proton Tokens ');
+    log('Charged Particles: Mint Proton & Lepton Tokens ');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
     log('  Using Network: ', chainNameById(chainId));
@@ -83,6 +86,12 @@ module.exports = async (hre) => {
     const Proton = await ethers.getContractFactory('Proton');
     const proton = await Proton.attach(ddProton.address);
 
+    log('  Loading Lepton from: ', ddLepton.address);
+    const Lepton = await ethers.getContractFactory('Lepton');
+    const lepton = await Lepton.attach(ddLepton.address);
+
+
+    log('  Batch Minting Protons...');
     await proton.batchProtonsForSale(
       initialMinter,
       toBN('500'),
@@ -91,8 +100,13 @@ module.exports = async (hre) => {
       SingularityPrices,
     );
 
-    log('\n  Proton Minting Complete!');
+
+    log('  Batch Minting Leptons...');
+    await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')});
+
+
+    log('\n  Token Minting Complete!');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
-module.exports.tags = ['mint-protons']
+module.exports.tags = ['mint-tokens']
