@@ -17,7 +17,7 @@ const _ = require('lodash');
 // ...
 // 100 - Estimated between 0.3393669 ETH  to  0.8522872 ETH
 
-const _AMOUNT_TO_MIGRATE = 5;
+const _AMOUNT_TO_MIGRATE = 100;
 
 module.exports = async (hre) => {
   const { ethers, getNamedAccounts } = hre;

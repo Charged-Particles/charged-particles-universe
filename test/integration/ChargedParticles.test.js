@@ -157,7 +157,6 @@ describe("[INTEGRATION] Charged Particles", () => {
     );
 
     expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
-
   });
 
   it("can discharge only after timelock expired", async () => {
