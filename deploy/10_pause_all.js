@@ -7,10 +7,8 @@ const {
 
 const _ = require('lodash');
 
-
-const _PAUSED_STATE = false;
+const _PAUSED_STATE = true;
 const _ACTION = _PAUSED_STATE ? 'Pausing' : 'Unpausing';
-
 
 module.exports = async (hre) => {
   const { ethers, getNamedAccounts } = hre;
@@ -22,9 +20,10 @@ module.exports = async (hre) => {
 
   if (chainId !== 1) { return; } // Mainnet only
 
-  const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
   const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
   const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
+  const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
+  const ddCompoundWalletManager = getDeployData('CompoundWalletManager', chainId);
   const ddProton = getDeployData('Proton', chainId);
   const ddLepton = getDeployData('Lepton', chainId);
 
@@ -50,6 +49,10 @@ module.exports = async (hre) => {
   const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
   const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
 
+  log('  Loading CompoundWalletManager from: ', ddCompoundWalletManager.address);
+  const CompoundWalletManager = await ethers.getContractFactory('CompoundWalletManager');
+  const compoundWalletManager = await CompoundWalletManager.attach(ddCompoundWalletManager.address);
+
   log('  Loading Proton from: ', ddProton.address);
   const Proton = await ethers.getContractFactory('Proton');
   const proton = await Proton.attach(ddProton.address);
@@ -71,6 +74,9 @@ module.exports = async (hre) => {
 
   await log(`  - ${_ACTION} AaveWalletManager...`)(alchemyTimeout);
   await aaveWalletManager.setPausedState(_PAUSED_STATE);
+
+  await log(`  - ${_ACTION} CompoundWalletManager...`)(alchemyTimeout);
+  await compoundWalletManager.setPausedState(_PAUSED_STATE);
 
   await log(`  - ${_ACTION} Proton...`)(alchemyTimeout);
   await proton.setPausedState(_PAUSED_STATE);

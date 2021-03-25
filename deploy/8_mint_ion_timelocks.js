@@ -24,6 +24,8 @@ module.exports = async (hre) => {
     const chainId = chainIdByName(network.name);
     const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
 
+    if (chainId === 1) { return; } // Testnet only
+
     const ddIon = getDeployData('Ion', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');

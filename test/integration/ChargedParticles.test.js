@@ -7,7 +7,6 @@ const {
 
 const {
   getDeployData,
-  toEth,
   toWei,
   toBN,
   presets
@@ -26,26 +25,31 @@ const { max } = require('lodash');
 const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
 
 const daiABI = require('../abis/dai');
-const { balanceOf } = require('../../js-helpers/balanceOf');
 const daiHodler = "0x55e4d16f9c3041EfF17Ca32850662f3e9Dddbce7"; // Hodler with the highest current amount of DAI, used for funding our operations on mainnet fork.
+
+const MAX_UINT = toBN('2').pow(toBN('256')).sub(toBN('1'));
 
 describe("[INTEGRATION] Charged Particles", () => {
   let chainId;
 
+  let daiAddress;
+  let cDaiAddress;
+
   // External contracts
   let dai;
-  let daiAddress;
 
   // Internal contracts
   let universe;
   let chargedParticles;
-  let aaveWalletManager;
   let genericWalletManager;
   let genericBasketManager;
+  let aaveWalletManager;
+  let compoundWalletManager;
   let proton;
   let lepton;
   let ion;
   let timelocks;
+  let cDai;
 
   // Settings
   let annuityPct = '1000';  // 10%
@@ -66,6 +70,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   beforeEach(async () => {
     chainId = await getChainId(); // chainIdByName(network.name);
     daiAddress = presets.Aave.v2.dai[chainId];
+    cDaiAddress = presets.Compound.dai[chainId];
 
     // With Forked Mainnet
     await network.provider.request({
@@ -93,9 +98,10 @@ describe("[INTEGRATION] Charged Particles", () => {
     const ChargedState = await ethers.getContractFactory('ChargedState');
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
-    const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
+    const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
+    const CompoundWalletManager = await ethers.getContractFactory('CompoundWalletManager');
     const Proton = await ethers.getContractFactory('Proton');
     const Lepton = await ethers.getContractFactory('Lepton');
     const Ion = await ethers.getContractFactory('Ion');
@@ -105,14 +111,16 @@ describe("[INTEGRATION] Charged Particles", () => {
     chargedState = ChargedState.attach(getDeployData('ChargedState', chainId).address);
     chargedSettings = ChargedSettings.attach(getDeployData('ChargedSettings', chainId).address);
     chargedParticles = ChargedParticles.attach(getDeployData('ChargedParticles', chainId).address);
-    aaveWalletManager = AaveWalletManager.attach(getDeployData('AaveWalletManager', chainId).address);
     genericWalletManager = GenericWalletManager.attach(getDeployData('GenericWalletManager', chainId).address);
     genericBasketManager = GenericBasketManager.attach(getDeployData('GenericBasketManager', chainId).address);
+    aaveWalletManager = AaveWalletManager.attach(getDeployData('AaveWalletManager', chainId).address);
+    compoundWalletManager = CompoundWalletManager.attach(getDeployData('CompoundWalletManager', chainId).address);
     proton = Proton.attach(getDeployData('Proton', chainId).address);
     lepton = Lepton.attach(getDeployData('Lepton', chainId).address);
     ion = Ion.attach(getDeployData('Ion', chainId).address);
     timelocks = Object.values(getDeployData('IonTimelocks', chainId))
       .map(ionTimelock => (IonTimelock.attach(ionTimelock.address)));
+    cDai = await ethers.getContractAt('ICErc20', cDaiAddress);
 
     await lepton.connect(signerD).setPausedState(false);
   });
@@ -125,8 +133,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     });
   });
 
-  it("can succesfully energize and release proton", async () => {
-
+  it("can succesfully energize using aave and release proton", async () => {
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
@@ -142,7 +149,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         user3,                        // referrer
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
         'aave',                       // walletManagerId
-        daiAddress, // assetToken
+        daiAddress,                   // assetToken
         toWei('10'),                  // assetAmount
         annuityPct,                   // annuityPercent
       ],
@@ -158,6 +165,50 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
 
+  });
+
+  it("can succesfully energize using compound and release proton", async () => {
+
+    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+
+    await dai.connect(daiSigner).transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    const energizedParticleId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'compound',                   // walletManagerId
+        daiAddress,                   // assetToken
+        toWei('10'),                  // assetAmount
+        annuityPct,                   // annuityPercent
+      ],
+    });
+
+    // Compound needs some pool changes in order for the redeem functions not to fail
+    await cDai.connect(signer1).borrow(toWei('1'));
+    await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + 10);
+    await dai.connect(daiSigner).transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](cDai.address, toWei('2'));
+    await cDai.connect(signer1).repayBorrow(MAX_UINT); // repay amount of 'uint(-1)' means: repay in full whatever I have to repay
+
+    const balanceBefore = await dai.balanceOf(user2);
+
+    await chargedParticles.connect(signer2).releaseParticle(
+      user2,
+      proton.address,
+      energizedParticleId,
+      'compound',
+      daiAddress
+    );
+
+    const balanceAfter = await dai.balanceOf(user2);
+    expect(balanceAfter.sub(balanceBefore)).to.be.above(toWei('9.9'));
   });
 
   it("can discharge only after timelock expired", async () => {
@@ -519,7 +570,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(await ion.balanceOf(user2)).to.be.above(user2BalanceBefore).and.below(user2BalanceBefore.add(bondWeight));
   });
 
-  it("charging a proton with a lepton should multiply ion return", async () => {
+  it("charging a proton with a lepton should multiply ion returns", async () => {
     const assetAmount10 = toWei('10');
     const assetAmount20 = toWei('20');
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens

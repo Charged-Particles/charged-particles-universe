@@ -58,7 +58,7 @@ module.exports = async (hre) => {
     log('     - Gas Cost:        ', getTxGasCost({deployTransaction: aaveBridgeV2.deployTransaction}));
 
     saveDeploymentData(chainId, deployData);
-    log('\n  Contract Deployment Data saved to "deployed" directory.');
+    log('\n  Contract Deployment Data saved to "deployments" directory.');
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };
