@@ -35,8 +35,8 @@
 - contracts/
   - tokens/
     - Ion.sol
-    - Lepton2.sol
     - Proton.sol
+    - Lepton2.sol
 
 
 ---
