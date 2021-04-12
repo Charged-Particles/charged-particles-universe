@@ -101,8 +101,16 @@ module.exports = async (hre) => {
     );
 
 
+    //   NOTE: Running all of these causes the Leptons to be SOLD OUT and the corresponding Unit-Tests will fail when trying to mint new ones
     log('  Batch Minting Leptons...');
-    await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')});
+    await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 25 Electron Neutrinos
+    // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 15 Electron Neutrinos  (40 Total)
+    // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 20 Muon Neutrinos
+    // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 12 Tau Neutrinos
+    // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 8 Electrons
+    // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 5 Muons
+    // await lepton.mintLepton({value: toWei('1')}); // 1 Tau
+    // await lepton.mintLepton({value: toWei('1')}); // 1 Tau
 
 
     log('\n  Token Minting Complete!');

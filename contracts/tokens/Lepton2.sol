@@ -34,7 +34,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
 import "../interfaces/ILepton.sol";
 import "../lib/BlackholePrevention.sol";
 
-
 contract Lepton2 is ILepton, ERC721Basic, Ownable, ReentrancyGuard, BlackholePrevention {
   using SafeMath for uint256;
   using Address for address payable;
@@ -56,6 +55,8 @@ contract Lepton2 is ILepton, ERC721Basic, Ownable, ReentrancyGuard, BlackholePre
 
   constructor() public ERC721Basic("Charged Particles - Lepton2", "LEPTON2") {
     _paused = true;
+    _migrationComplete = false;
+    _migratedCount = 0;
   }
 
 
@@ -158,7 +159,7 @@ contract Lepton2 is ILepton, ERC721Basic, Ownable, ReentrancyGuard, BlackholePre
     emit MaxMintPerTxSet(maxAmount);
   }
 
-  function setPausedState(bool state) external onlyOwner whenMigrated {
+  function setPausedState(bool state) external onlyOwner {
     _paused = state;
     emit PausedStateSet(state);
   }
@@ -183,9 +184,9 @@ contract Lepton2 is ILepton, ERC721Basic, Ownable, ReentrancyGuard, BlackholePre
 
   function migrateAccounts(address oldLeptonContract, uint256 count) external onlyOwner whenNotMigrated {
     uint256 oldSupply = IERC721Enumerable(oldLeptonContract).totalSupply();
-    if (oldSupply > 0) {
-      require(oldSupply > _migratedCount, "LPT:E-004");
+    require(oldSupply == 0 || oldSupply > _migratedCount, "LPT:E-004");
 
+    if (oldSupply > 0) {
       uint256 endTokenId = _migratedCount.add(count);
       if (endTokenId > oldSupply) {
         count = count.sub(endTokenId.sub(oldSupply));
@@ -196,7 +197,7 @@ contract Lepton2 is ILepton, ERC721Basic, Ownable, ReentrancyGuard, BlackholePre
         address tokenOwner = IERC721(oldLeptonContract).ownerOf(tokenId);
         _mint(tokenOwner);
       }
-      _migratedCount = _tokenCount;
+      _migratedCount = _migratedCount.add(count);
     }
 
     if (oldSupply == _migratedCount) {
@@ -281,11 +282,6 @@ contract Lepton2 is ILepton, ERC721Basic, Ownable, ReentrancyGuard, BlackholePre
   /***********************************|
   |             Modifiers             |
   |__________________________________*/
-
-  modifier whenMigrated() {
-    require(_migrationComplete, "LPT:E-003");
-    _;
-  }
 
   modifier whenNotMigrated() {
     require(!_migrationComplete, "LPT:E-004");
