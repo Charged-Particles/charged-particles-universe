@@ -15,6 +15,7 @@ build/
 bin/
 notes.txt
 cache
+lepton_data/
 
 # OpenZeppelin
 .openzeppelin/dev-*.json

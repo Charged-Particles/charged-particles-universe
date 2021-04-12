@@ -59,15 +59,25 @@ module.exports = async (hre) => {
     deployTransaction: lepton.deployTransaction,
   }
 
-    await log('\n  Deploying Ion FT...')(alchemyTimeout);
-    const Ion = await ethers.getContractFactory('Ion');
-    const IonInstance = await Ion.deploy();
-    const ion = await IonInstance.deployed();
-    deployData['Ion'] = {
-      abi: getContractAbi('Ion'),
-      address: ion.address,
-      deployTransaction: ion.deployTransaction,
-    }
+  await log('\n  Deploying Lepton2 NFT...')(alchemyTimeout);
+  const Lepton2 = await ethers.getContractFactory('Lepton2');
+  const Lepton2Instance = await Lepton2.deploy();
+  const lepton2 = await Lepton2Instance.deployed();
+  deployData['Lepton2'] = {
+    abi: getContractAbi('Lepton2'),
+    address: lepton2.address,
+    deployTransaction: lepton2.deployTransaction,
+  }
+
+  await log('\n  Deploying Ion FT...')(alchemyTimeout);
+  const Ion = await ethers.getContractFactory('Ion');
+  const IonInstance = await Ion.deploy();
+  const ion = await IonInstance.deployed();
+  deployData['Ion'] = {
+    abi: getContractAbi('Ion'),
+    address: ion.address,
+    deployTransaction: ion.deployTransaction,
+  }
 
   // Display Contract Addresses
   await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
@@ -77,6 +87,8 @@ module.exports = async (hre) => {
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
   log('  - Lepton:      ', lepton.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
+  log('  - Lepton2:      ', lepton2.address);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
   log('  - Ion:         ', ion.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ion.deployTransaction }));
 

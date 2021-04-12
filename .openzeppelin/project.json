@@ -13,7 +13,8 @@
     "IonTimelock": "IonTimelock",
     "WBoson": "WBoson",
     "Proton": "Proton",
-    "Lepton": "Lepton"
+    "Lepton": "Lepton",
+    "Lepton2": "Lepton2"
   },
   "dependencies": {
   },

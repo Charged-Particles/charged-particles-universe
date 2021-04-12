@@ -66,7 +66,7 @@ module.exports = {
         hardhat: {
             blockGasLimit: 200000000,
             allowUnlimitedContractSize: true,
-            gasPrice: 8e9,
+            gasPrice: 1e9,
             forking: {
                 url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
                 blockNumber: 11400000,  // MUST be after Aave V2 was deployed
@@ -87,7 +87,7 @@ module.exports = {
         mainnet: {
             url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
             // url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 190e9,
+            gasPrice: 130e9,
             blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.mainnet,
@@ -122,6 +122,7 @@ module.exports = {
         'Proton',
         'WBoson',
         'Lepton',
+        'Lepton2',
         'ERC20',
         'ERC721'
       ],

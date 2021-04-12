@@ -14,7 +14,7 @@ const _ACTION = _PAUSED_STATE ? 'Pausing' : 'Unpausing';
 
 module.exports = async (hre) => {
   const { ethers, getNamedAccounts } = hre;
-  const { deployer, owner } = await getNamedAccounts();
+  const { deployer, protocolOwner } = await getNamedAccounts();
   const network = await hre.network;
 
   const chainId = chainIdByName(network.name);
@@ -27,6 +27,7 @@ module.exports = async (hre) => {
   const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
   const ddProton = getDeployData('Proton', chainId);
   const ddLepton = getDeployData('Lepton', chainId);
+  const ddLepton2 = getDeployData('Lepton2', chainId);
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles: Pause All Contracts');
@@ -35,7 +36,7 @@ module.exports = async (hre) => {
   log('  Using Network: ', chainNameById(chainId));
   log('  Using Accounts:');
   log('  - Deployer:    ', deployer);
-  log('  - Owner:       ', owner);
+  log('  - Owner:       ', protocolOwner);
   log(' ');
 
   log('  Loading GenericWalletManager from: ', ddGenericWalletManager.address);
@@ -58,6 +59,10 @@ module.exports = async (hre) => {
   const Lepton = await ethers.getContractFactory('Lepton');
   const lepton = await Lepton.attach(ddLepton.address);
 
+  log('  Loading Lepton2 from: ', ddLepton2.address);
+  const Lepton2 = await ethers.getContractFactory('Lepton2');
+  const lepton2 = await Lepton2.attach(ddLepton2.address);
+
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Set Paused State
@@ -77,6 +82,9 @@ module.exports = async (hre) => {
 
   await log(`  - ${_ACTION} Lepton...`)(alchemyTimeout);
   await lepton.setPausedState(_PAUSED_STATE);
+
+  await log(`  - ${_ACTION} Lepton2...`)(alchemyTimeout);
+  await lepton2.setPausedState(_PAUSED_STATE);
 
 
   log('\n  Transaction Execution Complete!');
