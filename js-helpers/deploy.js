@@ -93,6 +93,12 @@ const getTxGasCost = ({deployTransaction}) => {
   return `${gasCost} ETH`;
 };
 
+const getActualTxGasCost = async (txData) => {
+  const txResult = await txData.wait();
+  const gasCostEst = toEth(txData.gasLimit.mul(txData.gasPrice));
+  const gasCost = toEth(txResult.gasUsed.mul(txData.gasPrice));
+  return `${gasCost} ETH Used.  (Estimated: ${gasCostEst} ETH)`;
+};
 
 const presets = {
   ChargedParticles: {
@@ -102,54 +108,56 @@ const presets = {
     ]
   },
   Lepton: {
-    maxMintPerTx: toBN('10'),
+    maxMintPerTx: toBN('25'),
+
+    // V2 Type Definitions
     types: [
       {
         name        : 'Electron Neutrino',
-        tokenUri    : 'https://ipfs.io/ipfs/QmSSuNTA5F9vhwxYHazVf8rBKY3ZFLq7yUtYtKZD32RX3L',
-        price       : toWei('0.3'),
-        supply      : toBN('721'),
+        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmcWuHx4MgywyEMzsqT9J3boJu1gk7GdtAMQ1pyQYRR3XS',
+        price       : {1: toWei('0.3'), 42: toWei('0.0000003'), 31337: toWei('0.000000003')},
+        supply      : {1: toBN('721'), 42: toBN('40'), 31337: toBN('40')},
         multiplier  : toBN('110'),  // 1.1%
         bonus       : toBN('0'),
       },
       {
         name        : 'Muon Neutrino',
-        tokenUri    : 'https://ipfs.io/ipfs/QmToEVPsjpyBFDYWRMMDZP9x2xNpRGFYWD4TT7UKqY3dAw',
-        price       : toWei('0.9'),
-        supply      : toBN('401'),
+        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmccGhGhvi37QScB4u2VmuVwENtEsMpx6hAKUqu3x3nU9V',
+        price       : {1: toWei('0.9'), 42: toWei('0.0000009'), 31337: toWei('0.000000009')},
+        supply      : {1: toBN('401'), 42: toBN('20'), 31337: toBN('20')},
         multiplier  : toBN('130'),  // 1.3%
         bonus       : toBN('1'),
       },
       {
         name        : 'Tau Neutrino',
-        tokenUri    : 'https://ipfs.io/ipfs/QmP9ive1Wufav2VHeC24JSEtA326nYVJnxTUF6qJq6qyP5  ',
-        price       : toWei('1.7'),
-        supply      : toBN('301'),
+        tokenUri    : 'https://gateway.pinata.cloud/ipfs/Qma2ZPnCM95AYZ1wPxZdDVvRiS114Svrw2J632ZpLiX7JV',
+        price       : {1: toWei('1.7'), 42: toWei('0.0000017'), 31337: toWei('0.000000017')},
+        supply      : {1: toBN('301'), 42: toBN('12'), 31337: toBN('12')},
         multiplier  : toBN('150'),  // 1.5%
         bonus       : toBN('2'),
       },
       {
         name        : 'Electron',
-        tokenUri    : 'https://ipfs.io/ipfs/QmTex8M3otqgyhKRrS75z6RSXnBkHQwQBbwWALjnQ956S1',
-        price       : toWei('2.9'),
-        supply      : toBN('201'),
+        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmNRKJsUwqEE9zYK6sEND8HDGa4cHFkkC2ntjQA5bFL6jJ',
+        price       : {1: toWei('2.9'), 42: toWei('0.000029'), 31337: toWei('0.00000029')},
+        supply      : {1: toBN('201'), 42: toBN('8'), 31337: toBN('8')},
         multiplier  : toBN('180'),  // 1.8%
         bonus       : toBN('4'),
       },
       {
         name        : 'Muon',
-        tokenUri    : 'https://ipfs.io/ipfs/QmVxPucxAaVFtEucoZNKPhjcdm7STmbDC51P9fq9xsTtYM',
-        price       : toWei('5.1'),
-        supply      : toBN('88'),
+        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmWiH5F9yPp7yRzcqocmQKuhrA3KVY9fGJZxD9UKBDu5wr',
+        price       : {1: toWei('5.1'), 42: toWei('0.000051'), 31337: toWei('0.00000051')},
+        supply      : {1: toBN('88'), 42: toBN('5'), 31337: toBN('5')},
         multiplier  : toBN('230'),  // 2.3%
         bonus       : toBN('8'),
       },
       {
         name        : 'Tau',
-        tokenUri    : 'https://ipfs.io/ipfs/QmeaDyfTrTN1GmCqSSDWMDDZ86Y6mLzfiB8RfUifc6CEex',
-        price       : toWei('21'),
-        supply      : toBN('21'),
-        multiplier  : toBN('310'),  // 3.1%
+        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmUkCXgyguBSxnGRtfBAvofAkyhFbRCwS7HPaoytAZvemt',
+        price       : {1: toWei('21'), 42: toWei('0.00021'), 31337: toWei('0.0000021')},
+        supply      : {1: toBN('21'), 42: toBN('2'), 31337: toBN('2')},
+        multiplier  : toBN('510'),  // 5.1%
         bonus       : toBN('16'),
       },
     ]
@@ -208,6 +216,7 @@ module.exports = {
   getContractAbi,
   getDeployData,
   getTxGasCost,
+  getActualTxGasCost,
   log,
   presets,
   toWei,
