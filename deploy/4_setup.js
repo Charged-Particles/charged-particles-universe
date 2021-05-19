@@ -247,7 +247,7 @@ module.exports = async (hre) => {
         await lepton.addLeptonType(
           leptonType.tokenUri,
           leptonType.price[chainId],
-          leptonType.supply,
+          leptonType.supply[chainId],
           leptonType.multiplier,
           leptonType.bonus,
         )
@@ -258,8 +258,8 @@ module.exports = async (hre) => {
     // Setup Ion
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('6-a', 'Ion: Registering Universe', async () =>
-      await ion.setUniverse(ddUniverse.address)
+    await executeTx('6-b', 'Ion: Setting Minter', async () =>
+      await ion.setMinter(protocolOwner)
     );
 
     await executeTx('6-b', 'Universe: Registering Ion', async () =>
@@ -339,7 +339,7 @@ module.exports = async (hre) => {
         await lepton2.addLeptonType(
           lepton2Type.tokenUri,
           lepton2Type.price[chainId],
-          lepton2Type.supply,
+          lepton2Type.supply[chainId],
           lepton2Type.multiplier,
           lepton2Type.bonus,
         )

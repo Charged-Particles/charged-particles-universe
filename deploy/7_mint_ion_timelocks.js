@@ -24,6 +24,7 @@ module.exports = async (hre) => {
     const chainId = chainIdByName(network.name);
     const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
 
+    const daoSigner = ethers.provider.getSigner(protocolOwner);
     const ddIon = getDeployData('Ion', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
@@ -38,7 +39,7 @@ module.exports = async (hre) => {
 
     log('  Loading Ion from: ', ddIon.address);
     const Ion = await ethers.getContractFactory('Ion');
-    const ion = await Ion.attach(ddIon.address);
+    const ion = await Ion.attach(ddIon.address).connect(daoSigner);
 
     const IonTimelock = await ethers.getContractFactory('IonTimelock');
     const ionTimelockAbi = getContractAbi('IonTimelock');
@@ -55,7 +56,7 @@ module.exports = async (hre) => {
     const _deployTimelock = async (timelockData) => {
       await log('\n  Deploying Ion Timelock for Receiver: ', timelockData.receiver)(alchemyTimeout);
 
-      const ionTimelockInstance = await IonTimelock.deploy(ionAddress, timelockData.receiver, ionAddress);
+      const ionTimelockInstance = await IonTimelock.deploy(protocolOwner, timelockData.receiver, ionAddress);
       const ionTimelockDeployed = await ionTimelockInstance.deployed();
 
       log('  - IonTimelock: ', ionTimelockDeployed.address);
@@ -64,16 +65,20 @@ module.exports = async (hre) => {
     };
 
     const _mintToTimelock = async (timelockData, ionTimelock) => {
-      await log('\n  Minting Ions to Timelock for Receiver: ', timelockData.receiver)(alchemyTimeout);
+      await log('\n  Minting Ion to Timelock for Receiver: ', timelockData.receiver)(alchemyTimeout);
 
       const amounts = _.map(timelockData.portions, 'amount');
       const timestamps = _.map(timelockData.portions, 'releaseDate');
 
-      await ion.mintToTimelock(ionTimelock.address, amounts, timestamps);
+      const totalAmount = _.reduce(amounts, (sum, n) => sum.add(n), toBN('0'));
 
-      const totalMinted = _.reduce(amounts, (sum, amt) => sum.add(amt), toBN('0'));
-      log('  - Total Minted: ', toEth(totalMinted));
-      return totalMinted;
+      // await ion.mintToTimelock(ionTimelock.address, amounts, timestamps);
+      await ion.transfer(ionTimelock.address, totalAmount);
+      await ionTimelock.connect(daoSigner).addPortions(amounts, timestamps);
+      await ionTimelock.connect(daoSigner).activateTimelock();
+
+      log('  - Total Minted: ', toEth(totalAmount));
+      return totalAmount;
     };
 
     let ionTimelock;
@@ -98,7 +103,7 @@ module.exports = async (hre) => {
 
         // Mint
         totalIonAmount = await _mintToTimelock(ionTimelockData, ionTimelock);
-        deployTxData['mintedIons'] = totalIonAmount;
+        deployTxData['mintedIon'] = totalIonAmount;
 
         // Save deployment data
         deployData['IonTimelocks'].push(deployTxData);

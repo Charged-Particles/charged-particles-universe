@@ -18,10 +18,11 @@ module.exports = async (hre) => {
 
   const ionMaxSupply = presets.Ion.universeMaxSupply;
 
+  const daoSigner = ethers.provider.getSigner(protocolOwner);
   const ddIon = getDeployData('Ion', chainId);
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-  log('Charged Particles: Universe Ions ');
+  log('Charged Particles: Minting ION to DAO ');
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
   log('  Using Network: ', chainNameById(chainId));
@@ -32,14 +33,14 @@ module.exports = async (hre) => {
 
   log('  Loading Ion from: ', ddIon.address);
   const Ion = await ethers.getContractFactory('Ion');
-  const ion = await Ion.attach(ddIon.address);
+  const ion = await Ion.attach(ddIon.address).connect(daoSigner);
 
   await log(`  - Ion: Minting to Universe`)(alchemyTimeout);
-  await ion.mintToUniverse(ionMaxSupply);
+  await ion.mint(protocolOwner, ionMaxSupply);
 
 
   log('\n  Contract Universe Ion Minting Complete!');
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
-module.exports.tags = ['ion-universe']
+module.exports.tags = ['mint-ion']
