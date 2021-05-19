@@ -27,8 +27,9 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 import "../interfaces/IIonTimelock.sol";
+import "../lib/BlackholePrevention.sol";
 
-contract IonTimelock is IIonTimelock {
+contract IonTimelock is IIonTimelock, BlackholePrevention {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
@@ -36,7 +37,8 @@ contract IonTimelock is IIonTimelock {
   address public funder;
   address public receiver;
   Portion[] public portions;
-
+  uint256 public totalAmountInTimelock;
+  bool public activated;
 
   /***********************************|
   |          Initialization           |
@@ -61,14 +63,16 @@ contract IonTimelock is IIonTimelock {
     external
     virtual
     override
+    onlyFunder
     returns (bool)
   {
-    require(msg.sender == funder, "ITL:E-103");
     require(amounts.length == releaseTimes.length, "ITL:E-202");
 
-    uint256 totalAmount;
     for (uint i = 0; i < amounts.length; i++) {
       uint256 releaseTime = releaseTimes[i];
+      if (i > 0) {
+        require(releaseTimes[i] > releaseTimes[i - 1], "ITL:E-204");
+      }
       uint256 amount = amounts[i];
 
       // solhint-disable-next-line not-rely-on-time
@@ -80,11 +84,11 @@ contract IonTimelock is IIonTimelock {
         claimed: false
       }));
 
-      totalAmount = totalAmount.add(amount);
+      totalAmountInTimelock = totalAmountInTimelock.add(amount);
     }
 
     uint256 amountAvailable = token.balanceOf(address(this));
-    require(amountAvailable >= totalAmount, "ITL:E-411");
+    require(amountAvailable >= totalAmountInTimelock, "ITL:E-411");
 
     emit PortionsAdded(amounts, releaseTimes);
     return true;
@@ -137,6 +141,7 @@ contract IonTimelock is IIonTimelock {
     external
     virtual
     override
+    onlyWhenActivated
     returns (uint256 amount)
   {
     require(numPortions <= portions.length, "ITL:E-201");
@@ -154,6 +159,7 @@ contract IonTimelock is IIonTimelock {
 
     uint256 amountAvailable = token.balanceOf(address(this));
     require(amount <= amountAvailable, "ITL:E-411");
+    totalAmountInTimelock = amountAvailable.sub(amount);
     token.safeTransfer(receiver, amount);
   }
 
@@ -164,6 +170,7 @@ contract IonTimelock is IIonTimelock {
     external
     virtual
     override
+    onlyWhenActivated
     returns (uint256 amount)
   {
     require(portionIndex >= 0 && portionIndex < portions.length, "ITL:E-201");
@@ -178,8 +185,56 @@ contract IonTimelock is IIonTimelock {
 
     uint256 amountAvailable = token.balanceOf(address(this));
     require(amount <= amountAvailable, "ITL:E-411");
+    totalAmountInTimelock = amountAvailable.sub(amount);
     token.safeTransfer(receiver, amount);
 
     emit PortionReleased(_portion.amount, _portion.releaseTime);
+  }
+
+
+  function withdrawEther(uint256 amount) external {
+    _withdrawEther(payable(receiver), amount);
+  }
+
+  function withdrawErc20(address tokenAddress, uint256 amount) external {
+    require(tokenAddress != address(token), "ITL:E-417");
+    _withdrawERC20(payable(receiver), tokenAddress, amount);
+  }
+
+  function withdrawERC721(address tokenAddress, uint256 tokenId) external {
+    require(tokenAddress != address(token), "ITL:E-417");
+    _withdrawERC721(payable(receiver), tokenAddress, tokenId);
+  }
+
+
+  function activateTimelock()
+    external
+    virtual
+    override
+    onlyFunder
+  {
+    activated = true;
+  }
+
+  function destroyTimelock()
+    external
+    virtual
+    override
+    onlyFunder
+  {
+    require(!activated, "ITL:E-115");
+    uint256 fullAmount = token.balanceOf(address(this));
+    token.safeTransfer(funder, fullAmount);
+    selfdestruct(payable(funder));
+  }
+
+  modifier onlyFunder() {
+    require(msg.sender == funder, "ITL:E-103");
+    _;
+  }
+
+  modifier onlyWhenActivated() {
+    require(activated, "ITL:E-116");
+    _;
   }
 }

@@ -41,6 +41,9 @@ interface IIonTimelock {
   function release(uint256 numPortions, uint256 indexOffset) external returns (uint256 amount);
   function releasePortion(uint256 portionIndex) external returns (uint256 amount);
 
+  function activateTimelock() external;
+  function destroyTimelock() external;
+
   event PortionsAdded(uint256[] amounts, uint256[] releaseTimes);
   event PortionReleased(uint256 amounts, uint256 releaseTime);
 }

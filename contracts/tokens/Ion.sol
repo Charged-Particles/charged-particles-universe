@@ -24,119 +24,76 @@
 pragma solidity 0.6.12;
 
 import "erc20permit/contracts/ERC20Permit.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-
-import "../interfaces/IUniverse.sol";
-import "../interfaces/IIonTimelock.sol";
 import "../lib/BlackholePrevention.sol";
 
 
 contract Ion is ERC20Permit, Ownable, BlackholePrevention {
+  using SafeMath for uint256;
 
-  event LockApproval(address indexed owner, address indexed operator, uint256 amount);
+  /// @notice An event thats emitted when the minter address is changed
+  event MinterChanged(address minter, address newMinter);
 
-  IUniverse internal _universe;
+  /// @notice Total number of tokens in circulation
+  uint256 constant public INITIAL_SUPPLY = 1e8 ether;
 
-  // Hard-Cap at 100 Million
-  uint256 public cap = 1e8 ether;
+  /// @notice Minimum time between mints
+  uint32 public constant INFLATION_EPOCH = 1 days * 365;
 
-  mapping (address => uint256) public locked;
-  mapping (address => uint256) public lockedUntil;
-  mapping (address => mapping (address => uint256)) internal _lockAllowances;
+  /// @notice Cap on the percentage of totalSupply that can be minted at each mint
+  uint8 public constant INFLATION_CAP = 2;
 
+  /// @notice Address which may mint new tokens
+  address public minter;
 
-  // Manual TODO after Launch:
-  //  Owner - Mint Portions to Universe which will distribute to Internal Team/Advisors via TokenTimelock
-  //  Owner - Mint Portions to Universe for Community Distribution
+  /// @notice The timestamp after which minting may occur
+  uint256 public mintingAllowedAfter;
 
-
-  /***********************************|
-  |          Initialization           |
-  |__________________________________*/
 
   constructor() public ERC20Permit("Charged Particles - ION", "ION") {}
 
 
-  /***********************************|
-  |              Staking              |
-  |__________________________________*/
-
-  function lockAllowance(address owner, address operator) external view returns (uint256) {
-    return _lockAllowances[owner][operator];
+  /**
+    * @notice Change the minter address
+    * @param newMinter The address of the new minter
+    */
+  function setMinter(address newMinter) external onlyOwner {
+    emit MinterChanged(minter, newMinter);
+    minter = newMinter;
   }
-
-  function approveLock(address operator, uint256 amount) external returns (bool) {
-    _approveLock(_msgSender(), operator, amount);
-    return true;
-  }
-
-  function increaseLockAllowance(address operator, uint256 addedAmount) external returns (bool) {
-    _approveLock(_msgSender(), operator, _lockAllowances[_msgSender()][operator].add(addedAmount));
-    return true;
-  }
-
-  function decreaseLockAllowance(address operator, uint256 subtractedAmount) external returns (bool) {
-    _approveLock(_msgSender(), operator, _lockAllowances[_msgSender()][operator].sub(subtractedAmount, "Ion:E-409"));
-    return true;
-  }
-
-  function lock(address account, uint256 amount, uint256 blocks) external returns (bool) {
-    // Set number of blocks until unlocked
-    // Cannot be changed once locked
-    if (lockedUntil[account] <= block.number) { // unlocked
-      lockedUntil[account] = blocks.add(block.number);
-      locked[account] = 0;
-    }
-
-    // Set amount locked
-    // Can be increased while locked
-    uint256 additional = amount;
-    if (locked[account] < amount) {
-      additional = amount.sub(locked[account]);
-      locked[account] = amount;
-    }
-
-    if (account != _msgSender()) {
-      _approveLock(account, _msgSender(), _lockAllowances[account][_msgSender()].sub(additional, "Ion:E-409"));
-    }
-
-    return true;
-  }
-
-
-  /***********************************|
-  |          Only Admin/DAO           |
-  |__________________________________*/
 
   /**
-    * @dev Setup the Universe Controller
+    * @notice Mint new tokens
+    * @param receiver The address of the destination account
+    * @param amount The number of tokens to be minted
     */
-  function setUniverse(address universe) external onlyOwner {
-    _universe = IUniverse(universe);
-  }
+  function mint(address receiver, uint256 amount) external onlyMinter {
+    require(block.timestamp >= mintingAllowedAfter, "Ion:E-114");
+    require(receiver != address(0), "Ion:E-403");
 
-  function mintToUniverse(uint256 amount) external onlyOwner returns (bool) {
-    require(address(_universe) != address(0x0), "Ion:E-404");
-    _mint(address(_universe), amount);
-  }
+    uint256 amountToMint = amount;
+    uint256 _totalSupply = totalSupply();
 
-  function mintToTimelock(address ionTimelock, uint256[] memory amounts, uint256[] memory releaseTimes) external onlyOwner {
-    require(address(ionTimelock) != address(0x0), "Ion:E-403");
-
-    uint256 totalAmount;
-    for (uint i = 0; i < amounts.length; i++) {
-      totalAmount = totalAmount.add(amounts[i]);
+    // From Inflationary Supply
+    if (_totalSupply >= INITIAL_SUPPLY) {
+      mintingAllowedAfter = mintingAllowedAfter.add(INFLATION_EPOCH);
+      amountToMint = _totalSupply.mul(INFLATION_CAP).div(100);
     }
 
-    _mint(address(ionTimelock), totalAmount);
-    require(IIonTimelock(ionTimelock).addPortions(amounts, releaseTimes), "Ion:E-406");
+    // From Initial Supply
+    else {
+      if (_totalSupply.add(amountToMint) > INITIAL_SUPPLY) {
+        amountToMint = INITIAL_SUPPLY.sub(_totalSupply);
+      }
+      if (_totalSupply.add(amountToMint) == INITIAL_SUPPLY) {
+        mintingAllowedAfter = block.timestamp.add(INFLATION_EPOCH);
+      }
+    }
+
+    // transfer the amount to the recipient
+    _mint(receiver, amountToMint);
   }
-
-
-  /***********************************|
-  |          Only Admin/DAO           |
-  |      (blackhole prevention)       |
-  |__________________________________*/
 
   function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
     _withdrawEther(receiver, amount);
@@ -150,33 +107,8 @@ contract Ion is ERC20Permit, Ownable, BlackholePrevention {
     _withdrawERC721(receiver, tokenAddress, tokenId);
   }
 
-
-  /***********************************|
-  |         Private Functions         |
-  |__________________________________*/
-
-  function _approveLock(address owner, address operator, uint256 amount) internal {
-    require(owner != address(0), "Ion:E-403");
-    require(operator != address(0), "Ion:E-403");
-
-    _lockAllowances[owner][operator] = amount;
-    emit LockApproval(owner, operator, amount);
-  }
-
-
-  function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {
-    super._beforeTokenTransfer(from, to, amount);
-
-    // Minting tokens; enforce hard-cap
-    if (from == address(0)) {
-      require(totalSupply().add(amount) <= cap, "Ion:E-408");
-    }
-
-    // Locked tokens
-    if (from != address(0) && lockedUntil[from] > block.number) {
-      uint256 fromBalance = balanceOf(from);
-      uint256 transferable = (fromBalance > locked[from]) ? fromBalance.sub(locked[from]) : 0;
-      require(transferable >= amount, "Ion:E-409");
-    }
+  modifier onlyMinter() {
+    require(msg.sender == minter, "Ion:E-113");
+    _;
   }
 }
