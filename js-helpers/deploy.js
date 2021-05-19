@@ -162,10 +162,10 @@ const presets = {
       },
     ]
   },
-  Ion: {
-    universeMaxSupply: toWei('40000000'), // 40% of 100 Million (Community Liquidity Mining Portion)
+  Ionx: {
+    universeMaxSupply: toWei('100000000'), // 100 Million
     rewardsForAssetTokens: [
-      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI (50% of Interest in Ion)
+      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI (50% of Interest in Ionx)
     ],
     timelocks: [
       {

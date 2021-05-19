@@ -16,12 +16,13 @@ module.exports = async (hre) => {
   const chainId = chainIdByName(network.name);
   const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
 
-  const ionMaxSupply = presets.Ion.universeMaxSupply;
+  const ionxMaxSupply = presets.Ionx.universeMaxSupply;
 
-  const ddIon = getDeployData('Ion', chainId);
+  const daoSigner = ethers.provider.getSigner(protocolOwner);
+  const ddIonx = getDeployData('Ionx', chainId);
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-  log('Charged Particles: Universe Ions ');
+  log('Charged Particles: Minting IONX to DAO ');
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
   log('  Using Network: ', chainNameById(chainId));
@@ -30,16 +31,16 @@ module.exports = async (hre) => {
   log('  - Owner:       ', protocolOwner);
   log(' ');
 
-  log('  Loading Ion from: ', ddIon.address);
-  const Ion = await ethers.getContractFactory('Ion');
-  const ion = await Ion.attach(ddIon.address);
+  log('  Loading Ionx from: ', ddIonx.address);
+  const Ionx = await ethers.getContractFactory('Ionx');
+  const ionx = await Ionx.attach(ddIonx.address).connect(daoSigner);
 
-  await log(`  - Ion: Minting to Universe`)(alchemyTimeout);
-  await ion.mintToUniverse(ionMaxSupply);
+  await log(`  - Ionx: Minting to DAO`)(alchemyTimeout);
+  await ionx.mint(protocolOwner, ionxMaxSupply);
 
 
-  log('\n  Contract Universe Ion Minting Complete!');
+  log('\n  Contract Universe Ionx Minting Complete!');
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
-module.exports.tags = ['ion-universe']
+module.exports.tags = ['ionx-mint']
