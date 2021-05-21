@@ -46,13 +46,14 @@ contract YieldFarm {
         _communityVault = communityVault;
         epochDuration = _staking.epochDuration();
         epochStart = _staking.epoch1Start() + epochDuration;
+        _deprecationPerEpoch = deprecationPerEpoch;
         uint n = nrOfEpochs;
-        uint difference = (n.mul(n.sub(1))).div(2); //Changed formula, we count first n-1 numbers not n since substraction happens after first epoch uint difference = (n.mul(n.add(1))).div(2);
+        uint difference = (deprecationPerEpoch.mul(n.sub(1))).div(2); //Changed formula, we count first n-1 numbers not n since substraction happens after first epoch uint difference = (n.mul(n.add(1))).div(2);
             TOTAL_DISTRIBUTED_AMOUNT = (genesisEpochAmount.mul(n)).sub(difference.mul(deprecationPerEpoch)); //Changed, formula was not multplying correctly, doesn't hamper contract since used in frontend
         NR_OF_EPOCHS = nrOfEpochs;
         epochs = new uint[](nrOfEpochs + 1);
         _genesisEpochAmount = genesisEpochAmount;
-        _deprecationPerEpoch = deprecationPerEpoch;
+        
     }
 
     // public methods
