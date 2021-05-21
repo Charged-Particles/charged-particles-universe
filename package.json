@@ -61,6 +61,7 @@
     "solidity-docgen": "^0.5.3"
   },
   "dependencies": {
+    "moment": "^2.29.1",
     "sleep-promise": "^9.1.0"
   }
 }
