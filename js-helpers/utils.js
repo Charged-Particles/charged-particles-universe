@@ -46,8 +46,8 @@ const returnWeight = function (sourceWeight, destBal, destWeight, amount, block,
 
 const calculateSumArithmeticSeriesAtN = (a1, d, n) => {
   const aN = a1.sub(n.sub(1).mul(d));
-  const sumAtN = n.mul((a1.add(aN)).div(2));
-  return sumAtN;
+  const sumAtEpochN = n.mul((a1.add(aN)).div(2));
+  return sumAtEpochN;
 };
 
 module.exports = {

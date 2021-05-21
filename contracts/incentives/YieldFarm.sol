@@ -3,7 +3,7 @@ pragma solidity ^0.6.11;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./interfaces/IStaking.sol";
+import "../interfaces/IStaking.sol";
 
 contract YieldFarm {
 

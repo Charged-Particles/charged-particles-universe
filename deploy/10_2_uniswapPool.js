@@ -6,6 +6,8 @@ const {
     getContractAbi,
     getTxGasCost,
     log,
+    toBN,
+    toWei,
     presets,
   } = require("../js-helpers/deploy");
 
@@ -16,7 +18,7 @@ const {
     //     process.exit(1)
     // }
 
-    const { getNamedAccounts } = hre;
+    const { ethers, upgrades, getNamedAccounts } = hre;
     const { deployer, protocolOwner } = await getNamedAccounts();
     const network = await hre.network;
 
@@ -41,8 +43,10 @@ const {
     const uniswapV2Addr = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'; // Same mainnet & kovan
 
       // Get Uniswap V2 Router instance
-    const UniswapV2Router = await ethers.getContractAt("IUniswapV2Router02", )
+    const UniswapV2Router = await hre.ethers.getContractAt("IUniswapV2Router02", uniswapV2Addr)
 
+    const reqTokens = toBN(DISTRIBUTION_INFO.community.unlocked.launch.uniswap);
+    
 
     await log('\n  Deploying GenericWalletManager...')(alchemyTimeout);
     const GenericWalletManager = await hre.ethers.getContractFactory('GenericWalletManager');
