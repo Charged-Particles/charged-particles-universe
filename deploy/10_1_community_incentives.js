@@ -52,7 +52,7 @@ const {
         deployTransaction: communityVault.deployTransaction,
     };  
 
-    await log('\n  Deployed CommunityVault')(alchemyTimeout);
+    await log(`\n  Deployed CommunityVault, ${communityVault.address}`)(alchemyTimeout);
 
     // Next transfer appropriate funds
     await distributeInitialFunds(

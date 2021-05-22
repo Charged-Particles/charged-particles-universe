@@ -57,14 +57,14 @@ const calculateSumArithmeticSeriesAtN = (a1, d, n) => {
 const distributeInitialFunds = async function distributeInitialFunds(tokenContract, contract, amount, signer) {
   let balance;
   console.log(chalk.bgBlue.white(`Distributing Initial Funds`))
-  console.log(chalk.bgBlack.white(`Sending Funds to ${contract.filename}`), chalk.green(`${ethers.utils.formatUnits(amount)} IONX`))
+  console.log(chalk.bgBlack.white(`Sending Funds to ${contract.address}`), chalk.green(`${ethers.utils.formatUnits(amount)} IONX`))
 
-  balance = await tokenContract.balanceOf(signer.address)
+  balance = await tokenContract.balanceOf(signer)
   console.log(chalk.bgBlack.white(`IONX Token Balance Before Transfer:`), chalk.yellow(`${ethers.utils.formatUnits(balance)} IONX`))
   const tx = await tokenContract.transfer(contract.address, amount)
   await tx.wait()
 
-  balance = await tokenContract.balanceOf(signer.address)
+  balance = await tokenContract.balanceOf(signer)
   console.log(chalk.bgBlack.white(`IONX Token Balance After Transfer:`), chalk.yellow(`${ethers.utils.formatUnits(balance)} IONX`))
 
   console.log(chalk.bgBlack.white(`Transaction hash:`), chalk.gray(`${tx.hash}`))
