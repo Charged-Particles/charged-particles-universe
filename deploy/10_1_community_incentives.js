@@ -67,7 +67,7 @@ const {
     const yieldFarmIONXInitialArgs = STAKING_INFO.stakingInfo.ionToken;
 
     // Deploying Staking Contract
-    const stakingInitialArgs = STAKING_INFO.stakingInfo.staking
+    const stakingInitialArgs = STAKING_INFO.stakingInfo.staking;
     const stakingArgs = [yieldFarmIONXInitialArgs.epoch1Start, stakingInitialArgs.epochDuration];
 
     const Staking = await ethers.getContractFactory('Staking');
@@ -80,7 +80,7 @@ const {
         deployTransaction: staking.deployTransaction,
     };  
 
-    await log('\n  Deployed Staking')(alchemyTimeout);
+    await log(`n  Deployed Staking... ${staking.address}`)(alchemyTimeout);
 
     // Deploying IONX Yield Farm Contract
     const yieldFarmIONXDeployArgs = [

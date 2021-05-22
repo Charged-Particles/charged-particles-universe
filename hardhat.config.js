@@ -125,7 +125,7 @@ module.exports = {
         'Lepton2',
         'ERC20',
         'ERC721',
-        'YieldFarming',
+        'YieldFarm',
         'Staking',
         'CommunityVault',
       ],
