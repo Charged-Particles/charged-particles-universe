@@ -40,6 +40,7 @@ contract YieldFarm {
     // constructor
     // @param totalDistributedAmount
     constructor(address ionxTokenAddress, address token, address stakeContract, address communityVault, uint genesisEpochAmount, uint deprecationPerEpoch, uint nrOfEpochs) public {
+
         _ionx = IERC20(ionxTokenAddress);
         _token = token;
         _staking = IStaking(stakeContract);

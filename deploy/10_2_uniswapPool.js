@@ -45,31 +45,9 @@ const {
       // Get Uniswap V2 Router instance
     const UniswapV2Router = await hre.ethers.getContractAt("IUniswapV2Router02", uniswapV2Addr)
 
-    const reqTokens = toBN(DISTRIBUTION_INFO.community.unlocked.launch.uniswap);
+    //const reqTokens = toBN(DISTRIBUTION_INFO.community.unlocked.launch.uniswap);
     
-
-    await log('\n  Deploying GenericWalletManager...')(alchemyTimeout);
-    const GenericWalletManager = await hre.ethers.getContractFactory('GenericWalletManager');
-    const GenericWalletManagerInstance = await GenericWalletManager.deploy();
-    const genericWalletManager = await GenericWalletManagerInstance.deployed();
-    deployData['GenericWalletManager'] = {
-      abi: getContractAbi('GenericWalletManager'),
-      address: genericWalletManager.address,
-      deployTransaction: genericWalletManager.deployTransaction,
-    }
-
-
-    // Display Contract Addresses
-    await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
-    log('  - GenericWalletManager:  ', genericWalletManager.address);
-    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
-    log('  - GenericBasketManager:  ', genericBasketManager.address);
-    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericBasketManager.deployTransaction }));
-
-    saveDeploymentData(chainId, deployData);
-    log('\n  Contract Deployment Data saved to "deployed" directory.');
-
-    log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
+    // TODO: CODE ME
 };
 
 module.exports.tags = ['generic']

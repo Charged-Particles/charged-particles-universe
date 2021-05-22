@@ -204,6 +204,11 @@ const presets = {
         31337: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // Hardhat - Forked Mainnet
       }
     }
+  },
+  UniV2LPTokenAddress: {
+    1: '', // mainnet
+    42: '0x5c6e126c32ba4439e40be2f60f7b2453485a4b7a', // kovan
+    31337: '', // Hardhat - Forked Mainnet
   }
 };
 

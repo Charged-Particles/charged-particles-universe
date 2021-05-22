@@ -2,6 +2,9 @@ require('dotenv').config();
 
 const { ethers } = require('hardhat');
 const moment = require('moment');
+
+const chalk = require("chalk")
+
 const { tokenInfo } = require('../config/config');
 
 const CONSTANT_1K = 1000;
@@ -50,6 +53,24 @@ const calculateSumArithmeticSeriesAtN = (a1, d, n) => {
   return sumAtEpochN;
 };
 
+// For Distributing funds
+const distributeInitialFunds = async function distributeInitialFunds(tokenContract, contract, amount, signer) {
+  let balance;
+  console.log(chalk.bgBlue.white(`Distributing Initial Funds`))
+  console.log(chalk.bgBlack.white(`Sending Funds to ${contract.filename}`), chalk.green(`${ethers.utils.formatUnits(amount)} IONX`))
+
+  balance = await tokenContract.balanceOf(signer.address)
+  console.log(chalk.bgBlack.white(`IONX Token Balance Before Transfer:`), chalk.yellow(`${ethers.utils.formatUnits(balance)} IONX`))
+  const tx = await tokenContract.transfer(contract.address, amount)
+  await tx.wait()
+
+  balance = await tokenContract.balanceOf(signer.address)
+  console.log(chalk.bgBlack.white(`IONX Token Balance After Transfer:`), chalk.yellow(`${ethers.utils.formatUnits(balance)} IONX`))
+
+  console.log(chalk.bgBlack.white(`Transaction hash:`), chalk.gray(`${tx.hash}`))
+  console.log(chalk.bgBlack.white(`Transaction etherscan:`), chalk.gray(`https://${hre.network.name}.etherscan.io/tx/${tx.hash}`))
+}
+
 module.exports = {
   CONSTANT_1K,
   CONSTANT_10K,
@@ -69,4 +90,5 @@ module.exports = {
   vestedAmount,
   returnWeight,
   calculateSumArithmeticSeriesAtN,
+  distributeInitialFunds,
 }
