@@ -3,6 +3,7 @@ const {
     chainIdByName,
     getDeployData,
     getContractAbi,
+    getTxGasCost,
     log,
     toBN,
     presets,
@@ -90,7 +91,14 @@ const {
     log(`   Args: `, JSON.stringify(yieldFarmIONXDeployArgs));
 
     const YieldFarm = await ethers.getContractFactory('YieldFarm');
-    const YieldFarmInstance = await YieldFarm.deploy(...yieldFarmIONXDeployArgs);
+    let YieldFarmInstance;
+    try {
+        YieldFarmInstance  = await YieldFarm.deploy(...yieldFarmIONXDeployArgs);
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
+   
     const yieldFarm = await YieldFarmInstance.deployed();
 
     deployData['YieldFarmIONX'] = {

@@ -38,7 +38,6 @@ contract YieldFarm {
     event Harvest(address indexed user, uint128 indexed epochId, uint256 amount);
 
     // constructor
-    // @param totalDistributedAmount
     constructor(address ionxTokenAddress, address token, address stakeContract, address communityVault, uint genesisEpochAmount, uint deprecationPerEpoch, uint nrOfEpochs) public {
 
         _ionx = IERC20(ionxTokenAddress);
@@ -49,8 +48,8 @@ contract YieldFarm {
         epochStart = _staking.epoch1Start() + epochDuration;
         _deprecationPerEpoch = deprecationPerEpoch;
         uint n = nrOfEpochs;
-        uint difference = (deprecationPerEpoch.mul(n.sub(1))).div(2); //Changed formula, we count first n-1 numbers not n since substraction happens after first epoch uint difference = (n.mul(n.add(1))).div(2);
-            TOTAL_DISTRIBUTED_AMOUNT = (genesisEpochAmount.mul(n)).sub(difference.mul(deprecationPerEpoch)); //Changed, formula was not multplying correctly, doesn't hamper contract since used in frontend
+        uint amountEpochN = genesisEpochAmount.sub(n.sub(1).mul(_deprecationPerEpoch));
+        TOTAL_DISTRIBUTED_AMOUNT = n.mul((genesisEpochAmount.add(amountEpochN)).div(2));
         NR_OF_EPOCHS = nrOfEpochs;
         epochs = new uint[](nrOfEpochs + 1);
         _genesisEpochAmount = genesisEpochAmount;
@@ -144,7 +143,7 @@ contract YieldFarm {
     }
 
     function _calcTotalAmountPerEpoch(uint256 epochId) internal view returns (uint) {
-      return _genesisEpochAmount.sub(epochId.mul(_deprecationPerEpoch));
+      return _genesisEpochAmount.sub(epochId.mul(_deprecationPerEpoch)); // .sub(1) ?
     }
 
     function _getPoolSize(uint128 epochId) internal view returns (uint) {
