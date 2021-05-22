@@ -1,7 +1,7 @@
 require('dotenv').config();
 
-const vestingDate = '21/05/2021 14:00';
-const stakingDate = '21/05/2021 14:00';
+const vestingDate = '22/05/2021 11:00';
+const stakingDate = '22/05/2021 11:00';
 
 const nftYieldFarmDate = '15/06/2021 14:00';
 

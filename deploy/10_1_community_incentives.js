@@ -10,8 +10,12 @@ const {
     presets,
   } = require("../js-helpers/deploy");
 
-  const { distributeInitialFunds } = require('../js-helpers/utils');
+  const { distributeInitialFunds } = require("../js-helpers/utils");
   const { STAKING_INFO } = require('./constants/constants');
+
+  const { stakingDate } = require('../config/config');
+
+  const util = require('util');
 
   const _ = require('lodash');
 
@@ -42,8 +46,7 @@ const {
     const Ion = await ethers.getContractFactory('Ion');
     const ion = await Ion.attach(ddIon.address);
 
-
-    await log('\n  Deploying CommunityVault...')(alchemyTimeout);
+    await log(`\n  Deploying CommunityVault... args: ${ddIon.address}`)(alchemyTimeout);
     const CommunityVault = await ethers.getContractFactory('CommunityVault');
     const CommunityVaultInstance = await CommunityVault.deploy(ddIon.address);
     const communityVault = await CommunityVaultInstance.deployed();
@@ -51,6 +54,7 @@ const {
     deployData['CommunityVault'] = {
         abi: getContractAbi('CommunityVault'),
         address: communityVault.address,
+        constructorArgs: [ddIon.address],
         deployTransaction: communityVault.deployTransaction,
     };  
 
@@ -62,6 +66,9 @@ const {
 
     // Deploying Staking Contract
     const stakingInitialArgs = STAKING_INFO.stakingInfo.staking;
+
+    log(util.inspect(stakingInitialArgs, false, 10, true));
+
     const stakingArgs = [yieldFarmIONXInitialArgs.epoch1Start, stakingInitialArgs.epochDuration];
 
     const Staking = await ethers.getContractFactory('Staking');
@@ -71,10 +78,11 @@ const {
     deployData['Staking'] = {
         abi: getContractAbi('Staking'),
         address: staking.address,
+        constructorArgs: stakingArgs,
         deployTransaction: staking.deployTransaction,
     };  
 
-    await log(`\n  Deployed Staking... ${staking.address}`)(alchemyTimeout);
+    await log(`\n  Deployed Staking... ${staking.address} starting at ${stakingDate}`)(alchemyTimeout);
 
     await log('\n  Deploying Yield Farming IONX Contract...')(alchemyTimeout);
 
@@ -105,6 +113,7 @@ const {
     deployData['YieldFarmIONX'] = {
         abi: getContractAbi('YieldFarm'),
         address: yieldFarm.address,
+        constructorArgs: yieldFarmIONXDeployArgs,
         deployTransaction: yieldFarm.deployTransaction,
     };  
 
@@ -139,6 +148,7 @@ const {
     deployData['YieldFarmLP'] = {
         abi: getContractAbi('YieldFarm'),
         address: yieldFarmLP.address,
+        constructorArgs: yieldFarmLPArgs,
         deployTransaction: yieldFarmLP.deployTransaction,
     };  
 

@@ -9,10 +9,12 @@ const success = (msg) => console.log(chalk.green(msg));
 
 const verifyContract = async (name, network, addressOverride = null) => {
   try {
-    const address = addressOverride || (await deployments.get(name)).address;
-    info(`Verifying ${name} at address "${address}"...`);
+    const deployment = (await deployments.get(name)) || {};
+    const address = addressOverride || deployment.address;
+    const constructorArgs = deployment.constructorArgs || [];
+    info(`Verifying ${name} at address "${address}" ${constructorArgs ? 'with args' : ''}...`);
 
-    await exec(`hardhat verify --network ${network} ${address}`);
+    await exec(`hardhat verify --network ${network} ${address} ${constructorArgs.map(String).join(' ')}`);
     success(`${name} verified!`);
   }
   catch (err) {
@@ -25,7 +27,7 @@ const verifyContract = async (name, network, addressOverride = null) => {
 }
 
 async function run() {
-  const network = await hardhat.ethers.provider.getNetwork()
+  const network = await hardhat.ethers.provider.getNetwork();
   const networkName = network.name === 'homestead' ? 'mainnet' : network.name;
   info(`Verifying contracts on network "${networkName}"...`);
 
@@ -42,23 +44,29 @@ async function run() {
   }
 
   // Protocol
-  await verifyContract('Universe', networkName, universeAddress);
-  await verifyContract('ChargedParticles', networkName, chargedParticlesAddress);
-  await verifyContract('ChargedState', networkName);
-  await verifyContract('ChargedSettings', networkName);
-  await verifyContract('WBoson', networkName);
-  await verifyContract('Ion', networkName);
-  await verifyContract('IonTimelock', networkName);
+  // await verifyContract('Universe', networkName, universeAddress);
+  // await verifyContract('ChargedParticles', networkName, chargedParticlesAddress);
+  // await verifyContract('ChargedState', networkName);
+  // await verifyContract('ChargedSettings', networkName);
+  // await verifyContract('WBoson', networkName);
+  // await verifyContract('Ion', networkName);
+  // await verifyContract('IonTimelock', networkName);
 
-  // Wallet Managers
-  await verifyContract('GenericWalletManager', networkName);
-  await verifyContract('GenericBasketManager', networkName);
-  await verifyContract('AaveWalletManager', networkName);
+  // // Wallet Managers
+  // await verifyContract('GenericWalletManager', networkName);
+  // await verifyContract('GenericBasketManager', networkName);
+  // await verifyContract('AaveWalletManager', networkName);
 
-  // NFTs
-  await verifyContract('Proton', networkName);
-  await verifyContract('Lepton', networkName);
-  await verifyContract('Lepton2', networkName);
+  // // NFTs
+  // await verifyContract('Proton', networkName);
+  // await verifyContract('Lepton', networkName);
+  // await verifyContract('Lepton2', networkName);
+
+  // Incentives
+  // await verifyContract('CommunityVault', networkName);
+  // await verifyContract('Staking', networkName);
+  await verifyContract('YieldFarmIONX', networkName);
+  await verifyContract('YieldFarmLP', networkName);
 
   success('Done!');
 };
