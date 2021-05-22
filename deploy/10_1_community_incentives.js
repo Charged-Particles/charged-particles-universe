@@ -4,6 +4,7 @@ const {
     getDeployData,
     getContractAbi,
     getTxGasCost,
+    saveDeploymentData,
     log,
     toBN,
     presets,
