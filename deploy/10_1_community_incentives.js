@@ -54,14 +54,6 @@ const {
 
     await log(`\n  Deployed CommunityVault, ${communityVault.address}`)(alchemyTimeout);
 
-    // Next transfer appropriate funds
-    await distributeInitialFunds(
-        ion,
-        communityVault,
-        STAKING_INFO.stakingInfo.helpers.getIonDistributionAmount().add(STAKING_INFO.stakingInfo.helpers.getLiquidityDistributionAmount()),
-        deployer
-    );
-
     await log('\n  Deploying Staking Contract...')(alchemyTimeout);
 
     const yieldFarmIONXInitialArgs = STAKING_INFO.stakingInfo.ionToken;
@@ -80,7 +72,9 @@ const {
         deployTransaction: staking.deployTransaction,
     };  
 
-    await log(`n  Deployed Staking... ${staking.address}`)(alchemyTimeout);
+    await log(`\n  Deployed Staking... ${staking.address}`)(alchemyTimeout);
+
+    await log('\n  Deploying Yield Farming IONX Contract...')(alchemyTimeout);
 
     // Deploying IONX Yield Farm Contract
     const yieldFarmIONXDeployArgs = [
@@ -91,7 +85,10 @@ const {
         yieldFarmIONXInitialArgs.startAmount.mul(ethers.BigNumber.from(10).pow(18)).toString(),
         yieldFarmIONXInitialArgs.deprecation.mul(ethers.BigNumber.from(10).pow(18)).toString(),
         yieldFarmIONXInitialArgs.nrOfEpochs.toString()
-      ]
+      ];
+
+    log(`   Args: `, JSON.stringify(yieldFarmIONXDeployArgs));
+
     const YieldFarm = await ethers.getContractFactory('YieldFarm');
     const YieldFarmInstance = await YieldFarm.deploy(...yieldFarmIONXDeployArgs);
     const yieldFarm = await YieldFarmInstance.deployed();
@@ -144,6 +141,14 @@ const {
     log('\n   Transaction etherscan:', `https://${hre.network.name}.etherscan.io/tx/${txAllowanceLP.hash}`);
 
       
+    // Next transfer appropriate funds
+    log('\n   Distributing funds to communityVault', txAllowance.hash);
+    await distributeInitialFunds(
+        ion,
+        communityVault,
+        STAKING_INFO.stakingInfo.helpers.getIonDistributionAmount().add(STAKING_INFO.stakingInfo.helpers.getLiquidityDistributionAmount()),
+        deployer
+    );
 
     // Display Contract Addresses
     await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
