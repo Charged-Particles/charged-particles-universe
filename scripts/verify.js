@@ -44,27 +44,27 @@ async function run() {
   }
 
   // Protocol
-  // await verifyContract('Universe', networkName, universeAddress);
-  // await verifyContract('ChargedParticles', networkName, chargedParticlesAddress);
-  // await verifyContract('ChargedState', networkName);
-  // await verifyContract('ChargedSettings', networkName);
-  // await verifyContract('WBoson', networkName);
-  // await verifyContract('Ion', networkName);
-  // await verifyContract('IonTimelock', networkName);
+  await verifyContract('Universe', networkName, universeAddress);
+  await verifyContract('ChargedParticles', networkName, chargedParticlesAddress);
+  await verifyContract('ChargedState', networkName);
+  await verifyContract('ChargedSettings', networkName);
+  await verifyContract('WBoson', networkName);
+  await verifyContract('Ion', networkName);
+  await verifyContract('IonTimelock', networkName);
 
   // // Wallet Managers
-  // await verifyContract('GenericWalletManager', networkName);
-  // await verifyContract('GenericBasketManager', networkName);
-  // await verifyContract('AaveWalletManager', networkName);
+  await verifyContract('GenericWalletManager', networkName);
+  await verifyContract('GenericBasketManager', networkName);
+  await verifyContract('AaveWalletManager', networkName);
 
   // // NFTs
-  // await verifyContract('Proton', networkName);
-  // await verifyContract('Lepton', networkName);
-  // await verifyContract('Lepton2', networkName);
+  await verifyContract('Proton', networkName);
+  await verifyContract('Lepton', networkName);
+  await verifyContract('Lepton2', networkName);
 
   // Incentives
-  // await verifyContract('CommunityVault', networkName);
-  // await verifyContract('Staking', networkName);
+  await verifyContract('CommunityVault', networkName);
+  await verifyContract('Staking', networkName);
   await verifyContract('YieldFarmIONX', networkName);
   await verifyContract('YieldFarmLP', networkName);
 
