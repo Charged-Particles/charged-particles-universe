@@ -15,9 +15,9 @@ const { stakingInfo } = require('./community_breakup/staking');
 
 
 const community = {
-    deposit: {
-      tokens: tokens(53 * CONSTANT_1M) // 53 Million Tokens
-    },
+    // deposit: {
+    //   tokens: tokens(53 * CONSTANT_1M) // 53 Million Tokens
+    // },
     breakdown: {
       stakingInfo: stakingInfo
     }

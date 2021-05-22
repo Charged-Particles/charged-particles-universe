@@ -4,8 +4,7 @@ const { bn, tokens, tokensBN, calculateSumArithmeticSeriesAtN, dateToEpoch, time
 
 const stakingInfo = {
   staking: {
-    epochDuration: timeInSecs(7,24,60,60),
-    communityVaultAddress: "", // Fill me?
+    epochDuration: 60*60,
     ionTokenAddress: {
         kovan: '0xD4b7e8676b2A7fAa6bd175234ffB48316d81DD38',
         mainnet: '0xCB367047f6860566a10ab778A02fA48eeCD1f22e',
@@ -14,13 +13,13 @@ const stakingInfo = {
   ionToken: {
     startAmount: bn(48_077),
     epoch1Start: dateToEpoch(stakingDate), // 19 May 2021 2 PM UTC
-    nrOfEpochs: bn(12), // 7 daysPerEpoch
+    nrOfEpochs: bn(102), // 1 hourPerEpoch
     deprecation: bn(100),
   },
   liquidityPoolTokens: {
     startAmount: bn(48_077),
     epoch1Start: dateToEpoch(stakingDate), // 19 May 2021 2 PM UTC
-    nrOfEpochs: bn(12),
+    nrOfEpochs: bn(102),
     deprecation: bn(100),
   },
   nftYieldFarmingL1: {
