@@ -69,14 +69,14 @@ module.exports = async (hre) => {
     deployTransaction: lepton2.deployTransaction,
   }
 
-  await log('\n  Deploying Ion FT...')(alchemyTimeout);
-  const Ion = await ethers.getContractFactory('Ion');
-  const IonInstance = await Ion.deploy();
-  const ion = await IonInstance.deployed();
-  deployData['Ion'] = {
-    abi: getContractAbi('Ion'),
-    address: ion.address,
-    deployTransaction: ion.deployTransaction,
+  await log('\n  Deploying Ionx FT...')(alchemyTimeout);
+  const Ionx = await ethers.getContractFactory('Ionx');
+  const IonxInstance = await Ionx.deploy();
+  const ionx = await IonxInstance.deployed();
+  deployData['Ionx'] = {
+    abi: getContractAbi('Ionx'),
+    address: ionx.address,
+    deployTransaction: ionx.deployTransaction,
   }
 
   // Display Contract Addresses
@@ -89,8 +89,8 @@ module.exports = async (hre) => {
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
   log('  - Lepton2:      ', lepton2.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
-  log('  - Ion:         ', ion.address);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ion.deployTransaction }));
+  log('  - Ionx:        ', ionx.address);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionx.deployTransaction }));
 
   saveDeploymentData(chainId, deployData);
   log('\n  Contract Deployment Data saved to "deployed" directory.');

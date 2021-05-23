@@ -38,6 +38,13 @@
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "activateTimelock",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256[]",
@@ -58,6 +65,13 @@
         "type": "bool"
       }
     ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "destroyTimelock",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },

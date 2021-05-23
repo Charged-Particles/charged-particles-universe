@@ -24,10 +24,9 @@
 pragma solidity >=0.6.0;
 
 /**
- * @title Charged Particles Ion-Timelock Interface
- * @dev ...
+ * @title Charged Particles Ionx-Timelock Interface
  */
-interface IIonTimelock {
+interface IIonxTimelock {
 
   struct Portion {
     uint256 amount;
@@ -40,6 +39,9 @@ interface IIonTimelock {
   function nextReleaseAmount() external view returns (uint256 releaseAmount);
   function release(uint256 numPortions, uint256 indexOffset) external returns (uint256 amount);
   function releasePortion(uint256 portionIndex) external returns (uint256 amount);
+
+  function activateTimelock() external;
+  function destroyTimelock() external;
 
   event PortionsAdded(uint256[] amounts, uint256[] releaseTimes);
   event PortionReleased(uint256 amounts, uint256 releaseTime);
