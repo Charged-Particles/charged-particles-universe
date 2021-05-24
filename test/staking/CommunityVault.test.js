@@ -12,7 +12,7 @@ const {
   presets
 } = require('../../js-helpers/deploy');
 
-describe.only('CommunityVault', function () {
+describe('CommunityVault', function () {
     let chainId, snapshotId;
     let deployer, owner, user, communityVault;
     let deployerAddr, ownerAddr, userAddr, communityVaultAddr;
