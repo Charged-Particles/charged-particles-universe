@@ -86,7 +86,6 @@ const {
       incentives.ionxToken.deprecation.mul(weiPerEth).toString(),
       incentives.ionxToken.nrOfEpochs.toString()
     ];
-    log(`   Args: `, JSON.stringify(ionxYieldFarmDeployArgs));
     const IonxYieldFarmInstance = await YieldFarm.deploy(...ionxYieldFarmDeployArgs);
     const ionxYieldFarm = await IonxYieldFarmInstance.deployed();
     deployData['IonxYieldFarm'] = {
@@ -98,8 +97,8 @@ const {
 
     log('\n  Setting allowance for IonxYieldFarm to transfer $IONX from CommunityVault');
     const txAllowance = await communityVault.setAllowance(ionxYieldFarm.address, getIonxDistributionAmount(chainId));
-    log('\n   Transaction hash:', txAllowance.hash);
-    log('\n   Transaction etherscan:', `https://${hre.network.name}.etherscan.io/tx/${txAllowance.hash}`);
+    log('   Transaction hash:', txAllowance.hash);
+    log('   Transaction etherscan:', `https://${hre.network.name}.etherscan.io/tx/${txAllowance.hash}`);
 
     // Transfer ownership?
 
@@ -125,8 +124,8 @@ const {
 
     log('\n  Setting allowance for LPYieldFarm to transfer $IONX from CommunityVault');
     const txAllowanceLP = await communityVault.setAllowance(lpYieldFarm.address, getLiquidityDistributionAmount(chainId));
-    log('\n   Transaction hash:', txAllowanceLP.hash);
-    log('\n   Transaction etherscan:', `https://${hre.network.name}.etherscan.io/tx/${txAllowanceLP.hash}`);
+    log('   Transaction hash:', txAllowanceLP.hash);
+    log('   Transaction etherscan:', `https://${hre.network.name}.etherscan.io/tx/${txAllowanceLP.hash}`);
 
 
     // Next transfer appropriate funds

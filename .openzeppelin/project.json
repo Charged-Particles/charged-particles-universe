@@ -14,7 +14,10 @@
     "WBoson": "WBoson",
     "Proton": "Proton",
     "Lepton": "Lepton",
-    "Lepton2": "Lepton2"
+    "Lepton2": "Lepton2",
+    "Staking": "Staking",
+    "YieldFarm": "YieldFarm",
+    "CommunityVault": "CommunityVault"
   },
   "dependencies": {
   },

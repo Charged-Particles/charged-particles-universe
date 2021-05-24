@@ -152,18 +152,18 @@ const presets = {
     },
     42: { // Kovan Testnet
       staking: {
-        epochDuration: 60 * 60,  // 1 Hour
+        epochDuration: 30 * 60,  // 1/2 Hour
         epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
         startAmount: bn(50000),
-        nrOfEpochs: bn(96),
-        deprecation: bn(100),
+        nrOfEpochs: bn(50),
+        deprecation: bn(500),
       },
       lpTokens: {
         startAmount: bn(50000),
-        nrOfEpochs: bn(96),
-        deprecation: bn(100),
+        nrOfEpochs: bn(50),
+        deprecation: bn(500),
       },
       nftYieldFarmingL1: {
       },
