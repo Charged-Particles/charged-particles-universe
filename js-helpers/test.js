@@ -1,4 +1,4 @@
-const { toBN } = require('./deploy');
+const { toBN } = require('./utils');
 
 const getNetworkBlockNumber = (network) => async () => {
     return toBN(

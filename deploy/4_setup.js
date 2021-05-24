@@ -1,11 +1,13 @@
 const {
+  getDeployData,
+  presets,
+} = require('../js-helpers/deploy');
+
+const {
+  log,
   chainNameById,
   chainIdByName,
-  getDeployData,
-  log,
-  toBN,
-  presets,
-} = require("../js-helpers/deploy");
+} = require('../js-helpers/utils');
 
 const _ = require('lodash');
 
@@ -33,7 +35,7 @@ module.exports = async (hre) => {
     }
 
     const referralCode = presets.Aave.referralCode[chainId];
-    const ionxMaxSupply = presets.Ionx.universeMaxSupply;
+    const ionxMaxSupply = presets.Ionx.maxSupply;
     const leptonMaxMint = presets.Lepton.maxMintPerTx;
     const depositCaps = presets.ChargedParticles.maxDeposits;
     const rewardsForAssetTokens = presets.Ionx.rewardsForAssetTokens;

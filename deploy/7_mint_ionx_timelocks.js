@@ -1,15 +1,18 @@
 const {
-  chainNameById,
-  chainIdByName,
   saveDeploymentData,
   getContractAbi,
   getDeployData,
   getTxGasCost,
-  log,
   presets,
-  toEth,
+} = require('../js-helpers/deploy');
+
+const {
+  log,
   toBN,
-} = require("../js-helpers/deploy");
+  toEth,
+  chainNameById,
+  chainIdByName,
+} = require('../js-helpers/utils');
 
 const _ = require('lodash');
 
@@ -112,7 +115,7 @@ module.exports = async (hre) => {
     log('\n  Contract Deployments & Ionx Minting Complete!');
 
     saveDeploymentData(chainId, deployData);
-    log('\n  Contract Deployment Data saved to "deployed" directory.');
+    log('\n  Contract Deployment Data saved to "deployments" directory.');
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 

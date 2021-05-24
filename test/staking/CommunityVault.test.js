@@ -1,27 +1,43 @@
 const { expect } = require('chai');
 
-describe('CommunityVault', function () {
-    let owner, user, communityVault, userAddr, ownerAddr, communityVaultAddr, creatorAccount, creatorAccountAddr
-    let pushToken
+const {
+  ethers,
+  network,
+  getNamedAccounts,
+  getChainId,
+} = require('hardhat');
+
+const {
+  getDeployData,
+  presets
+} = require('../../js-helpers/deploy');
+
+describe.only('CommunityVault', function () {
+    let chainId, snapshotId;
+    let deployer, owner, user, communityVault;
+    let deployerAddr, ownerAddr, userAddr, communityVaultAddr;
+    let ionxToken;
+
     const distributedAmount = ethers.BigNumber.from(800000).mul(ethers.BigNumber.from(10).pow(18))
-    let snapshotId
 
     beforeEach(async function () {
+        chainId = await getChainId();
         snapshotId = await ethers.provider.send('evm_snapshot')
-        const [creator, ownerSigner, userSigner] = await ethers.getSigners()
-        creatorAccount = creator
-        creatorAccountAddr = await creatorAccount.getAddress()
-        owner = ownerSigner
-        ownerAddr = await owner.getAddress()
-        user = userSigner
-        userAddr = await user.getAddress()
 
-        const CommunityVault = await ethers.getContractFactory('CommunityVault', creator)
+        const namedAccts = (await getNamedAccounts());
+        deployerAddr = namedAccts.deployer
+        deployer = ethers.provider.getSigner(deployerAddr);
+        ownerAddr = namedAccts.protocolOwner
+        owner = ethers.provider.getSigner(ownerAddr);
+        userAddr = namedAccts.user1
+        user = ethers.provider.getSigner(userAddr);
 
-        const EPNS = await ethers.getContractFactory('EPNS')
+        const CommunityVault = await ethers.getContractFactory('CommunityVault')
+        const Ionx = await ethers.getContractFactory('Ionx')
 
-        pushToken = await EPNS.deploy(creator.address)
-        communityVault = await CommunityVault.deploy(pushToken.address)
+        // ionxToken = await Ionx.deploy(creator.address)
+        ionxToken = Ionx.attach(getDeployData('Ionx', chainId).address).connect(owner);
+        communityVault = await CommunityVault.deploy(ionxToken.address)
         communityVaultAddr = communityVault.address
     })
     afterEach(async function () {
@@ -31,14 +47,14 @@ describe('CommunityVault', function () {
     describe('General Contract checks', function () {
         it('should be deployed', async function () {
             expect(communityVault.address).to.not.equal(0)
-            expect(pushToken.address).to.not.equal(0)
+            expect(ionxToken.address).to.not.equal(0)
         })
     })
 
     describe('Contract Tests', function () {
-        it('Mint push tokens in community vault address', async function () {
-            await pushToken.transfer(communityVaultAddr, distributedAmount)
-            expect(await pushToken.balanceOf(communityVaultAddr)).to.be.equal(distributedAmount)
+        it('Mint IONX tokens in community vault address', async function () {
+            await ionxToken.transfer(communityVaultAddr, distributedAmount)
+            expect(await ionxToken.balanceOf(communityVaultAddr)).to.be.equal(distributedAmount)
         })
 
         it('should fail if no owner tries to set allowance', async function () {
@@ -48,14 +64,14 @@ describe('CommunityVault', function () {
         })
 
         it('should set allowance as owner', async function () {
-            await pushToken.transfer(communityVaultAddr, distributedAmount)
-            await communityVault.connect(creatorAccount).setAllowance(userAddr, distributedAmount)
-            expect(await pushToken.allowance(communityVaultAddr, userAddr)).to.be.equal(distributedAmount)
+            await ionxToken.transfer(communityVaultAddr, distributedAmount)
+            await communityVault.connect(deployer).setAllowance(userAddr, distributedAmount)
+            expect(await ionxToken.allowance(communityVaultAddr, userAddr)).to.be.equal(distributedAmount)
         })
 
         it('should transfer ownership', async function () {
-            expect(await communityVault.owner()).to.be.equal(creatorAccountAddr)
-            await expect(communityVault.connect(creatorAccount).transferOwnership(ownerAddr)).to.emit(
+            expect(await communityVault.owner()).to.be.equal(deployerAddr)
+            await expect(communityVault.connect(deployer).transferOwnership(ownerAddr)).to.emit(
                 communityVault, 'OwnershipTransferred')
             expect(await communityVault.owner()).to.be.equal(ownerAddr)
         })
@@ -63,8 +79,8 @@ describe('CommunityVault', function () {
 
     describe('Events', function () {
         it('setAllowance emits SetAllowance', async function () {
-            await pushToken.transfer(communityVaultAddr, distributedAmount)
-            await expect(communityVault.connect(creatorAccount).setAllowance(userAddr, distributedAmount))
+            await ionxToken.transfer(communityVaultAddr, distributedAmount)
+            await expect(communityVault.connect(deployer).setAllowance(userAddr, distributedAmount))
                 .to.emit(communityVault, 'SetAllowance')
         })
     })

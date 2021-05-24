@@ -1,10 +1,13 @@
 const {
+  getDeployData,
+  presets,
+} = require('../js-helpers/deploy');
+
+const {
+  log,
   chainNameById,
   chainIdByName,
-  getDeployData,
-  log,
-  presets,
-} = require("../js-helpers/deploy");
+} = require('../js-helpers/utils');
 
 const _ = require('lodash');
 
@@ -28,7 +31,7 @@ module.exports = async (hre) => {
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
-    const ddIon = getDeployData('Ion', chainId);
+    const ddIonx = getDeployData('Ionx', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Initialization');
@@ -77,9 +80,9 @@ module.exports = async (hre) => {
     const Lepton = await ethers.getContractFactory('Lepton');
     const lepton = await Lepton.attach(ddLepton.address);
 
-    log('  Loading Ion from: ', ddIon.address);
-    const Ion = await ethers.getContractFactory('Ion');
-    const ion = await Ion.attach(ddIon.address);
+    log('  Loading Ionx from: ', ddIonx.address);
+    const Ionx = await ethers.getContractFactory('Ionx');
+    const ionx = await Ionx.attach(ddIonx.address);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Transfer Ownership of All Contracts
@@ -112,8 +115,8 @@ module.exports = async (hre) => {
     await log(`  - Lepton: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
     await lepton.transferOwnership(owner);
 
-    await log(`  - Ion: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
-    await ion.transferOwnership(owner);
+    await log(`  - Ionx: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await ionx.transferOwnership(owner);
 
     log('  Loading AaveBridgeV2 from: ', ddAaveBridgeV2.address);
     const AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');

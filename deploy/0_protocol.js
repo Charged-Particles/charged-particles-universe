@@ -1,11 +1,14 @@
 const {
-  chainNameById,
-  chainIdByName,
   saveDeploymentData,
   getContractAbi,
   getTxGasCost,
-  log
-} = require("../js-helpers/deploy");
+} = require('../js-helpers/deploy');
+
+const {
+  log,
+  chainNameById,
+  chainIdByName,
+} = require('../js-helpers/utils');
 
 const _ = require('lodash');
 
@@ -81,7 +84,7 @@ module.exports = async (hre) => {
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedParticles.deployTransaction }));
 
     saveDeploymentData(chainId, deployData);
-    log('\n  Contract Deployment Data saved to "deployed" directory.');
+    log('\n  Contract Deployment Data saved to "deployments" directory.');
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };

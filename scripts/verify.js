@@ -49,8 +49,8 @@ async function run() {
   await verifyContract('ChargedState', networkName);
   await verifyContract('ChargedSettings', networkName);
   await verifyContract('WBoson', networkName);
-  await verifyContract('Ion', networkName);
-  await verifyContract('IonTimelock', networkName);
+  await verifyContract('Ionx', networkName);
+  await verifyContract('IonxTimelock', networkName);
 
   // // Wallet Managers
   await verifyContract('GenericWalletManager', networkName);
@@ -65,8 +65,8 @@ async function run() {
   // Incentives
   await verifyContract('CommunityVault', networkName);
   await verifyContract('Staking', networkName);
-  await verifyContract('YieldFarmIONX', networkName);
-  await verifyContract('YieldFarmLP', networkName);
+  await verifyContract('IonxYieldFarm', networkName);
+  await verifyContract('LPYieldFarm', networkName);
 
   success('Done!');
 };

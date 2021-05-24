@@ -1,12 +1,15 @@
 const {
-  chainNameById,
-  chainIdByName,
   getDeployData,
+  presets,
+} = require('../js-helpers/deploy');
+
+const {
   log,
   toBN,
   toWei,
-  presets,
-} = require("../js-helpers/deploy");
+  chainNameById,
+  chainIdByName,
+} = require('../js-helpers/utils');
 
 const _ = require('lodash');
 

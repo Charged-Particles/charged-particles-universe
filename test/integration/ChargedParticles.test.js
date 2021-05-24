@@ -7,11 +7,13 @@ const {
 
 const {
   getDeployData,
-  toEth,
-  toWei,
-  toBN,
   presets
 } = require('../../js-helpers/deploy');
+
+const {
+  toWei,
+  toBN,
+} = require('../../js-helpers/utils');
 
 const {
   callAndReturn,
@@ -652,7 +654,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     )).to.be.revertedWith('CP:E-430');
   });
 
-  it.only("leptons switch to the next tier after minting all the available leptons in the previous tier", async () => {
+  it("leptons switch to the next tier after minting all the available leptons in the previous tier", async () => {
     const maxMintPerTx = 5; // presets.Lepton.maxMintPerTx;
     await lepton.setMaxMintPerTx(maxMintPerTx);
 

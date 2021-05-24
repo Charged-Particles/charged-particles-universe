@@ -7,10 +7,13 @@ const {
 
 const {
   getDeployData,
-  toWei,
-  toBN,
   presets
 } = require('../js-helpers/deploy');
+
+const {
+  toWei,
+  toBN,
+} = require('../js-helpers/utils');
 
 const { deployMockContract } = require('../js-helpers/deployMockContract');
 
@@ -53,7 +56,7 @@ describe("Universe", () => {
   // Internal contracts
   let universe;
   let chargedParticlesAddress;
-  let ionAddress;
+  let ionxAddress;
   let protonAddress;
   let ethSender;
 
@@ -92,7 +95,7 @@ describe("Universe", () => {
     signer3 = ethers.provider.getSigner(user3);
 
     chargedParticlesAddress = getDeployData('ChargedParticles', chainId).address;
-    ionAddress = getDeployData('Ion', chainId).address;
+    ionxAddress = getDeployData('Ionx', chainId).address;
     protonAddress = getDeployData('Proton', chainId).address;
 
     // With Forked Mainnet
@@ -165,14 +168,14 @@ describe("Universe", () => {
 
 
     it('should allow the contract owner to set the Ion contract', async () => {
-      let tx = universe.connect(signerD).setPhoton(ionAddress, toWei('1'));
+      let tx = universe.connect(signerD).setPhoton(ionxAddress, toWei('1'));
       await expect(tx)
         .to.emit(universe, 'PhotonSet')
-        .withArgs(ionAddress, toWei('1'));
+        .withArgs(ionxAddress, toWei('1'));
     });
 
     it('should not allow anyone else to set the Ion contract', async () => {
-      await expect(universe.connect(signer2).setPhoton(ionAddress, toWei('1')))
+      await expect(universe.connect(signer2).setPhoton(ionxAddress, toWei('1')))
         .to.be.revertedWith('Ownable: caller is not the owner');
     });
 

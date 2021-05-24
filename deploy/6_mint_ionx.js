@@ -1,10 +1,13 @@
 const {
+  getDeployData,
+  presets,
+} = require('../js-helpers/deploy');
+
+const {
+  log,
   chainNameById,
   chainIdByName,
-  getDeployData,
-  log,
-  presets,
-} = require("../js-helpers/deploy");
+} = require('../js-helpers/utils');
 
 const _ = require('lodash');
 
@@ -16,7 +19,7 @@ module.exports = async (hre) => {
   const chainId = chainIdByName(network.name);
   const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
 
-  const ionxMaxSupply = presets.Ionx.universeMaxSupply;
+  const ionxMaxSupply = presets.Ionx.maxSupply;
 
   const daoSigner = ethers.provider.getSigner(protocolOwner);
   const ddIonx = getDeployData('Ionx', chainId);

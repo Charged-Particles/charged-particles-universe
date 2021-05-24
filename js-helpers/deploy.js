@@ -1,104 +1,39 @@
-const { ethers } = require('ethers');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
-const sleep = require('sleep-promise');
+const moment = require('moment');
+const chalk = require('chalk');
+const dateFormat = require('dateformat');
+
+const {
+  bn,
+  toWei,
+  toEth,
+  toBN,
+  tokensBN,
+  chainNameById,
+  dateToEpoch,
+  blockTimeFromDate,
+  ensureDirectoryExistence,
+  calculateSumArithmeticSeriesAtN,
+} = require('./utils');
+
+const { weiPerEth } = require('./constants');
 
 require('./chaiMatchers');
 
-const toWei = ethers.utils.parseEther;
-const toEth = ethers.utils.formatEther;
-const toBN = ethers.BigNumber.from;
-const toStr = (val) => ethers.utils.toUtf8String(val).replace(/\0/g, '');
-const weiPerEth = ethers.constants.WeiPerEther;
 
-const txOverrides = (options = {}) => ({gasLimit: 15000000, ...options});
+// const STAKING_EPOCH_GENESIS_STR     = '22/05/2021 11:00'; // 22 May 2021 11 AM UTC
+// const STAKING_EPOCH_GENESIS         = dateToEpoch(STAKING_EPOCH_GENESIS_STR);
+// const STAKING_EPOCH_DURATION        = 60 * 60;
 
-const log = (...args) => {
-  console.log(...args);
-  return async (delay = 0) => (delay && await sleep(delay * 1000));
-};
+// const NFT_STAKING_EPOCH_GENESIS_STR = '15/06/2021 14:00';
+// const NFT_STAKING_EPOCH_GENESIS     = dateToEpoch(NFT_STAKING_EPOCH_GENESIS_STR);
 
-const chainIdByName = (chainName) => {
-  switch (_.toLower(chainName)) {
-    case 'mainnet': return 1;
-    case 'ropsten': return 3;
-    case 'rinkeby': return 4;
-    case 'kovan': return 42;
-    case 'hardhat': return 31337;
-    case 'coverage': return 31337;
-    default: return 0;
-  }
-};
 
-const chainNameById = (chainId) => {
-  switch (parseInt(chainId, 10)) {
-    case 1: return 'Mainnet';
-    case 3: return 'Ropsten';
-    case 4: return 'Rinkeby';
-    case 42: return 'Kovan';
-    case 31337: return 'Hardhat';
-    default: return 'Unknown';
-  }
-};
+const NOW = Date.now();
+const TEN_MINS_FROM_NOW = new Date(NOW + 10 * 60 * 1000);
 
-const blockTimeFromDate = (dateStr) => {
-  return Date.parse(dateStr) / 1000;
-};
-
-const ensureDirectoryExistence = (filePath) => {
-  var dirname = path.dirname(filePath);
-  if (fs.existsSync(dirname)) {
-    return true;
-  }
-  ensureDirectoryExistence(dirname);
-  fs.mkdirSync(dirname);
-};
-
-const saveDeploymentData = (chainId, deployData) => {
-  const network = chainNameById(chainId).toLowerCase();
-  const deployPath = path.join(__dirname, '..', 'deployments', network);
-
-  _.forEach(_.keys(deployData), (contractName) => {
-    const filename = `${deployPath}/${contractName}.json`;
-
-    let existingData = {};
-    if (fs.existsSync(filename)) {
-      existingData = JSON.parse(fs.readFileSync(filename));
-    }
-
-    const newData = _.merge(existingData, deployData[contractName]);
-    ensureDirectoryExistence(filename);
-    fs.writeFileSync(filename, JSON.stringify(newData, null, "\t"));
-  });
-};
-
-const getContractAbi = (contractName) => {
-  const buildPath = path.join(__dirname, '..', 'abis');
-  const filename = `${buildPath}/${contractName}.json`;
-  const contractJson = require(filename);
-  return contractJson;
-};
-
-const getDeployData = (contractName, chainId = 31337) => {
-  const network = chainNameById(chainId).toLowerCase();
-  const deployPath = path.join(__dirname, '..', 'deployments', network);
-  const filename = `${deployPath}/${contractName}.json`;
-  const contractJson = require(filename);
-  return contractJson;
-}
-
-const getTxGasCost = ({deployTransaction}) => {
-  const gasCost = toEth(deployTransaction.gasLimit.mul(deployTransaction.gasPrice));
-  return `${gasCost} ETH`;
-};
-
-const getActualTxGasCost = async (txData) => {
-  const txResult = await txData.wait();
-  const gasCostEst = toEth(txData.gasLimit.mul(txData.gasPrice));
-  const gasCost = toEth(txResult.gasUsed.mul(txData.gasPrice));
-  return `${gasCost} ETH Used.  (Estimated: ${gasCostEst} ETH)`;
-};
 
 const presets = {
   ChargedParticles: {
@@ -162,30 +97,6 @@ const presets = {
       },
     ]
   },
-  Ionx: {
-    universeMaxSupply: toWei('100000000'), // 100 Million
-    rewardsForAssetTokens: [
-      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI (50% of Interest in Ionx)
-    ],
-    timelocks: [
-      {
-        receiver: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',  // Testing - Account 3
-        portions: [
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('27 Dec 2021 00:00:00 GMT')},
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('28 Dec 2021 00:00:00 GMT')},
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('29 Dec 2021 00:00:00 GMT')},
-        ]
-      },
-      {
-        receiver: '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',  // Testing - Account 4
-        portions: [
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('27 Dec 2021 00:00:00 GMT')},
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('28 Dec 2021 00:00:00 GMT')},
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('29 Dec 2021 00:00:00 GMT')},
-        ]
-      },
-    ],
-  },
   Aave: {
     referralCode: {
       1: '',
@@ -205,27 +116,187 @@ const presets = {
       }
     }
   },
-  UniV2LPTokenAddress: {
-    1: '', // mainnet
-    42: '0x5c6e126c32ba4439e40be2f60f7b2453485a4b7a', // kovan
-    31337: '', // Hardhat - Forked Mainnet
-  }
+  Ionx: {
+    // token info to test
+    name: 'Charged Particles - IONX',
+    symbol: 'IONX',
+    decimals: 18,
+    maxSupply: toWei('100000000'), // 100 Million
+
+    rewardsForAssetTokens: [
+      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI (50% of Interest in Ionx)
+    ],
+
+    timelocks: [
+      {
+        receiver: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',  // Testing - Account 3
+        portions: [
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('27 Dec 2021 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('28 Dec 2021 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('29 Dec 2021 00:00:00 GMT')},
+        ]
+      },
+      {
+        receiver: '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',  // Testing - Account 4
+        portions: [
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('27 Dec 2021 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('28 Dec 2021 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('29 Dec 2021 00:00:00 GMT')},
+        ]
+      },
+    ],
+  },
+  Incentives: {
+    1: { // Mainnet
+
+    },
+    42: { // Kovan Testnet
+      staking: {
+        epochDuration: 60 * 60,  // 1 Hour
+        epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+      },
+      ionxToken: {
+        startAmount: bn(50000),
+        nrOfEpochs: bn(96),
+        deprecation: bn(100),
+      },
+      lpTokens: {
+        startAmount: bn(50000),
+        nrOfEpochs: bn(96),
+        deprecation: bn(100),
+      },
+      nftYieldFarmingL1: {
+      },
+      nftYieldFarmingL2: {
+      },
+
+      uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+      uniswapLPTokenAddress: '0x5c6e126c32ba4439e40be2f60f7b2453485a4b7a',
+    },
+    137: { // Polygon L2 Mainnet
+
+    },
+    31337: { // Hardhat - Forked Mainnet
+      staking: {
+        epochDuration: 60 * 60,  // 1 Hour
+        epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+      },
+      ionxToken: {
+        startAmount: bn(50000),
+        nrOfEpochs: bn(96),
+        deprecation: bn(100),
+      },
+      lpTokens: {
+        startAmount: bn(50000),
+        nrOfEpochs: bn(96),
+        deprecation: bn(100),
+      },
+      nftYieldFarmingL1: {
+      },
+      nftYieldFarmingL2: {
+      },
+
+      uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+      uniswapLPTokenAddress: '0x5c6e126c32ba4439e40be2f60f7b2453485a4b7a',
+    },
+  },
 };
 
 
+const txOverrides = (options = {}) => ({gasLimit: 15000000, ...options});
+
+const saveDeploymentData = (chainId, deployData) => {
+  const network = chainNameById(chainId).toLowerCase();
+  const deployPath = path.join(__dirname, '..', 'deployments', network);
+
+  _.forEach(_.keys(deployData), (contractName) => {
+    const filename = `${deployPath}/${contractName}.json`;
+
+    let existingData = {};
+    if (fs.existsSync(filename)) {
+      existingData = JSON.parse(fs.readFileSync(filename));
+    }
+
+    const newData = _.merge(existingData, deployData[contractName]);
+    ensureDirectoryExistence(filename);
+    fs.writeFileSync(filename, JSON.stringify(newData, null, "\t"));
+  });
+};
+
+const getContractAbi = (contractName) => {
+  const buildPath = path.join(__dirname, '..', 'abis');
+  const filename = `${buildPath}/${contractName}.json`;
+  const contractJson = require(filename);
+  return contractJson;
+};
+
+const getDeployData = (contractName, chainId = 31337) => {
+  const network = chainNameById(chainId).toLowerCase();
+  const deployPath = path.join(__dirname, '..', 'deployments', network);
+  const filename = `${deployPath}/${contractName}.json`;
+  const contractJson = require(filename);
+  return contractJson;
+}
+
+const getTxGasCost = ({deployTransaction}) => {
+  const gasCost = toEth(deployTransaction.gasLimit.mul(deployTransaction.gasPrice));
+  return `${gasCost} ETH`;
+};
+
+const getActualTxGasCost = async (txData) => {
+  const txResult = await txData.wait();
+  const gasCostEst = toEth(txData.gasLimit.mul(txData.gasPrice));
+  const gasCost = toEth(txResult.gasUsed.mul(txData.gasPrice));
+  return `${gasCost} ETH Used.  (Estimated: ${gasCostEst} ETH)`;
+};
+
+const getIonxDistributionAmount = (chainId = 42) => {
+  const incentives = presets.Incentives[chainId];
+  const a1 = incentives.ionxToken.startAmount;
+  const d = incentives.ionxToken.deprecation;
+  const n = incentives.ionxToken.nrOfEpochs;
+
+  const sumAtN = calculateSumArithmeticSeriesAtN(a1, d, n);
+  return tokensBN(sumAtN);
+};
+
+const getLiquidityDistributionAmount = (chainId = 42) => {
+  const incentives = presets.Incentives[chainId];
+  const a1 = incentives.lpTokens.startAmount;
+  const d = incentives.lpTokens.deprecation;
+  const n = incentives.lpTokens.nrOfEpochs;
+
+  const sumAtN = calculateSumArithmeticSeriesAtN(a1, d, n);
+  return tokensBN(sumAtN);
+};
+
+// For Distributing funds
+const distributeInitialFunds = async (tokenContract, contract, amount, signer) => {
+  let balance;
+  console.log(chalk.bgBlue.white(`Distributing Initial Funds`))
+  console.log(chalk.bgBlack.white(`Sending Funds to ${contract.address}`), chalk.green(`${ethers.utils.formatUnits(amount)} IONX`))
+
+  balance = await tokenContract.balanceOf(signer)
+  console.log(chalk.bgBlack.white(`IONX Token Balance Before Transfer:`), chalk.yellow(`${ethers.utils.formatUnits(balance)} IONX`))
+  const tx = await tokenContract.transfer(contract.address, amount)
+  await tx.wait()
+
+  balance = await tokenContract.balanceOf(signer)
+  console.log(chalk.bgBlack.white(`IONX Token Balance After Transfer:`), chalk.yellow(`${ethers.utils.formatUnits(balance)} IONX`))
+
+  console.log(chalk.bgBlack.white(`Transaction hash:`), chalk.gray(`${tx.hash}`))
+  console.log(chalk.bgBlack.white(`Transaction etherscan:`), chalk.gray(`https://${hre.network.name}.etherscan.io/tx/${tx.hash}`))
+};
+
 module.exports = {
   txOverrides,
-  chainNameById,
-  chainIdByName,
   saveDeploymentData,
   getContractAbi,
   getDeployData,
   getTxGasCost,
   getActualTxGasCost,
-  log,
+  getIonxDistributionAmount,
+  getLiquidityDistributionAmount,
+  distributeInitialFunds,
   presets,
-  toWei,
-  toEth,
-  toBN,
-  toStr,
 };
