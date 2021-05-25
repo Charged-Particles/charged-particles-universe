@@ -19,6 +19,8 @@
     "verify": "yarn hint && yarn test",
     "compile": "hardhat --show-stack-traces --max-memory 8192 compile",
     "test": "yarn clean-test && hardhat test --show-stack-traces && yarn clean-test",
+    "test-only": "yarn clean-test && hardhat test --show-stack-traces",
+    "watch-test": "hardhat watch test",
     "hint": "solhint \"contracts/**/*.sol\"",
     "etherscan-verify": "hardhat run ./scripts/verify.js --network",
     "pause-all": "hardhat run ./scripts/pause-all.js --network",
@@ -64,6 +66,7 @@
   },
   "dependencies": {
     "dateformat": "^4.5.1",
+    "hardhat-watcher": "^2.1.1",
     "moment": "^2.29.1",
     "sleep-promise": "^9.1.0"
   }

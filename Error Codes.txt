@@ -43,8 +43,8 @@ Codes:
     E-202 - array length mismatch
     E-203 - TokenID not in posession of smart wallet.
     E-204 - invalid chronological order
-    E-205 -
-    E-206 -
+    E-205 - amount must be positive
+    E-206 - 
     E-207 -
     E-208 -
     E-209 -
@@ -54,9 +54,9 @@ Codes:
     E-301 - release time is before current time
     E-302 - TOKEN_TIMELOCKED
     E-303 - TOKEN_TEMP_LOCKED
-    E-304 -
-    E-305 -
-    E-306 -
+    E-304 - too soon
+    E-305 - previous epoch not initialized
+    E-306 - epoch is in the future
     E-307 -
     E-308 -
     E-309 -
@@ -94,3 +94,4 @@ Codes:
     E-429 - minting restricted to limited amount
     E-430 - only 1 lepton per NFT allowed
     E-431 - portion already claimed
+    E-432 - balance too small

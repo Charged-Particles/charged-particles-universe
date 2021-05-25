@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.6.11;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract Staking is ReentrancyGuard {
+contract Staking is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
 
     uint128 constant private BASE_MULTIPLIER = uint128(1 * 10 ** 18);
@@ -41,21 +42,48 @@ contract Staking is ReentrancyGuard {
 
     mapping(address => uint128) private lastWithdrawEpochId;
 
+    event PausedStateSet(bool isPaused);
     event Deposit(address indexed user, address indexed tokenAddress, uint256 amount);
     event Withdraw(address indexed user, address indexed tokenAddress, uint256 amount);
     event ManualEpochInit(address indexed caller, uint128 indexed epochId, address[] tokens);
     event EmergencyWithdraw(address indexed user, address indexed tokenAddress, uint256 amount);
 
     constructor (uint256 _epoch1Start, uint256 _epochDuration) public {
+        _paused = true;
         epoch1Start = _epoch1Start;
         epochDuration = _epochDuration;
     }
 
+    bool internal _paused;
+
+
+    /***********************************|
+    |              Public               |
+    |__________________________________*/
+
+    function isPaused() external view returns (bool) {
+        return _paused;
+    }
+
+    /***********************************|
+    |          Only Admin/DAO           |
+    |__________________________________*/
+
+  /**
+    * @dev Sets the Paused-state of the Staking Contract
+    */
+    function setPausedState(bool paused) external onlyOwner {
+        _paused = paused;
+        emit PausedStateSet(paused);
+    }
+
+    
+
     /*
      * Stores `amount` of `tokenAddress` tokens for the `user` into the vault
      */
-    function deposit(address tokenAddress, uint256 amount) public nonReentrant {
-        require(amount > 0, "Staking: Amount must be > 0");
+    function deposit(address tokenAddress, uint256 amount) public nonReentrant whenNotPaused {
+        require(amount > 0, "STK:E-205");
 
         IERC20 token = IERC20(tokenAddress);
 
@@ -144,8 +172,8 @@ contract Staking is ReentrancyGuard {
     /*
      * Removes the deposit of the user and sends the amount of `tokenAddress` back to the `user`
      */
-    function withdraw(address tokenAddress, uint256 amount) public nonReentrant {
-        require(balances[msg.sender][tokenAddress] >= amount, "Staking: balance too small");
+    function withdraw(address tokenAddress, uint256 amount) public nonReentrant whenNotPaused {
+        require(balances[msg.sender][tokenAddress] >= amount, "STK:E-432");
 
         balances[msg.sender][tokenAddress] = balances[msg.sender][tokenAddress].sub(amount);
 
@@ -232,8 +260,8 @@ contract Staking is ReentrancyGuard {
      * This is only applicable if there was no action (deposit/withdraw) in the current epoch.
      * Any deposit and withdraw will automatically initialize the current and next epoch.
      */
-    function manualEpochInit(address[] memory tokens, uint128 epochId) public {
-        require(epochId <= getCurrentEpoch(), "can't init a future epoch");
+    function manualEpochInit(address[] memory tokens, uint128 epochId) public whenNotPaused {
+        require(epochId <= getCurrentEpoch(), "STK:E-306");
 
         for (uint i = 0; i < tokens.length; i++) {
             Pool storage p = poolSize[tokens[i]][epochId];
@@ -242,8 +270,8 @@ contract Staking is ReentrancyGuard {
                 p.size = uint256(0);
                 p.set = true;
             } else {
-                require(!epochIsInitialized(tokens[i], epochId), "Staking: epoch already initialized");
-                require(epochIsInitialized(tokens[i], epochId - 1), "Staking: previous epoch not initialized");
+                require(!epochIsInitialized(tokens[i], epochId), "STK:E-002");
+                require(epochIsInitialized(tokens[i], epochId - 1), "STK:E-305");
 
                 p.size = poolSize[tokens[i]][epochId - 1].size;
                 p.set = true;
@@ -253,11 +281,11 @@ contract Staking is ReentrancyGuard {
         emit ManualEpochInit(msg.sender, epochId, tokens);
     }
 
-    function emergencyWithdraw(address tokenAddress) public {
-        require((getCurrentEpoch() - lastWithdrawEpochId[tokenAddress]) >= 10, "At least 10 epochs must pass without success");
+    function emergencyWithdraw(address tokenAddress) public whenNotPaused {
+        require((getCurrentEpoch() - lastWithdrawEpochId[tokenAddress]) >= 10, "STK:E-304");
 
         uint256 totalUserBalance = balances[msg.sender][tokenAddress];
-        require(totalUserBalance > 0, "Amount must be > 0");
+        require(totalUserBalance > 0, "STK:E-205");
 
         balances[msg.sender][tokenAddress] = 0;
 
@@ -375,4 +403,12 @@ contract Staking is ReentrancyGuard {
     function getCheckpointEffectiveBalance(Checkpoint memory c) internal pure returns (uint256) {
         return getCheckpointBalance(c).mul(c.multiplier).div(BASE_MULTIPLIER);
     }
+
+    modifier whenNotPaused() {
+        require(_paused != true, "STK:E-101");
+         _;
+    }
+
 }
+
+

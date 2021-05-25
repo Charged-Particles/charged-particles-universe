@@ -14,6 +14,8 @@ require('hardhat-abi-exporter');
 require('solidity-coverage');
 require('hardhat-deploy-ethers');
 require('hardhat-deploy');
+require("hardhat-watcher");
+
 
 // This must occur after hardhat-deploy!
 task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
@@ -31,6 +33,7 @@ task(
   async (args, hre, runSuper) => {
     await hre.run('compile');
     await hre.deployments.fixture();
+    console.log(`Args: ${JSON.stringify(args)}`);
     return runSuper({...args, noCompile: true});
   }
 );
@@ -156,5 +159,17 @@ module.exports = {
           4: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // rinkeby
           42: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // kovan
         }
-    }
+    },
+    watcher: {
+      compilation: {
+        tasks: ["compile"],
+        files: ["./contracts"],
+        verbose: true,
+      },
+      test: {
+        tasks: [{ command: 'test', params: { testFiles: ['{path}'] } }],
+        files: ['./test/**/*'],
+        verbose: true
+      }
+    },
 };

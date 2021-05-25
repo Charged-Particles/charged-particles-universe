@@ -171,7 +171,7 @@ const presets = {
       },
 
       uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-      uniswapLPTokenAddress: '0x5c6e126c32ba4439e40be2f60f7b2453485a4b7a',
+      uniswapLPTokenAddress: '0xac5a8983d9289922a45f97b352dc3c94ff55a1a6', // TODO: Update me if you redeploy a new Ion by making a new Uniswap LP pair
     },
     137: { // Polygon L2 Mainnet
 
@@ -197,7 +197,7 @@ const presets = {
       },
 
       uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-      uniswapLPTokenAddress: '0x5c6e126c32ba4439e40be2f60f7b2453485a4b7a',
+      uniswapLPTokenAddress: '0xac5a8983d9289922a45f97b352dc3c94ff55a1a6',
     },
   },
 };
