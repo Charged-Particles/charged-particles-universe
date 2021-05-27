@@ -57,18 +57,18 @@ contract YieldFarm {
     }
 
     // public methods
-    function getAmountClaimable(address account) external view returns (uint) {
+    function getAmountClaimable() external view returns (uint) {
         uint totalClaimable;
         uint epochId = _getEpochId().sub(1); // fails in epoch 0
-        uint lastEpochIdHarvestedUser = lastEpochIdHarvested[account];
+        uint lastEpochIdHarvestedUser = lastEpochIdHarvested[msg.sender];
 
         // force max number of epochs
         if (epochId > NR_OF_EPOCHS) {
             epochId = NR_OF_EPOCHS;
         }
 
-        for (uint128 i = lastEpochIdHarvested[account] + 1; i <= epochId; i++) {
-            totalClaimable += _getAmountClaimableAtEpoch(account, i);
+        for (uint128 i = lastEpochIdHarvested[msg.sender] + 1; i <= epochId; i++) {
+            totalClaimable += _getAmountClaimableAtEpoch(msg.sender, i);
         }
 
         return totalClaimable;
