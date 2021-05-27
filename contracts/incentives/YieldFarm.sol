@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.6.11;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../lib/BlackholePrevention.sol";
 import "../interfaces/IStaking.sol";
 
-contract YieldFarm {
+contract YieldFarm is Ownable, BlackholePrevention {
 
     // lib
     using SafeMath for uint;
@@ -29,17 +31,19 @@ contract YieldFarm {
     uint private immutable _genesisEpochAmount;
     uint private _deprecationPerEpoch;
     uint128 public lastInitializedEpoch;
+    bool internal _paused;
     mapping(address => uint128) public lastEpochIdHarvested;
     uint public epochDuration; // init from staking contract
-    uint public epochStart; // init from staking contract
+    uint public immutable epochStart; // init from staking contract
 
     // events
+    event PausedStateSet(bool isPaused);
     event MassHarvest(address indexed user, uint256 epochsHarvested, uint256 totalValue);
     event Harvest(address indexed user, uint128 indexed epochId, uint256 amount);
 
     // constructor
     constructor(address ionxTokenAddress, address token, address stakeContract, address communityVault, uint genesisEpochAmount, uint deprecationPerEpoch, uint nrOfEpochs) public {
-
+        _paused = false;
         _ionx = IERC20(ionxTokenAddress);
         _token = token;
         _staking = IStaking(stakeContract);
@@ -54,6 +58,38 @@ contract YieldFarm {
         epochs = new uint[](nrOfEpochs + 1);
         _genesisEpochAmount = genesisEpochAmount;
 
+    }
+
+    /***********************************|
+    |              Public               |
+    |__________________________________*/
+
+    function isPaused() external view returns (bool) {
+        return _paused;
+    }
+
+    /***********************************|
+    |          Only Admin/DAO           |
+    |__________________________________*/
+
+  /**
+    * @dev Sets the Paused-state of the Staking Contract
+    */
+    function setPausedState(bool paused) external onlyOwner {
+        _paused = paused;
+        emit PausedStateSet(paused);
+    }
+
+    function withdrawEther(address payable receiver, uint256 amount) external virtual onlyOwner {
+        _withdrawEther(receiver, amount);
+    }
+
+    function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external virtual onlyOwner {
+        _withdrawERC20(receiver, tokenAddress, amount);
+    }
+
+    function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external virtual onlyOwner {
+        _withdrawERC721(receiver, tokenAddress, tokenId);
     }
 
     // public methods
@@ -75,7 +111,7 @@ contract YieldFarm {
     }
 
     // public method to harvest all the unharvested epochs until current epoch - 1
-    function massHarvest() external returns (uint){
+    function massHarvest() external whenNotPaused returns (uint){
         uint totalDistributedValue;
         uint epochId = _getEpochId().sub(1); // fails in epoch 0
         uint lastEpochIdHarvestedUser = lastEpochIdHarvested[msg.sender];
@@ -99,7 +135,7 @@ contract YieldFarm {
 
         return totalDistributedValue;
     }
-    function harvest (uint128 epochId) external returns (uint){
+    function harvest (uint128 epochId) external whenNotPaused returns (uint){
         // checks for requested epoch
         require (_getEpochId() > epochId, "This epoch is in the future");
         require(epochId <= NR_OF_EPOCHS, "Maximum number of epochs exceeded");
@@ -191,5 +227,10 @@ contract YieldFarm {
     // get the staking epoch which is 1 epoch more
     function _stakingEpochId(uint128 epochId) pure internal returns (uint128) {
         return epochId + 1;
+    }
+
+    modifier whenNotPaused() {
+    require(_paused != true, "STK:E-101");
+        _;
     }
 }

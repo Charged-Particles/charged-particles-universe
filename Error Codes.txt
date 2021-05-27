@@ -54,7 +54,7 @@ Codes:
     E-301 - release time is before current time
     E-302 - TOKEN_TIMELOCKED
     E-303 - TOKEN_TEMP_LOCKED
-    E-304 - too soon
+    E-304 - emergency withdraw too soon
     E-305 - previous epoch not initialized
     E-306 - epoch is in the future
     E-307 -
