@@ -32,6 +32,8 @@ const chainIdByName = (chainName) => {
     case 'ropsten': return 3;
     case 'rinkeby': return 4;
     case 'kovan': return 42;
+    case 'polygon': return 137;
+    case 'mumbai': return 80001;
     case 'hardhat': return 31337;
     case 'coverage': return 31337;
     default: return 0;
@@ -44,6 +46,8 @@ const chainNameById = (chainId) => {
     case 3: return 'Ropsten';
     case 4: return 'Rinkeby';
     case 42: return 'Kovan';
+    case 137: return 'Polygon';
+    case 80001: return 'Mumbai';
     case 31337: return 'Hardhat';
     default: return 'Unknown';
   }

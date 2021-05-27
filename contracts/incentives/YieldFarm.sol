@@ -53,10 +53,27 @@ contract YieldFarm {
         NR_OF_EPOCHS = nrOfEpochs;
         epochs = new uint[](nrOfEpochs + 1);
         _genesisEpochAmount = genesisEpochAmount;
-        
+
     }
 
     // public methods
+    function getAmountClaimable(address account) external view returns (uint) {
+        uint totalClaimable;
+        uint epochId = _getEpochId().sub(1); // fails in epoch 0
+        uint lastEpochIdHarvestedUser = lastEpochIdHarvested[account];
+
+        // force max number of epochs
+        if (epochId > NR_OF_EPOCHS) {
+            epochId = NR_OF_EPOCHS;
+        }
+
+        for (uint128 i = lastEpochIdHarvested[account] + 1; i <= epochId; i++) {
+            totalClaimable += _getAmountClaimableAtEpoch(account, i);
+        }
+
+        return totalClaimable;
+    }
+
     // public method to harvest all the unharvested epochs until current epoch - 1
     function massHarvest() external returns (uint){
         uint totalDistributedValue;
@@ -123,6 +140,13 @@ contract YieldFarm {
         epochs[epochId] = _getPoolSize(epochId);
     }
 
+    function _getAmountClaimableAtEpoch(address account, uint128 epochId) internal view returns (uint) {
+        if (epochs[epochId] == 0) { return 0; }
+        return _calcTotalAmountPerEpoch(epochId)
+          .mul(_getUserBalancePerEpoch(account, epochId))
+          .div(epochs[epochId]);
+    }
+
     function _harvest (uint128 epochId) internal returns (uint) {
         // try to initialize an epoch. if it can't it fails
         // if it fails either user either a BarnBridge account will init not init epochs
@@ -138,8 +162,8 @@ contract YieldFarm {
             return 0;
         }
         return _calcTotalAmountPerEpoch(epochId)
-        .mul(_getUserBalancePerEpoch(msg.sender, epochId))
-        .div(epochs[epochId]);
+          .mul(_getUserBalancePerEpoch(msg.sender, epochId))
+          .div(epochs[epochId]);
     }
 
     function _calcTotalAmountPerEpoch(uint256 epochId) internal view returns (uint) {

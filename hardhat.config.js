@@ -158,6 +158,8 @@ module.exports = {
           3: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // ropsten
           4: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // rinkeby
           42: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // kovan
+          137: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // Polygon L2 Mainnet
+          80001: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // Polygon L2 Testnet - Mumbai
         }
     },
     watcher: {

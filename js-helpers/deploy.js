@@ -51,7 +51,7 @@ const presets = {
         name        : 'Electron Neutrino',
         tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmcWuHx4MgywyEMzsqT9J3boJu1gk7GdtAMQ1pyQYRR3XS',
         price       : {1: toWei('0.3'), 42: toWei('0.0000003'), 31337: toWei('0.000000003')},
-        supply      : {1: toBN('721'), 42: toBN('40'), 31337: toBN('40')},
+        supply      : {1: toBN('721'),  42: toBN('40'),         31337: toBN('40')},
         multiplier  : toBN('110'),  // 1.1%
         bonus       : toBN('0'),
       },
@@ -59,7 +59,7 @@ const presets = {
         name        : 'Muon Neutrino',
         tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmccGhGhvi37QScB4u2VmuVwENtEsMpx6hAKUqu3x3nU9V',
         price       : {1: toWei('0.9'), 42: toWei('0.0000009'), 31337: toWei('0.000000009')},
-        supply      : {1: toBN('401'), 42: toBN('20'), 31337: toBN('20')},
+        supply      : {1: toBN('401'),  42: toBN('20'),         31337: toBN('20')},
         multiplier  : toBN('130'),  // 1.3%
         bonus       : toBN('1'),
       },
@@ -67,7 +67,7 @@ const presets = {
         name        : 'Tau Neutrino',
         tokenUri    : 'https://gateway.pinata.cloud/ipfs/Qma2ZPnCM95AYZ1wPxZdDVvRiS114Svrw2J632ZpLiX7JV',
         price       : {1: toWei('1.7'), 42: toWei('0.0000017'), 31337: toWei('0.000000017')},
-        supply      : {1: toBN('301'), 42: toBN('12'), 31337: toBN('12')},
+        supply      : {1: toBN('301'),  42: toBN('12'),         31337: toBN('12')},
         multiplier  : toBN('150'),  // 1.5%
         bonus       : toBN('2'),
       },
@@ -75,7 +75,7 @@ const presets = {
         name        : 'Electron',
         tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmNRKJsUwqEE9zYK6sEND8HDGa4cHFkkC2ntjQA5bFL6jJ',
         price       : {1: toWei('2.9'), 42: toWei('0.000029'), 31337: toWei('0.00000029')},
-        supply      : {1: toBN('201'), 42: toBN('8'), 31337: toBN('8')},
+        supply      : {1: toBN('201'),  42: toBN('8'),          31337: toBN('8')},
         multiplier  : toBN('180'),  // 1.8%
         bonus       : toBN('4'),
       },
@@ -83,7 +83,7 @@ const presets = {
         name        : 'Muon',
         tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmWiH5F9yPp7yRzcqocmQKuhrA3KVY9fGJZxD9UKBDu5wr',
         price       : {1: toWei('5.1'), 42: toWei('0.000051'), 31337: toWei('0.00000051')},
-        supply      : {1: toBN('88'), 42: toBN('5'), 31337: toBN('5')},
+        supply      : {1: toBN('88'),   42: toBN('5'),         31337: toBN('5')},
         multiplier  : toBN('230'),  // 2.3%
         bonus       : toBN('8'),
       },
@@ -91,7 +91,7 @@ const presets = {
         name        : 'Tau',
         tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmUkCXgyguBSxnGRtfBAvofAkyhFbRCwS7HPaoytAZvemt',
         price       : {1: toWei('21'), 42: toWei('0.00021'), 31337: toWei('0.0000021')},
-        supply      : {1: toBN('21'), 42: toBN('2'), 31337: toBN('2')},
+        supply      : {1: toBN('21'),  42: toBN('2'),        31337: toBN('2')},
         multiplier  : toBN('510'),  // 5.1%
         bonus       : toBN('16'),
       },
@@ -101,17 +101,23 @@ const presets = {
     referralCode: {
       1: '',
       42: '',
+      137: '',
+      80001: '',
       31337: '',
     },
     v2: {
       dai: {
         1: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // mainnet
         42: '0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD', // kovan
+        137: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', // polygon mainnet
+        80001: '0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F', // polygon testnet
         31337: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // Hardhat - Forked Mainnet
       },
       lendingPoolProvider: {
         1: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // mainnet
         42: '0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b', // kovan
+        137: '0xd05e3E715d945B59290df0ae8eF85c1BdB684744', // polygon mainnet
+        80001: '0x178113104fEcbcD7fF8669a0150721e231F0FD4B', // polygon testnet
         31337: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // Hardhat - Forked Mainnet
       }
     }
@@ -165,21 +171,36 @@ const presets = {
         nrOfEpochs: bn(50),
         deprecation: bn(500),
       },
-      nftYieldFarmingL1: {
-      },
-      nftYieldFarmingL2: {
-      },
 
       uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-      uniswapLPTokenAddress: '0xac5a8983d9289922a45f97b352dc3c94ff55a1a6', // TODO: Update me if you redeploy a new Ion by making a new Uniswap LP pair
+      uniswapLPTokenAddress: '0xac5A8983d9289922a45f97B352Dc3c94FF55a1A6',
     },
     137: { // Polygon L2 Mainnet
 
     },
+    80001: { // Polygon L2 Testnet - Mumbai
+      staking: {
+        epochDuration: 30 * 60,  // 1/2 Hour
+        epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+      },
+      ionxToken: {
+        startAmount: bn(53000),  // 5_000_000 TOTAL
+        nrOfEpochs: bn(104),
+        deprecation: bn(100),
+      },
+      lpTokens: {
+        startAmount: bn(100000),  // 10_000_000 TOTAL
+        nrOfEpochs: bn(104),
+        deprecation: bn(100),
+      },
+
+      uniswapV2Addr : '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff', // QuickSwap on Polygon Mainnet
+      uniswapLPTokenAddress: '',
+    },
     31337: { // Hardhat - Forked Mainnet
       staking: {
         epochDuration: 60 * 60,  // 1 Hour
-        epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+        epoch1Start: dateToEpoch(dateFormat(NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
         startAmount: bn(50000),
@@ -191,13 +212,9 @@ const presets = {
         nrOfEpochs: bn(96),
         deprecation: bn(100),
       },
-      nftYieldFarmingL1: {
-      },
-      nftYieldFarmingL2: {
-      },
 
       uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-      uniswapLPTokenAddress: '0xac5a8983d9289922a45f97b352dc3c94ff55a1a6',
+      uniswapLPTokenAddress: '0xac5A8983d9289922a45f97B352Dc3c94FF55a1A6',
     },
   },
 };
