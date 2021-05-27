@@ -55,7 +55,7 @@ contract Staking is
     event EmergencyWithdraw(address indexed user, address indexed tokenAddress, uint256 amount);
 
     constructor (uint256 _epoch1Start, uint256 _epochDuration) public {
-        _paused = true;
+        _paused = false;
         epoch1Start = _epoch1Start;
         epochDuration = _epochDuration;
     }

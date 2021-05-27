@@ -43,7 +43,7 @@ contract YieldFarm is Ownable, BlackholePrevention {
 
     // constructor
     constructor(address ionxTokenAddress, address token, address stakeContract, address communityVault, uint genesisEpochAmount, uint deprecationPerEpoch, uint nrOfEpochs) public {
-        _paused = true;
+        _paused = false;
         _ionx = IERC20(ionxTokenAddress);
         _token = token;
         _staking = IStaking(stakeContract);
