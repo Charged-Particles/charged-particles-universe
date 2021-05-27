@@ -173,7 +173,7 @@ const presets = {
       },
 
       uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-      uniswapLPTokenAddress: '0xac5A8983d9289922a45f97B352Dc3c94FF55a1A6',
+      uniswapLPTokenAddress: '0x509cc4b76d3b5424b4f1670f5ebda114c6e56da5',
     },
     137: { // Polygon L2 Mainnet
 
