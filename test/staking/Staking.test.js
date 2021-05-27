@@ -291,7 +291,7 @@ describe('Staking', function () {
         it('Reverts if user has no balance', async function () {
             await expect(
                 staking.connect(user).withdraw(ionxToken.address, amount),
-            ).to.be.revertedWith('Staking: balance too small')
+            ).to.be.revertedWith('STK:E-432');
         })
 
         it('Sets the balance of the user to 0', async function () {
@@ -332,13 +332,13 @@ describe('Staking', function () {
                 await moveAtEpoch(1)
                 await staking.manualEpochInit([ionxToken.address], 0)
 
-                await deposit(user, amount)
+                await deposit(user, amount) // 100 $IONX
 
                 await moveAtEpoch(5)
                 await staking.manualEpochInit([ionxToken.address], 3)
                 await staking.manualEpochInit([ionxToken.address], 4)
 
-                const ts = getEpochStart(1) + 24 * 60 * 60
+                const ts = getEpochStart(5) + 15 * 60;
                 await setNextBlockTimestamp(ts)
 
                 await withdraw(user, amount.div(2))
@@ -355,7 +355,7 @@ describe('Staking', function () {
 
                 await moveAtEpoch(2)
 
-                const ts = getEpochStart(1) + 24 * 60 * 60
+                const ts = getEpochStart(2) + 15 * 60;
                 await setNextBlockTimestamp(ts)
 
                 await withdraw(user, amount.div(2))
@@ -374,12 +374,12 @@ describe('Staking', function () {
                 await staking.manualEpochInit([ionxToken.address], 3)
                 await staking.manualEpochInit([ionxToken.address], 4)
 
-                const ts = getEpochStart(1) + 24 * 60 * 60
+                const ts = getEpochStart(5);
                 await setNextBlockTimestamp(ts)
 
                 await deposit(user, amount)
 
-                const ts1 = getEpochStart(1) + Math.floor(epochDuration / 2)
+                const ts1 = getEpochStart(5) + Math.floor(epochDuration / 2)
                 await setNextBlockTimestamp(ts1)
 
                 const balance = await getEpochUserBalance(userAddr, 5)
@@ -415,12 +415,12 @@ describe('Staking', function () {
                 await staking.manualEpochInit([ionxToken.address], 3)
                 await staking.manualEpochInit([ionxToken.address], 4)
 
-                const ts = getEpochStart(1) + 24 * 60 * 60
+                const ts = getEpochStart(5)
                 await setNextBlockTimestamp(ts)
 
                 await deposit(user, amount)
 
-                const ts1 = getEpochStart(1) + Math.floor(epochDuration / 2)
+                const ts1 = getEpochStart(5) + Math.floor(epochDuration / 2)
                 await setNextBlockTimestamp(ts1)
 
                 await withdraw(user, amount.add(amount.div(2)))
@@ -466,8 +466,10 @@ describe('Staking', function () {
             await moveAtEpoch(3)
             await withdraw(user, amount.mul(3))
 
-            expect(await getEpochPoolSize(4)).to.be.equal('0')
-            expect(await getEpochUserBalance(userAddr, 4)).to.be.equal('0')
+            expect(await getEpochPoolSize(3)).to.be.equal('0');
+            expect(await getEpochUserBalance(userAddr, 3)).to.be.equal('0');
+            expect(await getEpochPoolSize(4)).to.be.equal('0');
+            expect(await getEpochUserBalance(userAddr, 4)).to.be.equal('0');
         })
 
         it('deposit in epoch 0, withdraw in epoch 3', async function () {
@@ -670,7 +672,7 @@ describe('Staking', function () {
         it('Reverts if there\'s a gap', async function () {
             await moveAtEpoch(2)
 
-            await expect(deposit(user, amount)).to.be.revertedWith('Staking: previous epoch not initialized')
+            await expect(deposit(user, amount)).to.be.revertedWith('STK:E-305')
         })
 
         it('Returns pool size when epoch is initialized', async function () {
@@ -700,28 +702,29 @@ describe('Staking', function () {
 
     describe('currentEpochMultiplier', function () {
         it('Returns correct value', async function () {
-            // epoch size is 1 week = 604800 seconds
+            // epoch size is 1 hour in hardhat config = 3600 seconds
 
             await moveAtEpoch(1)
 
-            // after 100 seconds, multiplier should be 0.9998
+            // after 100 seconds, multiplier should be 0.972...222
             await moveAtTimestamp(epoch1Start + 100)
 
             let expectedMultiplier = multiplierAtTs(1, await getBlockTimestamp())
             expect(await staking.currentEpochMultiplier()).to.be.equal(expectedMultiplier)
 
-            // after 1h, multiplier should be  0.9940
-            await moveAtTimestamp(epoch1Start + 3600)
+            // after 360s : 0.9
+            await moveAtTimestamp(epoch1Start + 360)
+            
             expectedMultiplier = multiplierAtTs(1, await getBlockTimestamp())
             expect(await staking.currentEpochMultiplier()).to.be.equal(expectedMultiplier)
 
-            // after 1 day, multiplier should be 0.8571
-            await moveAtTimestamp(epoch1Start + 86400)
+            // after 720s : 0.8
+            await moveAtTimestamp(epoch1Start + 720)
             expectedMultiplier = multiplierAtTs(1, await getBlockTimestamp())
             expect(await staking.currentEpochMultiplier()).to.be.equal(expectedMultiplier)
 
-            // after 3.5 days (half time; 86400 + 216000), multiplier should be 0.5
-            await moveAtTimestamp(epoch1Start + 302400)
+            // after half an hour, multiplier should be 0.5
+            await moveAtTimestamp(epoch1Start + 1800)
             expectedMultiplier = multiplierAtTs(1, await getBlockTimestamp())
             expect(await staking.currentEpochMultiplier()).to.be.equal(expectedMultiplier)
         })
@@ -749,7 +752,7 @@ describe('Staking', function () {
         it('Does not work if less than 10 epochs passed', async function () {
             await expect(
                 staking.connect(user).emergencyWithdraw(ionxToken.address),
-            ).to.be.revertedWith('At least 10 epochs must pass without success')
+            ).to.be.revertedWith('STK:E-304')
         })
 
         it('Reverts if user has no balance', async function () {
@@ -757,7 +760,7 @@ describe('Staking', function () {
 
             await expect(
                 staking.connect(user).emergencyWithdraw(ionxToken.address),
-            ).to.be.revertedWith('Amount must be > 0')
+            ).to.be.revertedWith('STK:E-205')
         })
 
         it('Reverts if user has balance but less than 10 epochs passed', async function () {
@@ -765,7 +768,7 @@ describe('Staking', function () {
 
             await expect(
                 staking.connect(user).emergencyWithdraw(ionxToken.address),
-            ).to.be.revertedWith('At least 10 epochs must pass without success')
+            ).to.be.revertedWith('STK:E-304')
         })
 
         it('Reverts if user has balance, more than 10 epochs passed but somebody else did a withdraw',
@@ -784,7 +787,7 @@ describe('Staking', function () {
 
                 await expect(
                     staking.connect(user).emergencyWithdraw(ionxToken.address),
-                ).to.be.revertedWith('At least 10 epochs must pass without success')
+                ).to.be.revertedWith('STK:E-304')
             },
         )
 
