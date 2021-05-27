@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "../lib/BlackholePrevention.sol";
 
-contract Staking is 
+contract Staking is
         Ownable,
         ReentrancyGuard,
         BlackholePrevention
@@ -15,6 +15,7 @@ contract Staking is
     using SafeMath for uint256;
 
     uint128 constant private BASE_MULTIPLIER = uint128(1 * 10 ** 18);
+
     bool internal _paused;
 
     // timestamp for the epoch 1
@@ -60,39 +61,9 @@ contract Staking is
         epochDuration = _epochDuration;
     }
 
-    /***********************************|
-    |              Public               |
-    |__________________________________*/
-
     function isPaused() external view returns (bool) {
         return _paused;
     }
-
-    /***********************************|
-    |          Only Admin/DAO           |
-    |__________________________________*/
-
-  /**
-    * @dev Sets the Paused-state of the Staking Contract
-    */
-    function setPausedState(bool paused) external onlyOwner {
-        _paused = paused;
-        emit PausedStateSet(paused);
-    }
-
-    function withdrawEther(address payable receiver, uint256 amount) external virtual onlyOwner {
-        _withdrawEther(receiver, amount);
-    }
-
-    function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external virtual onlyOwner {
-        _withdrawERC20(receiver, tokenAddress, amount);
-    }
-
-    function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external virtual onlyOwner {
-        _withdrawERC721(receiver, tokenAddress, tokenId);
-    }
-
-    
 
     /*
      * Stores `amount` of `tokenAddress` tokens for the `user` into the vault
@@ -280,7 +251,7 @@ contract Staking is
 
 
         for (uint i = 0; i < tokens.length; i++) {
-            Pool storage p = poolSize[tokens[i]][epochId]; 
+            Pool storage p = poolSize[tokens[i]][epochId];
             if (epochId == 0) {
                 p.size = uint256(0);
                 p.set = true;
@@ -418,11 +389,33 @@ contract Staking is
         return getCheckpointBalance(c).mul(c.multiplier).div(BASE_MULTIPLIER);
     }
 
+
+    /***********************************|
+    |          Only Admin/DAO           |
+    |__________________________________*/
+
+    function setPausedState(bool paused) external onlyOwner {
+        _paused = paused;
+        emit PausedStateSet(paused);
+    }
+
+    function withdrawEther(address payable receiver, uint256 amount) external virtual onlyOwner {
+        _withdrawEther(receiver, amount);
+    }
+
+    function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external virtual onlyOwner {
+        _withdrawERC20(receiver, tokenAddress, amount);
+    }
+
+    function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external virtual onlyOwner {
+        _withdrawERC721(receiver, tokenAddress, tokenId);
+    }
+
+
+
     modifier whenNotPaused() {
         require(_paused != true, "STK:E-101");
          _;
     }
 
 }
-
-

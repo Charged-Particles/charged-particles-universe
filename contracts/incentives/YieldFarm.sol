@@ -60,43 +60,13 @@ contract YieldFarm is Ownable, BlackholePrevention {
 
     }
 
-    /***********************************|
-    |              Public               |
-    |__________________________________*/
-
     function isPaused() external view returns (bool) {
         return _paused;
     }
 
-    /***********************************|
-    |          Only Admin/DAO           |
-    |__________________________________*/
-
-  /**
-    * @dev Sets the Paused-state of the Staking Contract
-    */
-    function setPausedState(bool paused) external onlyOwner {
-        _paused = paused;
-        emit PausedStateSet(paused);
-    }
-
-    function withdrawEther(address payable receiver, uint256 amount) external virtual onlyOwner {
-        _withdrawEther(receiver, amount);
-    }
-
-    function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external virtual onlyOwner {
-        _withdrawERC20(receiver, tokenAddress, amount);
-    }
-
-    function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external virtual onlyOwner {
-        _withdrawERC721(receiver, tokenAddress, tokenId);
-    }
-
-    // public methods
     function getAmountClaimable() external view returns (uint) {
         uint totalClaimable;
         uint epochId = _getEpochId().sub(1); // fails in epoch 0
-        uint lastEpochIdHarvestedUser = lastEpochIdHarvested[msg.sender];
 
         // force max number of epochs
         if (epochId > NR_OF_EPOCHS) {
@@ -167,6 +137,18 @@ contract YieldFarm is Ownable, BlackholePrevention {
         return lastEpochIdHarvested[msg.sender];
     }
 
+    function withdrawEther(address payable receiver, uint256 amount) external virtual onlyOwner {
+        _withdrawEther(receiver, amount);
+    }
+
+    function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external virtual onlyOwner {
+        _withdrawERC20(receiver, tokenAddress, amount);
+    }
+
+    function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external virtual onlyOwner {
+        _withdrawERC721(receiver, tokenAddress, tokenId);
+    }
+
     // internal methods
 
     function _initEpoch(uint128 epochId) internal {
@@ -230,7 +212,7 @@ contract YieldFarm is Ownable, BlackholePrevention {
     }
 
     modifier whenNotPaused() {
-    require(_paused != true, "STK:E-101");
+        require(_paused != true, "STK:E-101");
         _;
     }
 }

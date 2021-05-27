@@ -33,7 +33,6 @@ task(
   async (args, hre, runSuper) => {
     await hre.run('compile');
     await hre.deployments.fixture();
-    console.log(`Args: ${JSON.stringify(args)}`);
     return runSuper({...args, noCompile: true});
   }
 );

@@ -162,14 +162,14 @@ const presets = {
         epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
-        startAmount: bn(50000),
-        nrOfEpochs: bn(50),
-        deprecation: bn(500),
+        startAmount: bn(75000),
+        nrOfEpochs: bn(750),
+        deprecation: bn(100),
       },
       lpTokens: {
-        startAmount: bn(50000),
-        nrOfEpochs: bn(50),
-        deprecation: bn(500),
+        startAmount: bn(75000),
+        nrOfEpochs: bn(750),
+        deprecation: bn(100),
       },
 
       uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
