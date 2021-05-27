@@ -5,11 +5,17 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "../lib/BlackholePrevention.sol";
 
-contract Staking is Ownable, ReentrancyGuard {
+contract Staking is 
+        Ownable,
+        ReentrancyGuard,
+        BlackholePrevention
+{
     using SafeMath for uint256;
 
     uint128 constant private BASE_MULTIPLIER = uint128(1 * 10 ** 18);
+    bool internal _paused;
 
     // timestamp for the epoch 1
     // everything before that is considered epoch 0 which won't have a reward but allows for the initial stake
@@ -54,9 +60,6 @@ contract Staking is Ownable, ReentrancyGuard {
         epochDuration = _epochDuration;
     }
 
-    bool internal _paused;
-
-
     /***********************************|
     |              Public               |
     |__________________________________*/
@@ -75,6 +78,18 @@ contract Staking is Ownable, ReentrancyGuard {
     function setPausedState(bool paused) external onlyOwner {
         _paused = paused;
         emit PausedStateSet(paused);
+    }
+
+    function withdrawEther(address payable receiver, uint256 amount) external virtual onlyOwner {
+        _withdrawEther(receiver, amount);
+    }
+
+    function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external virtual onlyOwner {
+        _withdrawERC20(receiver, tokenAddress, amount);
+    }
+
+    function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external virtual onlyOwner {
+        _withdrawERC721(receiver, tokenAddress, tokenId);
     }
 
     
@@ -172,7 +187,7 @@ contract Staking is Ownable, ReentrancyGuard {
     /*
      * Removes the deposit of the user and sends the amount of `tokenAddress` back to the `user`
      */
-    function withdraw(address tokenAddress, uint256 amount) public nonReentrant whenNotPaused {
+    function withdraw(address tokenAddress, uint256 amount) public nonReentrant {
         require(balances[msg.sender][tokenAddress] >= amount, "STK:E-432");
 
         balances[msg.sender][tokenAddress] = balances[msg.sender][tokenAddress].sub(amount);
@@ -263,16 +278,15 @@ contract Staking is Ownable, ReentrancyGuard {
     function manualEpochInit(address[] memory tokens, uint128 epochId) public whenNotPaused {
         require(epochId <= getCurrentEpoch(), "STK:E-306");
 
-        for (uint i = 0; i < tokens.length; i++) {
-            Pool storage p = poolSize[tokens[i]][epochId];
 
+        for (uint i = 0; i < tokens.length; i++) {
+            Pool storage p = poolSize[tokens[i]][epochId]; 
             if (epochId == 0) {
                 p.size = uint256(0);
                 p.set = true;
             } else {
                 require(!epochIsInitialized(tokens[i], epochId), "STK:E-002");
                 require(epochIsInitialized(tokens[i], epochId - 1), "STK:E-305");
-
                 p.size = poolSize[tokens[i]][epochId - 1].size;
                 p.set = true;
             }
@@ -281,7 +295,7 @@ contract Staking is Ownable, ReentrancyGuard {
         emit ManualEpochInit(msg.sender, epochId, tokens);
     }
 
-    function emergencyWithdraw(address tokenAddress) public whenNotPaused {
+    function emergencyWithdraw(address tokenAddress) public {
         require((getCurrentEpoch() - lastWithdrawEpochId[tokenAddress]) >= 10, "STK:E-304");
 
         uint256 totalUserBalance = balances[msg.sender][tokenAddress];
