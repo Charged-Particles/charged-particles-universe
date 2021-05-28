@@ -26,6 +26,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getCurrentEpoch",
+    "outputs": [
+      {
+        "internalType": "uint128",
+        "name": "",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -95,6 +108,24 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "tokens",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint128",
+        "name": "epochId",
+        "type": "uint128"
+      }
+    ],
+    "name": "manualEpochInit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]
