@@ -9,6 +9,9 @@ const {
     presets,
   } = require('../js-helpers/deploy');
 
+  const chalk = require('chalk');
+
+  
   const {
     log,
     chainNameById,
@@ -129,7 +132,7 @@ const {
 
 
     // Next transfer appropriate funds
-    log('\n   Distributing funds to CommunityVault...');
+    log(`\n   Distributing funds to CommunityVault: ${chalk.green(ethers.utils.formatUnits(getIonxDistributionAmount(chainId)))} IONX + ${chalk.green(ethers.utils.formatUnits(getLiquidityDistributionAmount(chainId)))}  IONX`);
     await distributeInitialFunds(
       ionx.connect(daoSigner),
       communityVault,

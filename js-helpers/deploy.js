@@ -203,13 +203,13 @@ const presets = {
         epoch1Start: dateToEpoch(dateFormat(NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
-        startAmount: bn(50000),
-        nrOfEpochs: bn(96),
+        startAmount: bn(53_000),
+        nrOfEpochs: bn(104),
         deprecation: bn(100),
       },
       lpTokens: {
-        startAmount: bn(50000),
-        nrOfEpochs: bn(96),
+        startAmount: bn(100_000),
+        nrOfEpochs: bn(104),
         deprecation: bn(100),
       },
 

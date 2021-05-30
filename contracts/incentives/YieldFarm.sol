@@ -107,9 +107,9 @@ contract YieldFarm is Ownable, BlackholePrevention {
     }
     function harvest (uint128 epochId) external whenNotPaused returns (uint){
         // checks for requested epoch
-        require (_getEpochId() > epochId, "This epoch is in the future");
-        require(epochId <= NR_OF_EPOCHS, "Maximum number of epochs exceeded");
-        require (lastEpochIdHarvested[msg.sender].add(1) == epochId, "Harvest in order");
+        require (_getEpochId() > epochId, "YLD:E-306");
+        require(epochId <= NR_OF_EPOCHS, "YLD:E-408");
+        require (lastEpochIdHarvested[msg.sender].add(1) == epochId, "YLD:E-204");
         uint userReward = _harvest(epochId);
         if (userReward > 0) {
             _ionx.transferFrom(_communityVault, msg.sender, userReward);
@@ -152,7 +152,7 @@ contract YieldFarm is Ownable, BlackholePrevention {
     // internal methods
 
     function _initEpoch(uint128 epochId) internal {
-        require(lastInitializedEpoch.add(1) == epochId, "Epoch can be init only in order");
+        require(lastInitializedEpoch.add(1) == epochId, "YLD:E-204");
         lastInitializedEpoch = epochId;
         // call the staking smart contract to init the epoch
         epochs[epochId] = _getPoolSize(epochId);
@@ -212,7 +212,7 @@ contract YieldFarm is Ownable, BlackholePrevention {
     }
 
     modifier whenNotPaused() {
-        require(_paused != true, "STK:E-101");
+        require(_paused != true, "YLD:E-101");
         _;
     }
 }
