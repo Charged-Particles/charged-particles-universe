@@ -1,12 +1,15 @@
 const {
-  chainNameById,
-  chainIdByName,
   saveDeploymentData,
   getContractAbi,
   getTxGasCost,
-  log,
   presets,
-} = require("../js-helpers/deploy");
+} = require('../js-helpers/deploy');
+
+const {
+  log,
+  chainNameById,
+  chainIdByName,
+} = require('../js-helpers/utils');
 
 module.exports = async (hre) => {
     const { getNamedAccounts } = hre;
@@ -55,7 +58,7 @@ module.exports = async (hre) => {
     log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericBasketManager.deployTransaction }));
 
     saveDeploymentData(chainId, deployData);
-    log('\n  Contract Deployment Data saved to "deployed" directory.');
+    log('\n  Contract Deployment Data saved to "deployments" directory.');
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };

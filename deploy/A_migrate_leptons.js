@@ -1,10 +1,13 @@
 const {
-  chainNameById,
-  chainIdByName,
   getDeployData,
   getActualTxGasCost,
+} = require('../js-helpers/deploy');
+
+const {
   log,
-} = require("../js-helpers/deploy");
+  chainNameById,
+  chainIdByName,
+} = require('../js-helpers/utils');
 
 const _ = require('lodash');
 

@@ -1,59 +1,254 @@
-const { ethers } = require('ethers');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
-const sleep = require('sleep-promise');
+const moment = require('moment');
+const chalk = require('chalk');
+const dateFormat = require('dateformat');
+
+const {
+  bn,
+  toWei,
+  toEth,
+  toBN,
+  tokensBN,
+  chainNameById,
+  dateToEpoch,
+  blockTimeFromDate,
+  ensureDirectoryExistence,
+  calculateSumArithmeticSeriesAtN,
+} = require('./utils');
+
+const { weiPerEth } = require('./constants');
 
 require('./chaiMatchers');
 
-const toWei = ethers.utils.parseEther;
-const toEth = ethers.utils.formatEther;
-const toBN = ethers.BigNumber.from;
-const toStr = (val) => ethers.utils.toUtf8String(val).replace(/\0/g, '');
-const weiPerEth = ethers.constants.WeiPerEther;
+
+// const STAKING_EPOCH_GENESIS_STR     = '22/05/2021 11:00'; // 22 May 2021 11 AM UTC
+// const STAKING_EPOCH_GENESIS         = dateToEpoch(STAKING_EPOCH_GENESIS_STR);
+// const STAKING_EPOCH_DURATION        = 60 * 60;
+
+// const NFT_STAKING_EPOCH_GENESIS_STR = '15/06/2021 14:00';
+// const NFT_STAKING_EPOCH_GENESIS     = dateToEpoch(NFT_STAKING_EPOCH_GENESIS_STR);
+
+
+const NOW = Date.now();
+const TEN_MINS_FROM_NOW = new Date(NOW + 10 * 60 * 1000);
+
+
+const presets = {
+  ChargedParticles: {
+    tempLockExpiryBlocks: toBN('5760'), // 1 Day == 86400 / 15
+    maxDeposits: [ // Temporary limit; remove after launch proves successful
+      {assetTokenId: 'Aave.v2.dai', amount: toWei('10000')}, // DAI
+    ]
+  },
+  Lepton: {
+    maxMintPerTx: toBN('25'),
+
+    // V2 Type Definitions
+    types: [
+      {
+        name        : 'Electron Neutrino',
+        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmcWuHx4MgywyEMzsqT9J3boJu1gk7GdtAMQ1pyQYRR3XS',
+        price       : {1: toWei('0.3'), 42: toWei('0.0000003'), 31337: toWei('0.000000003')},
+        supply      : {1: toBN('721'),  42: toBN('40'),         31337: toBN('40')},
+        multiplier  : toBN('110'),  // 1.1%
+        bonus       : toBN('0'),
+      },
+      {
+        name        : 'Muon Neutrino',
+        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmccGhGhvi37QScB4u2VmuVwENtEsMpx6hAKUqu3x3nU9V',
+        price       : {1: toWei('0.9'), 42: toWei('0.0000009'), 31337: toWei('0.000000009')},
+        supply      : {1: toBN('401'),  42: toBN('20'),         31337: toBN('20')},
+        multiplier  : toBN('130'),  // 1.3%
+        bonus       : toBN('1'),
+      },
+      {
+        name        : 'Tau Neutrino',
+        tokenUri    : 'https://gateway.pinata.cloud/ipfs/Qma2ZPnCM95AYZ1wPxZdDVvRiS114Svrw2J632ZpLiX7JV',
+        price       : {1: toWei('1.7'), 42: toWei('0.0000017'), 31337: toWei('0.000000017')},
+        supply      : {1: toBN('301'),  42: toBN('12'),         31337: toBN('12')},
+        multiplier  : toBN('150'),  // 1.5%
+        bonus       : toBN('2'),
+      },
+      {
+        name        : 'Electron',
+        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmNRKJsUwqEE9zYK6sEND8HDGa4cHFkkC2ntjQA5bFL6jJ',
+        price       : {1: toWei('2.9'), 42: toWei('0.000029'), 31337: toWei('0.00000029')},
+        supply      : {1: toBN('201'),  42: toBN('8'),          31337: toBN('8')},
+        multiplier  : toBN('180'),  // 1.8%
+        bonus       : toBN('4'),
+      },
+      {
+        name        : 'Muon',
+        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmWiH5F9yPp7yRzcqocmQKuhrA3KVY9fGJZxD9UKBDu5wr',
+        price       : {1: toWei('5.1'), 42: toWei('0.000051'), 31337: toWei('0.00000051')},
+        supply      : {1: toBN('88'),   42: toBN('5'),         31337: toBN('5')},
+        multiplier  : toBN('230'),  // 2.3%
+        bonus       : toBN('8'),
+      },
+      {
+        name        : 'Tau',
+        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmUkCXgyguBSxnGRtfBAvofAkyhFbRCwS7HPaoytAZvemt',
+        price       : {1: toWei('21'), 42: toWei('0.00021'), 31337: toWei('0.0000021')},
+        supply      : {1: toBN('21'),  42: toBN('2'),        31337: toBN('2')},
+        multiplier  : toBN('510'),  // 5.1%
+        bonus       : toBN('16'),
+      },
+    ]
+  },
+  Aave: {
+    referralCode: {
+      1: '',
+      42: '',
+      137: '',
+      80001: '',
+      31337: '',
+    },
+    v2: {
+      dai: {
+        1: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // mainnet
+        42: '0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD', // kovan
+        137: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', // polygon mainnet
+        80001: '0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F', // polygon testnet
+        31337: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // Hardhat - Forked Mainnet
+      },
+      lendingPoolProvider: {
+        1: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // mainnet
+        42: '0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b', // kovan
+        137: '0xd05e3E715d945B59290df0ae8eF85c1BdB684744', // polygon mainnet
+        80001: '0x178113104fEcbcD7fF8669a0150721e231F0FD4B', // polygon testnet
+        31337: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // Hardhat - Forked Mainnet
+      }
+    }
+  },
+  Ionx: {
+    // token info to test
+    name: 'Charged Particles - IONX',
+    symbol: 'IONX',
+    decimals: 18,
+    maxSupply: toWei('100000000'), // 100 Million
+
+    rewardsForAssetTokens: [
+      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI (50% of Interest in Ionx)
+    ],
+
+    timelocks: [
+      {
+        receiver: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',  // Testing - Account 3
+        portions: [
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('27 Dec 2021 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('28 Dec 2021 00:00:00 GMT')},
+          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('29 Dec 2021 00:00:00 GMT')},
+        ]
+      },
+      {
+        receiver: '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',  // Testing - Account 4
+        portions: [
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('27 Dec 2021 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('28 Dec 2021 00:00:00 GMT')},
+          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('29 Dec 2021 00:00:00 GMT')},
+        ]
+      },
+    ],
+  },
+  Incentives: {
+    1: { // Mainnet
+      airdrop: {
+        merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
+        totalIonx: tokensBN(bn(1_000_000)),
+      },
+      staking: {
+        epochDuration: 7 * 24 * 60 * 60,  // 1 week
+        epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+      },
+      ionxToken: {
+        startAmount: bn(48000),
+        nrOfEpochs: bn(12),
+        deprecation: bn(0),
+      },
+      lpTokens: {
+        startAmount: bn(48000),
+        nrOfEpochs: bn(12),
+        deprecation: bn(0),
+      },
+
+      uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+      uniswapLPTokenAddress: '0x60F6E2200bFEf8b4d120028Faff4D9A4486526f4',
+    },
+    42: { // Kovan Testnet
+      airdrop: {
+        merkleRoot: '0x42607ac6583b70ed3bb26c8583844da4b5ca1099ecf3f0252de4dd60d17c2fc3',
+        totalIonx: tokensBN(bn(1_000_000)),
+      },
+      staking: {
+        epochDuration: 30 * 60,  // 1/2 Hour
+        epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+      },
+      ionxToken: {
+        startAmount: bn(75_000),
+        nrOfEpochs: bn(750),
+        deprecation: bn(100),
+      },
+      lpTokens: {
+        startAmount: bn(75_000),
+        nrOfEpochs: bn(750),
+        deprecation: bn(100),
+      },
+
+      uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+      uniswapLPTokenAddress: '0x27125750e4D487cF4FbE65b12B6665062820a816',
+    },
+    137: { // Polygon L2 Mainnet
+
+    },
+    80001: { // Polygon L2 Testnet - Mumbai
+      staking: {
+        epochDuration: 30 * 60,  // 1/2 Hour
+        epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+      },
+      ionxToken: {
+        startAmount: bn(53_000),  // 5_000_000 TOTAL
+        nrOfEpochs: bn(104),
+        deprecation: bn(100),
+      },
+      lpTokens: {
+        startAmount: bn(100_000),  // 10_000_000 TOTAL
+        nrOfEpochs: bn(104),
+        deprecation: bn(100),
+      },
+
+      uniswapV2Addr : '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff', // QuickSwap on Polygon Mainnet
+      uniswapLPTokenAddress: '',
+    },
+    31337: { // Hardhat - Forked Mainnet
+      airdrop: {
+        merkleRoot: '0x42607ac6583b70ed3bb26c8583844da4b5ca1099ecf3f0252de4dd60d17c2fc3',
+        totalIonx: tokensBN(bn(1_000_000)),
+      },
+      staking: {
+        epochDuration: 60 * 60,  // 1 Hour
+        epoch1Start: dateToEpoch(dateFormat(NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+      },
+      ionxToken: {
+        startAmount: bn(53_000),
+        nrOfEpochs: bn(104),
+        deprecation: bn(100),
+      },
+      lpTokens: {
+        startAmount: bn(100_000),
+        nrOfEpochs: bn(104),
+        deprecation: bn(100),
+      },
+
+      uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+      uniswapLPTokenAddress: '0xac5A8983d9289922a45f97B352Dc3c94FF55a1A6',
+    },
+  },
+};
+
 
 const txOverrides = (options = {}) => ({gasLimit: 15000000, ...options});
-
-const log = (...args) => {
-  console.log(...args);
-  return async (delay = 0) => (delay && await sleep(delay * 1000));
-};
-
-const chainIdByName = (chainName) => {
-  switch (_.toLower(chainName)) {
-    case 'mainnet': return 1;
-    case 'ropsten': return 3;
-    case 'rinkeby': return 4;
-    case 'kovan': return 42;
-    case 'hardhat': return 31337;
-    case 'coverage': return 31337;
-    default: return 0;
-  }
-};
-
-const chainNameById = (chainId) => {
-  switch (parseInt(chainId, 10)) {
-    case 1: return 'Mainnet';
-    case 3: return 'Ropsten';
-    case 4: return 'Rinkeby';
-    case 42: return 'Kovan';
-    case 31337: return 'Hardhat';
-    default: return 'Unknown';
-  }
-};
-
-const blockTimeFromDate = (dateStr) => {
-  return Date.parse(dateStr) / 1000;
-};
-
-const ensureDirectoryExistence = (filePath) => {
-  var dirname = path.dirname(filePath);
-  if (fs.existsSync(dirname)) {
-    return true;
-  }
-  ensureDirectoryExistence(dirname);
-  fs.mkdirSync(dirname);
-};
 
 const saveDeploymentData = (chainId, deployData) => {
   const network = chainNameById(chainId).toLowerCase();
@@ -100,127 +295,53 @@ const getActualTxGasCost = async (txData) => {
   return `${gasCost} ETH Used.  (Estimated: ${gasCostEst} ETH)`;
 };
 
-const presets = {
-  ChargedParticles: {
-    tempLockExpiryBlocks: toBN('5760'), // 1 Day == 86400 / 15
-    maxDeposits: [ // Temporary limit; remove after launch proves successful
-      {assetTokenId: 'Aave.v2.dai', amount: toWei('10000')}, // DAI
-    ]
-  },
-  Lepton: {
-    maxMintPerTx: toBN('25'),
+const getIonxDistributionAmount = (chainId = 42) => {
+  const incentives = presets.Incentives[chainId];
+  const a1 = incentives.ionxToken.startAmount;
+  const d = incentives.ionxToken.deprecation;
+  const n = incentives.ionxToken.nrOfEpochs;
 
-    // V2 Type Definitions
-    types: [
-      {
-        name        : 'Electron Neutrino',
-        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmcWuHx4MgywyEMzsqT9J3boJu1gk7GdtAMQ1pyQYRR3XS',
-        price       : {1: toWei('0.3'), 42: toWei('0.0000003'), 31337: toWei('0.000000003')},
-        supply      : {1: toBN('721'), 42: toBN('40'), 31337: toBN('40')},
-        multiplier  : toBN('110'),  // 1.1%
-        bonus       : toBN('0'),
-      },
-      {
-        name        : 'Muon Neutrino',
-        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmccGhGhvi37QScB4u2VmuVwENtEsMpx6hAKUqu3x3nU9V',
-        price       : {1: toWei('0.9'), 42: toWei('0.0000009'), 31337: toWei('0.000000009')},
-        supply      : {1: toBN('401'), 42: toBN('20'), 31337: toBN('20')},
-        multiplier  : toBN('130'),  // 1.3%
-        bonus       : toBN('1'),
-      },
-      {
-        name        : 'Tau Neutrino',
-        tokenUri    : 'https://gateway.pinata.cloud/ipfs/Qma2ZPnCM95AYZ1wPxZdDVvRiS114Svrw2J632ZpLiX7JV',
-        price       : {1: toWei('1.7'), 42: toWei('0.0000017'), 31337: toWei('0.000000017')},
-        supply      : {1: toBN('301'), 42: toBN('12'), 31337: toBN('12')},
-        multiplier  : toBN('150'),  // 1.5%
-        bonus       : toBN('2'),
-      },
-      {
-        name        : 'Electron',
-        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmNRKJsUwqEE9zYK6sEND8HDGa4cHFkkC2ntjQA5bFL6jJ',
-        price       : {1: toWei('2.9'), 42: toWei('0.000029'), 31337: toWei('0.00000029')},
-        supply      : {1: toBN('201'), 42: toBN('8'), 31337: toBN('8')},
-        multiplier  : toBN('180'),  // 1.8%
-        bonus       : toBN('4'),
-      },
-      {
-        name        : 'Muon',
-        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmWiH5F9yPp7yRzcqocmQKuhrA3KVY9fGJZxD9UKBDu5wr',
-        price       : {1: toWei('5.1'), 42: toWei('0.000051'), 31337: toWei('0.00000051')},
-        supply      : {1: toBN('88'), 42: toBN('5'), 31337: toBN('5')},
-        multiplier  : toBN('230'),  // 2.3%
-        bonus       : toBN('8'),
-      },
-      {
-        name        : 'Tau',
-        tokenUri    : 'https://gateway.pinata.cloud/ipfs/QmUkCXgyguBSxnGRtfBAvofAkyhFbRCwS7HPaoytAZvemt',
-        price       : {1: toWei('21'), 42: toWei('0.00021'), 31337: toWei('0.0000021')},
-        supply      : {1: toBN('21'), 42: toBN('2'), 31337: toBN('2')},
-        multiplier  : toBN('510'),  // 5.1%
-        bonus       : toBN('16'),
-      },
-    ]
-  },
-  Ion: {
-    universeMaxSupply: toWei('40000000'), // 40% of 100 Million (Community Liquidity Mining Portion)
-    rewardsForAssetTokens: [
-      {assetTokenId: 'Aave.v2.dai', multiplier: '5000'}, // DAI (50% of Interest in Ion)
-    ],
-    timelocks: [
-      {
-        receiver: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',  // Testing - Account 3
-        portions: [
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('27 Dec 2021 00:00:00 GMT')},
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('28 Dec 2021 00:00:00 GMT')},
-          {amount: weiPerEth.mul('1000'), releaseDate: blockTimeFromDate('29 Dec 2021 00:00:00 GMT')},
-        ]
-      },
-      {
-        receiver: '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',  // Testing - Account 4
-        portions: [
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('27 Dec 2021 00:00:00 GMT')},
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('28 Dec 2021 00:00:00 GMT')},
-          {amount: weiPerEth.mul('5000'), releaseDate: blockTimeFromDate('29 Dec 2021 00:00:00 GMT')},
-        ]
-      },
-    ],
-  },
-  Aave: {
-    referralCode: {
-      1: '',
-      42: '',
-      31337: '',
-    },
-    v2: {
-      dai: {
-        1: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // mainnet
-        42: '0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD', // kovan
-        31337: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // Hardhat - Forked Mainnet
-      },
-      lendingPoolProvider: {
-        1: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // mainnet
-        42: '0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b', // kovan
-        31337: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // Hardhat - Forked Mainnet
-      }
-    }
-  }
+  const sumAtN = calculateSumArithmeticSeriesAtN(a1, d, n);
+  return tokensBN(sumAtN);
 };
 
+const getLiquidityDistributionAmount = (chainId = 42) => {
+  const incentives = presets.Incentives[chainId];
+  const a1 = incentives.lpTokens.startAmount;
+  const d = incentives.lpTokens.deprecation;
+  const n = incentives.lpTokens.nrOfEpochs;
+
+  const sumAtN = calculateSumArithmeticSeriesAtN(a1, d, n);
+  return tokensBN(sumAtN);
+};
+
+// For Distributing funds
+const distributeInitialFunds = async (tokenContract, contract, amount, signer) => {
+  let balance;
+  console.log(chalk.bgBlue.white(`Distributing Initial Funds`))
+  console.log(chalk.bgBlack.white(`Sending Funds to ${contract.address}`), chalk.green(`${ethers.utils.formatUnits(amount)} IONX`))
+
+  balance = await tokenContract.balanceOf(signer)
+  console.log(chalk.bgBlack.white(`IONX Token Balance Before Transfer:`), chalk.yellow(`${ethers.utils.formatUnits(balance)} IONX`))
+  const tx = await tokenContract.transfer(contract.address, amount)
+  await tx.wait()
+
+  balance = await tokenContract.balanceOf(signer)
+  console.log(chalk.bgBlack.white(`IONX Token Balance After Transfer:`), chalk.yellow(`${ethers.utils.formatUnits(balance)} IONX`))
+
+  console.log(chalk.bgBlack.white(`Transaction hash:`), chalk.gray(`${tx.hash}`))
+  console.log(chalk.bgBlack.white(`Transaction etherscan:`), chalk.gray(`https://${hre.network.name}.etherscan.io/tx/${tx.hash}`))
+};
 
 module.exports = {
   txOverrides,
-  chainNameById,
-  chainIdByName,
   saveDeploymentData,
   getContractAbi,
   getDeployData,
   getTxGasCost,
   getActualTxGasCost,
-  log,
+  getIonxDistributionAmount,
+  getLiquidityDistributionAmount,
+  distributeInitialFunds,
   presets,
-  toWei,
-  toEth,
-  toBN,
-  toStr,
 };

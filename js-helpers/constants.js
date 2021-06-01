@@ -1,0 +1,23 @@
+const { ethers } = require('ethers');
+
+const weiPerEth = ethers.constants.WeiPerEther;
+
+const CONSTANT_1K = 1000;
+const CONSTANT_10K = 10 * CONSTANT_1K;
+const CONSTANT_100K = 10 * CONSTANT_10K;
+const CONSTANT_1M = 10 * CONSTANT_100K;
+
+const WETH = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
+// const UNISWAP_FACTORY = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f';
+// const UNISWAP_INIT_CODEHASH = '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f';
+
+module.exports = {
+  weiPerEth,
+  CONSTANT_1K,
+  CONSTANT_10K,
+  CONSTANT_100K,
+  CONSTANT_1M,
+  WETH,
+  // UNISWAP_FACTORY,
+  // UNISWAP_INIT_CODEHASH,
+};

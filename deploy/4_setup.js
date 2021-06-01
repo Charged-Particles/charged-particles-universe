@@ -1,11 +1,13 @@
 const {
+  getDeployData,
+  presets,
+} = require('../js-helpers/deploy');
+
+const {
+  log,
   chainNameById,
   chainIdByName,
-  getDeployData,
-  log,
-  toBN,
-  presets,
-} = require("../js-helpers/deploy");
+} = require('../js-helpers/utils');
 
 const _ = require('lodash');
 
@@ -33,10 +35,10 @@ module.exports = async (hre) => {
     }
 
     const referralCode = presets.Aave.referralCode[chainId];
-    const ionMaxSupply = presets.Ion.universeMaxSupply;
+    const ionxMaxSupply = presets.Ionx.maxSupply;
     const leptonMaxMint = presets.Lepton.maxMintPerTx;
     const depositCaps = presets.ChargedParticles.maxDeposits;
-    const rewardsForAssetTokens = presets.Ion.rewardsForAssetTokens;
+    const rewardsForAssetTokens = presets.Ionx.rewardsForAssetTokens;
     const tempLockExpiryBlocks = presets.ChargedParticles.tempLockExpiryBlocks;
 
     const ddUniverse = getDeployData('Universe', chainId);
@@ -51,7 +53,7 @@ module.exports = async (hre) => {
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
     const ddLepton2 = getDeployData('Lepton2', chainId);
-    const ddIon = getDeployData('Ion', chainId);
+    const ddIonx = getDeployData('Ionx', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Initialization');
@@ -108,9 +110,9 @@ module.exports = async (hre) => {
     const Lepton2 = await ethers.getContractFactory('Lepton2');
     const lepton2 = await Lepton2.attach(ddLepton2.address);
 
-    log('  Loading Ion from: ', ddIon.address);
-    const Ion = await ethers.getContractFactory('Ion');
-    const ion = await Ion.attach(ddIon.address);
+    log('  Loading Ionx from: ', ddIonx.address);
+    const Ionx = await ethers.getContractFactory('Ionx');
+    const ionx = await Ionx.attach(ddIonx.address);
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -247,7 +249,7 @@ module.exports = async (hre) => {
         await lepton.addLeptonType(
           leptonType.tokenUri,
           leptonType.price[chainId],
-          leptonType.supply,
+          leptonType.supply[chainId],
           leptonType.multiplier,
           leptonType.bonus,
         )
@@ -255,15 +257,19 @@ module.exports = async (hre) => {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Setup Ion
+    // Setup Ionx
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('6-a', 'Ion: Registering Universe', async () =>
-      await ion.setUniverse(ddUniverse.address)
+    // await executeTx('6-a', 'Ionx: Registering Universe', async () =>
+    //   await ionx.setUniverse(ddUniverse.address)
+    // );
+
+    await executeTx('6-b', 'Universe: Registering Ionx', async () =>
+      await universe.setPhoton(ddIonx.address, ionxMaxSupply.div(2))
     );
 
-    await executeTx('6-b', 'Universe: Registering Ion', async () =>
-      await universe.setPhoton(ddIon.address, ionMaxSupply)
+    await executeTx('6-b', 'Ionx: Setting Minter', async () =>
+      await ionx.setMinter(protocolOwner)
     );
 
     let assetTokenId;
@@ -339,7 +345,7 @@ module.exports = async (hre) => {
         await lepton2.addLeptonType(
           lepton2Type.tokenUri,
           lepton2Type.price[chainId],
-          lepton2Type.supply,
+          lepton2Type.supply[chainId],
           lepton2Type.multiplier,
           lepton2Type.bonus,
         )

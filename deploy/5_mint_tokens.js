@@ -1,12 +1,15 @@
 const {
-  chainNameById,
-  chainIdByName,
   getDeployData,
+  presets,
+} = require('../js-helpers/deploy');
+
+const {
   log,
   toBN,
   toWei,
-  presets,
-} = require("../js-helpers/deploy");
+  chainNameById,
+  chainIdByName,
+} = require('../js-helpers/utils');
 
 const _ = require('lodash');
 
@@ -103,7 +106,7 @@ module.exports = async (hre) => {
 
     //   NOTE: Running all of these causes the Leptons to be SOLD OUT and the corresponding Unit-Tests will fail when trying to mint new ones
     log('  Batch Minting Leptons...');
-    await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 25 Electron Neutrinos
+    // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 25 Electron Neutrinos
     // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 15 Electron Neutrinos  (40 Total)
     // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 20 Muon Neutrinos
     // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 12 Tau Neutrinos

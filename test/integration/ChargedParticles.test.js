@@ -7,11 +7,13 @@ const {
 
 const {
   getDeployData,
-  toEth,
-  toWei,
-  toBN,
   presets
 } = require('../../js-helpers/deploy');
+
+const {
+  toWei,
+  toBN,
+} = require('../../js-helpers/utils');
 
 const {
   callAndReturn,
@@ -44,7 +46,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   let genericBasketManager;
   let proton;
   let lepton;
-  let ion;
+  let ionx;
   let timelocks;
 
   // Settings
@@ -98,8 +100,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const Proton = await ethers.getContractFactory('Proton');
     const Lepton = await ethers.getContractFactory('Lepton2');
-    const Ion = await ethers.getContractFactory('Ion');
-    const IonTimelock = await ethers.getContractFactory('IonTimelock');
+    const Ionx = await ethers.getContractFactory('Ionx');
+    const IonxTimelock = await ethers.getContractFactory('IonxTimelock');
 
     universe = Universe.attach(getDeployData('Universe', chainId).address);
     chargedState = ChargedState.attach(getDeployData('ChargedState', chainId).address);
@@ -110,9 +112,9 @@ describe("[INTEGRATION] Charged Particles", () => {
     genericBasketManager = GenericBasketManager.attach(getDeployData('GenericBasketManager', chainId).address);
     proton = Proton.attach(getDeployData('Proton', chainId).address);
     lepton = Lepton.attach(getDeployData('Lepton2', chainId).address);
-    ion = Ion.attach(getDeployData('Ion', chainId).address);
-    timelocks = Object.values(getDeployData('IonTimelocks', chainId))
-      .map(ionTimelock => (IonTimelock.attach(ionTimelock.address)));
+    ionx = Ionx.attach(getDeployData('Ionx', chainId).address);
+    timelocks = Object.values(getDeployData('IonxTimelocks', chainId))
+      .map(ionxTimelock => (IonxTimelock.attach(ionxTimelock.address)));
 
     await lepton.connect(signerD).setPausedState(false);
   });
@@ -261,10 +263,10 @@ describe("[INTEGRATION] Charged Particles", () => {
       .withArgs(user1, toWei('0.045'));
   });
 
-  it("IonTimelocks succesfully release Ions to receivers", async () => {
+  it("IonxTimelocks succesfully release Ionx to receivers", async () => {
     const receivers = await Promise.all(timelocks.map(async timelock => await timelock.receiver()));
 
-    const balancesBefore = await Promise.all(receivers.map(async receiver => await ion.balanceOf(receiver)));
+    const balancesBefore = await Promise.all(receivers.map(async receiver => await ionx.balanceOf(receiver)));
 
     const releaseTimes = await Promise.all(timelocks.map(async timelock => await timelock.nextReleaseTime()));
 
@@ -281,40 +283,9 @@ describe("[INTEGRATION] Charged Particles", () => {
     }));
 
     await Promise.all(receivers.map(async (receiver, i) => {
-      expect(await ion.balanceOf(receiver)).to.be.above(balancesBefore[i]);
+      expect(await ionx.balanceOf(receiver)).to.be.above(balancesBefore[i]);
     }));
 
-  });
-
-  it("Ions can only be transferred after locking block", async () => {
-    const blocks = 10;
-    const receivers = await Promise.all(timelocks.map(async timelock => await timelock.receiver()));
-    const maxReleaseTime = max(await Promise.all(timelocks.map(async timelock => await timelock.nextReleaseTime())));
-    await setNetworkAfterTimestamp(Number(maxReleaseTime.toString()));
-    await Promise.all(timelocks.map(async timelock => {
-      await timelock.release('0', '0');
-    }));
-    user1 = receivers[0];
-    user2 = receivers[1];
-    signer1 = ethers.provider.getSigner(user1);
-    signer2 = ethers.provider.getSigner(user2);
-
-    await expect(ion.connect(signer2).lock(user1, await ion.balanceOf(user1), blocks)).to.be.revertedWith("Ion:E-409");
-
-    await ion.connect(signer1).increaseLockAllowance(user2, await ion.balanceOf(user1));
-
-    await ion.connect(signer2).lock(user1, await ion.balanceOf(user1), blocks);
-
-    await expect(ion.connect(signer1).transfer(user3, await ion.balanceOf(user1))).to.be.revertedWith("Ion:E-409");
-
-    await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + blocks);
-
-    const balance1Before = await ion.balanceOf(user1);
-    const balance3Before = await ion.balanceOf(user3);
-
-    await ion.connect(signer1).transfer(user3, balance1Before);
-
-    expect(await ion.balanceOf(user3)).to.be.equal(balance3Before.add(balance1Before));
   });
 
   it("generic smart wallet and manager succesfully hold erc20 tokens", async () => {
@@ -480,144 +451,144 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect((await dai.balanceOf(user2)).sub(user2BalanceBefore)).to.be.above(toWei('9.9')).and.to.be.below(toWei('10.1'));
   });
 
-  it("can succesfully conduct Electrostatic Discharge", async () => {
-    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+  // it("can succesfully conduct Electrostatic Discharge", async () => {
+  //   await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
-    await dai.connect(daiSigner).transfer(user1, toWei('10'));
-    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+  //   await dai.connect(daiSigner).transfer(user1, toWei('10'));
+  //   await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
 
-    const energizedParticleId = await callAndReturn({
-      contractInstance: proton,
-      contractMethod: 'createChargedParticle',
-      contractCaller: signer1,
-      contractParams: [
-        user1,                        // creator
-        user2,                        // receiver
-        user3,                        // referrer
-        TEST_NFT_TOKEN_URI,           // tokenMetaUri
-        'aave',                       // walletManagerId
-        daiAddress,                   // assetToken
-        toWei('10'),                  // assetAmount
-        annuityPct,                   // annuityPercent
-      ],
-    });
+  //   const energizedParticleId = await callAndReturn({
+  //     contractInstance: proton,
+  //     contractMethod: 'createChargedParticle',
+  //     contractCaller: signer1,
+  //     contractParams: [
+  //       user1,                        // creator
+  //       user2,                        // receiver
+  //       user3,                        // referrer
+  //       TEST_NFT_TOKEN_URI,           // tokenMetaUri
+  //       'aave',                       // walletManagerId
+  //       daiAddress,                   // assetToken
+  //       toWei('10'),                  // assetAmount
+  //       annuityPct,                   // annuityPercent
+  //     ],
+  //   });
 
-    await chargedParticles.connect(signer2).releaseParticle(
-      user2,
-      proton.address,
-      energizedParticleId,
-      'aave',
-      daiAddress
-    );
+  //   await chargedParticles.connect(signer2).releaseParticle(
+  //     user2,
+  //     proton.address,
+  //     energizedParticleId,
+  //     'aave',
+  //     daiAddress
+  //   );
 
-    const bondWeight = toWei('1');
-    const user2BalanceBefore = await ion.balanceOf(user2);
+  //   const bondWeight = toWei('1');
+  //   const user2BalanceBefore = await ionx.balanceOf(user2);
 
-    await universe.connect(signer2).conductElectrostaticDischarge(user2, bondWeight);
+  //   await universe.connect(signer2).conductElectrostaticDischarge(user2, bondWeight);
 
-    expect(await ion.balanceOf(user2)).to.be.above(user2BalanceBefore).and.below(user2BalanceBefore.add(bondWeight));
-  });
+  //   expect(await ionx.balanceOf(user2)).to.be.above(user2BalanceBefore).and.below(user2BalanceBefore.add(bondWeight));
+  // });
 
-  it("charging a proton with a lepton should multiply ion return", async () => {
-    const assetAmount10 = toWei('10');
-    const assetAmount20 = toWei('20');
-    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
-    await dai.connect(daiSigner).transfer(user1, assetAmount20);
-    await dai.connect(signer1)['approve(address,uint256)'](proton.address, assetAmount20);
+  // it("charging a proton with a lepton should multiply ion return", async () => {
+  //   const assetAmount10 = toWei('10');
+  //   const assetAmount20 = toWei('20');
+  //   await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+  //   await dai.connect(daiSigner).transfer(user1, assetAmount20);
+  //   await dai.connect(signer1)['approve(address,uint256)'](proton.address, assetAmount20);
 
-    const protonId1 = await callAndReturn({
-      contractInstance: proton,
-      contractMethod: 'createChargedParticle',
-      contractCaller: signer1,
-      contractParams: [
-        user1,                        // creator
-        user2,                        // receiver
-        user3,                        // referrer
-        TEST_NFT_TOKEN_URI,           // tokenMetaUri
-        'aave',                       // walletManagerId
-        daiAddress,                   // assetToken
-        assetAmount10,                  // assetAmount
-        annuityPct,                   // annuityPercent
-      ],
-    });
+  //   const protonId1 = await callAndReturn({
+  //     contractInstance: proton,
+  //     contractMethod: 'createChargedParticle',
+  //     contractCaller: signer1,
+  //     contractParams: [
+  //       user1,                        // creator
+  //       user2,                        // receiver
+  //       user3,                        // referrer
+  //       TEST_NFT_TOKEN_URI,           // tokenMetaUri
+  //       'aave',                       // walletManagerId
+  //       daiAddress,                   // assetToken
+  //       assetAmount10,                  // assetAmount
+  //       annuityPct,                   // annuityPercent
+  //     ],
+  //   });
 
-    // need to wait for the same amount of time as in the case where the lepton is charged with, otherwise, Aave will render a smaller interest amount
-    await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + 2);
+  //   // need to wait for the same amount of time as in the case where the lepton is charged with, otherwise, Aave will render a smaller interest amount
+  //   await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + 2);
 
-    await chargedParticles.connect(signer2).releaseParticle(
-      user2,
-      proton.address,
-      protonId1,
-      'aave',
-      daiAddress
-    );
+  //   await chargedParticles.connect(signer2).releaseParticle(
+  //     user2,
+  //     proton.address,
+  //     protonId1,
+  //     'aave',
+  //     daiAddress
+  //   );
 
-    const bondWeight = toWei('1');
-    const ionBalance1 = await ion.balanceOf(user2);
+  //   const bondWeight = toWei('1');
+  //   const ionBalance1 = await ionx.balanceOf(user2);
 
-    await universe.conductElectrostaticDischarge(user2, bondWeight);
+  //   await universe.conductElectrostaticDischarge(user2, bondWeight);
 
-    const ionBalance2 = await ion.balanceOf(user2);
+  //   const ionBalance2 = await ionx.balanceOf(user2);
 
-    expect(ionBalance2).to.be.above(ionBalance1).and.below(ionBalance1.add(bondWeight));
+  //   expect(ionBalance2).to.be.above(ionBalance1).and.below(ionBalance1.add(bondWeight));
 
-    await lepton.connect(signerD).setPausedState(false);
-    const price = await lepton.getNextPrice();
+  //   await lepton.connect(signerD).setPausedState(false);
+  //   const price = await lepton.getNextPrice();
 
-    const leptonId = await callAndReturn({
-      contractInstance: lepton,
-      contractMethod: 'mintLepton',
-      contractCaller: signer3,
-      contractParams: [],
-      callValue: price.toString()
-    });
+  //   const leptonId = await callAndReturn({
+  //     contractInstance: lepton,
+  //     contractMethod: 'mintLepton',
+  //     contractCaller: signer3,
+  //     contractParams: [],
+  //     callValue: price.toString()
+  //   });
 
-    const multiplier = Number((await lepton.getMultiplier(leptonId)).toString()) / 1e4;
+  //   const multiplier = Number((await lepton.getMultiplier(leptonId)).toString()) / 1e4;
 
-    const protonId2 = await callAndReturn({
-      contractInstance: proton,
-      contractMethod: 'createChargedParticle',
-      contractCaller: signer1,
-      contractParams: [
-        user1,                        // creator
-        user2,                        // receiver
-        user3,                        // referrer
-        TEST_NFT_TOKEN_URI,           // tokenMetaUri
-        'aave',                       // walletManagerId
-        daiAddress,                   // assetToken
-        assetAmount10,                  // assetAmount
-        annuityPct,                   // annuityPercent
-      ],
-    });
+  //   const protonId2 = await callAndReturn({
+  //     contractInstance: proton,
+  //     contractMethod: 'createChargedParticle',
+  //     contractCaller: signer1,
+  //     contractParams: [
+  //       user1,                        // creator
+  //       user2,                        // receiver
+  //       user3,                        // referrer
+  //       TEST_NFT_TOKEN_URI,           // tokenMetaUri
+  //       'aave',                       // walletManagerId
+  //       daiAddress,                   // assetToken
+  //       assetAmount10,                  // assetAmount
+  //       annuityPct,                   // annuityPercent
+  //     ],
+  //   });
 
-    await lepton.connect(signer3).approve(chargedParticles.address, leptonId);
+  //   await lepton.connect(signer3).approve(chargedParticles.address, leptonId);
 
-    await chargedParticles.connect(signer3).covalentBond(
-      proton.address,
-      protonId2,
-      'generic',
-      lepton.address,
-      leptonId
-    );
+  //   await chargedParticles.connect(signer3).covalentBond(
+  //     proton.address,
+  //     protonId2,
+  //     'generic',
+  //     lepton.address,
+  //     leptonId
+  //   );
 
-    await chargedParticles.connect(signer2).releaseParticle(
-      user2,
-      proton.address,
-      protonId2,
-      'aave',
-      daiAddress
-    );
+  //   await chargedParticles.connect(signer2).releaseParticle(
+  //     user2,
+  //     proton.address,
+  //     protonId2,
+  //     'aave',
+  //     daiAddress
+  //   );
 
-    const ionBalance3 = await ion.balanceOf(user2);
+  //   const ionBalance3 = await ionx.balanceOf(user2);
 
-    await universe.conductElectrostaticDischarge(user2, bondWeight);
+  //   await universe.conductElectrostaticDischarge(user2, bondWeight);
 
-    const ionBalance4 = await ion.balanceOf(user2);
+  //   const ionBalance4 = await ionx.balanceOf(user2);
 
-    expect(ionBalance4).to.be.above(ionBalance3).and.below(ionBalance3.add(bondWeight));
+  //   expect(ionBalance4).to.be.above(ionBalance3).and.below(ionBalance3.add(bondWeight));
 
-    expect(Number(ionBalance4.sub(ionBalance3).toString()) / Number(ionBalance2.sub(ionBalance1).toString()) - Number(multiplier.toString())).to.be.above(1.0).and.below(1.05);
-  });
+  //   expect(Number(ionBalance4.sub(ionBalance3).toString()) / Number(ionBalance2.sub(ionBalance1).toString()) - Number(multiplier.toString())).to.be.above(1.0).and.below(1.05);
+  // });
 
   it("should not allow to charge a proton with a lepton multiple times", async () => {
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
@@ -684,7 +655,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   });
 
   it("leptons switch to the next tier after minting all the available leptons in the previous tier", async () => {
-    const maxMintPerTx = presets.Lepton.maxMintPerTx;
+    const maxMintPerTx = 5; // presets.Lepton.maxMintPerTx;
     await lepton.setMaxMintPerTx(maxMintPerTx);
 
     let supply;
@@ -692,7 +663,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     let price;
     let txsPerType;
     for (let i = 0; i < 3; i++) {
-      supply = presets.Lepton.types[i].supply;
+      supply = presets.Lepton.types[i].supply[31337];
       remainder = supply.mod(maxMintPerTx);
       price = presets.Lepton.types[i].price[31337];
       txsPerType = supply.sub(remainder).div(maxMintPerTx).add((remainder > 0) ? 1 : 0).toNumber();

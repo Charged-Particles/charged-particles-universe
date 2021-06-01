@@ -14,6 +14,8 @@ require('hardhat-abi-exporter');
 require('solidity-coverage');
 require('hardhat-deploy-ethers');
 require('hardhat-deploy');
+require("hardhat-watcher");
+
 
 // This must occur after hardhat-deploy!
 task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
@@ -87,7 +89,7 @@ module.exports = {
         mainnet: {
             url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
             // url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 130e9,
+            gasPrice: 38e9,
             blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.mainnet,
@@ -117,14 +119,18 @@ module.exports = {
         'AaveBridgeV2',
         'GenericWalletManager',
         'GenericBasketManager',
-        'Ion',
-        'IonTimelock',
+        'Ionx',
+        'IonxTimelock',
         'Proton',
         'WBoson',
         'Lepton',
         'Lepton2',
         'ERC20',
-        'ERC721'
+        'ERC721',
+        'YieldFarm',
+        'Staking',
+        'CommunityVault',
+        'MerkleDistributor',
       ],
     },
     namedAccounts: {
@@ -133,6 +139,7 @@ module.exports = {
         },
         protocolOwner: {
           default: 1,
+          1: '0x0Ca678b984186b0117501C00d4A6B4F8F342D06D', // IONX Gnosis Multisig
         },
         initialMinter: {
           default: 2,
@@ -152,6 +159,20 @@ module.exports = {
           3: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // ropsten
           4: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // rinkeby
           42: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // kovan
+          137: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // Polygon L2 Mainnet
+          80001: '0x1337c0d31337c0D31337C0d31337c0d31337C0d3', // Polygon L2 Testnet - Mumbai
         }
-    }
+    },
+    watcher: {
+      compilation: {
+        tasks: ["compile"],
+        files: ["./contracts"],
+        verbose: true,
+      },
+      test: {
+        tasks: [{ command: 'test', params: { testFiles: ['{path}'] } }],
+        files: ['./test/**/*'],
+        verbose: true
+      }
+    },
 };

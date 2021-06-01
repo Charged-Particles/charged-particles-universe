@@ -9,12 +9,16 @@
     "GenericBasketManager": "GenericBasketManager",
     "AaveWalltManager": "AaveWalletManager",
     "AaveBridgeV2": "AaveBridgeV2",
-    "Ion": "Ion",
-    "IonTimelock": "IonTimelock",
+    "Ionx": "Ionx",
+    "IonxTimelock": "IonxTimelock",
     "WBoson": "WBoson",
     "Proton": "Proton",
     "Lepton": "Lepton",
-    "Lepton2": "Lepton2"
+    "Lepton2": "Lepton2",
+    "Staking": "Staking",
+    "YieldFarm": "YieldFarm",
+    "CommunityVault": "CommunityVault",
+    "MerkleDistributor": "MerkleDistributor"
   },
   "dependencies": {
   },

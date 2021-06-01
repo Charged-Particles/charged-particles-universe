@@ -1,9 +1,12 @@
 const {
+  getDeployData,
+} = require('../js-helpers/deploy');
+
+const {
+  log,
   chainNameById,
   chainIdByName,
-  getDeployData,
-  log,
-} = require("../js-helpers/deploy");
+} = require('../js-helpers/utils');
 
 const _ = require('lodash');
 

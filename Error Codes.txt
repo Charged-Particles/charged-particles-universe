@@ -31,6 +31,10 @@ Codes:
     E-110 - only proton
     E-111 - approval to current owner, approve to caller
     E-112 - caller must be source contract
+    E-113 - not minter
+    E-114 - minting not allowed yet
+    E-115 - already activated
+    E-116 - not yet activated
 
 
   2. Find, Inequalities & Range
@@ -38,9 +42,9 @@ Codes:
     E-201 - INVALID_INDEX,
     E-202 - array length mismatch
     E-203 - TokenID not in posession of smart wallet.
-    E-204 -
-    E-205 -
-    E-206 -
+    E-204 - invalid chronological order
+    E-205 - amount must be positive
+    E-206 - 
     E-207 -
     E-208 -
     E-209 -
@@ -50,9 +54,9 @@ Codes:
     E-301 - release time is before current time
     E-302 - TOKEN_TIMELOCKED
     E-303 - TOKEN_TEMP_LOCKED
-    E-304 -
-    E-305 -
-    E-306 -
+    E-304 - emergency withdraw too soon
+    E-305 - previous epoch not initialized
+    E-306 - epoch is in the future
     E-307 -
     E-308 -
     E-309 -
@@ -62,7 +66,7 @@ Codes:
     E-401 - TRANSFER_FAILED, REWARDS_TRANSFER_FAILED, SEND_FAILED
     E-402 - transfer to non ERC721Receiver implementer
     E-403 - zero address, invalid token address, INVALID_TOKEN_ID, INVALID_LP_BRIDGE, INVALID_RECEIVER
-    E-404 - no universe
+    E-404 - no universe or dao
     E-405 - nonexistent token
     E-406 - add portions failed (MINT_FAILED)
     E-407 - token already minted
@@ -90,3 +94,4 @@ Codes:
     E-429 - minting restricted to limited amount
     E-430 - only 1 lepton per NFT allowed
     E-431 - portion already claimed
+    E-432 - balance too small

@@ -7,10 +7,13 @@ const {
 
 const {
   getDeployData,
-  toWei,
-  toBN,
   presets
 } = require('../js-helpers/deploy');
+
+const {
+  toWei,
+  toBN,
+} = require('../js-helpers/utils');
 
 const { deployMockContract } = require('../js-helpers/deployMockContract');
 

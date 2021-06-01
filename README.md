@@ -101,16 +101,22 @@ Join our community, share ideas and help support the project in anyway you want!
 
 ### Deploy:
 
-  Deploy (all): yarn deploy
-  Deploy (only protocol): yarn deploy --tags protocol
-  Deploy (only protocol and aave): yarn deploy --tags protocol,aave
-  Deploy (only protocol and aave on network kovan): yarn deploy --network kovan --tags protocol,generic,aave,tokens
+  Deploy (all): `yarn deploy`
+  Deploy (only protocol): `yarn deploy --tags protocol`
+  Deploy (only protocol and aave): `yarn deploy --tags protocol,aave`
+  Deploy (only protocol and aave on network kovan): `yarn deploy --network kovan --tags protocol,generic,aave,tokens`
 
 Deployed contract details go in deployments/{networkName}/{contractName}.json
+
+####Examples
+`yarn deploy-only community-incentives --network kovan`
+
 
 ### Test:
 
   yarn test
+  
+  Watching tests: `npx hardhat watch test`
 
 See package.json for more scripts
 
