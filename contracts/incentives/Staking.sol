@@ -399,19 +399,10 @@ contract Staking is
         emit PausedStateSet(paused);
     }
 
+    // Note: This contract should never hold ETH, if any is accidentally sent in then the DAO can return it
     function withdrawEther(address payable receiver, uint256 amount) external virtual onlyOwner {
         _withdrawEther(receiver, amount);
     }
-
-    function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external virtual onlyOwner {
-        _withdrawERC20(receiver, tokenAddress, amount);
-    }
-
-    function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external virtual onlyOwner {
-        _withdrawERC721(receiver, tokenAddress, tokenId);
-    }
-
-
 
     modifier whenNotPaused() {
         require(_paused != true, "STK:E-101");

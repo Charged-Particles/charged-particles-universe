@@ -95,14 +95,17 @@ contract Ionx is ERC20Permit, Ownable, BlackholePrevention {
     _mint(receiver, amountToMint);
   }
 
+  // Note: This contract should never hold ETH, if any is accidentally sent in then the DAO can return it
   function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
     _withdrawEther(receiver, amount);
   }
 
+  // Note: This contract should never hold any tokens, if any are accidentally sent in then the DAO can return them
   function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external onlyOwner {
     _withdrawERC20(receiver, tokenAddress, amount);
   }
 
+  // Note: This contract should never hold any tokens, if any are accidentally sent in then the DAO can return them
   function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external onlyOwner {
     _withdrawERC721(receiver, tokenAddress, tokenId);
   }

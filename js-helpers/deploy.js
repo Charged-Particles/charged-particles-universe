@@ -154,26 +154,50 @@ const presets = {
   },
   Incentives: {
     1: { // Mainnet
+      airdrop: {
+        merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
+        totalIonx: tokensBN(bn(1_000_000)),
+      },
+      staking: {
+        epochDuration: 7 * 24 * 60 * 60,  // 1 week
+        epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+      },
+      ionxToken: {
+        startAmount: bn(48000),
+        nrOfEpochs: bn(12),
+        deprecation: bn(0),
+      },
+      lpTokens: {
+        startAmount: bn(48000),
+        nrOfEpochs: bn(12),
+        deprecation: bn(0),
+      },
 
+      uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+      uniswapLPTokenAddress: '0x60F6E2200bFEf8b4d120028Faff4D9A4486526f4',
     },
     42: { // Kovan Testnet
+      airdrop: {
+        merkleRoot: '0x42607ac6583b70ed3bb26c8583844da4b5ca1099ecf3f0252de4dd60d17c2fc3',
+        totalIonx: tokensBN(bn(1_000_000)),
+      },
       staking: {
         epochDuration: 30 * 60,  // 1/2 Hour
         epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
-        startAmount: bn(75000),
+        startAmount: bn(75_000),
         nrOfEpochs: bn(750),
         deprecation: bn(100),
       },
       lpTokens: {
-        startAmount: bn(75000),
+        startAmount: bn(75_000),
         nrOfEpochs: bn(750),
         deprecation: bn(100),
       },
 
       uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-      uniswapLPTokenAddress: '0x509cc4b76d3b5424b4f1670f5ebda114c6e56da5',
+      uniswapLPTokenAddress: '0x27125750e4D487cF4FbE65b12B6665062820a816',
     },
     137: { // Polygon L2 Mainnet
 
@@ -184,12 +208,12 @@ const presets = {
         epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
-        startAmount: bn(53000),  // 5_000_000 TOTAL
+        startAmount: bn(53_000),  // 5_000_000 TOTAL
         nrOfEpochs: bn(104),
         deprecation: bn(100),
       },
       lpTokens: {
-        startAmount: bn(100000),  // 10_000_000 TOTAL
+        startAmount: bn(100_000),  // 10_000_000 TOTAL
         nrOfEpochs: bn(104),
         deprecation: bn(100),
       },
@@ -198,6 +222,10 @@ const presets = {
       uniswapLPTokenAddress: '',
     },
     31337: { // Hardhat - Forked Mainnet
+      airdrop: {
+        merkleRoot: '0x42607ac6583b70ed3bb26c8583844da4b5ca1099ecf3f0252de4dd60d17c2fc3',
+        totalIonx: tokensBN(bn(1_000_000)),
+      },
       staking: {
         epochDuration: 60 * 60,  // 1 Hour
         epoch1Start: dateToEpoch(dateFormat(NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'

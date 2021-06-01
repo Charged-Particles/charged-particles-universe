@@ -11,7 +11,7 @@ const {
 
   const chalk = require('chalk');
 
-  
+
   const {
     log,
     chainNameById,
@@ -132,13 +132,15 @@ const {
 
 
     // Next transfer appropriate funds
-    log(`\n   Distributing funds to CommunityVault: ${chalk.green(ethers.utils.formatUnits(getIonxDistributionAmount(chainId)))} IONX + ${chalk.green(ethers.utils.formatUnits(getLiquidityDistributionAmount(chainId)))}  IONX`);
-    await distributeInitialFunds(
-      ionx.connect(daoSigner),
-      communityVault,
-      getIonxDistributionAmount(chainId).add(getLiquidityDistributionAmount(chainId)),
-      protocolOwner,
-    );
+    if (chainId != 1) {
+      log(`\n   Distributing funds to CommunityVault: ${chalk.green(ethers.utils.formatUnits(getIonxDistributionAmount(chainId)))} IONX + ${chalk.green(ethers.utils.formatUnits(getLiquidityDistributionAmount(chainId)))}  IONX`);
+      await distributeInitialFunds(
+        ionx.connect(daoSigner),
+        communityVault,
+        getIonxDistributionAmount(chainId).add(getLiquidityDistributionAmount(chainId)),
+        protocolOwner,
+      );
+    }
 
     // Display Contract Addresses
     await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
@@ -157,4 +159,4 @@ const {
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
-module.exports.tags = ['community-incentives'];
+module.exports.tags = ['incentives'];

@@ -17,7 +17,8 @@
     "Lepton2": "Lepton2",
     "Staking": "Staking",
     "YieldFarm": "YieldFarm",
-    "CommunityVault": "CommunityVault"
+    "CommunityVault": "CommunityVault",
+    "MerkleDistributor": "MerkleDistributor"
   },
   "dependencies": {
   },
