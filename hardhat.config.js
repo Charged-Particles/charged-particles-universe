@@ -89,7 +89,7 @@ module.exports = {
         mainnet: {
             url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
             // url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 130e9,
+            gasPrice: 38e9,
             blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.mainnet,
@@ -130,6 +130,7 @@ module.exports = {
         'YieldFarm',
         'Staking',
         'CommunityVault',
+        'MerkleDistributor',
       ],
     },
     namedAccounts: {
@@ -138,6 +139,7 @@ module.exports = {
         },
         protocolOwner: {
           default: 1,
+          1: '0x0Ca678b984186b0117501C00d4A6B4F8F342D06D', // IONX Gnosis Multisig
         },
         initialMinter: {
           default: 2,

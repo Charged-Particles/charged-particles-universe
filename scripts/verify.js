@@ -44,29 +44,30 @@ async function run() {
   }
 
   // Protocol
-  await verifyContract('Universe', networkName, universeAddress);
-  await verifyContract('ChargedParticles', networkName, chargedParticlesAddress);
-  await verifyContract('ChargedState', networkName);
-  await verifyContract('ChargedSettings', networkName);
-  await verifyContract('WBoson', networkName);
-  await verifyContract('Ionx', networkName);
-  await verifyContract('IonxTimelock', networkName);
+  // await verifyContract('Universe', networkName, universeAddress);
+  // await verifyContract('ChargedParticles', networkName, chargedParticlesAddress);
+  // await verifyContract('ChargedState', networkName);
+  // await verifyContract('ChargedSettings', networkName);
+  // await verifyContract('WBoson', networkName);
+  // await verifyContract('Ionx', networkName);
+  // await verifyContract('IonxTimelock', networkName);
 
-  // // Wallet Managers
-  await verifyContract('GenericWalletManager', networkName);
-  await verifyContract('GenericBasketManager', networkName);
-  await verifyContract('AaveWalletManager', networkName);
+  // Wallet Managers
+  // await verifyContract('GenericWalletManager', networkName);
+  // await verifyContract('GenericBasketManager', networkName);
+  // await verifyContract('AaveWalletManager', networkName);
 
-  // // NFTs
-  await verifyContract('Proton', networkName);
-  await verifyContract('Lepton', networkName);
-  await verifyContract('Lepton2', networkName);
+  // NFTs
+  // await verifyContract('Proton', networkName);
+  // await verifyContract('Lepton', networkName);
+  // await verifyContract('Lepton2', networkName);
 
   // Incentives
-  await verifyContract('CommunityVault', networkName);
-  await verifyContract('Staking', networkName);
-  await verifyContract('IonxYieldFarm', networkName);
-  await verifyContract('LPYieldFarm', networkName);
+  // await verifyContract('CommunityVault', networkName);
+  // await verifyContract('Staking', networkName);
+  // await verifyContract('IonxYieldFarm', networkName);
+  // await verifyContract('LPYieldFarm', networkName);
+  await verifyContract('MerkleDistributor', networkName);
 
   success('Done!');
 };
