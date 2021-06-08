@@ -312,6 +312,27 @@ describe('YieldFarm Pool', function () {
             const balanceUser5 = await ionxToken.balanceOf(await user.getAddress());
             console.log(`After harvesting epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser5)} IONX`);
             expect(balanceUser5).to.be.gt(balanceUser4);
+
+            await moveAtStakingEpoch(6);
+            await yieldFarmIonx.connect(user).massHarvest();
+            await moveAtStakingEpoch(7);
+            await yieldFarmIonx.connect(user).massHarvest();
+            await moveAtStakingEpoch(8);
+            await yieldFarmIonx.connect(user).massHarvest();
+            await moveAtStakingEpoch(9);
+            await yieldFarmIonx.connect(user).massHarvest();
+            await moveAtStakingEpoch(10);
+            await yieldFarmIonx.connect(user).massHarvest();
+            await moveAtStakingEpoch(11);
+            await yieldFarmIonx.connect(user).massHarvest();
+            await moveAtStakingEpoch(12);
+            await yieldFarmIonx.connect(user).massHarvest();
+            await moveAtStakingEpoch(13);
+            await yieldFarmIonx.connect(user).massHarvest();
+
+            const balanceLast = await ionxToken.balanceOf(await user.getAddress());
+            expect(balanceLast).to.be.equal(distributedAmountIonx);
+
         });
 
         it('User harvest and mass Harvest', async function () {
@@ -370,6 +391,23 @@ describe('YieldFarm Pool', function () {
             expect(await yieldFarmLP.lastInitializedEpoch()).to.equal(NR_OF_EPOCHS);
 
             expect(await yieldFarmLP.getPoolSize(NR_OF_EPOCHS)).to.equal(totalAmount);
+
+            expect(await ionxToken.balanceOf(userAddr)).to.equal(distributedAmount.sub(deprecationBn.mul(NR_OF_EPOCHS)));
+        })
+
+        it('harvest maximum epochs IONX', async function () {
+            await depositIonxToken(amount)
+            const totalAmount = amount;
+            await moveAtStakingEpoch(13);
+
+            expect(await yieldFarmIonx.getPoolSize(1)).to.equal(totalAmount);
+            await (await yieldFarmIonx.connect(user).massHarvest()).wait();
+
+            const received = await ionxToken.balanceOf(userAddr);
+
+            expect(await yieldFarmIonx.lastInitializedEpoch()).to.equal(NR_OF_EPOCHS);
+
+            expect(await yieldFarmIonx.getPoolSize(NR_OF_EPOCHS)).to.equal(totalAmount);
 
             expect(await ionxToken.balanceOf(userAddr)).to.equal(distributedAmount.sub(deprecationBn.mul(NR_OF_EPOCHS)));
         })
