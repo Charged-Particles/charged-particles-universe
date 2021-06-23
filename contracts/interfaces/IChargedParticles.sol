@@ -35,6 +35,7 @@ interface IChargedParticles {
   function getStateAddress() external view returns (address stateAddress);
   function getSettingsAddress() external view returns (address settingsAddress);
 
+  function getFeesForDeposit(uint256 assetAmount) external view returns (uint256 protocolFee);
   function baseParticleMass(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
   function currentParticleCharge(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
   function currentParticleKinetics(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
@@ -50,7 +51,7 @@ interface IChargedParticles {
       string calldata walletManagerId,
       address assetToken,
       uint256 assetAmount,
-    address referrer
+      address referrer
   ) external returns (uint256 yieldTokensAmount);
 
   function dischargeParticle(
@@ -121,4 +122,7 @@ interface IChargedParticles {
   event ChargedStateSet(address indexed chargedState);
   event ChargedSettingsSet(address indexed chargedSettings);
   event LeptonTokenSet(address indexed leptonToken);
+  // event DepositFeeSet(uint256 depositFeeLimit, uint256 depositFee);
+  event DepositFeeSet(uint256 depositFee);
+  event ProtocolFeesCollected(address indexed assetToken, uint256 depositAmount, uint256 feesCollected);
 }

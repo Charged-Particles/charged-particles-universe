@@ -53,6 +53,22 @@ const chainNameById = (chainId) => {
   }
 };
 
+const chainTypeById = (chainId) => {
+  switch (parseInt(chainId, 10)) {
+    case 1:
+    case 137:
+      return {isProd: true, isTestnet: false, isHardhat: false};
+    case 3:
+    case 4:
+    case 42:
+    case 80001:
+      return {isProd: false, isTestnet: true, isHardhat: false};
+    case 31337:
+    default:
+      return {isProd: false, isTestnet: false, isHardhat: true};
+  }
+};
+
 const blockTimeFromDate = (dateStr) => {
   return Date.parse(dateStr) / 1000;
 };
@@ -82,6 +98,7 @@ module.exports = {
   tokens,
   tokensBN,
   bnToInt,
+  chainTypeById,
   chainNameById,
   chainIdByName,
   dateToEpoch,

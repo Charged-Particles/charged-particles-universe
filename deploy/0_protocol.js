@@ -6,6 +6,7 @@ const {
 
 const {
   log,
+  chainTypeById,
   chainNameById,
   chainIdByName,
 } = require('../js-helpers/utils');
@@ -19,13 +20,14 @@ module.exports = async (hre) => {
     const deployData = {};
 
     const chainId = chainIdByName(network.name);
-    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 5 : 3);
+    const {isProd, isHardhat} = chainTypeById(chainId);
+    const alchemyTimeout = isHardhat ? 0 : (isProd ? 5 : 3);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Deployment');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-    log('  Using Network: ', chainNameById(chainId));
+    log(`  Using Network: ${chainNameById(chainId)} (${network.name}:${chainId})`);
     log('  Using Accounts:');
     log('  - Deployer:          ', deployer);
     log('  - Owner:             ', protocolOwner);
@@ -41,6 +43,9 @@ module.exports = async (hre) => {
       address: universe.address,
       deployTransaction: universe.deployTransaction,
     }
+    log('  - Universe:         ', universe.address);
+    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
+    saveDeploymentData(chainId, deployData);
 
     await log('  Deploying ChargedState...')(alchemyTimeout);
     const ChargedState = await hre.ethers.getContractFactory('ChargedState');
@@ -51,6 +56,9 @@ module.exports = async (hre) => {
       address: chargedState.address,
       deployTransaction: chargedState.deployTransaction,
     }
+    log('  - ChargedState:     ', chargedState.address);
+    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedState.deployTransaction }));
+    saveDeploymentData(chainId, deployData);
 
     await log('  Deploying ChargedSettings...')(alchemyTimeout);
     const ChargedSettings = await hre.ethers.getContractFactory('ChargedSettings');
@@ -61,6 +69,9 @@ module.exports = async (hre) => {
       address: chargedSettings.address,
       deployTransaction: chargedSettings.deployTransaction,
     }
+    log('  - ChargedSettings:  ', chargedSettings.address);
+    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedSettings.deployTransaction }));
+    saveDeploymentData(chainId, deployData);
 
     await log('  Deploying ChargedParticles...')(alchemyTimeout);
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
@@ -71,21 +82,11 @@ module.exports = async (hre) => {
       address: chargedParticles.address,
       deployTransaction: chargedParticles.deployTransaction,
     }
-
-    // Display Contract Addresses
-    await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
-    log('  - Universe:         ', universe.address);
-    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
-    log('  - ChargedState:     ', chargedState.address);
-    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedState.deployTransaction }));
-    log('  - ChargedSettings:  ', chargedSettings.address);
-    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedSettings.deployTransaction }));
     log('  - ChargedParticles: ', chargedParticles.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedParticles.deployTransaction }));
-
     saveDeploymentData(chainId, deployData);
-    log('\n  Contract Deployment Data saved to "deployments" directory.');
 
+    log('\n  Contract Deployment Data saved to "deployments" directory.');
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };
 

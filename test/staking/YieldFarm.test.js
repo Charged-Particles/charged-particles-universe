@@ -59,7 +59,7 @@ describe('YieldFarm Pool', function () {
 
         deprecation = incentives.ionxToken.deprecation;
         deprecationBn = incentives.ionxToken.deprecation.mul(ethers.BigNumber.from(10).pow(18));
- 
+
         epochDuration = incentives.staking.epochDuration;
         NR_OF_EPOCHS = incentives.ionxToken.nrOfEpochs;
 
@@ -80,7 +80,7 @@ describe('YieldFarm Pool', function () {
 
         const namedAccts = (await getNamedAccounts());
 
-        deployerAddr = namedAccts.deployer; 
+        deployerAddr = namedAccts.deployer;
         deployer = ethers.provider.getSigner(deployerAddr);
 
         ownerAddr = namedAccts.protocolOwner;
@@ -145,7 +145,7 @@ describe('YieldFarm Pool', function () {
         // Dispatch to Community Vault
         await ionxToken.connect(owner).transfer(communityVaultAddr, distributedAmountIonx);
         await ionxToken.connect(owner).transfer(communityVaultAddr, distributedAmount);
-        
+
         await communityVault.connect(deployer).setAllowance(yieldFarmLP.address, distributedAmount);
         await communityVault.connect(deployer).setAllowance(yieldFarmIonx.address, distributedAmountIonx);
 

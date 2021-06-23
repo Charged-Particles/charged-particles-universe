@@ -178,7 +178,7 @@ const presets = {
     },
     42: { // Kovan Testnet
       airdrop: {
-        merkleRoot: '0x42607ac6583b70ed3bb26c8583844da4b5ca1099ecf3f0252de4dd60d17c2fc3',
+        merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
         totalIonx: tokensBN(bn(1_000_000)),
       },
       staking: {
@@ -203,27 +203,31 @@ const presets = {
 
     },
     80001: { // Polygon L2 Testnet - Mumbai
+      airdrop: {
+        merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
+        totalIonx: tokensBN(bn(1_000_000)),
+      },
       staking: {
         epochDuration: 30 * 60,  // 1/2 Hour
         epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
-        startAmount: bn(53_000),  // 5_000_000 TOTAL
-        nrOfEpochs: bn(104),
+        startAmount: bn(75_000),
+        nrOfEpochs: bn(750),
         deprecation: bn(100),
       },
       lpTokens: {
-        startAmount: bn(100_000),  // 10_000_000 TOTAL
-        nrOfEpochs: bn(104),
+        startAmount: bn(75_000),
+        nrOfEpochs: bn(750),
         deprecation: bn(100),
       },
 
-      uniswapV2Addr : '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff', // QuickSwap on Polygon Mainnet
+      uniswapV2Addr : '',
       uniswapLPTokenAddress: '',
     },
     31337: { // Hardhat - Forked Mainnet
       airdrop: {
-        merkleRoot: '0x42607ac6583b70ed3bb26c8583844da4b5ca1099ecf3f0252de4dd60d17c2fc3',
+        merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
         totalIonx: tokensBN(bn(1_000_000)),
       },
       staking: {

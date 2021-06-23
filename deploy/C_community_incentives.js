@@ -14,6 +14,7 @@ const {
 
   const {
     log,
+    chainTypeById,
     chainNameById,
     chainIdByName,
   } = require('../js-helpers/utils');
@@ -32,7 +33,8 @@ const {
     const deployData = {};
 
     const chainId = chainIdByName(network.name);
-    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 7);
+    const {isProd, isHardhat} = chainTypeById(chainId);
+    const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
     const incentives = presets.Incentives[chainId];
 
     const daoSigner = ethers.provider.getSigner(protocolOwner);

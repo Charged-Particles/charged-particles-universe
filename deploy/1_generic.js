@@ -7,6 +7,7 @@ const {
 
 const {
   log,
+  chainTypeById,
   chainNameById,
   chainIdByName,
 } = require('../js-helpers/utils');
@@ -17,14 +18,15 @@ module.exports = async (hre) => {
     const network = await hre.network;
 
     const chainId = chainIdByName(network.name);
-    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
+    const {isProd, isHardhat} = chainTypeById(chainId);
+    const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 1);
     const deployData = {};
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles LP: Generic - Contract Deployment');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-    log('  Using Network: ', chainNameById(chainId));
+    log(`  Using Network: ${chainNameById(chainId)} (${chainId})`);
     log('  Using Accounts:');
     log('  - Deployer:    ', deployer);
     log('  - Owner:       ', protocolOwner);
