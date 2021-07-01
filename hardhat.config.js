@@ -86,6 +86,26 @@ module.exports = {
                 count: 10,
             }
         },
+        mumbai: {
+            //url: `https://rpc-mumbai.matic.today`,
+            url: `https://rpc-mumbai.maticvigil.com`,
+            gasPrice: 1e9,
+            blockGasLimit: 12400000,
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            }
+        },
+        polygon: {
+            url: `https://rpc-mainnet.maticvigil.com`,
+            gasPrice: 15e9,
+            accounts: {
+                mnemonic: mnemonic.mainnet,
+                initialIndex: 0,
+                count: 3,
+            }
+        },
         mainnet: {
             url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
             // url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,

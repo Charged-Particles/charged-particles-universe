@@ -7,6 +7,7 @@ const {
 
 const {
   log,
+  chainTypeById,
   chainNameById,
   chainIdByName,
 } = require('../js-helpers/utils');
@@ -18,7 +19,8 @@ module.exports = async (hre) => {
     const deployData = {};
 
     const chainId = chainIdByName(network.name);
-    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
+    const {isProd, isHardhat} = chainTypeById(chainId);
+    const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 1);
     const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
 
 
@@ -26,7 +28,7 @@ module.exports = async (hre) => {
     log('Charged Particles LP: Aave - Contract Deployment');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-    log('  Using Network: ', chainNameById(chainId));
+    log(`  Using Network: ${chainNameById(chainId)} (${chainId})`);
     log('  Using Accounts:');
     log('  - Deployer:    ', deployer);
     log('  - Owner:       ', protocolOwner);

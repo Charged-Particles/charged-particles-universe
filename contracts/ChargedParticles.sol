@@ -61,6 +61,8 @@ contract ChargedParticles is
   using TokenInfo for address;
   using Bitwise for uint32;
 
+  uint256 constant internal PERCENTAGE_SCALE = 1e4;       // 10000  (100%)
+
   //
   // Particle Terminology
   //
@@ -90,6 +92,7 @@ contract ChargedParticles is
   IChargedState internal _chargedState;
   IChargedSettings internal _chargedSettings;
   address internal _lepton;
+  uint256 internal depositFee;
 
   /***********************************|
   |          Initialization           |
@@ -116,6 +119,20 @@ contract ChargedParticles is
 
   function onERC721Received(address, address, uint256, bytes calldata) external virtual override returns (bytes4) {
     return IERC721ReceiverUpgradeable(0).onERC721Received.selector;
+  }
+
+  /// @notice Calculates the amount of Fees to be paid for a specific deposit amount
+  /// @param assetAmount The Amount of Assets to calculate Fees on
+  /// @return protocolFee The amount of deposit fees for the protocol
+  function getFeesForDeposit(
+    uint256 assetAmount
+  )
+    external
+    override
+    view
+    returns (uint256 protocolFee)
+  {
+    protocolFee = _getFeesForDeposit(assetAmount);
   }
 
   /// @notice Gets the Amount of Asset Tokens that have been Deposited into the Particle
@@ -241,10 +258,10 @@ contract ChargedParticles is
     _validateDeposit(contractAddress, tokenId, walletManagerId, assetToken, assetAmount);
 
     // Transfer ERC20 Token from Caller to Contract (reverts on fail)
-    _collectAssetToken(_msgSender(), assetToken, assetAmount);
+    uint256 feeAmount = _collectAssetToken(_msgSender(), assetToken, assetAmount);
 
     // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
-    yieldTokensAmount = _depositIntoWalletManager(contractAddress, tokenId, walletManagerId, assetToken, assetAmount);
+    yieldTokensAmount = _depositIntoWalletManager(contractAddress, tokenId, walletManagerId, assetToken, assetAmount, feeAmount);
 
     // Signal to Universe Controller
     if (address(_universe) != address(0)) {
@@ -586,6 +603,16 @@ contract ChargedParticles is
     trustedForwarder = _trustedForwarder;
   }
 
+  /***********************************|
+  |          Protocol Fees            |
+  |__________________________________*/
+
+  /// @dev Setup the Base Deposit Fee for the Protocol
+  function setDepositFee(uint256 fee) external onlyOwner {
+    require(fee < PERCENTAGE_SCALE, "CP:E-421");
+    depositFee = fee;
+    emit DepositFeeSet(fee);
+  }
 
   /***********************************|
   |          Only Admin/DAO           |
@@ -799,12 +826,14 @@ contract ChargedParticles is
   /// @param walletManagerId  The Wallet Manager of the Assets to Deposit
   /// @param assetToken           The Address of the Asset Token to Deposit
   /// @param assetAmount          The specific amount of Asset Token to Deposit
+  /// @param feeAmount            The Amount of Protocol Fees charged
   function _depositIntoWalletManager(
     address contractAddress,
     uint256 tokenId,
     string calldata walletManagerId,
     address assetToken,
-    uint256 assetAmount
+    uint256 assetAmount,
+    uint256 feeAmount
   )
     internal
     virtual
@@ -812,11 +841,15 @@ contract ChargedParticles is
   {
     // Get Wallet-Manager for LP
     IWalletManager lpWalletMgr = _chargedSettings.getWalletManager(walletManagerId);
+
     (address creator, uint256 annuityPct) = _chargedSettings.getCreatorAnnuities(contractAddress, tokenId);
 
     // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
     address wallet = lpWalletMgr.getWalletAddressById(contractAddress, tokenId, creator, annuityPct);
     IERC20Upgradeable(assetToken).transfer(wallet, assetAmount);
+
+    emit ProtocolFeesCollected(assetToken, assetAmount, feeAmount);
+
     return lpWalletMgr.energize(contractAddress, tokenId, assetToken, assetAmount);
   }
 
@@ -844,13 +877,32 @@ contract ChargedParticles is
     return basketMgr.addToBasket(contractAddress, tokenId, nftTokenAddress, nftTokenId);
   }
 
+  /**
+    * @dev Calculates the amount of Fees to be paid for a specific deposit amount
+    *   Fees are calculated in Interest-Token as they are the type collected for Fees
+    * @param assetAmount The Amount of Assets to calculate Fees on
+    * @return protocolFee The amount of fees reserved for the protocol
+    */
+  function _getFeesForDeposit(
+    uint256 assetAmount
+  )
+    internal
+    view
+    returns (uint256 protocolFee)
+  {
+    if (depositFee > 0) {
+      protocolFee = assetAmount.mul(depositFee).div(PERCENTAGE_SCALE);
+    }
+  }
+
   /// @dev Collects the Required ERC20 Token(s) from the users wallet
   ///   Be sure to Approve this Contract to transfer your Token(s)
   /// @param from         The owner address to collect the tokens from
   /// @param tokenAddress  The addres of the token to transfer
   /// @param tokenAmount  The amount of tokens to collect
-  function _collectAssetToken(address from, address tokenAddress, uint256 tokenAmount) internal virtual {
-    require(IERC20Upgradeable(tokenAddress).transferFrom(from, address(this), tokenAmount), "CP:E-401");
+  function _collectAssetToken(address from, address tokenAddress, uint256 tokenAmount) internal virtual returns (uint256 protocolFee) {
+    protocolFee = _getFeesForDeposit(tokenAmount);
+    require(IERC20Upgradeable(tokenAddress).transferFrom(from, address(this), tokenAmount.add(protocolFee)), "CP:E-401");
   }
 
   /// @dev Collects the Required ERC721 Token(s) from the users wallet

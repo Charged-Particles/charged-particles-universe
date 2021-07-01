@@ -117,9 +117,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    if (referralSource[sender] == address(0x0) && referrer != address(0x0)) {
-      referralSource[sender] = referrer;
-    }
+    // no-op
   }
 
   function onDischarge(
@@ -135,11 +133,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    if (esaMultiplier[assetToken] > 0 && receiverEnergy > 0) {
-      uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
-      address nftOwner = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
-      _electrostaticAttraction(tokenUuid, nftOwner, assetToken, creatorEnergy.add(receiverEnergy));
-    }
+    // no-op
   }
 
   function onDischargeForCreator(
@@ -155,11 +149,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    if (esaMultiplier[assetToken] > 0 && receiverEnergy > 0) {
-      uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
-      address nftOwner = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
-      _electrostaticAttraction(tokenUuid, nftOwner, assetToken, receiverEnergy);
-    }
+    // no-op
   }
 
   function onRelease(
@@ -176,12 +166,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    uint256 totalEnergy = creatorEnergy.add(receiverEnergy);
-    if (esaMultiplier[assetToken] > 0 && totalEnergy > principalAmount) {
-      uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
-      address nftOwner = IERC721Upgradeable(contractAddress).ownerOf(tokenId);
-      _electrostaticAttraction(tokenUuid, nftOwner, assetToken, totalEnergy.sub(principalAmount));
-    }
+    // no-op
   }
 
   function onCovalentBond(
@@ -196,10 +181,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    if (lepton != address(0x0) && nftTokenAddress == lepton) {
-      uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
-      bondedLeptonMass[tokenUuid] = ILepton(nftTokenAddress).getMultiplier(nftTokenId);
-    }
+    // no-op
   }
 
   function onCovalentBreak(
@@ -214,10 +196,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    if (lepton != address(0x0) && nftTokenAddress == lepton) {
-      uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
-      delete bondedLeptonMass[tokenUuid];
-    }
+    // no-op
   }
 
   function onProtonSale(
