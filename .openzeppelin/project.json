@@ -18,7 +18,9 @@
     "Staking": "Staking",
     "YieldFarm": "YieldFarm",
     "CommunityVault": "CommunityVault",
-    "MerkleDistributor": "MerkleDistributor"
+    "MerkleDistributor": "MerkleDistributor",
+    "MerkleDistributor2": "MerkleDistributor2",
+    "VestingClaim": "VestingClaim"
   },
   "dependencies": {
   },

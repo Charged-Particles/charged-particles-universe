@@ -67,7 +67,9 @@ async function run() {
   // await verifyContract('Staking', networkName);
   // await verifyContract('IonxYieldFarm', networkName);
   // await verifyContract('LPYieldFarm', networkName);
-  await verifyContract('MerkleDistributor', networkName);
+  // await verifyContract('MerkleDistributor', networkName);
+  await verifyContract('MerkleDistributor2', networkName);
+  await verifyContract('VestingClaim', networkName);
 
   success('Done!');
 };

@@ -34,7 +34,8 @@ module.exports = async (hre) => {
 
   const ddIonx = getDeployData('Ionx', chainId);
 
-  const MerkleDistributor = await ethers.getContractFactory('MerkleDistributor');
+  // const MerkleDistributor = await ethers.getContractFactory('MerkleDistributor');
+  const MerkleDistributor2 = await ethers.getContractFactory('MerkleDistributor2');
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles Airdrop - Contract Initialization');
@@ -51,22 +52,40 @@ module.exports = async (hre) => {
   const Ionx = await ethers.getContractFactory('Ionx');
   const ionx = await Ionx.attach(ddIonx.address);
 
-  await log(`\n  Deploying MerkleDistributor...`)(alchemyTimeout);
-  const MerkleDistributorInstance = await MerkleDistributor.deploy(ddIonx.address, incentives.airdrop.merkleRoot);
-  const merkleDistributor = await MerkleDistributorInstance.deployed();
-  deployData['MerkleDistributor'] = {
-    abi: getContractAbi('MerkleDistributor'),
-    address: merkleDistributor.address,
-    constructorArgs: [ddIonx.address, incentives.airdrop.merkleRoot],
-    deployTransaction: merkleDistributor.deployTransaction,
+  // await log(`\n  Deploying MerkleDistributor...`)(alchemyTimeout);
+  // const MerkleDistributorInstance = await MerkleDistributor.deploy(ddIonx.address, incentives.airdrop.merkleRoot);
+  // const merkleDistributor = await MerkleDistributorInstance.deployed();
+  // deployData['MerkleDistributor'] = {
+  //   abi: getContractAbi('MerkleDistributor'),
+  //   address: merkleDistributor.address,
+  //   constructorArgs: [ddIonx.address, incentives.airdrop.merkleRoot],
+  //   deployTransaction: merkleDistributor.deployTransaction,
+  // };
+
+  await log(`\n  Deploying MerkleDistributor2 with Expiry: ${new Date(incentives.airdrop.expiryDate * 1000).toLocaleDateString("en-US")}...`)(alchemyTimeout);
+  const MerkleDistributor2Instance = await MerkleDistributor2.deploy(ddIonx.address, incentives.airdrop.merkleRoot, incentives.airdrop.expiryDate);
+  const merkleDistributor2 = await MerkleDistributor2Instance.deployed();
+  deployData['MerkleDistributor2'] = {
+    abi: getContractAbi('MerkleDistributor2'),
+    address: merkleDistributor2.address,
+    constructorArgs: [ddIonx.address, incentives.airdrop.merkleRoot, incentives.airdrop.expiryDate],
+    deployTransaction: merkleDistributor2.deployTransaction,
   };
 
   // Next transfer appropriate funds (Testnet only; Mainnet requires IONX DAO)
   if (chainId != 1) {
-    log('\n   Distributing Airdrop funds to MerkleDistributor...');
+    // log('\n   Distributing Airdrop funds to MerkleDistributor...');
+    // await distributeInitialFunds(
+    //   ionx.connect(daoSigner),
+    //   merkleDistributor,
+    //   incentives.airdrop.totalIonx,
+    //   protocolOwner,
+    // );
+
+    log('\n   Distributing Airdrop funds to MerkleDistributor2...');
     await distributeInitialFunds(
       ionx.connect(daoSigner),
-      merkleDistributor,
+      merkleDistributor2,
       incentives.airdrop.totalIonx,
       protocolOwner,
     );
@@ -74,8 +93,10 @@ module.exports = async (hre) => {
 
   // Display Contract Addresses
   await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
-  log('  - MerkleDistributor: ', merkleDistributor.address);
-  log('     - Gas Cost:    ', getTxGasCost({ deployTransaction: merkleDistributor.deployTransaction }));
+  // log('  - MerkleDistributor: ', merkleDistributor.address);
+  // log('     - Gas Cost:       ', getTxGasCost({ deployTransaction: merkleDistributor.deployTransaction }));
+  log('  - MerkleDistributor2: ', merkleDistributor2.address);
+  log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: merkleDistributor2.deployTransaction }));
 
   saveDeploymentData(chainId, deployData);
   log('\n  Contract Deployment Data saved to "deployments" directory.');

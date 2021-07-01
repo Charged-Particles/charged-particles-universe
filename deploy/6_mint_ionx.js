@@ -5,7 +5,6 @@ const {
 
 const {
   log,
-  chainTypeById,
   chainNameById,
   chainIdByName,
 } = require('../js-helpers/utils');
@@ -18,8 +17,7 @@ module.exports = async (hre) => {
   const network = await hre.network;
 
   const chainId = chainIdByName(network.name);
-  const {isProd, isHardhat} = chainTypeById(chainId);
-  const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 1);
+  const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
 
   const ionxMaxSupply = presets.Ionx.maxSupply;
 

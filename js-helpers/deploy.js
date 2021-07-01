@@ -12,7 +12,7 @@ const {
   toBN,
   tokensBN,
   chainNameById,
-  dateToEpoch,
+  dateToTimestamp,
   blockTimeFromDate,
   ensureDirectoryExistence,
   calculateSumArithmeticSeriesAtN,
@@ -24,15 +24,19 @@ require('./chaiMatchers');
 
 
 // const STAKING_EPOCH_GENESIS_STR     = '22/05/2021 11:00'; // 22 May 2021 11 AM UTC
-// const STAKING_EPOCH_GENESIS         = dateToEpoch(STAKING_EPOCH_GENESIS_STR);
+// const STAKING_EPOCH_GENESIS         = dateToTimestamp(STAKING_EPOCH_GENESIS_STR);
 // const STAKING_EPOCH_DURATION        = 60 * 60;
 
 // const NFT_STAKING_EPOCH_GENESIS_STR = '15/06/2021 14:00';
-// const NFT_STAKING_EPOCH_GENESIS     = dateToEpoch(NFT_STAKING_EPOCH_GENESIS_STR);
+// const NFT_STAKING_EPOCH_GENESIS     = dateToTimestamp(NFT_STAKING_EPOCH_GENESIS_STR);
 
 
 const NOW = Date.now();
 const TEN_MINS_FROM_NOW = new Date(NOW + 10 * 60 * 1000);
+const ONE_MONTH_FROM_NOW = new Date(NOW + 30 * 24 * 60 * 60 * 1000);
+
+const TEST_EXPIRY = dateToTimestamp('01/07/2021 07:00'); // July 1, 2021 @ 11:00 AM
+const LIVE_EXPIRY = dateToTimestamp('31/12/2021 23:59'); // Dec 31, 2021 @ EOD
 
 
 const presets = {
@@ -157,10 +161,11 @@ const presets = {
       airdrop: {
         merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
         totalIonx: tokensBN(bn(1_000_000)),
+        expiryDate: LIVE_EXPIRY,
       },
       staking: {
         epochDuration: 7 * 24 * 60 * 60,  // 1 week
-        epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+        epoch1Start: dateToTimestamp(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
         startAmount: bn(48000),
@@ -178,75 +183,80 @@ const presets = {
     },
     42: { // Kovan Testnet
       airdrop: {
-        merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
+        merkleRoot: '0x31340c29d25b57749abae264a051c31a96d6b79a24776ffc91a8d46d4a9258a5',
         totalIonx: tokensBN(bn(1_000_000)),
+        expiryDate: TEST_EXPIRY,
       },
       staking: {
-        epochDuration: 30 * 60,  // 1/2 Hour
-        epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+        epochDuration: 2 * 60 * 60,  // 2 Hours
+        epoch1Start: dateToTimestamp(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
-        startAmount: bn(75_000),
-        nrOfEpochs: bn(750),
-        deprecation: bn(100),
+        startAmount: bn(48000),
+        nrOfEpochs: bn(12),
+        deprecation: bn(0),
       },
       lpTokens: {
-        startAmount: bn(75_000),
-        nrOfEpochs: bn(750),
-        deprecation: bn(100),
+        startAmount: bn(48000),
+        nrOfEpochs: bn(12),
+        deprecation: bn(0),
       },
 
       uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-      uniswapLPTokenAddress: '0x27125750e4D487cF4FbE65b12B6665062820a816',
+      uniswapLPTokenAddress: '',
     },
     137: { // Polygon L2 Mainnet
 
     },
     80001: { // Polygon L2 Testnet - Mumbai
-      airdrop: {
-        merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
-        totalIonx: tokensBN(bn(1_000_000)),
-      },
       staking: {
         epochDuration: 30 * 60,  // 1/2 Hour
-        epoch1Start: dateToEpoch(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+        epoch1Start: dateToTimestamp(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
-        startAmount: bn(75_000),
-        nrOfEpochs: bn(750),
+        startAmount: bn(53_000),  // 5_000_000 TOTAL
+        nrOfEpochs: bn(104),
         deprecation: bn(100),
       },
       lpTokens: {
-        startAmount: bn(75_000),
-        nrOfEpochs: bn(750),
+        startAmount: bn(100_000),  // 10_000_000 TOTAL
+        nrOfEpochs: bn(104),
         deprecation: bn(100),
       },
 
-      uniswapV2Addr : '',
+      uniswapV2Addr : '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff', // QuickSwap on Polygon Mainnet
       uniswapLPTokenAddress: '',
     },
     31337: { // Hardhat - Forked Mainnet
       airdrop: {
-        merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
+        merkleRoot: '0x42607ac6583b70ed3bb26c8583844da4b5ca1099ecf3f0252de4dd60d17c2fc3',
         totalIonx: tokensBN(bn(1_000_000)),
+        expiryDate: LIVE_EXPIRY,
       },
       staking: {
         epochDuration: 60 * 60,  // 1 Hour
-        epoch1Start: dateToEpoch(dateFormat(NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+        epoch1Start: dateToTimestamp(dateFormat(NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
-        startAmount: bn(53_000),
-        nrOfEpochs: bn(104),
-        deprecation: bn(100),
+        startAmount: bn(48000),
+        nrOfEpochs: bn(12),
+        deprecation: bn(0),
       },
       lpTokens: {
-        startAmount: bn(100_000),
-        nrOfEpochs: bn(104),
-        deprecation: bn(100),
+        startAmount: bn(48000),
+        nrOfEpochs: bn(12),
+        deprecation: bn(0),
       },
 
       uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
       uniswapLPTokenAddress: '0xac5A8983d9289922a45f97B352Dc3c94FF55a1A6',
+    },
+  },
+  Vesting: {
+    month1: {
+      merkleRoot: '0x1a1a0383b73f75d06da1de54451dd7feec7c66b526cf4087a2997aec714a2f59',
+      totalIonx: tokensBN(bn(1_019_410)),
+      expiryDate: dateToTimestamp(dateFormat(ONE_MONTH_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')),
     },
   },
 };

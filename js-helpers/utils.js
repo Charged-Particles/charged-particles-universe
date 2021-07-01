@@ -16,7 +16,7 @@ const tokens = function (amount, decimals = 18) { return (bn(amount).mul(bn(10).
 const tokensBN = function (amount, decimals = 18) { return (bn(amount).mul(bn(10).pow(decimals))) }
 const bnToInt = function (bnAmount, decimals = 18) { return bnAmount.div(bn(10).pow(decimals)) }
 
-const dateToEpoch = function (dated) { return moment.utc(dated, "DD/MM/YYYY HH:mm").valueOf() / 1000 }
+const dateToTimestamp = function (dated) { return moment.utc(dated, "DD/MM/YYYY HH:mm").valueOf() / 1000 }
 const timeInSecs = function (days, hours, mins, secs) { return days * hours * mins * secs }
 const timeInDays = function (secs) { return (secs / (60 * 60 * 24)).toFixed(2) }
 const timeInDate = function (secs) { return moment.utc(secs * 1000).format("DD MMM YYYY hh:mm a") }
@@ -101,7 +101,7 @@ module.exports = {
   chainTypeById,
   chainNameById,
   chainIdByName,
-  dateToEpoch,
+  dateToTimestamp,
   timeInSecs,
   timeInDays,
   timeInDate,

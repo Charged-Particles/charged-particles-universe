@@ -29,7 +29,7 @@
     "start": "hardhat node --port 8545",
     "deploy": "yarn clean-test && hardhat deploy",
     "deploy-only": "hardhat deploy --tags",
-    "deploy-incentives": "hardhat deploy --tags community-incentives --network",
+    "deploy-incentives": "hardhat deploy --tags incentives --network",
     "gen-docs": "solidity-docgen -i contracts -o docs"
   },
   "devDependencies": {
