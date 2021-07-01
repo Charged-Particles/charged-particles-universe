@@ -158,8 +158,12 @@ const presets = {
   },
   Incentives: {
     1: { // Mainnet
-      airdrop: {
-        merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
+      // airdrop: {  //  AIRDROP # 1
+      //   merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
+      //   totalIonx: tokensBN(bn(1_000_000)),
+      // },
+      airdrop: {  //  AIRDROP # 2
+        merkleRoot: '0x31340c29d25b57749abae264a051c31a96d6b79a24776ffc91a8d46d4a9258a5',
         totalIonx: tokensBN(bn(1_000_000)),
         expiryDate: LIVE_EXPIRY,
       },
@@ -254,8 +258,8 @@ const presets = {
   },
   Vesting: {
     month1: {
-      merkleRoot: '0x1a1a0383b73f75d06da1de54451dd7feec7c66b526cf4087a2997aec714a2f59',
-      totalIonx: tokensBN(bn(1_019_410)),
+      merkleRoot: '0x868018bccd0169750f6d23ca2e851d0249e1802f8aed54ed747f2a910b603f78',
+      totalIonx: tokensBN(bn(1_516_631)),
       expiryDate: dateToTimestamp(dateFormat(ONE_MONTH_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')),
     },
   },

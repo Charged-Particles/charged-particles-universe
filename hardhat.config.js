@@ -107,9 +107,9 @@ module.exports = {
             }
         },
         mainnet: {
-            url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            // url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 38e9,
+            // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
+            url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+            gasPrice: 32e9,
             blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.mainnet,
