@@ -187,7 +187,7 @@ describe('YieldFarm Pool', function () {
     })
 
     describe('Contract Tests', function () {
-        it.only('Harvest Asap Epoch (2)', async function(){
+        it('Harvest Asap Epoch (2)', async function(){
             // const before = (await ionxToken.balanceOf(await user.getAddress()));
             // console.log({before:before.toString()});
 
@@ -423,7 +423,7 @@ describe('YieldFarm Pool', function () {
         });
     });
     // describe('Multiple Staking', function () {
-    //     it.only('it supports multi tokens in the staking contract', async function () {
+    //     it('it supports multi tokens in the staking contract', async function () {
     //         await depositUniV2Token(amount);
     //         await depositIonxToken(amount, user2);
     //         await moveAtStakingEpoch(3);
