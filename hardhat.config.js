@@ -76,8 +76,8 @@ module.exports = {
             },
         },
         kovan: {
-            url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            // url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+            // url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
+            url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
             gasPrice: 10e9,
             blockGasLimit: 12400000,
             accounts: {
@@ -131,6 +131,8 @@ module.exports = {
         'Staking',
         'CommunityVault',
         'MerkleDistributor',
+        'MerkleDistributor2',
+        'VestingClaim',
       ],
     },
     namedAccounts: {
