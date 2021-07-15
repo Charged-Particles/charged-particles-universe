@@ -4,6 +4,13 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const chalk = require('chalk');
 
+const {
+  log,
+  chainTypeById,
+  chainNameById,
+  chainIdByName,
+} = require('../js-helpers/utils');
+
 const info = (msg) => console.log(chalk.dim(msg));
 const success = (msg) => console.log(chalk.green(msg));
 
@@ -27,9 +34,11 @@ const verifyContract = async (name, network, addressOverride = null) => {
 }
 
 async function run() {
-  const network = await hardhat.ethers.provider.getNetwork();
+  const network = await hardhat.network;
+  const chainId = chainIdByName(network.name);
+
   const networkName = network.name === 'homestead' ? 'mainnet' : network.name;
-  info(`Verifying contracts on network "${networkName}"...`);
+  info(`Verifying contracts on network "${networkName} (${chainId})"...`);
 
   // Upgradeable Contracts; need to get implementation adderss from `.openzeppelin/__network__.json`
   let universeAddress = null;
@@ -41,6 +50,14 @@ async function run() {
   if (networkName === 'kovan') {
     universeAddress = '0xeC08CB0f69E2095CF27eCB6E9D4BB60b430334Ad';
     chargedParticlesAddress = '0x0cFAAD8cD948A0BAe647615ecc8DfeFD0294a5f2';
+  }
+  if (networkName === 'matic') {
+    universeAddress = '0x1E70aa1599a624880e91103738591C920cCbb925';
+    chargedParticlesAddress = '0xB29256073C63960daAa398f1227D0adBC574341C';
+  }
+  if (networkName === 'mumbai') {
+    universeAddress = '0x3e9A9544f8a995DF33771E84600E02a2fc81De58';
+    chargedParticlesAddress = '0xA85B3d84f54Fb238Ef257158da99FdfCe905C7aA';
   }
 
   // Protocol
@@ -61,6 +78,7 @@ async function run() {
   // await verifyContract('Proton', networkName);
   // await verifyContract('Lepton', networkName);
   // await verifyContract('Lepton2', networkName);
+  await verifyContract('ExternalNFT', networkName);
 
   // Incentives
   // await verifyContract('CommunityVault', networkName);
@@ -68,8 +86,8 @@ async function run() {
   // await verifyContract('IonxYieldFarm', networkName);
   // await verifyContract('LPYieldFarm', networkName);
   // await verifyContract('MerkleDistributor', networkName);
-  await verifyContract('MerkleDistributor2', networkName);
-  await verifyContract('VestingClaim', networkName);
+  // await verifyContract('MerkleDistributor2', networkName);
+  // await verifyContract('VestingClaim', networkName);
 
   success('Done!');
 };

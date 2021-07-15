@@ -87,15 +87,15 @@ module.exports = {
             }
         },
         mumbai: {
-            //url: `https://rpc-mumbai.matic.today`,
-            url: `https://rpc-mumbai.maticvigil.com`,
+            url: `https://rpc-mumbai.matic.today`,
+            // url: `https://rpc-mumbai.maticvigil.com`,
             gasPrice: 1e9,
-            blockGasLimit: 12400000,
             accounts: {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
                 count: 10,
-            }
+            },
+            chainId: 80001
         },
         polygon: {
             url: `https://rpc-mainnet.maticvigil.com`,
@@ -153,6 +153,7 @@ module.exports = {
         'MerkleDistributor',
         'MerkleDistributor2',
         'VestingClaim',
+        'ExternalNFT',
       ],
     },
     namedAccounts: {

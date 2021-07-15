@@ -65,6 +65,14 @@ const SingularityPrices = [
   // toWei('0.5'),
 ];
 
+
+const _externalNftsForTesting = [
+  {receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76', tokenUri: 'https://ipfs.io/ipfs/QmWc1upvg4C4wSiSu1ry72Lw2smGsEptq73vV5hNk84MR9'},
+  {receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76', tokenUri: 'https://ipfs.io/ipfs/QmScSSJ8HdKr13qkPHHgM7UMbbsLMRjLt2TRY8nQ97qCrL'},
+  {receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76', tokenUri: 'https://ipfs.io/ipfs/QmPUoAULoodhy2uipiCZbT4YcMwCJX7jEK9wM8V2A7JXxu'},
+];
+
+
 module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;
     const { deployer, initialMinter } = await getNamedAccounts();
@@ -77,6 +85,7 @@ module.exports = async (hre) => {
 
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
+    const ddExternalNFT = getDeployData('ExternalNFT', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles: Mint Proton & Lepton Tokens ');
@@ -85,6 +94,7 @@ module.exports = async (hre) => {
     log('  Using Network: ', chainNameById(chainId));
     log('  Using Accounts:');
     log('  - For Creator:     ', initialMinter);
+    log('  - With Timeout:    ', alchemyTimeout);
     log(' ');
 
     log('  Loading Proton from: ', ddProton.address);
@@ -95,19 +105,22 @@ module.exports = async (hre) => {
     const Lepton = await ethers.getContractFactory('Lepton');
     const lepton = await Lepton.attach(ddLepton.address);
 
+    log('  Loading ExternalNFT from: ', ddExternalNFT.address);
+    const ExternalNFT = await ethers.getContractFactory('ExternalNFT');
+    const externalNFT = await ExternalNFT.attach(ddExternalNFT.address);
 
-    log('  Batch Minting Protons...');
-    await proton.batchProtonsForSale(
-      initialMinter,
-      toBN('500'),
-      toBN('1000'),
-      SingularityCollection,
-      SingularityPrices,
-    );
 
+    // log('  Batch Minting Protons...');
+    // await proton.batchProtonsForSale(
+    //   initialMinter,
+    //   toBN('500'),
+    //   toBN('1000'),
+    //   SingularityCollection,
+    //   SingularityPrices,
+    // );
 
     //   NOTE: Running all of these causes the Leptons to be SOLD OUT and the corresponding Unit-Tests will fail when trying to mint new ones
-    log('  Batch Minting Leptons...');
+    // log('  Batch Minting Leptons...');
     // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 25 Electron Neutrinos
     // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 15 Electron Neutrinos  (40 Total)
     // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 20 Muon Neutrinos
@@ -116,6 +129,14 @@ module.exports = async (hre) => {
     // await lepton.batchMintLepton(leptonMaxMint, {value: toWei('1')}); // 5 Muons
     // await lepton.mintLepton({value: toWei('1')}); // 1 Tau
     // await lepton.mintLepton({value: toWei('1')}); // 1 Tau
+
+    let tx;
+    log('  Minting External NFTs...');
+    for (let i = 0; i < _externalNftsForTesting.length; i++) {
+      log(`    - Minting "${_externalNftsForTesting[i].tokenUri}" for "${_externalNftsForTesting[i].receiver}"`);
+      tx = await externalNFT.mintNft(_externalNftsForTesting[i].receiver, _externalNftsForTesting[i].tokenUri);
+      await tx.wait();
+    }
 
 
     log('\n  Token Minting Complete!');
