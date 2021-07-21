@@ -14,6 +14,7 @@ function isReserveActive(address assetToken) external returns bool;
 | assetToken | address of reserve token|
 
 ### getReserveInterestToken
+
 Get reserve token for a asset token. (e.g. get address of aUSDC)
 
 ```
@@ -56,6 +57,7 @@ function getInterest(
 | creatorInterest | Charge (interest) payable to Creator |
 | ownerInterest | Charge (interest) payable to Owner |
 ### getTotal
+
 Get total amount of an asset held within the wallet.
 
 ```
@@ -67,6 +69,7 @@ function getTotal(address assetToken) external returns (uint256);
 | assetToken | address of reserve token|
 
 ### getRewards
+
 Get total amount of an rewards held by a wallet.
 
 ```
