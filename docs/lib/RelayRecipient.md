@@ -1,0 +1,14 @@
+## `RelayRecipient`
+
+
+
+
+
+
+### `versionRecipient() → string` (external)
+
+
+
+
+
+

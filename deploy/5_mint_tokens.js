@@ -67,9 +67,12 @@ const SingularityPrices = [
 
 
 const _externalNftsForTesting = [
-  {receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76', tokenUri: 'https://ipfs.io/ipfs/QmWc1upvg4C4wSiSu1ry72Lw2smGsEptq73vV5hNk84MR9'},
-  {receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76', tokenUri: 'https://ipfs.io/ipfs/QmScSSJ8HdKr13qkPHHgM7UMbbsLMRjLt2TRY8nQ97qCrL'},
-  {receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76', tokenUri: 'https://ipfs.io/ipfs/QmPUoAULoodhy2uipiCZbT4YcMwCJX7jEK9wM8V2A7JXxu'},
+  { receiver: '0x9bB8b93E9E3eeb92B9C85A8058C27B962b82bAc3', tokenUri: 'https://ipfs.io/ipfs/QmWc1upvg4C4wSiSu1ry72Lw2smGsEptq73vV5hNk84MR9'},
+  { receiver: '0x9bB8b93E9E3eeb92B9C85A8058C27B962b82bAc3', tokenUri: 'https://ipfs.io/ipfs/QmScSSJ8HdKr13qkPHHgM7UMbbsLMRjLt2TRY8nQ97qCrL'},
+  { receiver: '0x9bB8b93E9E3eeb92B9C85A8058C27B962b82bAc3', tokenUri: 'https://ipfs.io/ipfs/QmPUoAULoodhy2uipiCZbT4YcMwCJX7jEK9wM8V2A7JXxu'},
+  { receiver: '0x9bB8b93E9E3eeb92B9C85A8058C27B962b82bAc3', tokenUri: 'https://ipfs.io/ipfs/QmPUoAULoodhy2uipiCZbT4YcMwCJX7jEK9wM8V2A7JXxu'},
+  { receiver: '0x9bB8b93E9E3eeb92B9C85A8058C27B962b82bAc3', tokenUri: 'https://ipfs.io/ipfs/QmPUoAULoodhy2uipiCZbT4YcMwCJX7jEK9wM8V2A7JXxu'},
+  { receiver: '0x9bB8b93E9E3eeb92B9C85A8058C27B962b82bAc3', tokenUri: 'https://ipfs.io/ipfs/QmPUoAULoodhy2uipiCZbT4YcMwCJX7jEK9wM8V2A7JXxu'},
 ];
 
 
