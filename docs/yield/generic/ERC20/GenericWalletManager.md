@@ -1,102 +1,340 @@
 ## `GenericWalletManager`
 
-Generic ERC20 Wallet Manager
+Generic ERC20 Wallet Manager. Non-upgradeable Contract.
 
+### isReserveActive
 
-Non-upgradeable Contract
+Checks if reserve is active for a given token and NFT.
 
+```
+function isReserveActive(
+  address contractAddress, 
+  uint256 tokenId, 
+  address assetToken
+) external returns (bool);
+```
 
-### `isReserveActive(address contractAddress, uint256 tokenId, address assetToken) → bool` (external)
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| assetToken | address of token to check |
 
+### getReserveInterestToken
 
+Gets interest token for a reserve asset.
 
+```
+function getReserveInterestToken(
+  address contractAddress, 
+  uint256 tokenId, 
+  address assetToken
+) external view returns (address);
+```
 
-
-### `getReserveInterestToken(address contractAddress, uint256 tokenId, address assetToken) → address` (external)
-
-
-
-
-
-### `getTotal(address contractAddress, uint256 tokenId, address assetToken) → uint256` (external)
-
-Gets the Available Balance of Assets held in the Token
-
-
-
-
-### `getPrincipal(address contractAddress, uint256 tokenId, address assetToken) → uint256` (external)
-
-Gets the Principal-Amount of Assets held in the Smart-Wallet
-
-
-
-
-### `getInterest(address contractAddress, uint256 tokenId, address assetToken) → uint256 creatorInterest, uint256 ownerInterest` (external)
-
-Gets the Interest-Amount that the Token has generated
-
-
-
-
-### `getRewards(address contractAddress, uint256 tokenId, address rewardToken) → uint256` (external)
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| assetToken | address of token to check |
 
 
 
+### getTotal
+
+Gets the Available Balance of Assets held in the Token.
+
+```  
+function getTotal(
+  address contractAddress, 
+  uint256 tokenId, 
+  address assetToken
+) external returns (uint256);
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| assetToken | address of token to check |
 
 
-### `energize(address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount) → uint256 yieldTokensAmount` (external)
+### getPrincipal
+
+Gets the Principal-Amount of Assets held in the Smart Wallet.
+
+```
+function getPrincipal(
+  address contractAddress, 
+  uint256 tokenId, 
+  address assetToken
+) external returns (uint256);
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| assetToken | address of token to check |
 
 
 
 
+### getInterest
 
-### `discharge(address, address, uint256, address, address) → uint256 creatorAmount, uint256 receiverAmount` (external)
+Gets the Interest-Amount that the Token has generated.
+
+**getInterest**
+```
+function getInterest(
+  address contractAddress, 
+  uint256 tokenId, 
+  address assetToken
+) external 
+  returns (
+    uint256 creatorInterest, 
+    uint256 ownerInterest
+  );
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| assetToken | address of token to check |
+| creatorInterest | interest amount generated for Creator |
+| ownerInterest | interest amount generated for Owner |
 
 
+### getRewards
 
+Gets the Available Balance of Reward Assets held in the Token. Rewards tokens are generally the result of liquidity mining programs like COMP's. 
 
+```
+function getRewards(
+  address contractAddress, 
+  uint256 tokenId, 
+  address rewardToken
+) external returns (uint256);
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| rewardToken | address of token to check |
+
+## Particle Interactions
+
+### energize
+
+Add an asset to the Smart Wallet.
+
+```
+function energize(
+  address contractAddress, 
+  uint256 tokenId, 
+  address assetToken, 
+  uint256 assetAmount
+) external returns (uint256 yieldTokensAmount);
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| assetToken | address of token to deposit |
+| assetAmount | amount of token to deposit |
+| yieldTokensAmount | amount of yield tokens user receives in exchange for deposit |
+
+### discharge
+
+Remove all of the accrued interest for a given asset in a given NFT.
+
+```  
+function discharge(
+  address // receiver, 
+  address // contractAddress, 
+  uint256 // tokenId, 
+  address // assetToken, 
+  address // creatorRedirect
+) external 
+  returns (
+    uint256 creatorAmount,
+    uint256 receiverAmount
+  );
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| receiver | NFT owner's address |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| assetToken | address of token to withdraw |
+| creatorRedirect | address to redirect creator annuities |
+| creatorAmount | amount of tokens creator receives |
+| receiverAmount | amount of tokens owner receives |
 
 ### `dischargeAmount(address, address, uint256, address, uint256, address) → uint256 creatorAmount, uint256 receiverAmount` (external)
 
 
+### dischargeAmount
+
+Remove a specific amount of the accrued interest for a given asset in a given NFT.
+
+```  
+function dischargeAmount(
+  address // receiver, 
+  address // contractAddress, 
+  uint256 // tokenId, 
+  address // assetToken, 
+  uint256 // assetAmount, 
+  address // creatorRedirect
+) external 
+  returns (
+    uint256 creatorAmount,
+    uint256 receiverAmount
+  );
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| receiver | NFT owner's address |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| assetToken | address of token to withdraw |
+| assetAmount | amount of token to withdraw |
+| creatorRedirect | address to redirect creator annuities |
+| creatorAmount | amount of tokens creator receives |
+| receiverAmount | amount of tokens owner receives |
+
+
+### dischargeAmountForCreator
+
+Remove a specific amount of the accrued interest for a given asset in a given NFT for the Creator only.
+
+```  
+function dischargeAmountForCreator(
+  address // receiver, 
+  address // contractAddress, 
+  uint256 // tokenId, 
+  address // assetToken, 
+  uint256 // assetAmount, 
+  address // creator
+) external 
+  returns (
+    uint256 receiverAmount
+  );
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| receiver | NFT owner's address |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| assetToken | address of token to withdraw |
+| assetAmount | amount of token to withdraw |
+| creator | address to redirect creator annuities |
+| receiverAmount | amount of tokens owner receives |
 
 
 
-### `dischargeAmountForCreator(address, address, uint256, address, address, uint256) → uint256 receiverAmount` (external)
 
 
+### release
+
+Withdraw all of the principal for an asset in a given NFT.
+
+```  
+function release(
+  address receiver, 
+  address contractAddress, 
+  uint256 tokenId,
+  address assetToken, 
+  address creatorRedirect
+) external 
+  returns (
+    uint256 principalAmount, 
+    uint256 creatorAmount, 
+    uint256 receiverAmount
+  );
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| receiver | NFT owner's address |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| assetToken | address of token to withdraw |
+| creatorRedirect | address to redirect creator annuities |
+| principalAmount | total amount of principal |
+| creatorAmount | amount of tokens creator receives |
+| receiverAmount | amount of tokens owner receives |
 
 
+### releaseAmount
 
-### `release(address receiver, address contractAddress, uint256 tokenId, address assetToken, address creatorRedirect) → uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount` (external)
+Withdraw a specific amount of the principal for an asset in a given NFT.
+
+```  
+function release(
+  address receiver, 
+  address contractAddress, 
+  uint256 tokenId,
+  address assetToken, 
+  uint256 assetAmount,
+  address creatorRedirect
+) external 
+  returns (
+    uint256 principalAmount, 
+    uint256 creatorAmount, 
+    uint256 receiverAmount
+  );
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| receiver | NFT owner's address |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| assetToken | address of token to withdraw |
+| assetAmount | amount of token to withdraw |
+| creatorRedirect | address to redirect creator annuities |
+| principalAmount | total amount of principal |
+| creatorAmount | amount of tokens creator receives |
+| receiverAmount | amount of tokens owner receives |
 
 
+### withdrawRewards
 
+Withdraw Rewards tokens earned by NFT's Smart Wallet.
 
+```
+function withdrawRewards(
+  address receiver, 
+  address contractAddress, 
+  uint256 tokenId, 
+  address rewardsToken, 
+  uint256 rewardsAmount
+) external returns (uint256 amount);
+```
 
-### `releaseAmount(address receiver, address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount, address creatorRedirect) → uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount` (external)
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| receiver | NFT owner's address |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| rewardsToken | address of reward token to withdraw |
+| rewardsAmount | amount of reward token to withdraw |
 
+### executeForAccount
 
+Call a contract method from the Smart Wallet.
 
-
-
-### `withdrawRewards(address receiver, address contractAddress, uint256 tokenId, address rewardsToken, uint256 rewardsAmount) → uint256 amount` (external)
-
-
-
-
-
-### `executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes encodedParams) → bytes` (external)
-
-
-
-
-
-### `getWalletAddressById(address contractAddress, uint256 tokenId, address creator, uint256 annuityPct) → address` (external)
-
-
-
-
-
-### `_createWallet() → address` (internal)
+```
+function executeForAccount(
+  address contractAddress, 
+  uint256 ethValue, 
+  bytes memory encodedParams
+) external returns (bytes memory);
+```

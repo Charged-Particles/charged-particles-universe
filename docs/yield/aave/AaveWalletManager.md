@@ -181,7 +181,7 @@ function dischargeAmount(
   address contractAddress, 
   uint256 tokenId, 
   address assetToken, 
-  address assetAmount, 
+  uint256 assetAmount, 
   address creatorRedirect
 ) external 
   returns (
@@ -212,7 +212,7 @@ function dischargeAmountForCreator(
   address contractAddress, 
   uint256 tokenId, 
   address assetToken, 
-  address assetAmount, 
+  uint256 assetAmount, 
   address creator
 ) external 
   returns (
@@ -271,6 +271,7 @@ function release(
   address contractAddress, 
   uint256 tokenId,
   address assetToken, 
+  uint256 assetAmount,
   address creatorRedirect
 ) external 
   returns (
@@ -286,6 +287,7 @@ function release(
 | contractAddress | NFT contract address |
 | tokenId | tokenId of NFT |
 | assetToken | address of token to withdraw |
+| assetAmount | amount of token to withdraw |
 | creatorRedirect | address to redirect creator annuities |
 | principalAmount | total amount of principal |
 | creatorAmount | amount of tokens creator receives |
