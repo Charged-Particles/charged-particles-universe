@@ -175,9 +175,6 @@ function discharge(
 | creatorAmount | amount of tokens creator receives |
 | receiverAmount | amount of tokens owner receives |
 
-### `dischargeAmount(address, address, uint256, address, uint256, address) → uint256 creatorAmount, uint256 receiverAmount` (external)
-
-
 ### dischargeAmount
 
 Remove a specific amount of the accrued interest for a given asset in a given NFT.
@@ -338,3 +335,23 @@ function executeForAccount(
   bytes memory encodedParams
 ) external returns (bytes memory);
 ```
+
+### getWalletAddressById
+
+Get address of Smart Wallet for a given NFT id.
+
+```
+function getWalletAddressById(
+  address contractAddress, 
+  uint256 tokenId, 
+  address creator, 
+  uint256 annuityPct
+);
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| creator | creator of NFT's address |
+| annuityPct | creator annuity as a percentage |

@@ -82,8 +82,7 @@ function removeFromBasket(
 | basketTokenId | tokenId of Charged Particle (for basket) |
 
 
-### `executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes encodedParams) → bytes` (public)
-
+### executeForAccount
 
 Execute a contract method from the Smart Basket.
 
