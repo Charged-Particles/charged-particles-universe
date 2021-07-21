@@ -100,9 +100,3 @@ Gets the Interest-Amount that the Token has generated
 
 
 ### `_createWallet() → address` (internal)
-
-
-
-
-
-

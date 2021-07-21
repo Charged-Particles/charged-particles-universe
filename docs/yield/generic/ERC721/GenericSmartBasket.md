@@ -1,69 +1,66 @@
 ## `GenericSmartBasket`
 
-Generic ERC721-Token Smart-Basket
+Generic ERC721-Token Smart-Basket. Non-upgradeable Contract.
+### getTokenCountByType
 
+Gets token count for a given NFT contract and
 
-Non-upgradeable Contract
+```
+function getTokenCountByType(
+  address contractAddress, 
+  uint256 tokenId
+) external view returns (uint256);
+```
 
-### `onlyBasketManager()`
-
-
-
-Throws if called by any account other than the basket manager
-
-
-### `initialize()` (public)
-
-
-
-
-
-### `getTokenCountByType(address contractAddress, uint256 tokenId) → uint256` (external)
-
-
-
-
-
-### `onERC721Received(address, address, uint256, bytes) → bytes4` (external)
-
-
-
-
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
 
 ### `addToBasket(address contractAddress, uint256 tokenId) → bool` (external)
 
+Add NFT to Smart Basket of NFTs.
 
+```
+function addToBasket(
+  address contractAddress, 
+  uint256 tokenId
+) external returns (bool);
+```
 
-
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
 
 ### `removeFromBasket(address receiver, address contractAddress, uint256 tokenId) → bool` (external)
 
+Remove an NFT from Smart Basket of NFTs.
+
+```
+function removeFromBasket(
+  address receiver, 
+  address contractAddress, 
+  uint256 tokenId
+) external returns (bool);
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| receiver | address of remover or other recipient |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
 
 
 
+### executeForAccount
 
-### `executeForAccount(address contractAddress, uint256 ethValue, bytes encodedParams) → bytes` (external)
+Call a contract method from the Smart Basket.
 
-
-
-
-
-### `withdrawEther(address payable receiver, uint256 amount)` (external)
-
-
-
-
-
-### `withdrawERC20(address payable receiver, address tokenAddress, uint256 amount)` (external)
-
-
-
-
-
-### `withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId)` (external)
-
-
-
-
-
-
+```
+function executeForAccount(
+  address contractAddress, 
+  uint256 ethValue, 
+  bytes memory encodedParams
+) external returns (bytes memory);
+```

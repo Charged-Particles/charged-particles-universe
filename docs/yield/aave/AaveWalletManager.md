@@ -312,3 +312,15 @@ function withdrawRewards(
 | tokenId | tokenId of NFT |
 | rewardsToken | address of reward token to withdraw |
 | rewardsAmount | amount of reward token to withdraw |
+
+### executeForAccount
+
+Call a contract method from the Smart Wallet.
+
+```
+function executeForAccount(
+  address contractAddress, 
+  uint256 ethValue, 
+  bytes memory encodedParams
+) external returns (bytes memory);
+```
