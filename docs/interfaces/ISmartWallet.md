@@ -1,6 +1,6 @@
 # `ISmartWallet`
 
-Manages holding and transferring assets of an NFT to a specific LP for Yield (if any),
+Manages holding and transferring assets of an NFT to a specific Liquidity Provider (e.g. Aave) for Yield. Smart Wallets are created by the Wallet Manager when an NFT first has an asset deposited into it.
 
 ## Methods
 
