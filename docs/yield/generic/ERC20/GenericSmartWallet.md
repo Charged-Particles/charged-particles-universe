@@ -1,4 +1,4 @@
-## `GenericSmartWallet`
+## GenericSmartWallet
 
 Generic ERC20-Token Smart-Wallet Bridge. Non-upgradeable Contract.
 ### isReserveActive

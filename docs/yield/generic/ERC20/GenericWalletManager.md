@@ -1,4 +1,4 @@
-## `GenericWalletManager`
+## GenericWalletManager
 
 Generic ERC20 Wallet Manager. Non-upgradeable Contract.
 

@@ -1,4 +1,4 @@
-## `GenericBasketManager`
+# GenericBasketManager
 
 Generic ERC721 Basket Manager. Non-upgradeable Contract.
 
