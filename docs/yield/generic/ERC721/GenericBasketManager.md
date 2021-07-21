@@ -1,112 +1,113 @@
 ## `GenericBasketManager`
 
-Generic ERC721 Basket Manager
+Generic ERC721 Basket Manager. Non-upgradeable Contract.
 
 
-Non-upgradeable Contract
+### getTokenTotalCount
 
-### `onlyController()`
+Get count of total tokens in NFT Basket.
+
+```
+function getTokenTotalCount(
+  address contractAddress, 
+  uint256 tokenId
+) external view returns (uint256);
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+
+### getTokenCountByType
+
+Get count of tokens (by contract address) for an NFT's Smart Basket.
+
+```
+function getTokenCountByType(
+  address contractAddress, 
+  uint256 tokenId, 
+  address basketTokenAddress, 
+  uint256 basketTokenId
+) external returns (uint256);
+```
+
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
+| basketTokenAddress | contract address of Charged Particle (basket owner) | 
+| basketTokenId | tokenId of Charged Particle (for basket) |
+
+### addToBasket
+
+Add an NFT to a Smart Basket.
+
+```
+function addToBasket(
+  address contractAddress, 
+  uint256 tokenId, 
+  address basketTokenAddress, 
+  uint256 basketTokenId
+) external returns (bool);
+```
 
 
-
-Throws if called by any account other than the Controller contract
-
-### `whenNotPaused()`
-
-
-
-
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT to remove from basket |
+| basketTokenAddress | contract address of Charged Particle (basket owner) | 
+| basketTokenId | tokenId of Charged Particle (for basket) |
 
 
-### `isPaused() → bool` (external)
+### removeFromBasket
 
+```
+function removeFromBasket(
+  address receiver, 
+  address contractAddress, 
+  uint256 tokenId, 
+  address basketTokenAddress, 
+  uint256 basketTokenId
+) external returns (bool);
+```
 
-
-
-
-### `getTokenTotalCount(address contractAddress, uint256 tokenId) → uint256` (external)
-
-
-
-
-
-### `getTokenCountByType(address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 basketTokenId) → uint256` (external)
-
-
-
-
-
-### `addToBasket(address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 basketTokenId) → bool added` (public)
-
-
-
-
-
-### `removeFromBasket(address receiver, address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 basketTokenId) → bool removed` (public)
-
-
-
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| receiver | address of remover or other recipient |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT to remove from basket |
+| basketTokenAddress | contract address of Charged Particle (basket owner) | 
+| basketTokenId | tokenId of Charged Particle (for basket) |
 
 
 ### `executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes encodedParams) → bytes` (public)
 
 
+Execute a contract method from the Smart Basket.
 
+```
+function executeForAccount(
+  address contractAddress, uint256 tokenId, 
+  address externalAddress, 
+  uint256 ethValue, 
+  bytes memory encodedParams
+) external returns (bytes memory);
+```  
 
+### getBasketAddressById
 
-### `getBasketAddressById(address contractAddress, uint256 tokenId) → address` (public)
+Get address of Smart Basket for a given NFT id.
 
+```
+function getBasketAddressById(
+  address contractAddress, 
+  uint256 tokenId
+) external returns (address);
+```
 
-
-
-
-### `setPausedState(bool paused)` (external)
-
-
-
-Sets the Paused-state of the Basket Manager
-
-### `setController(address controller)` (external)
-
-
-
-Connects to the Charged Particles Controller
-
-### `withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount)` (external)
-
-
-
-
-
-### `withdrawERC20(address contractAddress, uint256 tokenId, address payable receiver, address tokenAddress, uint256 amount)` (external)
-
-
-
-
-
-### `withdrawERC721(address contractAddress, uint256 tokenId, address payable receiver, address nftTokenAddress, uint256 nftTokenId)` (external)
-
-
-
-
-
-### `_getTokenUUID(address contractAddress, uint256 tokenId) → uint256` (internal)
-
-
-
-
-
-### `_createBasket() → address` (internal)
-
-
-
-
-
-### `_createClone(address target) → address result` (internal)
-
-
-
-Creates Contracts from a Template via Cloning
-see: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1167.md
-
-
+| Parameter / Return Value | Description |
+|--------------------------| ------------ |
+| contractAddress | NFT contract address |
+| tokenId | tokenId of NFT |
