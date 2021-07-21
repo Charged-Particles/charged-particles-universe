@@ -88,13 +88,13 @@ event WalletRewarded(
 **isPaused**
 
 ```
-function isPaused() → bool (external)
+function isPaused() external returns (bool);
 ```
 
 **isReserveActive**
 
 ```
-isReserveActive(address contractAddress, uint256 tokenId, address assetToken) external returns (bool);
+function isReserveActive(address contractAddress, uint256 tokenId, address assetToken) external returns (bool);
 ```
 
 **getReserveInterestToken**

@@ -1,4 +1,4 @@
-## `AaveSmartWallet`
+# AaveSmartWallet
 
 ERC20-Token Smart-Wallet for Aave Assets. Non-upgradeable Contract.
 
