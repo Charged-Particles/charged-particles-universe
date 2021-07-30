@@ -109,7 +109,7 @@ module.exports = {
         mainnet: {
             // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
             url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 32e9,
+            gasPrice: 40e9,
             blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.mainnet,
@@ -152,6 +152,7 @@ module.exports = {
         'CommunityVault',
         'MerkleDistributor',
         'MerkleDistributor2',
+        'MerkleDistributor3',
         'VestingClaim',
         'ExternalNFT',
       ],

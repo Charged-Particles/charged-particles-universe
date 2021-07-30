@@ -9,6 +9,8 @@ const {
 
 const {
   log,
+  bn,
+  tokensBN,
   chainTypeById,
   chainNameById,
   chainIdByName,
@@ -37,7 +39,8 @@ module.exports = async (hre) => {
 
   // const MerkleDistributor = await ethers.getContractFactory('MerkleDistributor');
   // const MerkleDistributor2 = await ethers.getContractFactory('MerkleDistributor2');
-  const VestingClaim = await ethers.getContractFactory('VestingClaim');
+  const MerkleDistributor3 = await ethers.getContractFactory('MerkleDistributor3');
+  // const VestingClaim = await ethers.getContractFactory('VestingClaim');
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles Airdrop - Contract Initialization');
@@ -74,15 +77,25 @@ module.exports = async (hre) => {
   //   deployTransaction: merkleDistributor2.deployTransaction,
   // };
 
-  await log(`\n  Deploying VestingClaim with Expiry: ${new Date(vesting.expiryDate * 1000).toLocaleDateString("en-US")}...`)(alchemyTimeout);
-  const VestingClaimInstance = await VestingClaim.deploy(ddIonx.address, vesting.merkleRoot, vesting.expiryDate);
-  const vestingClaim = await VestingClaimInstance.deployed();
-  deployData['VestingClaim'] = {
-    abi: getContractAbi('VestingClaim'),
-    address: vestingClaim.address,
-    constructorArgs: [ddIonx.address, vesting.merkleRoot, vesting.expiryDate],
-    deployTransaction: vestingClaim.deployTransaction,
+  await log(`\n  Deploying MerkleDistributor3 with Expiry: ${new Date(incentives.airdrop.expiryDate * 1000).toLocaleDateString("en-US")}...`)(alchemyTimeout);
+  const MerkleDistributor3Instance = await MerkleDistributor3.deploy(ddIonx.address, incentives.airdrop.merkleRoot, incentives.airdrop.expiryDate);
+  const merkleDistributor3 = await MerkleDistributor3Instance.deployed();
+  deployData['MerkleDistributor3'] = {
+    abi: getContractAbi('MerkleDistributor3'),
+    address: merkleDistributor3.address,
+    constructorArgs: [ddIonx.address, incentives.airdrop.merkleRoot, incentives.airdrop.expiryDate],
+    deployTransaction: merkleDistributor3.deployTransaction,
   };
+
+  // await log(`\n  Deploying VestingClaim with Expiry: ${new Date(vesting.expiryDate * 1000).toLocaleDateString("en-US")}...`)(alchemyTimeout);
+  // const VestingClaimInstance = await VestingClaim.deploy(ddIonx.address, vesting.merkleRoot, vesting.expiryDate);
+  // const vestingClaim = await VestingClaimInstance.deployed();
+  // deployData['VestingClaim'] = {
+  //   abi: getContractAbi('VestingClaim'),
+  //   address: vestingClaim.address,
+  //   constructorArgs: [ddIonx.address, vesting.merkleRoot, vesting.expiryDate],
+  //   deployTransaction: vestingClaim.deployTransaction,
+  // };
 
   // Next transfer appropriate funds (Testnet only; Mainnet requires IONX DAO)
   if (chainId != 1) {
@@ -102,13 +115,21 @@ module.exports = async (hre) => {
     //   protocolOwner,
     // );
 
-    log('\n   Distributing Vested funds to VestingClaim...');
+    log('\n   Distributing Airdrop funds to MerkleDistributor3...');
     await distributeInitialFunds(
       ionx.connect(daoSigner),
-      vestingClaim,
-      vesting.totalIonx,
+      merkleDistributor3,
+      incentives.airdrop.totalIonx,
       protocolOwner,
     );
+
+    // log('\n   Distributing Vested funds to VestingClaim...');
+    // await distributeInitialFunds(
+    //   ionx.connect(daoSigner),
+    //   vestingClaim,
+    //   vesting.totalIonx,
+    //   protocolOwner,
+    // );
   }
 
   // Display Contract Addresses
@@ -117,8 +138,10 @@ module.exports = async (hre) => {
   // log('     - Gas Cost:       ', getTxGasCost({ deployTransaction: merkleDistributor.deployTransaction }));
   // log('  - MerkleDistributor2: ', merkleDistributor2.address);
   // log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: merkleDistributor2.deployTransaction }));
-  log('  - VestingClaim: ', vestingClaim.address);
-  log('     - Gas Cost:  ', getTxGasCost({ deployTransaction: vestingClaim.deployTransaction }));
+  log('  - MerkleDistributor3: ', merkleDistributor3.address);
+  log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: merkleDistributor3.deployTransaction }));
+  // log('  - VestingClaim: ', vestingClaim.address);
+  // log('     - Gas Cost:  ', getTxGasCost({ deployTransaction: vestingClaim.deployTransaction }));
 
   saveDeploymentData(chainId, deployData);
   log('\n  Contract Deployment Data saved to "deployments" directory.');

@@ -78,7 +78,7 @@ async function run() {
   // await verifyContract('Proton', networkName);
   // await verifyContract('Lepton', networkName);
   // await verifyContract('Lepton2', networkName);
-  await verifyContract('ExternalNFT', networkName);
+  // await verifyContract('ExternalNFT', networkName);
 
   // Incentives
   // await verifyContract('CommunityVault', networkName);
@@ -87,6 +87,7 @@ async function run() {
   // await verifyContract('LPYieldFarm', networkName);
   // await verifyContract('MerkleDistributor', networkName);
   // await verifyContract('MerkleDistributor2', networkName);
+  await verifyContract('MerkleDistributor3', networkName);
   // await verifyContract('VestingClaim', networkName);
 
   success('Done!');

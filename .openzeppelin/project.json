@@ -20,6 +20,7 @@
     "CommunityVault": "CommunityVault",
     "MerkleDistributor": "MerkleDistributor",
     "MerkleDistributor2": "MerkleDistributor2",
+    "MerkleDistributor3": "MerkleDistributor3",
     "VestingClaim": "VestingClaim",
     "ExternalNFT": "ExternalNFT"
   },

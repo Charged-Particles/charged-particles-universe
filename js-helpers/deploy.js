@@ -162,8 +162,13 @@ const presets = {
       //   merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
       //   totalIonx: tokensBN(bn(1_000_000)),
       // },
-      airdrop: {  //  AIRDROP # 2
-        merkleRoot: '0x31340c29d25b57749abae264a051c31a96d6b79a24776ffc91a8d46d4a9258a5',
+      // airdrop: {  //  AIRDROP # 2
+      //   merkleRoot: '0x31340c29d25b57749abae264a051c31a96d6b79a24776ffc91a8d46d4a9258a5',
+      //   totalIonx: tokensBN(bn(1_000_000)),
+      //   expiryDate: LIVE_EXPIRY,
+      // },
+      airdrop: {  //  AIRDROP # 3
+        merkleRoot: '0x57a3449b2574a7fe391a62fbb1d15456b7c39422bbeee27d64cef4502cdf613a',
         totalIonx: tokensBN(bn(1_000_000)),
         expiryDate: LIVE_EXPIRY,
       },
@@ -187,7 +192,7 @@ const presets = {
     },
     42: { // Kovan Testnet
       airdrop: {
-        merkleRoot: '0x31340c29d25b57749abae264a051c31a96d6b79a24776ffc91a8d46d4a9258a5',
+        merkleRoot: '0x57a3449b2574a7fe391a62fbb1d15456b7c39422bbeee27d64cef4502cdf613a',
         totalIonx: tokensBN(bn(1_000_000)),
         expiryDate: TEST_EXPIRY,
       },
