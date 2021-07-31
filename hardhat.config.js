@@ -147,6 +147,7 @@ module.exports = {
         'Lepton2',
         'ERC20',
         'ERC721',
+        'ExternalNFT',
         'YieldFarm',
         'Staking',
         'CommunityVault',
@@ -154,7 +155,7 @@ module.exports = {
         'MerkleDistributor2',
         'MerkleDistributor3',
         'VestingClaim',
-        'ExternalNFT',
+        'VestingClaim2',
       ],
     },
     namedAccounts: {

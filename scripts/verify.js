@@ -87,8 +87,8 @@ async function run() {
   // await verifyContract('LPYieldFarm', networkName);
   // await verifyContract('MerkleDistributor', networkName);
   // await verifyContract('MerkleDistributor2', networkName);
-  await verifyContract('MerkleDistributor3', networkName);
-  // await verifyContract('VestingClaim', networkName);
+  // await verifyContract('MerkleDistributor3', networkName);
+  await verifyContract('VestingClaim2', networkName);
 
   success('Done!');
 };

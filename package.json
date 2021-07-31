@@ -31,6 +31,7 @@
     "deploy-only": "hardhat deploy --tags",
     "deploy-airdrop": "hardhat deploy --tags airdrop --network",
     "deploy-incentives": "hardhat deploy --tags incentives --network",
+    "deploy-vesting": "hardhat deploy --tags vesting --network",
     "gen-docs": "solidity-docgen -i contracts -o docs"
   },
   "devDependencies": {

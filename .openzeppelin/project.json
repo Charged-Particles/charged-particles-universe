@@ -15,6 +15,7 @@
     "Proton": "Proton",
     "Lepton": "Lepton",
     "Lepton2": "Lepton2",
+    "ExternalNFT": "ExternalNFT",
     "Staking": "Staking",
     "YieldFarm": "YieldFarm",
     "CommunityVault": "CommunityVault",
@@ -22,7 +23,7 @@
     "MerkleDistributor2": "MerkleDistributor2",
     "MerkleDistributor3": "MerkleDistributor3",
     "VestingClaim": "VestingClaim",
-    "ExternalNFT": "ExternalNFT"
+    "VestingClaim2": "VestingClaim2"
   },
   "dependencies": {
   },
