@@ -34,58 +34,58 @@ module.exports = async (hre) => {
   log('  - Trusted Forwarder: ', trustedForwarder);
   log(' ');
 
-  // await log('\n  Deploying WBoson...')(alchemyTimeout);
-  // const WBoson = await ethers.getContractFactory('WBoson');
-  // const WBosonInstance = await WBoson.deploy();
-  // const wBoson = await WBosonInstance.deployed();
-  // deployData['WBoson'] = {
-  //   abi: getContractAbi('WBoson'),
-  //   address: wBoson.address,
-  //   deployTransaction: wBoson.deployTransaction,
-  // }
+  await log('\n  Deploying WBoson...')(alchemyTimeout);
+  const WBoson = await ethers.getContractFactory('WBoson');
+  const WBosonInstance = await WBoson.deploy();
+  const wBoson = await WBosonInstance.deployed();
+  deployData['WBoson'] = {
+    abi: getContractAbi('WBoson'),
+    address: wBoson.address,
+    deployTransaction: wBoson.deployTransaction,
+  }
 
-  // await log('\n  Deploying Proton NFT...')(alchemyTimeout);
-  // const Proton = await ethers.getContractFactory('Proton');
-  // const ProtonInstance = await Proton.deploy();
-  // const proton = await ProtonInstance.deployed();
-  // deployData['Proton'] = {
-  //   abi: getContractAbi('Proton'),
-  //   address: proton.address,
-  //   deployTransaction: proton.deployTransaction,
-  // }
+  await log('\n  Deploying Proton NFT...')(alchemyTimeout);
+  const Proton = await ethers.getContractFactory('Proton');
+  const ProtonInstance = await Proton.deploy();
+  const proton = await ProtonInstance.deployed();
+  deployData['Proton'] = {
+    abi: getContractAbi('Proton'),
+    address: proton.address,
+    deployTransaction: proton.deployTransaction,
+  }
 
-  // let LeptonInstance, Lepton, lepton;
-  // if (isHardhat) {
-  //   await log('\n  Deploying Lepton NFT...')(alchemyTimeout);
-  //   Lepton = await ethers.getContractFactory('Lepton');
-  //   LeptonInstance = await Lepton.deploy();
-  //   lepton = await LeptonInstance.deployed();
-  //   deployData['Lepton'] = {
-  //     abi: getContractAbi('Lepton'),
-  //     address: lepton.address,
-  //     deployTransaction: lepton.deployTransaction,
-  //   }
-  // }
+  let LeptonInstance, Lepton, lepton;
+  if (isHardhat) {
+    await log('\n  Deploying Lepton NFT...')(alchemyTimeout);
+    Lepton = await ethers.getContractFactory('Lepton');
+    LeptonInstance = await Lepton.deploy();
+    lepton = await LeptonInstance.deployed();
+    deployData['Lepton'] = {
+      abi: getContractAbi('Lepton'),
+      address: lepton.address,
+      deployTransaction: lepton.deployTransaction,
+    }
+  }
 
-  // await log('\n  Deploying Lepton2 NFT...')(alchemyTimeout);
-  // const Lepton2 = await ethers.getContractFactory('Lepton2');
-  // const Lepton2Instance = await Lepton2.deploy();
-  // const lepton2 = await Lepton2Instance.deployed();
-  // deployData['Lepton2'] = {
-  //   abi: getContractAbi('Lepton2'),
-  //   address: lepton2.address,
-  //   deployTransaction: lepton2.deployTransaction,
-  // }
+  await log('\n  Deploying Lepton2 NFT...')(alchemyTimeout);
+  const Lepton2 = await ethers.getContractFactory('Lepton2');
+  const Lepton2Instance = await Lepton2.deploy();
+  const lepton2 = await Lepton2Instance.deployed();
+  deployData['Lepton2'] = {
+    abi: getContractAbi('Lepton2'),
+    address: lepton2.address,
+    deployTransaction: lepton2.deployTransaction,
+  }
 
-  // await log('\n  Deploying Ionx FT...')(alchemyTimeout);
-  // const Ionx = await ethers.getContractFactory('Ionx');
-  // const IonxInstance = await Ionx.deploy();
-  // const ionx = await IonxInstance.deployed();
-  // deployData['Ionx'] = {
-  //   abi: getContractAbi('Ionx'),
-  //   address: ionx.address,
-  //   deployTransaction: ionx.deployTransaction,
-  // }
+  await log('\n  Deploying Ionx FT...')(alchemyTimeout);
+  const Ionx = await ethers.getContractFactory('Ionx');
+  const IonxInstance = await Ionx.deploy();
+  const ionx = await IonxInstance.deployed();
+  deployData['Ionx'] = {
+    abi: getContractAbi('Ionx'),
+    address: ionx.address,
+    deployTransaction: ionx.deployTransaction,
+  }
 
   await log('\n  Deploying ExternalNFT NFT...')(alchemyTimeout);
   const ExternalNFT = await ethers.getContractFactory('ExternalNFT');
@@ -99,18 +99,18 @@ module.exports = async (hre) => {
 
   // Display Contract Addresses
   await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
-  // log('  - WBoson:      ', wBoson.address);
-  // log('     - Gas Cost: ', getTxGasCost({ deployTransaction: wBoson.deployTransaction }));
-  // log('  - Proton:      ', proton.address);
-  // log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
-  // if (isHardhat) {
-  //   log('  - Lepton:      ', lepton.address);
-  //   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
-  // }
-  // log('  - Lepton2:      ', lepton2.address);
-  // log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
-  // log('  - Ionx:        ', ionx.address);
-  // log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionx.deployTransaction }));
+  log('  - WBoson:      ', wBoson.address);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: wBoson.deployTransaction }));
+  log('  - Proton:      ', proton.address);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
+  if (isHardhat) {
+    log('  - Lepton:      ', lepton.address);
+    log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
+  }
+  log('  - Lepton2:      ', lepton2.address);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
+  log('  - Ionx:        ', ionx.address);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionx.deployTransaction }));
   log('  - ExternalNFT:      ', externalNFT.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: externalNFT.deployTransaction }));
 

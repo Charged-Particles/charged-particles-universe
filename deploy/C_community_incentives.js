@@ -25,9 +25,6 @@ const {
   const _ = require('lodash');
 
 
-  const __STAKING_INDEX = 2;
-
-
   module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;
     const { deployer, protocolOwner, trustedForwarder } = await getNamedAccounts();
@@ -38,14 +35,11 @@ const {
     const chainId = chainIdByName(network.name);
     const {isProd, isHardhat} = chainTypeById(chainId);
     const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
+    const __STAKING_INDEX = isHardhat ? '' : 2;
     const incentives = presets.Incentives[chainId];
 
     const daoSigner = ethers.provider.getSigner(protocolOwner);
 
-    const ddIonx = getDeployData('Ionx', chainId);
-    const ddCommunityVault = getDeployData('CommunityVault', chainId);
-
-    // const CommunityVault = await ethers.getContractFactory('CommunityVault');
     const YieldFarm = await ethers.getContractFactory(`YieldFarm${__STAKING_INDEX}`);
     const Staking = await ethers.getContractFactory(`Staking${__STAKING_INDEX}`);
 
@@ -60,6 +54,7 @@ const {
     log('  - Trusted Forwarder: ', trustedForwarder);
     log(' ');
 
+    const ddIonx = getDeployData('Ionx', chainId);
     log('  Loading Ionx from: ', ddIonx.address);
     const Ionx = await ethers.getContractFactory('Ionx');
     const ionx = await Ionx.attach(ddIonx.address);
@@ -67,8 +62,9 @@ const {
     let CommunityVault;
     let communityVault;
 
-    if (__STAKING_INDEX === 1) {
+    if (isHardhat) {
       await log(`\n  Deploying CommunityVault...`)(alchemyTimeout);
+      CommunityVault = await ethers.getContractFactory('CommunityVault');
       CommunityVaultInstance = await CommunityVault.deploy(ddIonx.address);
       communityVault = await CommunityVaultInstance.deployed();
       deployData['CommunityVault'] = {
@@ -78,12 +74,13 @@ const {
           deployTransaction: communityVault.deployTransaction,
       };
     } else {
+      const ddCommunityVault = getDeployData('CommunityVault', chainId);
       log('  Loading CommunityVault from: ', ddCommunityVault.address);
       CommunityVault = await ethers.getContractFactory('CommunityVault');
       communityVault = await CommunityVault.attach(ddCommunityVault.address);
     }
 
-    await log(`\n  Deploying Staking Contract # ${__STAKING_INDEX}...`)(alchemyTimeout);
+    await log(`\n  Deploying Staking Contract ${__STAKING_INDEX}...`)(alchemyTimeout);
     const stakingArgs = [incentives.staking.epoch1Start, incentives.staking.epochDuration];
     const StakingInstance = await Staking.deploy(...stakingArgs);
     const staking = await StakingInstance.deployed();
@@ -94,7 +91,7 @@ const {
         deployTransaction: staking.deployTransaction,
     };
 
-    await log(`\n  Deploying IONX Yield Farm # ${__STAKING_INDEX}...`)(alchemyTimeout);
+    await log(`\n  Deploying IONX Yield Farm ${__STAKING_INDEX}...`)(alchemyTimeout);
     const ionxYieldFarmDeployArgs = [
       ionx.address,
       ionx.address,
@@ -113,7 +110,7 @@ const {
       deployTransaction: ionxYieldFarm.deployTransaction,
     };
 
-    log(`\n  Setting allowance for IONX YieldFarm # ${__STAKING_INDEX} to transfer $IONX from CommunityVault`);
+    log(`\n  Setting allowance for IONX YieldFarm ${__STAKING_INDEX} to transfer $IONX from CommunityVault`);
     const txAllowance = await communityVault.setAllowance(ionxYieldFarm.address, getIonxDistributionAmount(chainId));
     log('   Transaction hash:', txAllowance.hash);
     log('   Transaction etherscan:', `https://${hre.network.name}.etherscan.io/tx/${txAllowance.hash}`);
@@ -140,7 +137,7 @@ const {
         deployTransaction: lpYieldFarm.deployTransaction,
     };
 
-    log(`\n  Setting allowance for LPYieldFarm # ${__STAKING_INDEX} to transfer $IONX from CommunityVault`);
+    log(`\n  Setting allowance for LPYieldFarm ${__STAKING_INDEX} to transfer $IONX from CommunityVault`);
     const txAllowanceLP = await communityVault.setAllowance(lpYieldFarm.address, getLiquidityDistributionAmount(chainId));
     log('   Transaction hash:', txAllowanceLP.hash);
     log('   Transaction etherscan:', `https://${hre.network.name}.etherscan.io/tx/${txAllowanceLP.hash}`);
@@ -161,7 +158,7 @@ const {
 
     // Display Contract Addresses
     await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
-    if (__STAKING_INDEX === 1) {
+    if (isHardhat) {
       log('  - CommunityVault: ', communityVault.address);
       log('     - Gas Cost:    ', getTxGasCost({ deployTransaction: communityVault.deployTransaction }));
     }
