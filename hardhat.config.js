@@ -150,6 +150,8 @@ module.exports = {
         'ExternalNFT',
         'YieldFarm',
         'Staking',
+        'YieldFarm2',
+        'Staking2',
         'CommunityVault',
         'MerkleDistributor',
         'MerkleDistributor2',

@@ -25,6 +25,9 @@ const {
   const _ = require('lodash');
 
 
+  const __STAKING_INDEX = 2;
+
+
   module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;
     const { deployer, protocolOwner, trustedForwarder } = await getNamedAccounts();
@@ -40,10 +43,11 @@ const {
     const daoSigner = ethers.provider.getSigner(protocolOwner);
 
     const ddIonx = getDeployData('Ionx', chainId);
+    const ddCommunityVault = getDeployData('CommunityVault', chainId);
 
-    const CommunityVault = await ethers.getContractFactory('CommunityVault');
-    const YieldFarm = await ethers.getContractFactory('YieldFarm');
-    const Staking = await ethers.getContractFactory('Staking');
+    // const CommunityVault = await ethers.getContractFactory('CommunityVault');
+    const YieldFarm = await ethers.getContractFactory(`YieldFarm${__STAKING_INDEX}`);
+    const Staking = await ethers.getContractFactory(`Staking${__STAKING_INDEX}`);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles CommunityVault - Contract Initialization');
@@ -60,28 +64,37 @@ const {
     const Ionx = await ethers.getContractFactory('Ionx');
     const ionx = await Ionx.attach(ddIonx.address);
 
-    await log(`\n  Deploying CommunityVault...`)(alchemyTimeout);
-    const CommunityVaultInstance = await CommunityVault.deploy(ddIonx.address);
-    const communityVault = await CommunityVaultInstance.deployed();
-    deployData['CommunityVault'] = {
-        abi: getContractAbi('CommunityVault'),
-        address: communityVault.address,
-        constructorArgs: [ddIonx.address],
-        deployTransaction: communityVault.deployTransaction,
-    };
+    let CommunityVault;
+    let communityVault;
 
-    await log('\n  Deploying Staking Contract...')(alchemyTimeout);
+    if (__STAKING_INDEX === 1) {
+      await log(`\n  Deploying CommunityVault...`)(alchemyTimeout);
+      CommunityVaultInstance = await CommunityVault.deploy(ddIonx.address);
+      communityVault = await CommunityVaultInstance.deployed();
+      deployData['CommunityVault'] = {
+          abi: getContractAbi('CommunityVault'),
+          address: communityVault.address,
+          constructorArgs: [ddIonx.address],
+          deployTransaction: communityVault.deployTransaction,
+      };
+    } else {
+      log('  Loading CommunityVault from: ', ddCommunityVault.address);
+      CommunityVault = await ethers.getContractFactory('CommunityVault');
+      communityVault = await CommunityVault.attach(ddCommunityVault.address);
+    }
+
+    await log(`\n  Deploying Staking Contract # ${__STAKING_INDEX}...`)(alchemyTimeout);
     const stakingArgs = [incentives.staking.epoch1Start, incentives.staking.epochDuration];
     const StakingInstance = await Staking.deploy(...stakingArgs);
     const staking = await StakingInstance.deployed();
-    deployData['Staking'] = {
-        abi: getContractAbi('Staking'),
+    deployData[`Staking${__STAKING_INDEX}`] = {
+        abi: getContractAbi(`Staking${__STAKING_INDEX}`),
         address: staking.address,
         constructorArgs: stakingArgs,
         deployTransaction: staking.deployTransaction,
     };
 
-    await log('\n  Deploying IONX Yield Farm...')(alchemyTimeout);
+    await log(`\n  Deploying IONX Yield Farm # ${__STAKING_INDEX}...`)(alchemyTimeout);
     const ionxYieldFarmDeployArgs = [
       ionx.address,
       ionx.address,
@@ -93,14 +106,14 @@ const {
     ];
     const IonxYieldFarmInstance = await YieldFarm.deploy(...ionxYieldFarmDeployArgs);
     const ionxYieldFarm = await IonxYieldFarmInstance.deployed();
-    deployData['IonxYieldFarm'] = {
-      abi: getContractAbi('YieldFarm'),
+    deployData[`IonxYieldFarm${__STAKING_INDEX}`] = {
+      abi: getContractAbi(`YieldFarm${__STAKING_INDEX}`),
       address: ionxYieldFarm.address,
       constructorArgs: ionxYieldFarmDeployArgs,
       deployTransaction: ionxYieldFarm.deployTransaction,
     };
 
-    log('\n  Setting allowance for IonxYieldFarm to transfer $IONX from CommunityVault');
+    log(`\n  Setting allowance for IONX YieldFarm # ${__STAKING_INDEX} to transfer $IONX from CommunityVault`);
     const txAllowance = await communityVault.setAllowance(ionxYieldFarm.address, getIonxDistributionAmount(chainId));
     log('   Transaction hash:', txAllowance.hash);
     log('   Transaction etherscan:', `https://${hre.network.name}.etherscan.io/tx/${txAllowance.hash}`);
@@ -120,14 +133,14 @@ const {
     ];
     const LPYieldFarmInstance = await YieldFarm.deploy(...lpYieldFarmDeployArgs);
     const lpYieldFarm = await LPYieldFarmInstance.deployed();
-    deployData['LPYieldFarm'] = {
-        abi: getContractAbi('YieldFarm'),
+    deployData[`LPYieldFarm${__STAKING_INDEX}`] = {
+        abi: getContractAbi(`YieldFarm${__STAKING_INDEX}`),
         address: lpYieldFarm.address,
         constructorArgs: lpYieldFarmDeployArgs,
         deployTransaction: lpYieldFarm.deployTransaction,
     };
 
-    log('\n  Setting allowance for LPYieldFarm to transfer $IONX from CommunityVault');
+    log(`\n  Setting allowance for LPYieldFarm # ${__STAKING_INDEX} to transfer $IONX from CommunityVault`);
     const txAllowanceLP = await communityVault.setAllowance(lpYieldFarm.address, getLiquidityDistributionAmount(chainId));
     log('   Transaction hash:', txAllowanceLP.hash);
     log('   Transaction etherscan:', `https://${hre.network.name}.etherscan.io/tx/${txAllowanceLP.hash}`);
@@ -142,17 +155,21 @@ const {
         getIonxDistributionAmount(chainId).add(getLiquidityDistributionAmount(chainId)),
         protocolOwner,
       );
+    } else {
+      log(`\n   TODO: Manually Distribute funds to CommunityVault: ${chalk.green(ethers.utils.formatUnits(getIonxDistributionAmount(chainId)))} IONX + ${chalk.green(ethers.utils.formatUnits(getLiquidityDistributionAmount(chainId)))}  IONX`);
     }
 
     // Display Contract Addresses
     await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
-    log('  - CommunityVault: ', communityVault.address);
-    log('     - Gas Cost:    ', getTxGasCost({ deployTransaction: communityVault.deployTransaction }));
-    log('  - Staking:        ', staking.address);
+    if (__STAKING_INDEX === 1) {
+      log('  - CommunityVault: ', communityVault.address);
+      log('     - Gas Cost:    ', getTxGasCost({ deployTransaction: communityVault.deployTransaction }));
+    }
+    log(`  - Staking${__STAKING_INDEX}:        `, staking.address);
     log('     - Gas Cost:    ', getTxGasCost({ deployTransaction: staking.deployTransaction }));
-    log('  - YieldFarmIONX:  ', ionxYieldFarm.address);
+    log(`  - YieldFarm${__STAKING_INDEX} (IONX):  `, ionxYieldFarm.address);
     log('     - Gas Cost:    ', getTxGasCost({ deployTransaction: ionxYieldFarm.deployTransaction }));
-    log('  - YieldFarmLP:    ', lpYieldFarm.address);
+    log(`  - YieldFarm${__STAKING_INDEX} (LP):    `, lpYieldFarm.address);
     log('     - Gas Cost:    ', getTxGasCost({ deployTransaction: lpYieldFarm.deployTransaction }));
 
     saveDeploymentData(chainId, deployData);
