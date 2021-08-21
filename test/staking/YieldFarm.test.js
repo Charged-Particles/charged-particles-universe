@@ -348,6 +348,7 @@ describe('YieldFarm Pool', function () {
             await expect(yieldFarmLP.harvest(10)).to.be.revertedWith('YLD:E-306');
             await expect(yieldFarmLP.harvest(3)).to.be.revertedWith('YLD:E-204');
 
+            await await yieldFarmLP.
             // Harvest once at [1] -> Get IONX.
             await (await yieldFarmLP.connect(user).harvest(1)).wait()
             epochAmount = calculateEpochAmount(1)
@@ -395,12 +396,236 @@ describe('YieldFarm Pool', function () {
             expect(await ionxToken.balanceOf(userAddr)).to.equal(distributedAmount.sub(deprecationBn.mul(NR_OF_EPOCHS)));
         })
 
+        it('skips epoch 0 deposit, deposits at 1, harvest 2', async function () {
+    
+                let epochAmount = calculateEpochAmount(0);
+                let epochNow = await yieldFarmIonx.getCurrentEpoch();
+    
+                console.log(`No depositing IONX at epoch ${epochNow}`);
+                console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+
+                await staking.manualEpochInit([ionxToken.address], 0);
+                await moveAtStakingEpoch(1);
+                await staking.manualEpochInit([ionxToken.address], 1);
+                let claimableNow;
+                
+                await depositIonxToken(amount); // Mints and stakes 33
+    
+                epochNow = await yieldFarmIonx.getCurrentEpoch();
+
+                console.log(`Depositing ${formatUnits(amount)} IONX at epoch ${epochNow}`);
+
+    
+                epochAmount = calculateEpochAmount(1);
+                console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
+                console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+    
+                // Impossible to harvest epoch 1
+                await expect(yieldFarmIonx.connect(user).harvest(1)).to.be.revertedWith('YLD:E-306');
+    
+                // Possible to mass harvest but gives 0.
+                await yieldFarmIonx.connect(user).massHarvest();
+                await yieldFarmIonx.connect(deployer).massHarvest();
+    
+                const balanceUserTooSoon = await ionxToken.balanceOf(await user.getAddress());
+                console.log(`[Epoch-${epochNow}] After harvesting too soon [Epoch-${epochNow}], user balance: ${formatUnits(balanceUserTooSoon)} IONX`);
+                expect(balanceUserTooSoon).to.be.equal(0);
+    
+    
+    
+    
+                claimableNow = await yieldFarmIonx.connect(user).getAmountClaimable();
+    
+                console.log(`[Epoch-${epochNow}] Current Claimable at [${epochNow}]`,claimableNow,formatUnits(claimableNow));
+    
+                await moveAtStakingEpoch(2);
+    
+    
+                epochNow = await yieldFarmIonx.getCurrentEpoch();
+    
+                console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
+                console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+    
+                claimableNow = await yieldFarmIonx.connect(user).getAmountClaimable();
+    
+                console.log(`[Epoch-${epochNow}] Current Claimable Now at ${epochNow}`,claimableNow,formatUnits(claimableNow));
+    
+                // Possible to mass harvest
+                await yieldFarmIonx.connect(user).massHarvest();
+    
+                const balanceUser = await ionxToken.balanceOf(await user.getAddress());
+                console.log(`After harvesting epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser)} IONX`);
+                expect(balanceUser).to.be.gt(0);
+        });
+
+        it('skips epoch 0-10, deposits at 11, harvest 12', async function () {
+    
+            let epochAmount = calculateEpochAmount(0);
+            let epochNow = await yieldFarmIonx.getCurrentEpoch();
+
+            console.log(`No depositing IONX at epoch ${epochNow}`);
+            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+
+            await staking.manualEpochInit([ionxToken.address], 0);
+            await moveAtStakingEpoch(1);
+            await moveAtStakingEpoch(11);
+            await staking.manualEpochInit([ionxToken.address], 1);
+            await staking.manualEpochInit([ionxToken.address], 2);
+            await staking.manualEpochInit([ionxToken.address], 3);
+            await staking.manualEpochInit([ionxToken.address], 4);
+            await staking.manualEpochInit([ionxToken.address], 5);
+            await staking.manualEpochInit([ionxToken.address], 6);
+            await staking.manualEpochInit([ionxToken.address], 7);
+            await staking.manualEpochInit([ionxToken.address], 8);
+            await staking.manualEpochInit([ionxToken.address], 9);
+            await staking.manualEpochInit([ionxToken.address], 10);
+            await staking.manualEpochInit([ionxToken.address], 11);
+            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+            
+            let claimableNow;
+            
+            await depositIonxToken(amount); // Mints and stakes 33
+
+            epochNow = await yieldFarmIonx.getCurrentEpoch();
+
+            console.log(`Depositing ${formatUnits(amount)} IONX at epoch ${epochNow}`);
+
+
+
+            await moveAtStakingEpoch(12);
+            epochNow = await yieldFarmIonx.getCurrentEpoch();
+
+            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+
+            // Possible to mass harvest
+            await yieldFarmIonx.connect(user).massHarvest();
+
+            const balanceUser = await ionxToken.balanceOf(await user.getAddress());
+            console.log(`After harvesting epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser)} IONX`);
+            expect(balanceUser).to.be.gt(0);
+
+            await moveAtStakingEpoch(13);
+            epochNow = await yieldFarmIonx.getCurrentEpoch();
+
+            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+
+            // Possible to mass harvest
+            await yieldFarmIonx.connect(user).massHarvest();
+
+            const balanceUser12 = await ionxToken.balanceOf(await user.getAddress());
+            console.log(`After harvesting epoch [Epoch-${epochNow}], user balance:${formatUnits(balanceUser)} --> ${formatUnits(balanceUser12)} IONX`);
+            expect(balanceUser12).to.be.gt(balanceUser);
+
+            await moveAtStakingEpoch(14);
+            epochNow = await yieldFarmIonx.getCurrentEpoch();
+            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+            // Possible to mass harvest
+            await yieldFarmIonx.connect(user).massHarvest();
+            const balanceUser13 = await ionxToken.balanceOf(await user.getAddress());
+            console.log(`After harvesting epoch [Epoch-${epochNow}], user balance unchanged`);
+            expect(balanceUser13).to.be.eq(balanceUser12);
+        });
+
+        it.only('skips epoch 0-11, deposits at 12, harvest 13', async function () {
+    
+            let epochAmount = calculateEpochAmount(0);
+            let epochNow = await yieldFarmIonx.getCurrentEpoch();
+
+            console.log(`No depositing IONX at epoch ${epochNow}`);
+            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+
+            await staking.manualEpochInit([ionxToken.address], 0);
+            await moveAtStakingEpoch(1);
+            await moveAtStakingEpoch(12);
+            await staking.manualEpochInit([ionxToken.address], 1);
+            await staking.manualEpochInit([ionxToken.address], 2);
+            await staking.manualEpochInit([ionxToken.address], 3);
+            await staking.manualEpochInit([ionxToken.address], 4);
+            await staking.manualEpochInit([ionxToken.address], 5);
+            await staking.manualEpochInit([ionxToken.address], 6);
+            await staking.manualEpochInit([ionxToken.address], 7);
+            await staking.manualEpochInit([ionxToken.address], 8);
+            await staking.manualEpochInit([ionxToken.address], 9);
+            await staking.manualEpochInit([ionxToken.address], 10);
+            await staking.manualEpochInit([ionxToken.address], 11);
+            await staking.manualEpochInit([ionxToken.address], 12);
+            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+            
+            let claimableNow;
+            
+            await depositIonxToken(amount); // Mints and stakes 33
+
+            epochNow = await yieldFarmIonx.getCurrentEpoch();
+
+            console.log(`Depositing ${formatUnits(amount)} IONX at epoch ${epochNow}`);
+
+
+
+            await moveAtStakingEpoch(13);
+            epochNow = await yieldFarmIonx.getCurrentEpoch();
+
+            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+
+            // Possible to mass harvest
+            await yieldFarmIonx.connect(user).massHarvest();
+
+            const balanceUser = await ionxToken.balanceOf(await user.getAddress());
+            console.log(`After harvesting epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser)} IONX`);
+            expect(balanceUser).to.be.gt(0);
+
+            await moveAtStakingEpoch(14);
+            epochNow = await yieldFarmIonx.getCurrentEpoch();
+            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+            // Possible to mass harvest
+            await yieldFarmIonx.connect(user).massHarvest();
+            const balanceUser14 = await ionxToken.balanceOf(await user.getAddress());
+            console.log(`After harvesting epoch [Epoch-${epochNow}], user balance unchanged`);
+            expect(balanceUser14).to.be.eq(balanceUser);
+    });
+
+
         it('harvest maximum epochs IONX', async function () {
             await depositIonxToken(amount)
             const totalAmount = amount;
             await moveAtStakingEpoch(13);
 
             expect(await yieldFarmIonx.getPoolSize(1)).to.equal(totalAmount);
+
+            const claimableNow = await yieldFarmIonx.connect(user).getAmountClaimable(); // 0 always, this function never works
+
+            console.log(`Claimable:`,claimableNow);
+
+            await (await yieldFarmIonx.connect(user).massHarvest()).wait();
+
+            const received = await ionxToken.balanceOf(userAddr);
+
+            expect(await yieldFarmIonx.lastInitializedEpoch()).to.equal(NR_OF_EPOCHS);
+
+            expect(await yieldFarmIonx.getPoolSize(NR_OF_EPOCHS)).to.equal(totalAmount);
+
+            expect(await ionxToken.balanceOf(userAddr)).to.equal(distributedAmount.sub(deprecationBn.mul(NR_OF_EPOCHS)));
+        });
+
+        it('harvest maximum epochs IONX', async function () {
+            await depositIonxToken(amount)
+            const totalAmount = amount;
+            await moveAtStakingEpoch(2);
+
+            // Possible to mass harvest
+            await yieldFarmIonx.connect(user).massHarvest();
+
+            epochNow = await yieldFarmIonx.getCurrentEpoch();
+            const balanceUser = await ionxToken.balanceOf(await user.getAddress());
+            console.log(`After harvesting epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser)} IONX`);
+            expect(balanceUser).to.be.gt(0);
+
+            await moveAtStakingEpoch(13);
+            expect(await yieldFarmIonx.getPoolSize(1)).to.equal(totalAmount);
+
+            const claimableNow = await yieldFarmIonx.connect(user).getAmountClaimable(); // 0 always, this function never works
+
+            console.log(`Claimable:`,claimableNow);
+
             await (await yieldFarmIonx.connect(user).massHarvest()).wait();
 
             const received = await ionxToken.balanceOf(userAddr);

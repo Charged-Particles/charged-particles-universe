@@ -82,6 +82,7 @@ const {
 
     await log(`\n  Deploying Staking Contract ${__STAKING_INDEX}...`)(alchemyTimeout);
     const stakingArgs = [incentives.staking.epoch1Start, incentives.staking.epochDuration];
+    console.log(`⭕ Epoch 1 will begin at ${incentives.staking.epoch1Start} for ${incentives.staking.epochDuration} seconds each epoch, for ${incentives.ionxToken.nrOfEpochs} epochs`);
     const StakingInstance = await Staking.deploy(...stakingArgs);
     const staking = await StakingInstance.deployed();
     deployData[`Staking${__STAKING_INDEX}`] = {
@@ -118,7 +119,7 @@ const {
     // Transfer ownership?
 
     // Deploying LP Yield Farm Contract
-    await log('\n  Deploying LP Yield Farm...')(alchemyTimeout);
+    await log('\n  Deploying LP Yield Farm... to allow LP from ', incentives.uniswapLPTokenAddress)(alchemyTimeout);
     const lpYieldFarmDeployArgs = [
       ionx.address,
       incentives.uniswapLPTokenAddress,
@@ -145,13 +146,13 @@ const {
 
     // Next transfer appropriate funds
     if (chainId != 1) {
-      log(`\n   Distributing funds to CommunityVault: ${chalk.green(ethers.utils.formatUnits(getIonxDistributionAmount(chainId)))} IONX + ${chalk.green(ethers.utils.formatUnits(getLiquidityDistributionAmount(chainId)))}  IONX`);
-      await distributeInitialFunds(
-        ionx.connect(daoSigner),
-        communityVault,
-        getIonxDistributionAmount(chainId).add(getLiquidityDistributionAmount(chainId)),
-        protocolOwner,
-      );
+      // log(`\n   Distributing funds to CommunityVault: ${chalk.green(ethers.utils.formatUnits(getIonxDistributionAmount(chainId)))} IONX + ${chalk.green(ethers.utils.formatUnits(getLiquidityDistributionAmount(chainId)))}  IONX`);
+      // await distributeInitialFunds(
+      //   ionx.connect(daoSigner),
+      //   communityVault,
+      //   getIonxDistributionAmount(chainId).add(getLiquidityDistributionAmount(chainId)),
+      //   protocolOwner,
+      // );
     } else {
       log(`\n   TODO: Manually Distribute funds to CommunityVault: ${chalk.green(ethers.utils.formatUnits(getIonxDistributionAmount(chainId)))} IONX + ${chalk.green(ethers.utils.formatUnits(getLiquidityDistributionAmount(chainId)))}  IONX`);
     }
