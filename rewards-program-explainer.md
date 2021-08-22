@@ -1,8 +1,8 @@
 # Charged Particles Rewards Program
 
-## Purpose
+## Overview
 
-The Charged Particles Rewards program serves two purposes:
+Charged Particles is currently offering IONX rewards to community members who provide liquidity to the official IONX/ETH Uniswap V2 pool and/or stake their IONX at rewards.charged.fi. The Charged Particles Rewards program serves two purposes:
 
 1) Distribute more IONX tokens to community members to help the protocol further decentralize
 2) Reward users for providing Liquidity to the IONX/ETH pool on Uniswap V2 or holding their IONX long-term
