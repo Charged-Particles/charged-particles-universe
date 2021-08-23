@@ -18,7 +18,7 @@ Charged Particles is currently offering IONX rewards to community members who pr
 **Staking IONX**
 - Connect your wallet
 - Click GET IONX button on UI to get IONX from Uniswap
-  - IONX Address: 0x02D3A27Ac3f55d5D91Fb0f52759842696a864217
+  - IONX Address: `0x02D3A27Ac3f55d5D91Fb0f52759842696a864217`
 - Approve token
 - Deposit IONX
   
