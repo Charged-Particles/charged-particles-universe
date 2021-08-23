@@ -32,8 +32,9 @@ require('./chaiMatchers');
 
 
 const NOW = Date.now();
-const TEN_MINS_FROM_NOW = new Date(NOW + 10 * 60 * 1000);
-const ONE_MONTH_FROM_NOW = new Date(NOW + 30 * 24 * 60 * 60 * 1000);
+const TEN_MINS_FROM_NOW = new Date(NOW + (10 * 60 * 1000));
+const ONE_DAY_FROM_NOW = new Date(NOW + (24 * 60 * 60 * 1000));
+const ONE_MONTH_FROM_NOW = new Date(NOW + (30 * 24 * 60 * 60 * 1000));
 
 const TEST_EXPIRY = dateToTimestamp('01/07/2021 07:00'); // July 1, 2021 @ 11:00 AM
 const LIVE_EXPIRY = dateToTimestamp('31/12/2021 23:59'); // Dec 31, 2021 @ EOD
@@ -174,7 +175,7 @@ const presets = {
       },
       staking: {
         epochDuration: 7 * 24 * 60 * 60,  // 1 week
-        epoch1Start: dateToTimestamp(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+        epoch1Start: 1629754980, // dateToTimestamp(dateFormat('23/08/2021 5:30', 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
         startAmount: bn(48000),
