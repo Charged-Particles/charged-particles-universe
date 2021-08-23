@@ -46,6 +46,7 @@ Charged Particles is currently offering IONX rewards to community members who pr
 `Expected Rewards = (User Pool Balance * Epoch Multiplier) / Total Pool Balance`
 
 **Variables:**
+
 Expected Rewards = how much IONX a user can expect to earn  
 User Pool Balance = user's balance of IONX or IONX/ETH in the staking pool
 Total Pool Balance = all IONX or IONX/ETH in the staking pool
