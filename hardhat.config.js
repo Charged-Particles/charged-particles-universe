@@ -121,6 +121,9 @@ module.exports = {
     etherscan: {
       apiKey: process.env.ETHERSCAN_APIKEY
     },
+    polygonscan: {
+      apiKey: process.env.POLYGONSCAN_APIKEY
+    },
     gasReporter: {
         currency: 'USD',
         gasPrice: 1,
