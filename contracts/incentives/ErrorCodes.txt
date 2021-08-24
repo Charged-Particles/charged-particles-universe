@@ -1,0 +1,8 @@
+STK:E-205: amount must be positive
+STK:E-432: balance too small
+STK:E-306: epoch is in the future
+STK:E-002: ALREADY_INIT
+STK:E-305: previous epoch not initialized
+STK:E-304: emergency withdraw too soon
+STK:E-205: amount must be positive
+STK:E-101: PAUSED
