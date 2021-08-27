@@ -1,8 +1,37 @@
-STK:E-205: amount must be positive
-STK:E-432: balance too small
-STK:E-306: epoch is in the future
-STK:E-002: ALREADY_INIT
-STK:E-305: previous epoch not initialized
-STK:E-304: emergency withdraw too soon
-STK:E-205: amount must be positive
-STK:E-101: PAUSED
+
+Categories:
+  0. General
+  1. Permission & Control
+  2. Find, Inequalities & Range
+  3. Availability & Time
+  4. Tokens, Funds & Finance
+
+
+
+
+Codes:
+
+
+  0. General
+    E-002 - ALREADY_INIT
+   
+
+  1. Permission & Control
+    E-101 - PAUSED
+
+
+  2. Find, Inequalities & Range
+    E-204 - invalid chronological order
+    E-205 - amount must be positive
+
+
+  3. Availability & Time
+    E-304 - emergency withdraw too soon
+    E-305 - previous epoch not initialized
+    E-306 - epoch is in the future
+
+
+  4. Tokens, Funds & Finance
+    E-408 - cap exceeded
+    E-432 - balance too small
+
