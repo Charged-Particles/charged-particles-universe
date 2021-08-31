@@ -25,7 +25,8 @@
     "MerkleDistributor2": "MerkleDistributor2",
     "MerkleDistributor3": "MerkleDistributor3",
     "VestingClaim": "VestingClaim",
-    "VestingClaim2": "VestingClaim2"
+    "VestingClaim2": "VestingClaim2",
+    "VestingClaim3": "VestingClaim3"
   },
   "dependencies": {
   },

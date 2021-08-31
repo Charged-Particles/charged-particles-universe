@@ -53,28 +53,28 @@ async function run() {
   // Upgradeable Contracts; need to get implementation adderss from `.openzeppelin/__network__.json`
   let universeAddress = null;
   let chargedParticlesAddress = null;
-  if (networkName === 'mainnet') {
-    universeAddress = '0xd6ed8455903CBd94d8F432eC4059197984baA65e';
-    chargedParticlesAddress = '0x660De54CEA09838d11Df0812E2754eD8D08CD2f7';
-  }
-  if (networkName === 'kovan') {
-    universeAddress = '0xeC08CB0f69E2095CF27eCB6E9D4BB60b430334Ad';
-    chargedParticlesAddress = '0x0cFAAD8cD948A0BAe647615ecc8DfeFD0294a5f2';
-  }
-  if (networkName === 'polygon') {
-    universeAddress = '0x1E70aa1599a624880e91103738591C920cCbb925';
-    chargedParticlesAddress = '0xB29256073C63960daAa398f1227D0adBC574341C';
-  }
-  if (networkName === 'mumbai') {
-    universeAddress = '0x3e9A9544f8a995DF33771E84600E02a2fc81De58';
-    chargedParticlesAddress = '0xA85B3d84f54Fb238Ef257158da99FdfCe905C7aA';
-  }
+  // if (networkName === 'mainnet') {
+  //   universeAddress = '0xd6ed8455903CBd94d8F432eC4059197984baA65e';
+  //   chargedParticlesAddress = '0x660De54CEA09838d11Df0812E2754eD8D08CD2f7';
+  // }
+  // if (networkName === 'kovan') {
+  //   universeAddress = '0xeC08CB0f69E2095CF27eCB6E9D4BB60b430334Ad';
+  //   chargedParticlesAddress = '0x0cFAAD8cD948A0BAe647615ecc8DfeFD0294a5f2';
+  // }
+  // if (networkName === 'polygon') {
+  //   universeAddress = '0x1E70aa1599a624880e91103738591C920cCbb925';
+  //   chargedParticlesAddress = '0xB29256073C63960daAa398f1227D0adBC574341C';
+  // }
+  // if (networkName === 'mumbai') {
+  //   universeAddress = '0x3e9A9544f8a995DF33771E84600E02a2fc81De58';
+  //   chargedParticlesAddress = '0xA85B3d84f54Fb238Ef257158da99FdfCe905C7aA';
+  // }
 
-  // Protocol
-  await verifyContract({name: 'Universe', networkName, addressOverride: universeAddress});
-  await verifyContract({name: 'ChargedParticles', networkName, addressOverride: chargedParticlesAddress});
-  // await verifyContract({name: 'ChargedState', networkName});
-  // await verifyContract({name: 'ChargedSettings', networkName});
+  // // // Protocol
+  // // await verifyContract({name: 'Universe', networkName, addressOverride: universeAddress});
+  // // await verifyContract({name: 'ChargedParticles', networkName, addressOverride: chargedParticlesAddress});
+  // // // await verifyContract({name: 'ChargedState', networkName});
+  // // await verifyContract({name: 'ChargedSettings', networkName});
   // await verifyContract({name: 'WBoson', networkName});
   // await verifyContract({name: 'Ionx', networkName});
   // await verifyContract({name: 'IonxTimelock', networkName});
@@ -106,6 +106,7 @@ async function run() {
   // await verifyContract({name: 'MerkleDistributor3', networkName});
 
   // await verifyContract({name: 'VestingClaim2', networkName});
+  await verifyContract({name: 'VestingClaim3', networkName});
 
   success('Done!');
 };

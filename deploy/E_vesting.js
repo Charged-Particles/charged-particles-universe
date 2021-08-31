@@ -20,7 +20,7 @@ const util = require('util');
 const _ = require('lodash');
 
 
-const __VESTING_CLAIM_INDEX = 2;
+const __VESTING_CLAIM_INDEX = 3;
 
 
 module.exports = async (hre) => {
