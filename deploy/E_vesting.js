@@ -16,6 +16,7 @@ const {
   chainIdByName,
 } = require('../js-helpers/utils');
 
+const chalk = require('chalk');
 const util = require('util');
 const _ = require('lodash');
 
