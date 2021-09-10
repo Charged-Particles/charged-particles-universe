@@ -5,6 +5,7 @@ const {
 
 const {
   log,
+  chainTypeById,
   chainNameById,
   chainIdByName,
 } = require('../js-helpers/utils');
@@ -17,7 +18,8 @@ module.exports = async (hre) => {
     const network = await hre.network;
 
     const chainId = chainIdByName(network.name);
-    const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 7);
+    const {isProd, isHardhat} = chainTypeById(chainId);
+    const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
 
     const executeTx = async (txId, txDesc, callback, increaseDelay = 0) => {
       try {
@@ -51,7 +53,6 @@ module.exports = async (hre) => {
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddWBoson = getDeployData('WBoson', chainId);
     const ddProton = getDeployData('Proton', chainId);
-    const ddLepton = getDeployData('Lepton', chainId);
     const ddLepton2 = getDeployData('Lepton2', chainId);
     const ddIonx = getDeployData('Ionx', chainId);
 
@@ -59,7 +60,7 @@ module.exports = async (hre) => {
     log('Charged Particles Protocol - Contract Initialization');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-    log('  Using Network: ', chainNameById(chainId));
+    log(`  Using Network: ${chainNameById(chainId)} (${chainId})`);
     log('  Using Accounts:');
     log('  - Deployer:          ', deployer);
     log('  - Owner:             ', protocolOwner);
@@ -102,9 +103,13 @@ module.exports = async (hre) => {
     const Proton = await ethers.getContractFactory('Proton');
     const proton = await Proton.attach(ddProton.address);
 
-    log('  Loading Lepton from: ', ddLepton.address);
-    const Lepton = await ethers.getContractFactory('Lepton');
-    const lepton = await Lepton.attach(ddLepton.address);
+    let ddLepton, Lepton, lepton;
+    if (isHardhat) {
+      ddLepton = getDeployData('Lepton', chainId);
+      log('  Loading Lepton from: ', ddLepton.address);
+      Lepton = await ethers.getContractFactory('Lepton');
+      lepton = await Lepton.attach(ddLepton.address);
+    }
 
     log('  Loading Lepton2 from: ', ddLepton2.address);
     const Lepton2 = await ethers.getContractFactory('Lepton2');
@@ -135,9 +140,11 @@ module.exports = async (hre) => {
       await chargedParticles.setChargedSettings(ddChargedSettings.address)
     );
 
-    await executeTx('1-e', 'ChargedParticles: Registering Lepton', async () =>
-      await chargedParticles.setLeptonToken(ddLepton.address)
-    );
+    if (isHardhat) {
+      await executeTx('1-e', 'ChargedParticles: Registering Lepton', async () =>
+        await chargedParticles.setLeptonToken(ddLepton.address)
+      );
+    }
 
     await executeTx('1-f', 'ChargedState: Registering ChargedSettings', async () =>
       await chargedState.setChargedSettings(ddChargedSettings.address)
@@ -185,11 +192,11 @@ module.exports = async (hre) => {
       await chargedSettings.registerWalletManager('aave', ddAaveWalletManager.address)
     );
 
-    if (referralCode.length > 0) {
-      await executeTx('3-d', 'AaveWalletManager: Setting Referral Code', async () =>
-        await aaveWalletManager.setReferralCode(referralCode)
-      );
-    }
+    // if (referralCode.length > 0) {
+    //   await executeTx('3-d', 'AaveWalletManager: Setting Referral Code', async () =>
+    //     await aaveWalletManager.setReferralCode(referralCode)
+    //   );
+    // }
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -225,44 +232,39 @@ module.exports = async (hre) => {
     // Setup Lepton
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('5-a', 'Lepton: Setting Max Mint per Transaction', async () =>
-      await lepton.setMaxMintPerTx(leptonMaxMint)
-    );
 
-    await executeTx('5-b', 'Universe: Registering Lepton', async () =>
-      await universe.setLeptonToken(ddLepton.address)
-    );
-
-    await executeTx('5-c', 'ChargedParticles: Registering Lepton', async () =>
-      await chargedSettings.enableNftContracts([ddLepton.address])
-    );
-
-    await executeTx('5-d', 'Lepton: Unpausing', async () =>
-      await lepton.setPausedState(false)
-    );
-
-    let leptonType;
-    for (let i = 0; i < presets.Lepton.types.length; i++) {
-      leptonType = presets.Lepton.types[i];
-
-      await executeTx(`5-e-${i}`, `Lepton: Adding Lepton Type: ${leptonType.name}`, async () =>
-        await lepton.addLeptonType(
-          leptonType.tokenUri,
-          leptonType.price[chainId],
-          leptonType.supply[chainId],
-          leptonType.multiplier,
-          leptonType.bonus,
-        )
+    if (isHardhat) {
+      await executeTx('5-a', 'Lepton: Setting Max Mint per Transaction', async () =>
+        await lepton.setMaxMintPerTx(leptonMaxMint)
       );
+
+      await executeTx('5-c', 'ChargedParticles: Registering Lepton', async () =>
+        await chargedSettings.enableNftContracts([ddLepton.address])
+      );
+
+      await executeTx('5-d', 'Lepton: Unpausing', async () =>
+        await lepton.setPausedState(false)
+      );
+
+      let leptonType;
+      for (let i = 0; i < presets.Lepton.types.length; i++) {
+        leptonType = presets.Lepton.types[i];
+
+        await executeTx(`5-e-${i}`, `Lepton: Adding Lepton Type: ${leptonType.name}`, async () =>
+          await lepton.addLeptonType(
+            leptonType.tokenUri,
+            leptonType.price[chainId],
+            leptonType.supply[chainId],
+            leptonType.multiplier,
+            leptonType.bonus,
+          )
+        );
+      }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Ionx
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // await executeTx('6-a', 'Ionx: Registering Universe', async () =>
-    //   await ionx.setUniverse(ddUniverse.address)
-    // );
 
     await executeTx('6-b', 'Universe: Registering Ionx', async () =>
       await universe.setPhoton(ddIonx.address, ionxMaxSupply.div(2))
@@ -272,34 +274,34 @@ module.exports = async (hre) => {
       await ionx.setMinter(protocolOwner)
     );
 
-    let assetTokenId;
-    let assetTokenAddress;
-    let assetTokenMultiplier;
-    for (let i = 0; i < rewardsForAssetTokens.length; i++) {
-      assetTokenId = rewardsForAssetTokens[i].assetTokenId;
-      assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
-      assetTokenMultiplier = rewardsForAssetTokens[i].multiplier;
+    // let assetTokenId;
+    // let assetTokenAddress;
+    // let assetTokenMultiplier;
+    // for (let i = 0; i < rewardsForAssetTokens.length; i++) {
+    //   assetTokenId = rewardsForAssetTokens[i].assetTokenId;
+    //   assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
+    //   assetTokenMultiplier = rewardsForAssetTokens[i].multiplier;
 
-      await executeTx(`6-c-${i}`, `Universe: Setting ESA Multiplier for Asset Token (${assetTokenAddress} = ${assetTokenMultiplier})`, async () =>
-        await universe.setEsaMultiplier(assetTokenAddress, assetTokenMultiplier)
-      );
-    }
+    //   await executeTx(`6-c-${i}`, `Universe: Setting ESA Multiplier for Asset Token (${assetTokenAddress} = ${assetTokenMultiplier})`, async () =>
+    //     await universe.setEsaMultiplier(assetTokenAddress, assetTokenMultiplier)
+    //   );
+    // }
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Max Deposits
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    let assetTokenCap;
-    for (let i = 0; i < depositCaps.length; i++) {
-      assetTokenId = depositCaps[i].assetTokenId;
-      assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
-      assetTokenCap = depositCaps[i].amount;
+    // let assetTokenCap;
+    // for (let i = 0; i < depositCaps.length; i++) {
+    //   assetTokenId = depositCaps[i].assetTokenId;
+    //   assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
+    //   assetTokenCap = depositCaps[i].amount;
 
-      await executeTx(`7-a-${i}`, `ChargedParticles: Setting Deposit Cap for Asset "${assetTokenId}" (${assetTokenAddress} = ${assetTokenCap})`, async () =>
-        await chargedSettings.setDepositCap(assetTokenAddress, assetTokenCap)
-      );
-    }
+    //   await executeTx(`7-a-${i}`, `ChargedParticles: Setting Deposit Cap for Asset "${assetTokenId}" (${assetTokenAddress} = ${assetTokenCap})`, async () =>
+    //     await chargedSettings.setDepositCap(assetTokenAddress, assetTokenCap)
+    //   );
+    // }
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -337,24 +339,24 @@ module.exports = async (hre) => {
       await chargedSettings.enableNftContracts([ddLepton2.address])
     );
 
-    let lepton2Type;
+    let useChainId = parseInt(chainId, 10);
+    if (useChainId === 80001) { useChainId = 42; }
+    if (useChainId === 137) { useChainId = 1; }
+
+    // let lepton2Type;
     for (let i = 0; i < presets.Lepton.types.length; i++) {
       lepton2Type = presets.Lepton.types[i];
 
       await executeTx(`9-c-${i}`, `Lepton2: Adding Lepton Type: ${lepton2Type.name}`, async () =>
         await lepton2.addLeptonType(
           lepton2Type.tokenUri,
-          lepton2Type.price[chainId],
-          lepton2Type.supply[chainId],
+          lepton2Type.price[useChainId],
+          lepton2Type.supply[useChainId],
           lepton2Type.multiplier,
           lepton2Type.bonus,
         )
       );
     }
-
-    await executeTx('9-d', 'Universe: Switching to Lepton2', async () =>
-      await universe.setLeptonToken(ddLepton2.address)
-    );
 
     await executeTx('9-e', 'ChargedParticles: Registering Lepton2', async () =>
       await chargedParticles.setLeptonToken(ddLepton2.address)

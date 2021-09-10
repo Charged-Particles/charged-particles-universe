@@ -15,10 +15,18 @@
     "Proton": "Proton",
     "Lepton": "Lepton",
     "Lepton2": "Lepton2",
+    "ExternalNFT": "ExternalNFT",
     "Staking": "Staking",
     "YieldFarm": "YieldFarm",
+    "Staking2": "Staking2",
+    "YieldFarm2": "YieldFarm2",
     "CommunityVault": "CommunityVault",
-    "MerkleDistributor": "MerkleDistributor"
+    "MerkleDistributor": "MerkleDistributor",
+    "MerkleDistributor2": "MerkleDistributor2",
+    "MerkleDistributor3": "MerkleDistributor3",
+    "VestingClaim": "VestingClaim",
+    "VestingClaim2": "VestingClaim2",
+    "VestingClaim3": "VestingClaim3"
   },
   "dependencies": {
   },

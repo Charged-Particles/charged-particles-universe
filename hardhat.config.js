@@ -76,8 +76,8 @@ module.exports = {
             },
         },
         kovan: {
-            url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            // url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+            // url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
+            url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
             gasPrice: 10e9,
             blockGasLimit: 12400000,
             accounts: {
@@ -86,10 +86,30 @@ module.exports = {
                 count: 10,
             }
         },
+        mumbai: {
+            url: `https://rpc-mumbai.matic.today`,
+            // url: `https://rpc-mumbai.maticvigil.com`,
+            gasPrice: 1e9,
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            },
+            chainId: 80001
+        },
+        polygon: {
+            url: `https://rpc-mainnet.maticvigil.com`,
+            gasPrice: 15e9,
+            accounts: {
+                mnemonic: mnemonic.mainnet,
+                initialIndex: 0,
+                count: 3,
+            }
+        },
         mainnet: {
-            url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            // url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 38e9,
+            // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
+            url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+            gasPrice: 135e9,
             blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.mainnet,
@@ -100,6 +120,9 @@ module.exports = {
     },
     etherscan: {
       apiKey: process.env.ETHERSCAN_APIKEY
+    },
+    polygonscan: {
+      apiKey: process.env.POLYGONSCAN_APIKEY
     },
     gasReporter: {
         currency: 'USD',
@@ -127,10 +150,18 @@ module.exports = {
         'Lepton2',
         'ERC20',
         'ERC721',
+        'ExternalNFT',
         'YieldFarm',
         'Staking',
+        'YieldFarm2',
+        'Staking2',
         'CommunityVault',
         'MerkleDistributor',
+        'MerkleDistributor2',
+        'MerkleDistributor3',
+        'VestingClaim',
+        'VestingClaim2',
+        'VestingClaim3'
       ],
     },
     namedAccounts: {

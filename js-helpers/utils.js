@@ -16,7 +16,7 @@ const tokens = function (amount, decimals = 18) { return (bn(amount).mul(bn(10).
 const tokensBN = function (amount, decimals = 18) { return (bn(amount).mul(bn(10).pow(decimals))) }
 const bnToInt = function (bnAmount, decimals = 18) { return bnAmount.div(bn(10).pow(decimals)) }
 
-const dateToEpoch = function (dated) { return moment.utc(dated, "DD/MM/YYYY HH:mm").valueOf() / 1000 }
+const dateToTimestamp = function (dated) { return moment.utc(dated, "DD/MM/YYYY HH:mm").valueOf() / 1000 }
 const timeInSecs = function (days, hours, mins, secs) { return days * hours * mins * secs }
 const timeInDays = function (secs) { return (secs / (60 * 60 * 24)).toFixed(2) }
 const timeInDate = function (secs) { return moment.utc(secs * 1000).format("DD MMM YYYY hh:mm a") }
@@ -53,6 +53,22 @@ const chainNameById = (chainId) => {
   }
 };
 
+const chainTypeById = (chainId) => {
+  switch (parseInt(chainId, 10)) {
+    case 1:
+    case 137:
+      return {isProd: true, isTestnet: false, isHardhat: false};
+    case 3:
+    case 4:
+    case 42:
+    case 80001:
+      return {isProd: false, isTestnet: true, isHardhat: false};
+    case 31337:
+    default:
+      return {isProd: false, isTestnet: false, isHardhat: true};
+  }
+};
+
 const blockTimeFromDate = (dateStr) => {
   return Date.parse(dateStr) / 1000;
 };
@@ -82,9 +98,10 @@ module.exports = {
   tokens,
   tokensBN,
   bnToInt,
+  chainTypeById,
   chainNameById,
   chainIdByName,
-  dateToEpoch,
+  dateToTimestamp,
   timeInSecs,
   timeInDays,
   timeInDate,

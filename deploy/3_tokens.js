@@ -6,6 +6,7 @@ const {
 
 const {
   log,
+  chainTypeById,
   chainNameById,
   chainIdByName,
 } = require('../js-helpers/utils');
@@ -19,13 +20,14 @@ module.exports = async (hre) => {
   const deployData = {};
 
   const chainId = chainIdByName(network.name);
-  const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 3 : 2);
+  const {isProd, isHardhat} = chainTypeById(chainId);
+  const alchemyTimeout = isHardhat ? 0 : (isProd ? 3 : 2);
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles: Tokens - Contract Deployment');
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
-  log('  Using Network: ', chainNameById(chainId));
+  log(`  Using Network: ${chainNameById(chainId)} (${chainId})`);
   log('  Using Accounts:');
   log('  - Deployer:          ', deployer);
   log('  - Owner:             ', protocolOwner);
@@ -52,14 +54,17 @@ module.exports = async (hre) => {
     deployTransaction: proton.deployTransaction,
   }
 
-  await log('\n  Deploying Lepton NFT...')(alchemyTimeout);
-  const Lepton = await ethers.getContractFactory('Lepton');
-  const LeptonInstance = await Lepton.deploy();
-  const lepton = await LeptonInstance.deployed();
-  deployData['Lepton'] = {
-    abi: getContractAbi('Lepton'),
-    address: lepton.address,
-    deployTransaction: lepton.deployTransaction,
+  let LeptonInstance, Lepton, lepton;
+  if (isHardhat) {
+    await log('\n  Deploying Lepton NFT...')(alchemyTimeout);
+    Lepton = await ethers.getContractFactory('Lepton');
+    LeptonInstance = await Lepton.deploy();
+    lepton = await LeptonInstance.deployed();
+    deployData['Lepton'] = {
+      abi: getContractAbi('Lepton'),
+      address: lepton.address,
+      deployTransaction: lepton.deployTransaction,
+    }
   }
 
   await log('\n  Deploying Lepton2 NFT...')(alchemyTimeout);
@@ -82,18 +87,32 @@ module.exports = async (hre) => {
     deployTransaction: ionx.deployTransaction,
   }
 
+  await log('\n  Deploying ExternalNFT NFT...')(alchemyTimeout);
+  const ExternalNFT = await ethers.getContractFactory('ExternalNFT');
+  const ExternalNFTInstance = await ExternalNFT.deploy();
+  const externalNFT = await ExternalNFTInstance.deployed();
+  deployData['ExternalNFT'] = {
+    abi: getContractAbi('ExternalNFT'),
+    address: externalNFT.address,
+    deployTransaction: externalNFT.deployTransaction,
+  }
+
   // Display Contract Addresses
   await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
   log('  - WBoson:      ', wBoson.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: wBoson.deployTransaction }));
   log('  - Proton:      ', proton.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
-  log('  - Lepton:      ', lepton.address);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
+  if (isHardhat) {
+    log('  - Lepton:      ', lepton.address);
+    log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
+  }
   log('  - Lepton2:      ', lepton2.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
   log('  - Ionx:        ', ionx.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionx.deployTransaction }));
+  log('  - ExternalNFT:      ', externalNFT.address);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: externalNFT.deployTransaction }));
 
   saveDeploymentData(chainId, deployData);
   log('\n  Contract Deployment Data saved to "deployments" directory.');

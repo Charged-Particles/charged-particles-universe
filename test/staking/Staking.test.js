@@ -714,7 +714,6 @@ describe('Staking', function () {
 
             // after 360s : 0.9
             await moveAtTimestamp(epoch1Start + 360)
-            
             expectedMultiplier = multiplierAtTs(1, await getBlockTimestamp())
             expect(await staking.currentEpochMultiplier()).to.be.equal(expectedMultiplier)
 
