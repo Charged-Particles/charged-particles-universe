@@ -27,6 +27,7 @@ const verifyContract = async (name, network, addressOverride = null) => {
 }
 
 async function run() {
+
   const network = await hardhat.ethers.provider.getNetwork();
   const networkName = network.name === 'homestead' ? 'mainnet' : network.name;
   info(`Verifying contracts on network "${networkName}"...`);
@@ -63,11 +64,13 @@ async function run() {
   // await verifyContract('Lepton2', networkName);
 
   // Incentives
-  // await verifyContract('CommunityVault', networkName);
+  //await verifyContract('CommunityVault', networkName);
   // await verifyContract('Staking', networkName);
   // await verifyContract('IonxYieldFarm', networkName);
   // await verifyContract('LPYieldFarm', networkName);
-  await verifyContract('MerkleDistributor', networkName);
+  //await verifyContract('MerkleDistributor', networkName);
+  await verifyContract('AaveBridgeV2', networkName);
+  
 
   success('Done!');
 };

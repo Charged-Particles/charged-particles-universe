@@ -154,6 +154,7 @@ contract ChargedParticles is
     address assetToken
   )
     external
+    view
     virtual
     override
     managerEnabled(walletManagerId)
@@ -884,6 +885,7 @@ contract ChargedParticles is
     address assetToken
   )
     internal
+    view
     virtual
     returns (uint256)
   {

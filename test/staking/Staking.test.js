@@ -309,6 +309,7 @@ describe('Staking', function () {
 
         it('Calls the `transfer` function on token when all conditions are met', async function () {
             // set-up the balance sheet
+            console.log('Balance user:',(await ionxToken.balanceOf(userAddr)).toString());
             await ionxToken.transfer(userAddr, amount)
             await ionxToken.connect(user).approve(staking.address, amount)
             await staking.connect(user).deposit(ionxToken.address, amount)

@@ -1,4 +1,7 @@
 {
+	"constructorArgs": [
+		"0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b"
+	],
 	"abi": [
 		{
 			"inputs": [

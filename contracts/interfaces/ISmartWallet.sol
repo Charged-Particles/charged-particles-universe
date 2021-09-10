@@ -37,7 +37,7 @@ interface ISmartWallet {
   function getReserveInterestToken(address assetToken) external view returns (address);
 
   function getPrincipal(address assetToken) external returns (uint256);
-  function getInterest(address assetToken) external returns (uint256 creatorInterest, uint256 ownerInterest);
+  function getInterest(address assetToken) external view returns (uint256 creatorInterest, uint256 ownerInterest);
   function getTotal(address assetToken) external returns (uint256);
   function getRewards(address assetToken) external returns (uint256);
 

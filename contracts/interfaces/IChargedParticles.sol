@@ -36,7 +36,7 @@ interface IChargedParticles {
   function getSettingsAddress() external view returns (address settingsAddress);
 
   function baseParticleMass(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
-  function currentParticleCharge(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
+  function currentParticleCharge(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external view returns (uint256);
   function currentParticleKinetics(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
   function currentParticleCovalentBonds(address contractAddress, uint256 tokenId, string calldata basketManagerId) external view returns (uint256);
 

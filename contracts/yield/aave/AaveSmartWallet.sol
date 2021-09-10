@@ -73,7 +73,7 @@ contract AaveSmartWallet is SmartWalletBase {
     return _getPrincipal(assetToken);
   }
 
-  function getInterest(address assetToken) external override returns (uint256 creatorInterest, uint256 ownerInterest) {
+  function getInterest(address assetToken) external view override returns (uint256 creatorInterest, uint256 ownerInterest) {
     return _getInterest(assetToken);
   }
 

@@ -46,7 +46,7 @@ interface IWalletManager {
 
   function getTotal(address contractAddress, uint256 tokenId, address assetToken) external returns (uint256);
   function getPrincipal(address contractAddress, uint256 tokenId, address assetToken) external returns (uint256);
-  function getInterest(address contractAddress, uint256 tokenId, address assetToken) external returns (uint256 creatorInterest, uint256 ownerInterest);
+  function getInterest(address contractAddress, uint256 tokenId, address assetToken) external view returns (uint256 creatorInterest, uint256 ownerInterest);
   function getRewards(address contractAddress, uint256 tokenId, address rewardToken) external returns (uint256);
 
   function energize(address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount) external returns (uint256 yieldTokensAmount);

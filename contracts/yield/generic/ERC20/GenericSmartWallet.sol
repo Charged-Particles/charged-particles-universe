@@ -75,6 +75,7 @@ contract GenericSmartWallet is SmartWalletBase {
 
   function getInterest(address /* assetToken */)
     external
+    view
     override
     returns (uint256 creatorInterest, uint256 ownerInterest)
   {

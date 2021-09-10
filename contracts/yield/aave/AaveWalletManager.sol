@@ -88,6 +88,7 @@ contract AaveWalletManager is WalletManagerBase {
     */
   function getInterest(address contractAddress, uint256 tokenId, address assetToken)
     external
+    view
     override
     returns (uint256 creatorInterest, uint256 ownerInterest)
   {
