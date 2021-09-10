@@ -309,6 +309,7 @@ describe('Staking', function () {
 
         it('Calls the `transfer` function on token when all conditions are met', async function () {
             // set-up the balance sheet
+            const balanceBefore = await ionxToken.balanceOf(userAddr);
             await ionxToken.transfer(userAddr, amount)
             await ionxToken.connect(user).approve(staking.address, amount)
             await staking.connect(user).deposit(ionxToken.address, amount)
@@ -317,7 +318,7 @@ describe('Staking', function () {
 
             // expect(await ionxToken.transferCalled()).to.be.true
             // expect(await ionxToken.transferRecipient()).to.be.equal(userAddr)
-            expect((await ionxToken.balanceOf(userAddr)).toString()).to.be.equal(amount.toString())
+            expect((await ionxToken.balanceOf(userAddr)).toString()).to.be.equal(balanceBefore.add(amount).toString())
         })
 
         describe('Partial withdraw', function () {
@@ -791,6 +792,8 @@ describe('Staking', function () {
         )
 
         it('Works if more than 10 epochs passed with no withdraw', async function () {
+            // Start balance is not 0 when running the entire repo test suite
+            const balanceBefore = await ionxToken.balanceOf(userAddr);
             await deposit(user, amount)
             await moveAtEpoch(11)
 
@@ -800,7 +803,7 @@ describe('Staking', function () {
 
             // expect(await ionxToken.transferCalled()).to.be.true
             // expect(await ionxToken.transferRecipient()).to.be.equal(userAddr)
-            expect((await ionxToken.balanceOf(userAddr)).toString()).to.be.equal(amount.mul(10).toString())
+            expect((await ionxToken.balanceOf(userAddr)).toString()).to.be.equal(balanceBefore.toString());
             expect(await staking.balanceOf(userAddr, ionxToken.address)).to.be.equal(0)
         })
     })
