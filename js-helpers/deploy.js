@@ -278,6 +278,11 @@ const presets = {
       totalIonx: tokensBN(bn(100)),
       expiryDate: dateToTimestamp(dateFormat(ONE_MONTH_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')),
     },
+    month4: {
+      merkleRoot: '0xf0c21b0f8e577f02024d3a7a33eabca1aa1e224e67f3dec1866c0c1be04f9b1d',
+      totalIonx: tokensBN(bn(100)),
+      expiryDate: dateToTimestamp(dateFormat(ONE_MONTH_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')),
+    },
   },
 };
 
