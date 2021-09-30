@@ -21,7 +21,7 @@ const util = require('util');
 const _ = require('lodash');
 
 
-const __VESTING_CLAIM_INDEX = 3;
+const __VESTING_CLAIM_INDEX = 4;
 
 
 module.exports = async (hre) => {
@@ -34,7 +34,6 @@ module.exports = async (hre) => {
   const chainId = chainIdByName(network.name);
   const {isProd, isHardhat} = chainTypeById(chainId);
   const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
-  const incentives = presets.Incentives[chainId];
   const vesting = presets.Vesting[`month${__VESTING_CLAIM_INDEX}`];
 
   const daoSigner = ethers.provider.getSigner(protocolOwner);
