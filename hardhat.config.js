@@ -18,24 +18,24 @@ require("hardhat-watcher");
 
 
 // This must occur after hardhat-deploy!
-task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
-  const input = await runSuper();
-  input.settings.metadata.useLiteralContent = process.env.USE_LITERAL_CONTENT != 'false';
-  console.log(`useLiteralContent: ${input.settings.metadata.useLiteralContent}`);
-  return input;
-});
+// task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
+//   const input = await runSuper();
+//   input.settings.metadata.useLiteralContent = process.env.USE_LITERAL_CONTENT != 'false';
+//   console.log(`useLiteralContent: ${input.settings.metadata.useLiteralContent}`);
+//   return input;
+// });
 
-// Task to run deployment fixtures before tests without the need of "--deploy-fixture"
-//  - Required to get fixtures deployed before running Coverage Reports
-task(
-  TASK_TEST,
-  "Runs the coverage report",
-  async (args, hre, runSuper) => {
-    await hre.run('compile');
-    await hre.deployments.fixture();
-    return runSuper({...args, noCompile: true});
-  }
-);
+// // Task to run deployment fixtures before tests without the need of "--deploy-fixture"
+// //  - Required to get fixtures deployed before running Coverage Reports
+// task(
+//   TASK_TEST,
+//   "Runs the coverage report",
+//   async (args, hre, runSuper) => {
+//     await hre.run('compile');
+//     await hre.deployments.fixture();
+//     return runSuper({...args, noCompile: true});
+//   }
+// );
 
 
 const mnemonic = {
@@ -71,7 +71,7 @@ module.exports = {
             gasPrice: 1e9,
             forking: {
                 url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-                blockNumber: 11400000,  // MUST be after Aave V2 was deployed
+          //      blockNumber: 13389557,  // MUST be after Aave V2 was deployed
                 timeout: 1000000
             },
         },
