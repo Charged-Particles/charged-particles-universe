@@ -61,7 +61,6 @@ describe('YieldFarm Pool', function () {
 
         deprecation = incentives.ionxToken.deprecation;
         deprecationBn = incentives.ionxToken.deprecation.mul(ethers.BigNumber.from(10).pow(18));
-
         epochDuration = incentives.staking.epochDuration;
         NR_OF_EPOCHS = incentives.ionxToken.nrOfEpochs;
 
@@ -148,7 +147,6 @@ describe('YieldFarm Pool', function () {
         // Dispatch to Community Vault
         await ionxToken.connect(owner).transfer(communityVaultAddr, distributedAmountIonx);
         await ionxToken.connect(owner).transfer(communityVaultAddr, distributedAmount);
-
         await communityVault.connect(deployer).setAllowance(yieldFarmLP.address, distributedAmount);
         await communityVault.connect(deployer).setAllowance(yieldFarmIonx.address, distributedAmountIonx);
 
@@ -201,12 +199,10 @@ describe('YieldFarm Pool', function () {
 
             let claimableNow;
 
-
             console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
             console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
 
             await expect(yieldFarmIonx.getAmountClaimable()).to.be.revertedWith('SafeMath: subtraction overflow');
-
             await moveAtStakingEpoch(1);
 
             epochNow = await yieldFarmIonx.getCurrentEpoch();
@@ -239,7 +235,6 @@ describe('YieldFarm Pool', function () {
 
             await moveAtStakingEpoch(2);
 
-
             epochNow = await yieldFarmIonx.getCurrentEpoch();
 
             console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
@@ -259,7 +254,6 @@ describe('YieldFarm Pool', function () {
 
             await moveAtStakingEpoch(3);
 
-
             console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
             console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
 
@@ -278,7 +272,6 @@ describe('YieldFarm Pool', function () {
             // Epoch 4
             await moveAtStakingEpoch(4);
 
-
             console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
             console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
 
@@ -293,7 +286,6 @@ describe('YieldFarm Pool', function () {
 
 
             await moveAtStakingEpoch(5);
-
             epochNow = await yieldFarmIonx.getCurrentEpoch();
 
             console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
@@ -308,7 +300,6 @@ describe('YieldFarm Pool', function () {
 
 
             await yieldFarmIonx.connect(user).massHarvest();
-
             const balanceUser5 = await ionxToken.balanceOf(await user.getAddress());
             console.log(`After harvesting epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser5)} IONX`);
             expect(balanceUser5).to.be.gt(balanceUser4);
