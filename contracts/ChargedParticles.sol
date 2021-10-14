@@ -30,6 +30,7 @@ import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
 
 import "./interfaces/IUniverse.sol";
 import "./interfaces/IChargedState.sol";
@@ -58,6 +59,7 @@ contract ChargedParticles is
   BlackholePrevention
 {
   using SafeMathUpgradeable for uint256;
+  using SafeERC20Upgradeable for IERC20Upgradeable;
   using TokenInfo for address;
   using Bitwise for uint32;
 
@@ -902,7 +904,7 @@ contract ChargedParticles is
   /// @param tokenAmount  The amount of tokens to collect
   function _collectAssetToken(address from, address tokenAddress, uint256 tokenAmount) internal virtual returns (uint256 protocolFee) {
     protocolFee = _getFeesForDeposit(tokenAmount);
-    require(IERC20Upgradeable(tokenAddress).transferFrom(from, address(this), tokenAmount.add(protocolFee)), "CP:E-401");
+    IERC20Upgradeable(tokenAddress).safeTransferFrom(from, address(this), tokenAmount.add(protocolFee));
   }
 
   /// @dev Collects the Required ERC721 Token(s) from the users wallet
