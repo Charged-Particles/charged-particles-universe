@@ -9,6 +9,7 @@
     "GenericBasketManager": "GenericBasketManager",
     "AaveWalltManager": "AaveWalletManager",
     "AaveBridgeV2": "AaveBridgeV2",
+    "TokenInfoProxy": "TokenInfoProxy",
     "Ionx": "Ionx",
     "IonxTimelock": "IonxTimelock",
     "WBoson": "WBoson",
