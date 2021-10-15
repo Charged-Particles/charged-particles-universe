@@ -25,36 +25,31 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "../interfaces/ITokenInfoProxy.sol";
 import "../interfaces/IERC721Chargeable.sol";
 
 
-contract TokenInfoProxy is Ownable {
+contract TokenInfoProxy is ITokenInfoProxy, Ownable {
   using Address for address;
 
-  event ContractFunctionSignatureSet(address indexed contractAddress, string fnName, bytes4 fnSig);
-
-  struct FnSignatures {
-    bytes4 ownerOf;
-    bytes4 creatorOf;
-  }
   mapping (address => FnSignatures) internal _remappedFnSigs;
 
-  function setContractFnOwnerOf(address contractAddress, bytes4 fnSig) external onlyOwner {
+  function setContractFnOwnerOf(address contractAddress, bytes4 fnSig) external override onlyOwner {
     _remappedFnSigs[contractAddress].ownerOf = fnSig;
     emit ContractFunctionSignatureSet(contractAddress, "ownerOf", fnSig);
   }
-  function setContractFnCreatorOf(address contractAddress, bytes4 fnSig) external onlyOwner {
+  function setContractFnCreatorOf(address contractAddress, bytes4 fnSig) external override onlyOwner {
     _remappedFnSigs[contractAddress].creatorOf = fnSig;
     emit ContractFunctionSignatureSet(contractAddress, "creatorOf", fnSig);
   }
 
 
 
-  function getTokenUUID(address contractAddress, uint256 tokenId) external pure returns (uint256) {
+  function getTokenUUID(address contractAddress, uint256 tokenId) external pure override returns (uint256) {
     return uint256(keccak256(abi.encodePacked(contractAddress, tokenId)));
   }
 
-  function getTokenOwner(address contractAddress, uint256 tokenId) external returns (address) {
+  function getTokenOwner(address contractAddress, uint256 tokenId) external override returns (address) {
     bytes4 fnSig = IERC721Chargeable.ownerOf.selector;
     if (_remappedFnSigs[contractAddress].ownerOf.length > 0) {
       fnSig = _remappedFnSigs[contractAddress].ownerOf;
@@ -63,7 +58,7 @@ contract TokenInfoProxy is Ownable {
     return abi.decode(returnData, (address));
   }
 
-  function getTokenCreator(address contractAddress, uint256 tokenId) external returns (address) {
+  function getTokenCreator(address contractAddress, uint256 tokenId) external override returns (address) {
     bytes4 fnSig = IERC721Chargeable.creatorOf.selector;
     if (_remappedFnSigs[contractAddress].creatorOf.length > 0) {
       fnSig = _remappedFnSigs[contractAddress].creatorOf;
