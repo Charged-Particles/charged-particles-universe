@@ -54,7 +54,17 @@ contract TokenInfoProxy is Ownable {
     return uint256(keccak256(abi.encodePacked(contractAddress, tokenId)));
   }
 
+  function isErc721OwnerOrOperator(address contractAddress, uint256 tokenId, address sender) external returns (bool) {
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
+    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
+    return (sender == tokenOwner || tokenInterface.isApprovedForAll(tokenOwner, sender));
+  }
+
   function getTokenOwner(address contractAddress, uint256 tokenId) external returns (address) {
+    return _getTokenOwner(contractAddress, tokenId);
+  }
+
+  function _getTokenOwner(address contractAddress, uint256 tokenId) internal returns (address) {
     bytes4 fnSig = IERC721Chargeable.ownerOf.selector;
     if (_remappedFnSigs[contractAddress].ownerOf.length > 0) {
       fnSig = _remappedFnSigs[contractAddress].ownerOf;

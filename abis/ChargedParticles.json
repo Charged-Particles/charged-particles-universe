@@ -623,6 +623,11 @@
         "internalType": "address",
         "name": "_trustedForwarder",
         "type": "address"
+      },
+      {
+        "internalType": "contract ITokenInfoProxy",
+        "name": "_tokenInfoProxy",
+        "type": "address"
       }
     ],
     "name": "initialize",

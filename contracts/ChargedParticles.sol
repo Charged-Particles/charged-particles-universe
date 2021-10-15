@@ -38,9 +38,9 @@ import "./interfaces/IChargedSettings.sol";
 import "./interfaces/IChargedParticles.sol";
 import "./interfaces/IWalletManager.sol";
 import "./interfaces/IBasketManager.sol";
+import "./interfaces/ITokenInfoProxy.sol";
 
 import "./lib/Bitwise.sol";
-import "./lib/TokenInfo.sol";
 import "./lib/RelayRecipient.sol";
 
 import "./lib/BlackholePrevention.sol";
@@ -60,7 +60,6 @@ contract ChargedParticles is
 {
   using SafeMathUpgradeable for uint256;
   using SafeERC20Upgradeable for IERC20Upgradeable;
-  using TokenInfo for address;
   using Bitwise for uint32;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;       // 10000  (100%)
@@ -95,15 +94,17 @@ contract ChargedParticles is
   IChargedSettings internal _chargedSettings;
   address internal _lepton;
   uint256 internal depositFee;
+  ITokenInfoProxy internal tokenInfoProxy;
 
   /***********************************|
   |          Initialization           |
   |__________________________________*/
 
-  function initialize(address _trustedForwarder) public initializer {
+  function initialize(address _trustedForwarder, ITokenInfoProxy _tokenInfoProxy) public initializer {
     __Ownable_init();
     __ReentrancyGuard_init();
     trustedForwarder = _trustedForwarder;
+    tokenInfoProxy = _tokenInfoProxy;
   }
 
 
@@ -384,7 +385,9 @@ contract ChargedParticles is
     returns (uint256 receiverAmount)
   {
     address sender = _msgSender();
-    require(contractAddress.isTokenCreator(tokenId, sender), "CP:E-104");
+    address tokenCreator = tokenInfoProxy.getTokenCreator(contractAddress, tokenId);
+
+    require(sender == tokenCreator, "CP:E-104");
 
     receiverAmount = _chargedSettings.getWalletManager(walletManagerId).dischargeAmountForCreator(
       receiver,
@@ -655,7 +658,8 @@ contract ChargedParticles is
     virtual
   {
     if (_chargedState.isEnergizeRestricted(contractAddress, tokenId)) {
-      require(contractAddress.isErc721OwnerOrOperator(tokenId, _msgSender()), "CP:E-105");
+      bool isERC721OwnerOrOperator = tokenInfoProxy.isErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
+      require(isERC721OwnerOrOperator, "CP:E-105");
     }
 
     ( string memory requiredWalletManager,
@@ -745,7 +749,8 @@ contract ChargedParticles is
     virtual
   {
     if (_chargedState.isCovalentBondRestricted(contractAddress, tokenId)) {
-      require(contractAddress.isErc721OwnerOrOperator(tokenId, _msgSender()), "CP:E-105");
+      bool isErc721OwnerOrOperator = tokenInfoProxy.isErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
+      require(isErc721OwnerOrOperator, "CP:E-105");
     }
 
     ( string memory requiredBasketManager,

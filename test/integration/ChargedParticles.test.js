@@ -15,6 +15,8 @@ const {
   toBN,
 } = require('../../js-helpers/utils');
 
+const { deployMockContract } = require('../../js-helpers/deployMockContract');
+
 const {
   callAndReturn,
   getNetworkBlockNumber,
@@ -25,11 +27,15 @@ const {
 const { expect, assert } = require('chai');
 const { max } = require('lodash');
 
+const CryptoPunksMarket = require('../../build/contracts/contracts/test/CryptoPunks.sol/CryptoPunksMarket.json');
+
 const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
 
 const daiABI = require('../abis/dai');
 const { balanceOf } = require('../../js-helpers/balanceOf');
 const daiHodler = "0x55e4d16f9c3041EfF17Ca32850662f3e9Dddbce7"; // Hodler with the highest current amount of DAI, used for funding our operations on mainnet fork.
+
+let overrides = { gasLimit: 20000000 }
 
 describe("[INTEGRATION] Charged Particles", () => {
   let chainId;
@@ -37,6 +43,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   // External contracts
   let dai;
   let daiAddress;
+  let cryptoPunksMarket;
 
   // Internal contracts
   let universe;
@@ -89,6 +96,9 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     // With Forked Mainnet
     dai = new ethers.Contract(daiAddress, daiABI, daiSigner);
+
+    // test NFTs that are non-compliant with ERC721 standard
+    cryptoPunksMarket = await deployMockContract(signerD, CryptoPunksMarket.abi, overrides);
 
     // Connect to Internal Contracts
     const Universe = await ethers.getContractFactory('Universe');
