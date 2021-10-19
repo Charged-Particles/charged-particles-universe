@@ -30,6 +30,8 @@ const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31b
 const daiABI = require('../abis/dai');
 const { balanceOf } = require('../../js-helpers/balanceOf');
 const daiHodler = "0x55e4d16f9c3041EfF17Ca32850662f3e9Dddbce7"; // Hodler with the highest current amount of DAI, used for funding our operations on mainnet fork.
+const amplAddress = "0xD46bA6D942050d489DBd938a2C909A5d5039A161";
+const amplHodler = "0x6723B7641c8Ac48a61F5f505aB1E9C03Bb44a301";
 
 describe("[INTEGRATION] Charged Particles", () => {
   let chainId;
@@ -690,5 +692,63 @@ describe("[INTEGRATION] Charged Particles", () => {
     const ethBal2 = await ethers.provider.getBalance(user1);
     expect(ethBal2.sub(ethBal1)).to.be.equal(ethToWithdraw);
   });
+
+  it("can add non-compliant tokens to invalidAssets", async () => {
+    expect(
+      await chargedSettings.connect(signerD).setAssetInvalidity(amplAddress, true)
+  ).to.emit(chargedSettings, 'AssetInvaliditySet').withArgs(amplAddress, true)
+
+    await signerD.sendTransaction({ to: amplHodler, value: toWei('10') });
+
+    await network.provider.request({
+      method: "hardhat_stopImpersonatingAccount",
+      params: [daiHodler]
+    });
+
+    await network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [amplHodler]
+    });
+
+    const amplSigner = await ethers.provider.getSigner(amplHodler);
+    const ampl = new ethers.Contract(
+      amplAddress,
+      [
+        'function transfer(address to, uint amount) external',
+        'function approve(address spender, uint value) external'
+      ],
+      amplSigner
+    );
+
+    await ampl.transfer(user1, '100000000000');
+    await ampl.connect(signer1).approve(proton.address, '100000000000');
+
+    await expect(
+      proton.connect(signer1).createChargedParticle(
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'generic',                    // walletManagerId
+        amplAddress,                  // assetToken
+        '100000000000',               // assetAmount
+        annuityPct                    // annuityPercent
+      )
+    ).to.be.revertedWith('Invalid Asset');
+
+    await expect(
+      proton.connect(signer1).createChargedParticle(
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'aave',                       // walletManagerId
+        amplAddress,                  // assetToken
+        '100000000000',               // assetAmount
+        annuityPct                    // annuityPercent
+      )
+    ).to.be.revertedWith('Invalid Asset');
+
+  })
 
 });
