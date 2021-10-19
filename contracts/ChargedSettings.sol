@@ -33,6 +33,8 @@ import "./lib/TokenInfo.sol";
 import "./lib/RelayRecipient.sol";
 import "./lib/BlackholePrevention.sol";
 
+import "./lib/TokenInfoProxy.sol";
+
 /**
  * @notice Charged Particles Settings Contract
  */
@@ -55,30 +57,27 @@ contract ChargedSettings is
   uint32 constant internal PERM_TIMELOCK_OWN_NFT  = 8;    // NFT Contracts that can timelock their own NFTs on behalf of their users
   uint32 constant internal PERM_RESTRICTED_ASSETS = 16;   // NFT Contracts that have restricted deposits to specific assets
 
+
   // Current Settings for External NFT Token Contracts;
   //  - Any user can add any ERC721 or ERC1155 token as a Charged Particle without Limits,
   //    unless the Owner of the ERC721 or ERC1155 token contract registers the token
   //    and sets the Custom Settings for their token(s)
-  struct NftSettings {
-    uint32 actionPerms;
+  mapping (address => uint32) internal _nftActionPerms;
 
-    string requiredWalletManager;
-    string requiredBasketManager;
+  mapping (address => string) internal _nftRequiredWalletManager;
+  mapping (address => string) internal _nftRequiredBasketManager;
 
-    // ERC20
-    mapping (address => bool) allowedAssetTokens;
-    mapping (address => uint256) depositMin;  // Asset Token Address => Min
-    mapping (address => uint256) depositMax;  // Asset Token Address => Max
+  // ERC20
+  mapping (address => mapping(address => bool)) internal _nftAllowedAssetTokens;
+  mapping (address => mapping (address => uint256)) internal _nftDepositMin;
+  mapping (address => mapping (address => uint256)) internal _nftDepositMax;
 
-    // ERC721 / ERC1155
-    mapping (address => uint256) maxNfts;     // NFT Token Address => Max
-  }
+  // ERC721 / ERC1155
+  mapping (address => mapping (address => uint256)) internal _nftMaxNfts;     // NFT Token Address => Max
 
-  // Optional Configs for individual NFTs set by NFT Creator
-  struct CreatorSettings {
-    uint256 annuityPercent;
-    address annuityRedirect;
-  }
+  // Optional Configs for individual NFTs set by NFT Creator (by Token UUID)
+  mapping (uint256 => uint256) internal _creatorAnnuityPercent;
+  mapping (uint256 => address) internal _creatorAnnuityRedirect;
 
   mapping (address => uint256) internal _depositCap;
   uint256 internal _tempLockExpiryBlocks;
@@ -86,12 +85,6 @@ contract ChargedSettings is
   // Wallet/Basket Managers (by Unique Manager ID)
   mapping (string => IWalletManager) internal _ftWalletManager;
   mapping (string => IBasketManager) internal _nftBasketManager;
-
-  // Settings for individual NFTs set by NFT Creator (by Token UUID)
-  mapping (uint256 => CreatorSettings) internal _creatorSettings;
-
-  // Settings for External NFT Token Contracts (by Token Contract Address)
-  mapping (address => NftSettings) internal _nftSettings;
 
 
   /***********************************|
