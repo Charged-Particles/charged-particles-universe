@@ -55,6 +55,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   let lepton;
   let ionx;
   let timelocks;
+  let tokenInfoProxy;
 
   // Settings
   let annuityPct = '1000';  // 10%
@@ -112,7 +113,9 @@ describe("[INTEGRATION] Charged Particles", () => {
     const Lepton = await ethers.getContractFactory('Lepton2');
     const Ionx = await ethers.getContractFactory('Ionx');
     const IonxTimelock = await ethers.getContractFactory('IonxTimelock');
+    const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy')
 
+    tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address)
     universe = Universe.attach(getDeployData('Universe', chainId).address);
     chargedState = ChargedState.attach(getDeployData('ChargedState', chainId).address);
     chargedSettings = ChargedSettings.attach(getDeployData('ChargedSettings', chainId).address);
@@ -705,6 +708,57 @@ describe("[INTEGRATION] Charged Particles", () => {
     await lepton.withdrawEther(user1, ethToWithdraw);
     const ethBal2 = await ethers.provider.getBalance(user1);
     expect(ethBal2.sub(ethBal1)).to.be.equal(ethToWithdraw);
+  });
+
+  it("can accept a cryptopunks deposit", async () => {
+      let punksAddress = cryptoPunksMarket.address;
+      let fnSig = cryptoPunksMarket.interface.getSighash('punkIndexToAddress(uint256)');
+      expect(
+          await tokenInfoProxy.setContractFnOwnerOf(punksAddress, fnSig)
+      ).to.emit(tokenInfoProxy, 'ContractFunctionSignatureSet').withArgs(
+          punksAddress, 'ownerOf', fnSig
+      )
+
+      fnSig = cryptoPunksMarket.interface.getSighash('buyPunk(uint256)');
+      expect(
+          await tokenInfoProxy.setContractFnCollectOverride(punksAddress, fnSig)
+      ).to.emit(tokenInfoProxy, 'ContractFunctionSignatureSet').withArgs(
+          punksAddress, 'collectOverride', fnSig
+      )
+
+      fnSig = cryptoPunksMarket.interface.getSighash('transferPunk(address,uint256)');
+      expect(
+          await tokenInfoProxy.setContractFnDepositOverride(punksAddress, fnSig)
+      ).to.emit(tokenInfoProxy, 'ContractFunctionSignatureSet').withArgs(
+          punksAddress, 'depositOverride', fnSig
+      )
+
+      // const tokenId1 = await callAndReturn({
+      //   contractInstance: proton,
+      //   contractMethod: 'createChargedParticle',
+      //   contractCaller: signer1,
+      //   contractParams: [
+      //     user1,                        // creator
+      //     user2,                        // receiver
+      //     user3,                        // referrer
+      //     TEST_NFT_TOKEN_URI,           // tokenMetaUri
+      //     'generic',                    // walletManagerId
+      //     daiAddress,                   // assetToken
+      //     toWei('3'),                   // assetAmount
+      //     annuityPct,                   // annuityPercent
+      //   ],
+      // });
+      //
+      // await chargedParticles.connect(signer1).covalentBond(
+      //   proton.address,
+      //   tokenId1,
+      //   'generic',
+      //   proton.address,
+      //   tokenId2,
+      //   '0x',
+      //   '0x'
+      // );
+
   });
 
 });
