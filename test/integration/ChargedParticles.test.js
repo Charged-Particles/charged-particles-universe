@@ -378,7 +378,9 @@ describe("[INTEGRATION] Charged Particles", () => {
       tokenId1,
       'generic',
       proton.address,
-      tokenId2
+      tokenId2,
+      '0x',
+      '0x'
     );
 
     await chargedParticles.connect(signer2).breakCovalentBond(
@@ -652,7 +654,9 @@ describe("[INTEGRATION] Charged Particles", () => {
       protonId,
       'generic',
       lepton.address,
-      leptonId1
+      leptonId1,
+      '0x',
+      '0x'
     );
 
     await expect(chargedParticles.connect(signer3).covalentBond(
@@ -660,7 +664,9 @@ describe("[INTEGRATION] Charged Particles", () => {
       protonId,
       'generic',
       lepton.address,
-      leptonId2
+      leptonId2,
+      '0x',
+      '0x'
     )).to.be.revertedWith('CP:E-430');
   });
 

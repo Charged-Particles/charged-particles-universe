@@ -117,8 +117,9 @@ describe("Charged Settings", () => {
     const GenericWalletManagerInstance = await GenericWalletManager.deploy();
     newGenericWalletManager = await GenericWalletManagerInstance.deployed();
 
+    const tokenInfoProxyAddress = getDeployData('TokenInfoProxy', chainId).address
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
-    const GenericBasketManagerInstance = await GenericBasketManager.deploy();
+    const GenericBasketManagerInstance = await GenericBasketManager.deploy(tokenInfoProxyAddress);
     newGenericBasketManager = await GenericBasketManagerInstance.deployed();
 
     ddChargedParticles = getDeployData('ChargedParticles', chainId);

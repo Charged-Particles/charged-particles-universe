@@ -198,7 +198,7 @@ contract CryptoPunksMarket {
 
     function enterBidForPunk(uint punkIndex) payable {
         if (punkIndex >= 10000) throw;
-        if (!allPunksAssigned) throw;                
+        if (!allPunksAssigned) throw;
         if (punkIndexToAddress[punkIndex] == 0x0) throw;
         if (punkIndexToAddress[punkIndex] == msg.sender) throw;
         if (msg.value == 0) throw;
@@ -214,7 +214,7 @@ contract CryptoPunksMarket {
 
     function acceptBidForPunk(uint punkIndex, uint minPrice) {
         if (punkIndex >= 10000) throw;
-        if (!allPunksAssigned) throw;                
+        if (!allPunksAssigned) throw;
         if (punkIndexToAddress[punkIndex] != msg.sender) throw;
         address seller = msg.sender;
         Bid bid = punkBids[punkIndex];
@@ -235,7 +235,7 @@ contract CryptoPunksMarket {
 
     function withdrawBidForPunk(uint punkIndex) {
         if (punkIndex >= 10000) throw;
-        if (!allPunksAssigned) throw;                
+        if (!allPunksAssigned) throw;
         if (punkIndexToAddress[punkIndex] == 0x0) throw;
         if (punkIndexToAddress[punkIndex] == msg.sender) throw;
         Bid bid = punkBids[punkIndex];
