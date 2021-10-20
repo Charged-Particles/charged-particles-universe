@@ -28,9 +28,9 @@ const { max } = require('lodash');
 const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
 
 const daiABI = require('../abis/dai');
+const erc20ABI = require('../abis/erc20');
 const { balanceOf } = require('../../js-helpers/balanceOf');
 const daiHodler = "0x55e4d16f9c3041EfF17Ca32850662f3e9Dddbce7"; // Hodler with the highest current amount of DAI, used for funding our operations on mainnet fork.
-const amplAddress = "0xD46bA6D942050d489DBd938a2C909A5d5039A161";
 const amplHodler = "0x6723B7641c8Ac48a61F5f505aB1E9C03Bb44a301";
 
 describe("[INTEGRATION] Charged Particles", () => {
@@ -39,6 +39,8 @@ describe("[INTEGRATION] Charged Particles", () => {
   // External contracts
   let dai;
   let daiAddress;
+  let ampl;
+  let amplAddress;
 
   // Internal contracts
   let universe;
@@ -58,6 +60,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   let trustedForwarder;
 
   let daiSigner;
+  let amplSigner;
   let deployer;
   let user1;
   let user2;
@@ -70,14 +73,20 @@ describe("[INTEGRATION] Charged Particles", () => {
   beforeEach(async () => {
     chainId = await getChainId(); // chainIdByName(network.name);
     daiAddress = presets.Aave.v2.dai[chainId];
+    amplAddress = presets.Aave.v2.ampl[chainId];
 
     // With Forked Mainnet
     await network.provider.request({
       method: "hardhat_impersonateAccount",
       params: [daiHodler]
     });
+    await network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [amplHodler]
+    });
 
     daiSigner = ethers.provider.getSigner(daiHodler);
+    amplSigner = ethers.provider.getSigner(amplHodler);
     const namedAccts = (await getNamedAccounts());
     deployer = namedAccts.deployer
     trustedForwarder = namedAccts.trustedForwarder;
@@ -91,6 +100,7 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     // With Forked Mainnet
     dai = new ethers.Contract(daiAddress, daiABI, daiSigner);
+    ampl = new ethers.Contract(amplAddress, erc20ABI, amplSigner);
 
     // Connect to Internal Contracts
     const Universe = await ethers.getContractFactory('Universe');
@@ -126,6 +136,10 @@ describe("[INTEGRATION] Charged Particles", () => {
     await network.provider.request({
       method: "hardhat_stopImpersonatingAccount",
       params: [daiHodler]
+    });
+    await network.provider.request({
+      method: "hardhat_stopImpersonatingAccount",
+      params: [amplHodler]
     });
   });
 
@@ -696,31 +710,11 @@ describe("[INTEGRATION] Charged Particles", () => {
   it("can add non-compliant tokens to invalidAssets", async () => {
     expect(
       await chargedSettings.connect(signerD).setAssetInvalidity(amplAddress, true)
-  ).to.emit(chargedSettings, 'AssetInvaliditySet').withArgs(amplAddress, true)
+    ).to.emit(chargedSettings, 'AssetInvaliditySet').withArgs(amplAddress, true)
 
     await signerD.sendTransaction({ to: amplHodler, value: toWei('10') });
 
-    await network.provider.request({
-      method: "hardhat_stopImpersonatingAccount",
-      params: [daiHodler]
-    });
-
-    await network.provider.request({
-      method: "hardhat_impersonateAccount",
-      params: [amplHodler]
-    });
-
-    const amplSigner = await ethers.provider.getSigner(amplHodler);
-    const ampl = new ethers.Contract(
-      amplAddress,
-      [
-        'function transfer(address to, uint amount) external',
-        'function approve(address spender, uint value) external'
-      ],
-      amplSigner
-    );
-
-    await ampl.transfer(user1, '100000000000');
+    await ampl.connect(amplSigner).transfer(user1, '100000000000');
     await ampl.connect(signer1).approve(proton.address, '100000000000');
 
     await expect(
@@ -734,7 +728,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         '100000000000',               // assetAmount
         annuityPct                    // annuityPercent
       )
-    ).to.be.revertedWith('Invalid Asset');
+    ).to.be.revertedWith('CP:E-424');
 
     await expect(
       proton.connect(signer1).createChargedParticle(
@@ -747,8 +741,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         '100000000000',               // assetAmount
         annuityPct                    // annuityPercent
       )
-    ).to.be.revertedWith('Invalid Asset');
-
+    ).to.be.revertedWith('CP:E-424');
   })
 
 });

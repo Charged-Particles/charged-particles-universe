@@ -670,7 +670,7 @@ contract ChargedParticles is
 
     require(energizeEnabled, "CP:E-417");
 
-    require(!invalidAsset, "Invalid Asset");
+    require(!invalidAsset, "CP:E-424");
 
     // Valid Wallet Manager?
     if (bytes(requiredWalletManager).length > 0) {

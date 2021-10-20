@@ -118,6 +118,11 @@ const presets = {
         80001: '0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F', // polygon testnet
         31337: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // Hardhat - Forked Mainnet
       },
+      ampl: {
+        1: '0xD46bA6D942050d489DBd938a2C909A5d5039A161', // mainnet
+        42: '0x3E0437898a5667a4769B1Ca5A34aAB1ae7E81377', // kovan
+        31337: '0xD46bA6D942050d489DBd938a2C909A5d5039A161', // Hardhat - Forked Mainnet
+      },
       lendingPoolProvider: {
         1: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // mainnet
         42: '0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b', // kovan
