@@ -30,6 +30,25 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "invalidity",
+        "type": "bool"
+      }
+    ],
+    "name": "AssetInvaliditySet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "contractAddress",
         "type": "address"
       },
@@ -489,6 +508,11 @@
         "internalType": "uint256",
         "name": "depositMax",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "invalidAsset",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -812,6 +836,24 @@
       }
     ],
     "name": "setAllowedAssetToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "invalidity",
+        "type": "bool"
+      }
+    ],
+    "name": "setAssetInvalidity",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

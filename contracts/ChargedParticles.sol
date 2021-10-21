@@ -664,10 +664,13 @@ contract ChargedParticles is
       bool validAsset,
       uint256 depositCap,
       uint256 depositMin,
-      uint256 depositMax
+      uint256 depositMax,
+      bool invalidAsset
     ) = _chargedSettings.getAssetRequirements(contractAddress, assetToken);
 
     require(energizeEnabled, "CP:E-417");
+
+    require(!invalidAsset, "CP:E-424");
 
     // Valid Wallet Manager?
     if (bytes(requiredWalletManager).length > 0) {
