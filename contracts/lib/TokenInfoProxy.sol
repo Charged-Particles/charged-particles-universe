@@ -32,38 +32,75 @@ import "../interfaces/IERC721Chargeable.sol";
 contract TokenInfoProxy is ITokenInfoProxy, Ownable {
   using Address for address;
 
+  event ContractFunctionSignatureSet(address indexed contractAddress, string fnName, bytes4 fnSig);
+
+  struct FnSignatures {
+    bytes4 ownerOf;
+    bytes4 creatorOf;
+    bytes4 collectOverride;
+    bytes4 depositOverride;
+  }
   mapping (address => FnSignatures) internal _remappedFnSigs;
 
   function setContractFnOwnerOf(address contractAddress, bytes4 fnSig) external override onlyOwner {
     _remappedFnSigs[contractAddress].ownerOf = fnSig;
     emit ContractFunctionSignatureSet(contractAddress, "ownerOf", fnSig);
   }
-  function setContractFnCreatorOf(address contractAddress, bytes4 fnSig) external override onlyOwner {
+
+  function setContractFnCreatorOf(address contractAddress, bytes4 fnSig) external onlyOwner {
     _remappedFnSigs[contractAddress].creatorOf = fnSig;
     emit ContractFunctionSignatureSet(contractAddress, "creatorOf", fnSig);
   }
 
+  function setContractFnCollectOverride(address contractAddress, bytes4 fnSig) external onlyOwner {
+    require(_remappedFnSigs[contractAddress].collectOverride == bytes4(0));
+    _remappedFnSigs[contractAddress].collectOverride = fnSig;
+    emit ContractFunctionSignatureSet(contractAddress, "collectOverride", fnSig);
+  }
 
+  function setContractFnDepositOverride(address contractAddress, bytes4 fnSig) external onlyOwner {
+    require(_remappedFnSigs[contractAddress].depositOverride == bytes4(0));
+    _remappedFnSigs[contractAddress].depositOverride = fnSig;
+    emit ContractFunctionSignatureSet(contractAddress, "depositOverride", fnSig);
+  }
 
   function getTokenUUID(address contractAddress, uint256 tokenId) external pure override returns (uint256) {
     return uint256(keccak256(abi.encodePacked(contractAddress, tokenId)));
   }
 
-  function getTokenOwner(address contractAddress, uint256 tokenId) external override returns (address) {
+  function isErc721OwnerOrOperator(address contractAddress, uint256 tokenId, address sender) external returns (bool) {
+    IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
+    address tokenOwner = _getTokenOwner(contractAddress, tokenId);
+    return (sender == tokenOwner || tokenInterface.isApprovedForAll(tokenOwner, sender));
+  }
+
+  function getTokenOwner(address contractAddress, uint256 tokenId) external returns (address) {
+    return _getTokenOwner(contractAddress, tokenId);
+  }
+
+  function _getTokenOwner(address contractAddress, uint256 tokenId) internal returns (address) {
     bytes4 fnSig = IERC721Chargeable.ownerOf.selector;
-    if (_remappedFnSigs[contractAddress].ownerOf.length > 0) {
+    if (_remappedFnSigs[contractAddress].ownerOf != bytes4(0)) {
       fnSig = _remappedFnSigs[contractAddress].ownerOf;
     }
-    bytes memory returnData =  contractAddress.functionCall(abi.encodeWithSelector(fnSig, tokenId), "TokenInfoProxy: low-level call failed on getTokenOwner");
+    bytes memory returnData = contractAddress.functionCall(abi.encodeWithSelector(fnSig, tokenId), "TokenInfoProxy: low-level call failed on getTokenOwner");
     return abi.decode(returnData, (address));
   }
 
   function getTokenCreator(address contractAddress, uint256 tokenId) external override returns (address) {
     bytes4 fnSig = IERC721Chargeable.creatorOf.selector;
-    if (_remappedFnSigs[contractAddress].creatorOf.length > 0) {
+    if (_remappedFnSigs[contractAddress].creatorOf != bytes4(0)) {
       fnSig = _remappedFnSigs[contractAddress].creatorOf;
     }
-    bytes memory returnData =  contractAddress.functionCall(abi.encodeWithSelector(fnSig, tokenId), "TokenInfoProxy: low-level call failed on getTokenCreator");
+    bytes memory returnData = contractAddress.functionCall(abi.encodeWithSelector(fnSig, tokenId), "TokenInfoProxy: low-level call failed on getTokenCreator");
     return abi.decode(returnData, (address));
+  }
+
+  function getCollectOverrideFnSig(address contractAddress) external returns (bytes4) {
+    return _remappedFnSigs[contractAddress].collectOverride;
+  }
+
+  function getDepositOverrideFnSig(address contractAddress) external returns (bytes4) {
+    return _remappedFnSigs[contractAddress].depositOverride;
   }
 }

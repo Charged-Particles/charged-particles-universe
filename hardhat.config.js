@@ -47,14 +47,27 @@ const optimizerDisabled = process.env.OPTIMIZER_DISABLED
 
 module.exports = {
     solidity: {
-        version: '0.6.12',
-        settings: {
-            optimizer: {
-                enabled: !optimizerDisabled,
+        compilers: [
+          {
+            version: '0.6.12',
+            settings: {
+                optimizer: {
+                    enabled: !optimizerDisabled,
+                    runs: 200
+                }
+            },
+            evmVersion: 'istanbul'
+          },
+          {
+            version: '0.4.11', // for testing cryptopunks (matches compiler version of etherscan verified contract)
+            settings: {
+              optimizer: {
+                enabled: true,
                 runs: 200
+              }
             }
-        },
-        evmVersion: 'istanbul'
+          }
+        ]
     },
     paths: {
         sources: "./contracts",
@@ -159,6 +172,7 @@ module.exports = {
         'MerkleDistributor',
         'MerkleDistributor2',
         'MerkleDistributor3',
+        'TokenInfoProxy',
         'VestingClaim',
         'VestingClaim2',
         'VestingClaim3'
