@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// TokenInfoProxy.sol -- Part of the Charged Particles Protocol
+// ICryptoPunksMarket.sol -- Part of the Charged Particles Protocol
 // Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,34 +21,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-pragma solidity 0.6.12;
+pragma solidity ^0.6.12;
 
+interface ICryptoPunksBridge {
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event PunkTransfer(address indexed from, address indexed to, uint256 punkIndex);
+    event PunkOffered(uint indexed punkIndex, uint minValue, address indexed toAddress);
+    event PunkBought(uint indexed punkIndex, uint value, address indexed fromAddress, address indexed toAddress);
 
-interface ITokenInfoProxy {
-
-  event ContractFunctionSignatureSet(address indexed contractAddress, string fnName, bytes4 fnSig);
-
-  struct FnSignatures {
-    bytes4 ownerOf;
-    bytes4 creatorOf;
-    bytes4 collectOverride;
-    bytes4 depositOverride;
-  }
-
-  function setContractFnOwnerOf(address contractAddress, bytes4 fnSig) external;
-
-  function setContractFnCreatorOf(address contractAddress, bytes4 fnSig) external;
-
-  function getTokenUUID(address contractAddress, uint256 tokenId) external pure returns (uint256);
-
-  function isErc721OwnerOrOperator(address contractAddress, uint256 tokenId, address sender) external view returns (bool);
-
-  function getTokenOwner(address contractAddress, uint256 tokenId) external returns (address);
-
-  function getTokenCreator(address contractAddress, uint256 tokenId) external returns (address);
-
-  function getCollectOverrideFnSig(address contractAddress) external returns (bytes4);
-
-  function getDepositOverrideFnSig(address contractAddress) external returns (bytes4);
-
+    function punkIndexToAddress(uint256 punkIndex) external view returns (address);
+    function transferPunk(address to, uint256 punkIndex) external;
+    function buyPunk(uint256 punkIndex) external payable;
+    function offerPunkForSaleToAddress(uint256 punkIndex, uint256 minSalePriceInWei, address toAddress) external;
 }

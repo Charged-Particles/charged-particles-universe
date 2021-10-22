@@ -23,38 +23,39 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/utils/EnumerableSet.sol";
-import "../../../interfaces/ISmartBasket.sol";
-import "../../../interfaces/ITokenInfoProxy.sol";
-import "../../../lib/BlackholePrevention.sol";
-import "../../../lib/NftTokenType.sol";
 
+
+import "@openzeppelin/contracts/utils/EnumerableSet.sol";
+import "../../interfaces/ISmartBasket.sol";
+import "../../lib/BlackholePrevention.sol";
+import "../../lib/NftTokenType.sol";
+
+import "../../interfaces/ICryptoPunksBridge.sol";
 
 /**
  * @notice Generic ERC721-Token Smart-Basket
  * @dev Non-upgradeable Contract
  */
-contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receiver {
+contract PunksSmartBasket is ISmartBasket, BlackholePrevention {
   using EnumerableSet for EnumerableSet.UintSet;
   using EnumerableSet for EnumerableSet.AddressSet;
   using NftTokenType for address;
 
   address internal _basketManager;
 
+  ICryptoPunksBridge internal _bridge;
+
   // NFT contract address => Token Ids in Basket
   mapping (address => mapping(uint256 => EnumerableSet.UintSet)) internal _nftContractTokens;
 
-  ITokenInfoProxy internal tokenInfoProxy;
+
   /***********************************|
   |          Initialization           |
   |__________________________________*/
 
-  function initialize(ITokenInfoProxy _tokenInfoProxy) public {
+  function initialize() public {
     require(_basketManager == address(0x0), "GSB:E-002");
     _basketManager = msg.sender;
-    tokenInfoProxy = _tokenInfoProxy;
   }
 
 
@@ -63,12 +64,7 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
   |__________________________________*/
 
   function getTokenCountByType(address contractAddress, uint256 tokenId) external view override returns (uint256) {
-    uint256 nftType = contractAddress.getTokenType(tokenId);
-    return _nftContractTokens[contractAddress][nftType].length();
-  }
-
-  function onERC721Received(address, address, uint256, bytes calldata) external override returns (bytes4) {
-    return IERC721Receiver(0).onERC721Received.selector;
+    return _nftContractTokens[contractAddress][0].length();
   }
 
   function addToBasket(address contractAddress, uint256 tokenId)
@@ -83,8 +79,7 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
     bool added = _nftContractTokens[contractAddress][nftType].add(tokenId);
     if (added) {
       // NFT should have been Transferred into here via Charged-Particles
-      address ownerOf = tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
-      added = (ownerOf == address(this));
+      added = (IERC721(contractAddress).ownerOf(tokenId) == address(this));
     }
     return added;
   }
