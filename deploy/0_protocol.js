@@ -73,9 +73,23 @@ module.exports = async (hre) => {
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedSettings.deployTransaction }));
     saveDeploymentData(chainId, deployData);
 
+    await log('  Deploying TokenInfoProxy...')(alchemyTimeout);
+    const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
+    const TokenInfoProxyInstance = await TokenInfoProxy.deploy();
+    const tokenInfoProxy = await TokenInfoProxyInstance.deployed();
+    deployData['TokenInfoProxy'] = {
+      abi: getContractAbi('TokenInfoProxy'),
+      address: tokenInfoProxy.address,
+      deployTransaction: tokenInfoProxy.deployTransaction
+    }
+    log('  - TokenInfoProxy: ', tokenInfoProxy.address);
+    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: tokenInfoProxy.deployTransaction }));
+    saveDeploymentData(chainId, deployData);
+
+
     await log('  Deploying ChargedParticles...')(alchemyTimeout);
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
-    const ChargedParticlesInstance = await upgrades.deployProxy(ChargedParticles, [trustedForwarder], { unsafeAllowCustomTypes: true });
+    const ChargedParticlesInstance = await upgrades.deployProxy(ChargedParticles, [trustedForwarder, tokenInfoProxy.address], { unsafeAllowCustomTypes: true });
     const chargedParticles = await ChargedParticlesInstance.deployed();
     deployData['ChargedParticles'] = {
       abi: getContractAbi('ChargedParticles'),

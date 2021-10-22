@@ -15,6 +15,8 @@ const {
   toBN,
 } = require('../../js-helpers/utils');
 
+const { deployMockContract } = require('../../js-helpers/deployMockContract');
+
 const {
   callAndReturn,
   getNetworkBlockNumber,
@@ -25,11 +27,17 @@ const {
 const { expect, assert } = require('chai');
 const { max } = require('lodash');
 
+const CryptoPunksMarket = require('../../build/contracts/contracts/test/CryptoPunks.sol/CryptoPunksMarket.json');
+
 const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
 
 const daiABI = require('../abis/dai');
+const erc20ABI = require('../abis/erc20');
 const { balanceOf } = require('../../js-helpers/balanceOf');
 const daiHodler = "0x55e4d16f9c3041EfF17Ca32850662f3e9Dddbce7"; // Hodler with the highest current amount of DAI, used for funding our operations on mainnet fork.
+const amplHodler = "0x6723B7641c8Ac48a61F5f505aB1E9C03Bb44a301";
+
+let overrides = { gasLimit: 20000000 }
 
 describe("[INTEGRATION] Charged Particles", () => {
   let chainId;
@@ -37,6 +45,9 @@ describe("[INTEGRATION] Charged Particles", () => {
   // External contracts
   let dai;
   let daiAddress;
+  let ampl;
+  let amplAddress;
+  let cryptoPunksMarket;
 
   // Internal contracts
   let universe;
@@ -48,6 +59,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   let lepton;
   let ionx;
   let timelocks;
+  let tokenInfoProxy;
 
   // Settings
   let annuityPct = '1000';  // 10%
@@ -56,6 +68,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   let trustedForwarder;
 
   let daiSigner;
+  let amplSigner;
   let deployer;
   let user1;
   let user2;
@@ -68,14 +81,20 @@ describe("[INTEGRATION] Charged Particles", () => {
   beforeEach(async () => {
     chainId = await getChainId(); // chainIdByName(network.name);
     daiAddress = presets.Aave.v2.dai[chainId];
+    amplAddress = presets.Aave.v2.ampl[chainId];
 
     // With Forked Mainnet
     await network.provider.request({
       method: "hardhat_impersonateAccount",
       params: [daiHodler]
     });
+    await network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [amplHodler]
+    });
 
     daiSigner = ethers.provider.getSigner(daiHodler);
+    amplSigner = ethers.provider.getSigner(amplHodler);
     const namedAccts = (await getNamedAccounts());
     deployer = namedAccts.deployer
     trustedForwarder = namedAccts.trustedForwarder;
@@ -89,6 +108,10 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     // With Forked Mainnet
     dai = new ethers.Contract(daiAddress, daiABI, daiSigner);
+    ampl = new ethers.Contract(amplAddress, erc20ABI, amplSigner);
+
+    // test NFTs that are non-compliant with ERC721 standard
+    cryptoPunksMarket = await deployMockContract(signerD, CryptoPunksMarket.abi, overrides);
 
     // Connect to Internal Contracts
     const Universe = await ethers.getContractFactory('Universe');
@@ -102,7 +125,9 @@ describe("[INTEGRATION] Charged Particles", () => {
     const Lepton = await ethers.getContractFactory('Lepton2');
     const Ionx = await ethers.getContractFactory('Ionx');
     const IonxTimelock = await ethers.getContractFactory('IonxTimelock');
+    const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy')
 
+    tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address)
     universe = Universe.attach(getDeployData('Universe', chainId).address);
     chargedState = ChargedState.attach(getDeployData('ChargedState', chainId).address);
     chargedSettings = ChargedSettings.attach(getDeployData('ChargedSettings', chainId).address);
@@ -124,6 +149,10 @@ describe("[INTEGRATION] Charged Particles", () => {
     await network.provider.request({
       method: "hardhat_stopImpersonatingAccount",
       params: [daiHodler]
+    });
+    await network.provider.request({
+      method: "hardhat_stopImpersonatingAccount",
+      params: [amplHodler]
     });
   });
 
@@ -368,7 +397,9 @@ describe("[INTEGRATION] Charged Particles", () => {
       tokenId1,
       'generic',
       proton.address,
-      tokenId2
+      tokenId2,
+      '0x',
+      '0x'
     );
 
     await chargedParticles.connect(signer2).breakCovalentBond(
@@ -642,7 +673,9 @@ describe("[INTEGRATION] Charged Particles", () => {
       protonId,
       'generic',
       lepton.address,
-      leptonId1
+      leptonId1,
+      '0x',
+      '0x'
     );
 
     await expect(chargedParticles.connect(signer3).covalentBond(
@@ -650,7 +683,9 @@ describe("[INTEGRATION] Charged Particles", () => {
       protonId,
       'generic',
       lepton.address,
-      leptonId2
+      leptonId2,
+      '0x',
+      '0x'
     )).to.be.revertedWith('CP:E-430');
   });
 
@@ -689,6 +724,94 @@ describe("[INTEGRATION] Charged Particles", () => {
     await lepton.withdrawEther(user1, ethToWithdraw);
     const ethBal2 = await ethers.provider.getBalance(user1);
     expect(ethBal2.sub(ethBal1)).to.be.equal(ethToWithdraw);
+  });
+
+  it("can add non-compliant tokens to invalidAssets", async () => {
+    expect(
+      await chargedSettings.connect(signerD).setAssetInvalidity(amplAddress, true)
+    ).to.emit(chargedSettings, 'AssetInvaliditySet').withArgs(amplAddress, true)
+
+    await signerD.sendTransaction({ to: amplHodler, value: toWei('10') });
+
+    await ampl.connect(amplSigner).transfer(user1, '100000000000');
+    await ampl.connect(signer1).approve(proton.address, '100000000000');
+
+    await expect(
+      proton.connect(signer1).createChargedParticle(
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'generic',                    // walletManagerId
+        amplAddress,                  // assetToken
+        '100000000000',               // assetAmount
+        annuityPct                    // annuityPercent
+      )
+    ).to.be.revertedWith('CP:E-424');
+
+    await expect(
+      proton.connect(signer1).createChargedParticle(
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'aave',                       // walletManagerId
+        amplAddress,                  // assetToken
+        '100000000000',               // assetAmount
+        annuityPct                    // annuityPercent
+      )
+    ).to.be.revertedWith('CP:E-424');
+  })
+
+  it("can accept a cryptopunks deposit", async () => {
+      let punksAddress = cryptoPunksMarket.address;
+      let fnSig = cryptoPunksMarket.interface.getSighash('punkIndexToAddress(uint256)');
+      expect(
+          await tokenInfoProxy.setContractFnOwnerOf(punksAddress, fnSig)
+      ).to.emit(tokenInfoProxy, 'ContractFunctionSignatureSet').withArgs(
+          punksAddress, 'ownerOf', fnSig
+      )
+
+      fnSig = cryptoPunksMarket.interface.getSighash('buyPunk(uint256)');
+      expect(
+          await tokenInfoProxy.setContractFnCollectOverride(punksAddress, fnSig)
+      ).to.emit(tokenInfoProxy, 'ContractFunctionSignatureSet').withArgs(
+          punksAddress, 'collectOverride', fnSig
+      )
+
+      fnSig = cryptoPunksMarket.interface.getSighash('transferPunk(address,uint256)');
+      expect(
+          await tokenInfoProxy.setContractFnDepositOverride(punksAddress, fnSig)
+      ).to.emit(tokenInfoProxy, 'ContractFunctionSignatureSet').withArgs(
+          punksAddress, 'depositOverride', fnSig
+      )
+
+      // const tokenId1 = await callAndReturn({
+      //   contractInstance: proton,
+      //   contractMethod: 'createChargedParticle',
+      //   contractCaller: signer1,
+      //   contractParams: [
+      //     user1,                        // creator
+      //     user2,                        // receiver
+      //     user3,                        // referrer
+      //     TEST_NFT_TOKEN_URI,           // tokenMetaUri
+      //     'generic',                    // walletManagerId
+      //     daiAddress,                   // assetToken
+      //     toWei('3'),                   // assetAmount
+      //     annuityPct,                   // annuityPercent
+      //   ],
+      // });
+      //
+      // await chargedParticles.connect(signer1).covalentBond(
+      //   proton.address,
+      //   tokenId1,
+      //   'generic',
+      //   proton.address,
+      //   tokenId2,
+      //   '0x',
+      //   '0x'
+      // );
+
   });
 
 });

@@ -86,6 +86,15 @@ contract ChargedSettings is
   mapping (string => IWalletManager) internal _ftWalletManager;
   mapping (string => IBasketManager) internal _nftBasketManager;
 
+  // Settings for individual NFTs set by NFT Creator (by Token UUID)
+  mapping (uint256 => CreatorSettings) internal _creatorSettings;
+
+  // Settings for External NFT Token Contracts (by Token Contract Address)
+  mapping (address => NftSettings) internal _nftSettings;
+
+  // Blacklist for non-compliant tokens
+  mapping (address => bool) internal _invalidAssets;
+
 
   /***********************************|
   |               Public              |
@@ -177,7 +186,8 @@ contract ChargedSettings is
       bool validAsset,
       uint256 depositCap,
       uint256 depositMin,
-      uint256 depositMax
+      uint256 depositMax,
+      bool invalidAsset
     )
   {
     requiredWalletManager = _nftSettings[contractAddress].requiredWalletManager;
@@ -187,6 +197,7 @@ contract ChargedSettings is
     depositCap = _depositCap[assetToken];
     depositMin = _nftSettings[contractAddress].depositMin[assetToken];
     depositMax = _nftSettings[contractAddress].depositMax[assetToken];
+    invalidAsset = _invalidAssets[assetToken];
   }
 
   function getNftAssetRequirements(address contractAddress, address nftTokenAddress)
@@ -429,6 +440,11 @@ contract ChargedSettings is
   /***********************************|
   |          Only Admin/DAO           |
   |__________________________________*/
+
+  function setAssetInvalidity(address assetToken, bool invalidity) external virtual override onlyOwner {
+    _invalidAssets[assetToken] = invalidity;
+    emit AssetInvaliditySet(assetToken, invalidity);
+  }
 
   function setDepositCap(address assetToken, uint256 cap) external virtual onlyOwner {
     _depositCap[assetToken] = cap;
