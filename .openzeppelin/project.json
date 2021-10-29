@@ -22,11 +22,13 @@
     "YieldFarm2": "YieldFarm2",
     "CommunityVault": "CommunityVault",
     "MerkleDistributor": "MerkleDistributor",
-    "MerkleDistributor2": "MerkleDistributor2",
+    "MerkleDistributor2": "MerkleDistributor2", 
     "MerkleDistributor3": "MerkleDistributor3",
     "VestingClaim": "VestingClaim",
     "VestingClaim2": "VestingClaim2",
-    "VestingClaim3": "VestingClaim3"
+    "VestingClaim3": "VestingClaim3",
+    "VestingClaim4": "VestingClaim4",
+    "VestingClaim5": "VestingClaim5"
   },
   "dependencies": {
   },

@@ -161,7 +161,9 @@ module.exports = {
         'MerkleDistributor3',
         'VestingClaim',
         'VestingClaim2',
-        'VestingClaim3'
+        'VestingClaim3',
+        'VestingClaim4',
+        'VestingClaim5'
       ],
     },
     namedAccounts: {
