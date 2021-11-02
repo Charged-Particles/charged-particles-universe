@@ -107,7 +107,8 @@ async function run() {
 
   // await verifyContract({name: 'VestingClaim2', networkName});
   // await verifyContract({name: 'VestingClaim3', networkName});
-  await verifyContract({name: 'VestingClaim4', networkName});
+  // await verifyContract({name: 'VestingClaim4', networkName});
+  await verifyContract({name: 'VestingClaim5', networkName});
 
   success('Done!');
 };
