@@ -30,11 +30,13 @@ import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
 
 import "./interfaces/IUniverse.sol";
 import "./interfaces/IChargedState.sol";
 import "./interfaces/IChargedSettings.sol";
+import "./interfaces/IChargedManagers.sol";
 import "./interfaces/IChargedParticles.sol";
 import "./interfaces/IWalletManager.sol";
 import "./interfaces/IBasketManager.sol";
@@ -56,7 +58,8 @@ contract ChargedParticles is
   ReentrancyGuardUpgradeable,
   RelayRecipient,
   IERC721ReceiverUpgradeable,
-  BlackholePrevention
+  BlackholePrevention,
+  IERC1155ReceiverUpgradeable
 {
   using SafeMathUpgradeable for uint256;
   using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -95,17 +98,17 @@ contract ChargedParticles is
   IChargedSettings internal _chargedSettings;
   address internal _lepton;
   uint256 internal depositFee;
-  ITokenInfoProxy internal tokenInfoProxy;
+  ITokenInfoProxy internal _tokenInfoProxy;
+  IChargedManagers internal _chargedManagers;
+
 
   /***********************************|
   |          Initialization           |
   |__________________________________*/
 
-  function initialize(address _trustedForwarder, ITokenInfoProxy _tokenInfoProxy) public initializer {
+  function initialize() public initializer {
     __Ownable_init();
     __ReentrancyGuard_init();
-    trustedForwarder = _trustedForwarder;
-    tokenInfoProxy = _tokenInfoProxy;
   }
 
 
@@ -121,8 +124,25 @@ contract ChargedParticles is
     return address(_chargedSettings);
   }
 
+  function getManagersAddress() external view virtual override returns (address managersAddress) {
+    return address(_chargedManagers);
+  }
+
   function onERC721Received(address, address, uint256, bytes calldata) external virtual override returns (bytes4) {
     return IERC721ReceiverUpgradeable(0).onERC721Received.selector;
+  }
+
+  function onERC1155Received(address, address, uint256, uint256, bytes calldata) external virtual override returns (bytes4) {
+    return IERC1155ReceiverUpgradeable(0).onERC1155Received.selector;
+  }
+
+  // Unimplemented
+  function onERC1155BatchReceived(address, address, uint256[] calldata, uint256[] calldata, bytes calldata) external virtual override returns (bytes4) {
+    return ""; // IERC1155ReceiverUpgradeable(0).onERC1155BatchReceived.selector;
+  }
+
+  function supportsInterface(bytes4 interfaceId) external view virtual override returns (bool) {
+    return (interfaceId == 0x0);
   }
 
   /// @notice Calculates the amount of Fees to be paid for a specific deposit amount
@@ -304,7 +324,7 @@ contract ChargedParticles is
     _validateDischarge(contractAddress, tokenId);
 
     address creatorRedirect = _chargedSettings.getCreatorAnnuitiesRedirect(contractAddress, tokenId);
-    (creatorAmount, receiverAmount) = _chargedSettings.getWalletManager(walletManagerId).discharge(
+    (creatorAmount, receiverAmount) = _chargedManagers.getWalletManager(walletManagerId).discharge(
       receiver,
       contractAddress,
       tokenId,
@@ -346,7 +366,7 @@ contract ChargedParticles is
     _validateDischarge(contractAddress, tokenId);
 
     address creatorRedirect = _chargedSettings.getCreatorAnnuitiesRedirect(contractAddress, tokenId);
-    (creatorAmount, receiverAmount) = _chargedSettings.getWalletManager(walletManagerId).dischargeAmount(
+    (creatorAmount, receiverAmount) = _chargedManagers.getWalletManager(walletManagerId).dischargeAmount(
       receiver,
       contractAddress,
       tokenId,
@@ -386,11 +406,11 @@ contract ChargedParticles is
     returns (uint256 receiverAmount)
   {
     address sender = _msgSender();
-    address tokenCreator = tokenInfoProxy.getTokenCreator(contractAddress, tokenId);
+    address tokenCreator = _tokenInfoProxy.getTokenCreator(contractAddress, tokenId);
 
     require(sender == tokenCreator, "CP:E-104");
 
-    receiverAmount = _chargedSettings.getWalletManager(walletManagerId).dischargeAmountForCreator(
+    receiverAmount = _chargedManagers.getWalletManager(walletManagerId).dischargeAmountForCreator(
       receiver,
       contractAddress,
       tokenId,
@@ -437,7 +457,7 @@ contract ChargedParticles is
     // Release Particle to Receiver
     uint256 principalAmount;
     address creatorRedirect = _chargedSettings.getCreatorAnnuitiesRedirect(contractAddress, tokenId);
-    (principalAmount, creatorAmount, receiverAmount) = _chargedSettings.getWalletManager(walletManagerId).release(
+    (principalAmount, creatorAmount, receiverAmount) = _chargedManagers.getWalletManager(walletManagerId).release(
       receiver,
       contractAddress,
       tokenId,
@@ -481,7 +501,7 @@ contract ChargedParticles is
     // Release Particle to Receiver
     uint256 principalAmount;
     address creatorRedirect = _chargedSettings.getCreatorAnnuitiesRedirect(contractAddress, tokenId);
-    (principalAmount, creatorAmount, receiverAmount) = _chargedSettings.getWalletManager(walletManagerId).releaseAmount(
+    (principalAmount, creatorAmount, receiverAmount) = _chargedManagers.getWalletManager(walletManagerId).releaseAmount(
       receiver,
       contractAddress,
       tokenId,
@@ -567,7 +587,7 @@ contract ChargedParticles is
     _validateBreakBond(contractAddress, tokenId);
 
     // Release Particle to Receiver
-    success = _chargedSettings.getBasketManager(basketManagerId).removeFromBasket(
+    success = _chargedManagers.getBasketManager(basketManagerId).removeFromBasket(
       receiver,
       contractAddress,
       tokenId,
@@ -586,32 +606,35 @@ contract ChargedParticles is
   |          Only Admin/DAO           |
   |__________________________________*/
 
-  /// @dev Setup the Charged-Settings Controller
-  function setChargedSettings(address settingsController) external virtual onlyOwner {
-    _chargedSettings = IChargedSettings(settingsController);
-    emit ChargedSettingsSet(settingsController);
+  /// @dev Setup the various Charged-Controllers
+  function setController(address controller, string calldata controllerId) external virtual onlyOwner {
+    bytes32 controllerIdStr = keccak256(abi.encodePacked(controllerId));
+
+    if (controllerIdStr == keccak256(abi.encodePacked("universe"))) {
+      _universe = IUniverse(controller);
+    }
+    else if (controllerIdStr == keccak256(abi.encodePacked("settings"))) {
+      _chargedSettings = IChargedSettings(controller);
+    }
+    else if (controllerIdStr == keccak256(abi.encodePacked("state"))) {
+      _chargedState = IChargedState(controller);
+    }
+    else if (controllerIdStr == keccak256(abi.encodePacked("managers"))) {
+      _chargedManagers = IChargedManagers(controller);
+    }
+    else if (controllerIdStr == keccak256(abi.encodePacked("leptons"))) {
+      _lepton = controller;
+    }
+    else if (controllerIdStr == keccak256(abi.encodePacked("forwarder"))) {
+      trustedForwarder = controller;
+    }
+    else if (controllerIdStr == keccak256(abi.encodePacked("tokeninfo"))) {
+      _tokenInfoProxy = ITokenInfoProxy(controller);
+    }
+
+    emit ControllerSet(controller, controllerId);
   }
 
-  /// @dev Setup the Charged-State Controller
-  function setChargedState(address stateController) external virtual onlyOwner {
-    _chargedState = IChargedState(stateController);
-    emit ChargedStateSet(stateController);
-  }
-
-  /// @dev Setup the Universal Controller
-  function setUniverse(address universe) external virtual onlyOwner {
-    _universe = IUniverse(universe);
-    emit UniverseSet(universe);
-  }
-
-  function setLeptonToken(address token) external virtual onlyOwner {
-    _lepton = token;
-    emit LeptonTokenSet(token);
-  }
-
-  function setTrustedForwarder(address _trustedForwarder) external onlyOwner {
-    trustedForwarder = _trustedForwarder;
-  }
 
   /***********************************|
   |          Protocol Fees            |
@@ -662,82 +685,7 @@ contract ChargedParticles is
     internal
     virtual
   {
-    if (_chargedState.isEnergizeRestricted(contractAddress, tokenId)) {
-      bool isERC721OwnerOrOperator = tokenInfoProxy.isErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
-      require(isERC721OwnerOrOperator, "CP:E-105");
-    }
-
-    ( string memory requiredWalletManager,
-      bool energizeEnabled,
-      bool restrictedAssets,
-      bool validAsset,
-      uint256 depositCap,
-      uint256 depositMin,
-      uint256 depositMax,
-      bool invalidAsset
-    ) = _chargedSettings.getAssetRequirements(contractAddress, assetToken);
-
-    require(energizeEnabled, "CP:E-417");
-
-    require(!invalidAsset, "CP:E-424");
-
-    // Valid Wallet Manager?
-    if (bytes(requiredWalletManager).length > 0) {
-        require(keccak256(abi.encodePacked(requiredWalletManager)) == keccak256(abi.encodePacked(walletManagerId)), "CP:E-419");
-    }
-
-    // Valid Asset?
-    if (restrictedAssets) {
-      require(validAsset, "CP:E-424");
-    }
-
-    _validateDepositAmount(
-      contractAddress,
-      tokenId,
-      walletManagerId,
-      assetToken,
-      assetAmount,
-      depositCap,
-      depositMin,
-      depositMax
-    );
-  }
-
-  /// @dev Validates a Deposit-Amount according to the rules set by the Token Contract
-  /// @param contractAddress      The Address to the Contract of the External NFT to check
-  /// @param tokenId              The Token ID of the External NFT to check
-  /// @param walletManagerId      The Wallet Manager of the Assets to Deposit
-  /// @param assetToken           The Address of the Asset Token to Deposit
-  /// @param assetAmount          The specific amount of Asset Token to Deposit
-  function _validateDepositAmount(
-    address contractAddress,
-    uint256 tokenId,
-    string calldata walletManagerId,
-    address assetToken,
-    uint256 assetAmount,
-    uint256 depositCap,
-    uint256 depositMin,
-    uint256 depositMax
-  )
-    internal
-    virtual
-  {
-    IWalletManager lpWalletMgr = _chargedSettings.getWalletManager(walletManagerId);
-    uint256 existingBalance = lpWalletMgr.getPrincipal(contractAddress, tokenId, assetToken);
-    uint256 newBalance = assetAmount.add(existingBalance);
-
-    // Validate Deposit Cap
-    if (depositCap > 0) {
-      require(newBalance <= depositCap, "CP:E-408");
-    }
-
-    // Valid Amount for Deposit?
-    if (depositMin > 0) {
-        require(newBalance >= depositMin, "CP:E-410");
-    }
-    if (depositMax > 0) {
-        require(newBalance <= depositMax, "CP:E-410");
-    }
+    _chargedManagers.validateDeposit(_msgSender(), contractAddress, tokenId, walletManagerId, assetToken, assetAmount);
   }
 
   /// @dev Validates an NFT Deposit according to the rules set by the Token Contract
@@ -756,83 +704,19 @@ contract ChargedParticles is
     internal
     virtual
   {
-    if (_chargedState.isCovalentBondRestricted(contractAddress, tokenId)) {
-      bool isErc721OwnerOrOperator = tokenInfoProxy.isErc721OwnerOrOperator(contractAddress, tokenId, _msgSender());
-      require(isErc721OwnerOrOperator, "CP:E-105");
-    }
-
-    ( string memory requiredBasketManager,
-      bool basketEnabled,
-      uint256 maxNfts
-    ) = _chargedSettings.getNftAssetRequirements(contractAddress, nftTokenAddress);
-
-    require(basketEnabled, "CP:E-417");
-
-    // Valid Basket Manager?
-    if (bytes(requiredBasketManager).length > 0) {
-        require(keccak256(abi.encodePacked(requiredBasketManager)) == keccak256(abi.encodePacked(basketManagerId)), "CP:E-419");
-    }
-
-    if (maxNfts > 0 || _lepton == nftTokenAddress) {
-      IBasketManager basketMgr = _chargedSettings.getBasketManager(basketManagerId);
-      uint256 tokenCountByType = basketMgr.getTokenCountByType(contractAddress, tokenId, nftTokenAddress, nftTokenId);
-
-      if (maxNfts > 0) {
-        require(maxNfts > tokenCountByType, "CP:E-427");
-      }
-
-      if (_lepton == nftTokenAddress) {
-        require(tokenCountByType == 0, "CP:E-430");
-      }
-    }
+    _chargedManagers.validateNftDeposit(_msgSender(), contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
   }
 
-  function _validateDischarge(address contractAddress, uint256 tokenId) internal view virtual {
-    ( bool allowFromAll,
-      bool isApproved,
-      uint256 timelock,
-      uint256 tempLockExpiry
-    ) = _chargedState.getDischargeState(contractAddress, tokenId, _msgSender());
-    _validateState(allowFromAll, isApproved, timelock, tempLockExpiry);
+  function _validateDischarge(address contractAddress, uint256 tokenId) internal virtual {
+    _chargedManagers.validateDischarge(_msgSender(), contractAddress, tokenId);
   }
 
-  function _validateRelease(address contractAddress, uint256 tokenId) internal view virtual {
-    ( bool allowFromAll,
-      bool isApproved,
-      uint256 timelock,
-      uint256 tempLockExpiry
-    ) = _chargedState.getReleaseState(contractAddress, tokenId, _msgSender());
-    _validateState(allowFromAll, isApproved, timelock, tempLockExpiry);
+  function _validateRelease(address contractAddress, uint256 tokenId) internal virtual {
+    _chargedManagers.validateRelease(_msgSender(), contractAddress, tokenId);
   }
 
-  function _validateBreakBond(address contractAddress, uint256 tokenId) internal view virtual {
-    ( bool allowFromAll,
-      bool isApproved,
-      uint256 timelock,
-      uint256 tempLockExpiry
-    ) = _chargedState.getBreakBondState(contractAddress, tokenId, _msgSender());
-    _validateState(allowFromAll, isApproved, timelock, tempLockExpiry);
-  }
-
-  function _validateState(
-    bool allowFromAll,
-    bool isApproved,
-    uint256 timelock,
-    uint256 tempLockExpiry
-  )
-    internal
-    view
-    virtual
-  {
-    if (!allowFromAll) {
-      require(isApproved, "CP:E-105");
-    }
-    if (timelock > 0) {
-      require(block.number >= timelock, "CP:E-302");
-    }
-    if (tempLockExpiry > 0) {
-      require(block.number >= tempLockExpiry, "CP:E-303");
-    }
+  function _validateBreakBond(address contractAddress, uint256 tokenId) internal virtual {
+    _chargedManagers.validateBreakBond(_msgSender(), contractAddress, tokenId);
   }
 
   /// @dev Deposit Asset Tokens into an NFT via the Wallet Manager
@@ -855,7 +739,7 @@ contract ChargedParticles is
     returns (uint256)
   {
     // Get Wallet-Manager for LP
-    IWalletManager lpWalletMgr = _chargedSettings.getWalletManager(walletManagerId);
+    IWalletManager lpWalletMgr = _chargedManagers.getWalletManager(walletManagerId);
 
     (address creator, uint256 annuityPct) = _chargedSettings.getCreatorAnnuities(contractAddress, tokenId);
 
@@ -888,11 +772,11 @@ contract ChargedParticles is
     returns (bool)
   {
     // Deposit NFT Token directly into Smart Wallet (reverts on fail) and Update BasketManager
-    IBasketManager basketMgr = _chargedSettings.getBasketManager(basketManagerId);
+    IBasketManager basketMgr = _chargedManagers.getBasketManager(basketManagerId);
     address wallet = basketMgr.getBasketAddressById(contractAddress, tokenId);
 
     if (encodedArgs.length > 0) {
-      bytes4 remappedFnSig = tokenInfoProxy.getDepositOverrideFnSig(nftTokenAddress);
+      bytes4 remappedFnSig = _tokenInfoProxy.getDepositOverrideFnSig(nftTokenAddress);
       require(remappedFnSig != bytes4(0), "depositOverrideFnSig not registered");
       nftTokenAddress.functionCall(abi.encodePacked(remappedFnSig, encodedArgs), "ChargedParticles: low-level call failed on _collectNftToken");
     } else {
@@ -939,7 +823,7 @@ contract ChargedParticles is
     // NFTs that use the optional encodedArgs are assumed to be non-compliant, therefore they must have a remapped fnSig
     // We require that the fnSig is stored in TokenInfoProxy to prevent arbitrary function calls
     if (encodedArgs.length > 0) {
-      bytes4 remappedFnSig = tokenInfoProxy.getCollectOverrideFnSig(nftTokenAddress);
+      bytes4 remappedFnSig = _tokenInfoProxy.getCollectOverrideFnSig(nftTokenAddress);
       require(remappedFnSig != bytes4(0), "collectOverrideFnSig not registered");
       nftTokenAddress.functionCall(abi.encodePacked(remappedFnSig, encodedArgs), "ChargedParticles: low-level call failed on _collectNftToken");
     } else {
@@ -958,7 +842,7 @@ contract ChargedParticles is
     virtual
     returns (uint256)
   {
-    return _chargedSettings.getWalletManager(walletManagerId).getPrincipal(contractAddress, tokenId, assetToken);
+    return _chargedManagers.getWalletManager(walletManagerId).getPrincipal(contractAddress, tokenId, assetToken);
   }
 
   /// @dev See {ChargedParticles-currentParticleCharge}.
@@ -972,7 +856,7 @@ contract ChargedParticles is
     virtual
     returns (uint256)
   {
-    (, uint256 ownerInterest) = _chargedSettings.getWalletManager(walletManagerId).getInterest(contractAddress, tokenId, assetToken);
+    (, uint256 ownerInterest) = _chargedManagers.getWalletManager(walletManagerId).getInterest(contractAddress, tokenId, assetToken);
     return ownerInterest;
   }
 
@@ -987,7 +871,7 @@ contract ChargedParticles is
     virtual
     returns (uint256)
   {
-    return _chargedSettings.getWalletManager(walletManagerId).getRewards(contractAddress, tokenId, assetToken);
+    return _chargedManagers.getWalletManager(walletManagerId).getRewards(contractAddress, tokenId, assetToken);
   }
 
   /// @dev See {ChargedParticles-currentParticleCovalentBonds}.
@@ -1001,7 +885,7 @@ contract ChargedParticles is
     virtual
     returns (uint256)
   {
-    return _chargedSettings.getBasketManager(basketManagerId).getTokenTotalCount(contractAddress, tokenId);
+    return _chargedManagers.getBasketManager(basketManagerId).getTokenTotalCount(contractAddress, tokenId);
   }
 
 
@@ -1037,12 +921,12 @@ contract ChargedParticles is
   |__________________________________*/
 
   modifier managerEnabled(string calldata walletManagerId) {
-    require(_chargedSettings.isWalletManagerEnabled(walletManagerId), "CP:E-419");
+    require(_chargedManagers.isWalletManagerEnabled(walletManagerId), "CP:E-419");
     _;
   }
 
   modifier basketEnabled(string calldata basketManagerId) {
-    require(_chargedSettings.isNftBasketEnabled(basketManagerId), "CP:E-419");
+    require(_chargedManagers.isNftBasketEnabled(basketManagerId), "CP:E-419");
     _;
   }
 }

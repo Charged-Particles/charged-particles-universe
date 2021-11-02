@@ -23,8 +23,9 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 
 import "./interfaces/IChargedState.sol";
 import "./interfaces/ITokenInfoProxy.sol";
@@ -34,19 +35,22 @@ import "./lib/TokenInfo.sol";
 import "./lib/RelayRecipient.sol";
 import "./lib/BlackholePrevention.sol";
 
+import "hardhat/console.sol";
+
+
 /**
  * @notice Charged Particles Settings Contract
  */
 contract ChargedState is
   IChargedState,
-  Ownable,
+  Initializable,
+  OwnableUpgradeable,
   RelayRecipient,
   BlackholePrevention
 {
-  using SafeMath for uint256;
+  using SafeMathUpgradeable for uint256;
   using TokenInfo for address;
   using Bitwise for uint32;
-
 
   // NftState - actionPerms
   uint32 constant internal PERM_RESTRICT_ENERGIZE_FROM_ALL = 1;  // NFTs that have Restrictions on Energize
@@ -55,39 +59,14 @@ contract ChargedState is
   uint32 constant internal PERM_RESTRICT_BOND_FROM_ALL     = 8;  // NFTs that have Restrictions on Covalent Bonds
   uint32 constant internal PERM_ALLOW_BREAK_BOND_FROM_ALL  = 16; // NFTs that allow Breaking Covalent Bonds by anyone
 
-  /// @dev DEPRECATED   
-   struct NftTimelock {
-    uint256 unlockBlock;
-    address lockedBy;
-  }
-
-  /// @dev DEPRECATED
-  struct NftState {
-    uint32 actionPerms;
-
-    NftTimelock dischargeTimelock;
-    NftTimelock releaseTimelock;
-    NftTimelock breakBondTimelock;
-    uint256 tempLockExpiry;
-
-    mapping (address => address) dischargeApproval;
-    mapping (address => address) releaseApproval;
-    mapping (address => address) breakBondApproval;
-    mapping (address => address) timelockApproval;
-  }
-
   IChargedSettings internal _chargedSettings;
-
-  /// @dev DEPRECATED
-  mapping (uint256 => NftState) internal _nftState;
-
   ITokenInfoProxy internal _tokenInfoProxy;
-  
+
   // NftTimelocks
   /// @dev discharge unlockBlock and lockedBy
   mapping (uint256 => uint256) internal _nftDischargeTimelockUnlockBlock;
   mapping (uint256 => address) internal _nftDischargeTimelockLockedBy;
-  
+
   /// @dev release unlockBlock and lockedBy
   mapping (uint256 => uint256) internal _nftReleaseTimelockUnlockBlock;
   mapping (uint256 => address) internal _nftReleaseTimelockLockedBy;
@@ -108,6 +87,15 @@ contract ChargedState is
   mapping (uint256 => mapping(address => address)) internal _nftReleaseApproval;
   mapping (uint256 => mapping(address => address)) internal _nftBreakBondApproval;
   mapping (uint256 => mapping(address => address)) internal _nftTimelockApproval;
+
+
+  /***********************************|
+  |          Initialization           |
+  |__________________________________*/
+
+  function initialize() public initializer {
+    __Ownable_init();
+  }
 
   /***********************************|
   |               Public              |
@@ -179,7 +167,7 @@ contract ChargedState is
   /// @param tokenId          The ID of the Token
   /// @param operator         The Address of the operator to check
   /// @return True if the operator is Approved
-  function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external virtual override view returns (bool) {
+  function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external virtual override returns (bool) {
     return _isApprovedForTimelock(contractAddress, tokenId, operator);
   }
 
@@ -198,7 +186,6 @@ contract ChargedState is
 
   function getDischargeState(address contractAddress, uint256 tokenId, address sender)
     external
-    view
     virtual
     override
     returns (
@@ -219,7 +206,6 @@ contract ChargedState is
 
   function getReleaseState(address contractAddress, uint256 tokenId, address sender)
     external
-    view
     virtual
     override
     returns (
@@ -240,7 +226,6 @@ contract ChargedState is
 
   function getBreakBondState(address contractAddress, uint256 tokenId, address sender)
     external
-    view
     virtual
     override
     returns (
@@ -277,9 +262,8 @@ contract ChargedState is
     external
     virtual
     override
-    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+    onlyNFTOwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    // address tokenOwner = contractAddress.getTokenOwner(tokenId); // deprecated
     address tokenOwner = _tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
     require(operator != tokenOwner, "CP:E-106");
     _setDischargeApproval(contractAddress, tokenId, tokenOwner, operator);
@@ -298,9 +282,8 @@ contract ChargedState is
     external
     virtual
     override
-    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+    onlyNFTOwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    // address tokenOwner = contractAddress.getTokenOwner(tokenId); // deprecated
     address tokenOwner = _tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
     require(operator != tokenOwner, "CP:E-106");
     _setReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
@@ -319,9 +302,8 @@ contract ChargedState is
     external
     virtual
     override
-    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+    onlyNFTOwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    // address tokenOwner = contractAddress.getTokenOwner(tokenId); // deprecated
     address tokenOwner = _tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
     require(operator != tokenOwner, "CP:E-106");
     _setBreakBondApproval(contractAddress, tokenId, tokenOwner, operator);
@@ -340,7 +322,7 @@ contract ChargedState is
     external
     virtual
     override
-    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+    onlyNFTOwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     address tokenOwner = contractAddress.getTokenOwner(tokenId);
     require(operator != tokenOwner, "CP:E-106");
@@ -359,9 +341,8 @@ contract ChargedState is
     external
     virtual
     override
-    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+    onlyNFTOwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    // address tokenOwner = contractAddress.getTokenOwner(tokenId); // deprecated
     address tokenOwner = _tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
     require(operator != tokenOwner, "CP:E-106");
     _setDischargeApproval(contractAddress, tokenId, tokenOwner, operator);
@@ -375,7 +356,7 @@ contract ChargedState is
     external
     virtual
     override
-    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+    onlyNFTOwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     _setPermsForRestrictCharge(contractAddress, tokenId, state);
   }
@@ -385,7 +366,7 @@ contract ChargedState is
     external
     virtual
     override
-    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+    onlyNFTOwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     _setPermsForAllowDischarge(contractAddress, tokenId, state);
   }
@@ -395,7 +376,7 @@ contract ChargedState is
     external
     virtual
     override
-    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+    onlyNFTOwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     _setPermsForAllowRelease(contractAddress, tokenId, state);
   }
@@ -405,7 +386,7 @@ contract ChargedState is
     external
     virtual
     override
-    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+    onlyNFTOwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     _setPermsForRestrictBond(contractAddress, tokenId, state);
   }
@@ -415,7 +396,7 @@ contract ChargedState is
     external
     virtual
     override
-    onlyErc721OwnerOrOperator(contractAddress, tokenId, _msgSender())
+    onlyNFTOwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
     _setPermsForAllowBreakBond(contractAddress, tokenId, state);
   }
@@ -560,14 +541,18 @@ contract ChargedState is
   |          Only Admin/DAO           |
   |__________________________________*/
 
-  /// @dev Setup the Charged-Settings Controller
-  function setChargedSettings(address settingsController) external virtual onlyOwner {
-    _chargedSettings = IChargedSettings(settingsController);
-    emit ChargedSettingsSet(settingsController);
-  }
+  /// @dev Setup the various Charged-Controllers
+  function setController(address controller, string calldata controllerId) external virtual onlyOwner {
+    bytes32 controllerIdStr = keccak256(abi.encodePacked(controllerId));
 
-  function setTrustedForwarder(address _trustedForwarder) external onlyOwner {
-    trustedForwarder = _trustedForwarder;
+    if (controllerIdStr == keccak256(abi.encodePacked("settings"))) {
+      _chargedSettings = IChargedSettings(controller);
+    }
+    else if (controllerIdStr == keccak256(abi.encodePacked("tokeninfo"))) {
+      _tokenInfoProxy = ITokenInfoProxy(controller);
+    }
+
+    emit ControllerSet(controller, controllerId);
   }
 
   /***********************************|
@@ -594,7 +579,6 @@ contract ChargedState is
 
   /// @dev See {ChargedParticles-isApprovedForDischarge}.
   function _isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) internal virtual returns (bool) {
-    // address tokenOwner = contractAddress.getTokenOwner(tokenId); // deprecated
     address tokenOwner = _tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     return contractAddress == operator || tokenOwner == operator || _nftDischargeApproval[tokenUuid][tokenOwner] == operator;
@@ -602,7 +586,6 @@ contract ChargedState is
 
   /// @dev See {ChargedParticles-isApprovedForRelease}.
   function _isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) internal virtual returns (bool) {
-    // address tokenOwner = contractAddress.getTokenOwner(tokenId); // deprecated
     address tokenOwner = _tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     return contractAddress == operator || tokenOwner == operator || _nftReleaseApproval[tokenUuid][tokenOwner] == operator;
@@ -610,7 +593,6 @@ contract ChargedState is
 
   /// @dev See {ChargedParticles-isApprovedForBreakBond}.
   function _isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) internal virtual returns (bool) {
-    // address tokenOwner = contractAddress.getTokenOwner(tokenId); // deprecated
     address tokenOwner = _tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     return contractAddress == operator || tokenOwner == operator || _nftBreakBondApproval[tokenUuid][tokenOwner] == operator;
@@ -621,7 +603,6 @@ contract ChargedState is
     (bool timelockAny, bool timelockOwn) = _chargedSettings.getTimelockApprovals(operator);
     if (timelockAny || (timelockOwn && contractAddress == operator)) { return true; }
 
-    // address tokenOwner = contractAddress.getTokenOwner(tokenId); // deprecated
     address tokenOwner = _tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     return tokenOwner == operator || _nftTimelockApproval[tokenUuid][tokenOwner] == operator;
@@ -772,7 +753,7 @@ contract ChargedState is
     internal
     view
     virtual
-    override(BaseRelayRecipient, Context)
+    override(BaseRelayRecipient, ContextUpgradeable)
     returns (address payable)
   {
     return BaseRelayRecipient._msgSender();
@@ -783,7 +764,7 @@ contract ChargedState is
     internal
     view
     virtual
-    override(BaseRelayRecipient, Context)
+    override(BaseRelayRecipient, ContextUpgradeable)
     returns (bytes memory)
   {
     return BaseRelayRecipient._msgData();
@@ -794,8 +775,8 @@ contract ChargedState is
   |             Modifiers             |
   |__________________________________*/
 
-  modifier onlyErc721OwnerOrOperator(address contractAddress, uint256 tokenId, address sender) {
-    require(contractAddress.isErc721OwnerOrOperator(tokenId, sender), "CP:E-105");
+  modifier onlyNFTOwnerOrOperator(address contractAddress, uint256 tokenId, address sender) {
+    require(_tokenInfoProxy.isNFTOwnerOrOperator(contractAddress, tokenId, sender), "CP:E-105");
     _;
   }
 }

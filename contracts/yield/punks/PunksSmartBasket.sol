@@ -54,7 +54,7 @@ contract PunksSmartBasket is ISmartBasket, BlackholePrevention {
   |__________________________________*/
 
   function initialize() public {
-    require(_basketManager == address(0x0), "GSB:E-002");
+    require(_basketManager == address(0x0), "PSB:E-002");
     _basketManager = msg.sender;
   }
 
@@ -63,7 +63,7 @@ contract PunksSmartBasket is ISmartBasket, BlackholePrevention {
   |              Public               |
   |__________________________________*/
 
-  function getTokenCountByType(address contractAddress, uint256 tokenId) external view override returns (uint256) {
+  function getTokenCountByType(address contractAddress, uint256) external view override returns (uint256) {
     return _nftContractTokens[contractAddress][0].length();
   }
 
@@ -74,7 +74,7 @@ contract PunksSmartBasket is ISmartBasket, BlackholePrevention {
     returns (bool)
   {
     uint256 nftType = contractAddress.getTokenType(tokenId);
-    require(!_nftContractTokens[contractAddress][nftType].contains(tokenId), "GSB:E-425");
+    require(!_nftContractTokens[contractAddress][nftType].contains(tokenId), "PSB:E-425");
 
     bool added = _nftContractTokens[contractAddress][nftType].add(tokenId);
     if (added) {
@@ -91,7 +91,7 @@ contract PunksSmartBasket is ISmartBasket, BlackholePrevention {
     returns (bool)
   {
     uint256 nftType = contractAddress.getTokenType(tokenId);
-    require(_nftContractTokens[contractAddress][nftType].contains(tokenId), "GSB:E-426");
+    require(_nftContractTokens[contractAddress][nftType].contains(tokenId), "PSB:E-426");
 
     bool removed = _nftContractTokens[contractAddress][nftType].remove(tokenId);
     if (removed) {
@@ -140,7 +140,7 @@ contract PunksSmartBasket is ISmartBasket, BlackholePrevention {
 
   /// @dev Throws if called by any account other than the basket manager
   modifier onlyBasketManager() {
-    require(_basketManager == msg.sender, "GSB:E-109");
+    require(_basketManager == msg.sender, "PSB:E-109");
     _;
   }
 }

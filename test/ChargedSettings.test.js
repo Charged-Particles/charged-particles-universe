@@ -52,6 +52,7 @@ describe("Charged Settings", () => {
   let universe;
   let chargedState;
   let chargedSettings;
+  let chargedManagers;
   let chargedParticles;
   let ethSender;
 
@@ -113,13 +114,15 @@ describe("Charged Settings", () => {
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     chargedSettings = ChargedSettings.attach(getDeployData('ChargedSettings', chainId).address);
 
+    const ChargedManagers = await ethers.getContractFactory('ChargedManagers');
+    chargedManagers = ChargedManagers.attach(getDeployData('ChargedManagers', chainId).address);
+
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const GenericWalletManagerInstance = await GenericWalletManager.deploy();
     newGenericWalletManager = await GenericWalletManagerInstance.deployed();
 
-    const tokenInfoProxyAddress = getDeployData('TokenInfoProxy', chainId).address
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
-    const GenericBasketManagerInstance = await GenericBasketManager.deploy(tokenInfoProxyAddress);
+    const GenericBasketManagerInstance = await GenericBasketManager.deploy();
     newGenericBasketManager = await GenericBasketManagerInstance.deployed();
 
     ddChargedParticles = getDeployData('ChargedParticles', chainId);
@@ -136,12 +139,12 @@ describe("Charged Settings", () => {
 
   describe('Wallet Managers', async () => {
     it('should have enabled "aave" and "generic" as wallet managers', async () => {
-      expect(await chargedSettings.isWalletManagerEnabled('aave')).to.equal(true);
-      expect(await chargedSettings.isWalletManagerEnabled('generic')).to.equal(true);
+      expect(await chargedManagers.isWalletManagerEnabled('aave')).to.equal(true);
+      expect(await chargedManagers.isWalletManagerEnabled('generic')).to.equal(true);
     });
 
     it('should have enabled "generic" as a basket manager', async () => {
-      expect(await chargedSettings.isNftBasketEnabled('generic')).to.equal(true);
+      expect(await chargedManagers.isNftBasketEnabled('generic')).to.equal(true);
     });
   });
 
@@ -202,7 +205,7 @@ describe("Charged Settings", () => {
     });
 
     it('should return the contract owner of the external NFT contract', async () => {
-      expect(await chargedSettings.isContractOwner(erc721chargeable.address, user1));
+      expect(await chargedManagers.isContractOwner(erc721chargeable.address, user1));
     });
 
     describe('setRequiredWalletManager', async () => {
@@ -440,14 +443,14 @@ describe("Charged Settings", () => {
     });
 
     it('should allow the contract owner to register new wallet managers', async () => {
-      expect(await chargedSettings.connect(signerD).registerWalletManager('newGeneric', newGenericWalletManager.address))
-        .to.emit(chargedSettings, 'WalletManagerRegistered')
+      expect(await chargedManagers.connect(signerD).registerWalletManager('newGeneric', newGenericWalletManager.address))
+        .to.emit(chargedManagers, 'WalletManagerRegistered')
         .withArgs('newGeneric', newGenericWalletManager.address);
     });
 
     it('should allow the contract owner to register new basket managers', async () => {
-      expect(await chargedSettings.connect(signerD).registerBasketManager('newGeneric', newGenericBasketManager.address))
-        .to.emit(chargedSettings, 'BasketManagerRegistered')
+      expect(await chargedManagers.connect(signerD).registerBasketManager('newGeneric', newGenericBasketManager.address))
+        .to.emit(chargedManagers, 'BasketManagerRegistered')
         .withArgs('newGeneric', newGenericBasketManager.address);
     });
   });

@@ -150,6 +150,7 @@ module.exports = {
         'Universe',
         'ChargedState',
         'ChargedSettings',
+        'ChargedManagers',
         'ChargedParticles',
         'AaveWalletManager',
         'AaveBridgeV2',

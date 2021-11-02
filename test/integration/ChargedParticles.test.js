@@ -28,6 +28,7 @@ const { expect, assert } = require('chai');
 const { max } = require('lodash');
 
 const CryptoPunksMarket = require('../../build/contracts/contracts/test/CryptoPunks.sol/CryptoPunksMarket.json');
+const TokenInfoProxyMock = require('../../build/contracts/contracts/lib/TokenInfoProxy.sol/TokenInfoProxy.json');
 
 const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
 
@@ -51,6 +52,9 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   // Internal contracts
   let universe;
+  let chargedState;
+  let chargedSettings;
+  let chargedManagers;
   let chargedParticles;
   let aaveWalletManager;
   let genericWalletManager;
@@ -60,6 +64,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   let ionx;
   let timelocks;
   let tokenInfoProxy;
+  let tokenInfoProxyMock;
 
   // Settings
   let annuityPct = '1000';  // 10%
@@ -112,11 +117,13 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     // test NFTs that are non-compliant with ERC721 standard
     cryptoPunksMarket = await deployMockContract(signerD, CryptoPunksMarket.abi, overrides);
+    tokenInfoProxyMock = await deployMockContract(signerD, TokenInfoProxyMock.abi, overrides);
 
     // Connect to Internal Contracts
     const Universe = await ethers.getContractFactory('Universe');
     const ChargedState = await ethers.getContractFactory('ChargedState');
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
+    const ChargedManagers = await ethers.getContractFactory('ChargedManagers');
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
@@ -127,10 +134,10 @@ describe("[INTEGRATION] Charged Particles", () => {
     const IonxTimelock = await ethers.getContractFactory('IonxTimelock');
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy')
 
-    tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address)
     universe = Universe.attach(getDeployData('Universe', chainId).address);
     chargedState = ChargedState.attach(getDeployData('ChargedState', chainId).address);
     chargedSettings = ChargedSettings.attach(getDeployData('ChargedSettings', chainId).address);
+    chargedManagers = ChargedManagers.attach(getDeployData('ChargedManagers', chainId).address);
     chargedParticles = ChargedParticles.attach(getDeployData('ChargedParticles', chainId).address);
     aaveWalletManager = AaveWalletManager.attach(getDeployData('AaveWalletManager', chainId).address);
     genericWalletManager = GenericWalletManager.attach(getDeployData('GenericWalletManager', chainId).address);
@@ -140,6 +147,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     ionx = Ionx.attach(getDeployData('Ionx', chainId).address);
     timelocks = Object.values(getDeployData('IonxTimelocks', chainId))
       .map(ionxTimelock => (IonxTimelock.attach(ionxTimelock.address)));
+    tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address);
 
     await lepton.connect(signerD).setPausedState(false);
   });
@@ -157,6 +165,9 @@ describe("[INTEGRATION] Charged Particles", () => {
   });
 
   it("can succesfully energize and release proton", async () => {
+
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
 
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
@@ -179,6 +190,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       ],
     });
 
+    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
     await chargedParticles.connect(signer2).releaseParticle(
       user2,
       proton.address,
@@ -191,6 +203,10 @@ describe("[INTEGRATION] Charged Particles", () => {
   });
 
   it("can discharge only after timelock expired", async () => {
+
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
@@ -213,6 +229,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         annuityPct,
       ],
     });
+    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
 
     const blockNumberTimelock = (await getNetworkBlockNumber()).add(toBN('10'));
 
@@ -318,6 +335,10 @@ describe("[INTEGRATION] Charged Particles", () => {
   });
 
   it("generic smart wallet and manager succesfully hold erc20 tokens", async () => {
+
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
@@ -341,6 +362,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       ],
     });
 
+    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
     await chargedParticles.connect(signer2).releaseParticle(
       user2,
       proton.address,
@@ -353,6 +375,10 @@ describe("[INTEGRATION] Charged Particles", () => {
   });
 
   it("generic smart basket and manager succesfully hold erc721 tokens", async () => {
+
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
@@ -373,6 +399,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         annuityPct,                   // annuityPercent
       ],
     });
+    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, tokenId1.toString()).returns(user2);
 
     const tokenId2 = await callAndReturn({
       contractInstance: proton,
@@ -389,6 +416,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         annuityPct,                   // annuityPercent
       ],
     });
+    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, tokenId2.toString()).returns(user2);
 
     await proton.connect(signer2).approve(chargedParticles.address, tokenId2);
 
@@ -415,6 +443,10 @@ describe("[INTEGRATION] Charged Particles", () => {
   });
 
   it("cannot discharge more than the wallet holds", async () => {
+
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
@@ -435,6 +467,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         annuityPct,                   // annuityPercent
       ],
     });
+    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
 
     await expect(chargedParticles.connect(signer2).dischargeParticleAmount(
       user2,
@@ -447,6 +480,10 @@ describe("[INTEGRATION] Charged Particles", () => {
   });
 
   it("can order to release more than the wallet holds, but receive only the wallet amount", async () => {
+
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
@@ -467,6 +504,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         annuityPct,                   // annuityPercent
       ],
     });
+    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
 
     const user2BalanceBefore = await dai.balanceOf(user2);
 
@@ -621,73 +659,73 @@ describe("[INTEGRATION] Charged Particles", () => {
   //   expect(Number(ionBalance4.sub(ionBalance3).toString()) / Number(ionBalance2.sub(ionBalance1).toString()) - Number(multiplier.toString())).to.be.above(1.0).and.below(1.05);
   // });
 
-  it("should not allow to charge a proton with a lepton multiple times", async () => {
-    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+  // it("should not allow to charge a proton with a lepton multiple times", async () => {
+  //   await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
-    await dai.connect(daiSigner).transfer(user1, toWei('10'));
-    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+  //   await dai.connect(daiSigner).transfer(user1, toWei('10'));
+  //   await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
 
-    const protonId = await callAndReturn({
-      contractInstance: proton,
-      contractMethod: 'createChargedParticle',
-      contractCaller: signer1,
-      contractParams: [
-        user1,                        // creator
-        user2,                        // receiver
-        user3,                        // referrer
-        TEST_NFT_TOKEN_URI,           // tokenMetaUri
-        'aave',                       // walletManagerId
-        daiAddress,                   // assetToken
-        toWei('10'),                  // assetAmount
-        annuityPct,                   // annuityPercent
-      ],
-    });
+  //   const protonId = await callAndReturn({
+  //     contractInstance: proton,
+  //     contractMethod: 'createChargedParticle',
+  //     contractCaller: signer1,
+  //     contractParams: [
+  //       user1,                        // creator
+  //       user2,                        // receiver
+  //       user3,                        // referrer
+  //       TEST_NFT_TOKEN_URI,           // tokenMetaUri
+  //       'aave',                       // walletManagerId
+  //       daiAddress,                   // assetToken
+  //       toWei('10'),                  // assetAmount
+  //       annuityPct,                   // annuityPercent
+  //     ],
+  //   });
 
-    await lepton.connect(signerD).setPausedState(false);
+  //   await lepton.connect(signerD).setPausedState(false);
 
-    const price1 = await lepton.getNextPrice();
+  //   const price1 = await lepton.getNextPrice();
 
-    const leptonId1 = await callAndReturn({
-      contractInstance: lepton,
-      contractMethod: 'mintLepton',
-      contractCaller: signer3,
-      contractParams: [],
-      callValue: price1.toString()
-    });
+  //   const leptonId1 = await callAndReturn({
+  //     contractInstance: lepton,
+  //     contractMethod: 'mintLepton',
+  //     contractCaller: signer3,
+  //     contractParams: [],
+  //     callValue: price1.toString()
+  //   });
 
-    const price2 = await lepton.getNextPrice();
+  //   const price2 = await lepton.getNextPrice();
 
-    const leptonId2 = await callAndReturn({
-      contractInstance: lepton,
-      contractMethod: 'mintLepton',
-      contractCaller: signer3,
-      contractParams: [],
-      callValue: price2.toString()
-    });
+  //   const leptonId2 = await callAndReturn({
+  //     contractInstance: lepton,
+  //     contractMethod: 'mintLepton',
+  //     contractCaller: signer3,
+  //     contractParams: [],
+  //     callValue: price2.toString()
+  //   });
 
-    await lepton.connect(signer3).approve(chargedParticles.address, leptonId1);
-    await lepton.connect(signer3).approve(chargedParticles.address, leptonId2);
+  //   await lepton.connect(signer3).approve(chargedParticles.address, leptonId1);
+  //   await lepton.connect(signer3).approve(chargedParticles.address, leptonId2);
 
-    await chargedParticles.connect(signer3).covalentBond(
-      proton.address,
-      protonId,
-      'generic',
-      lepton.address,
-      leptonId1,
-      '0x',
-      '0x'
-    );
+  //   await chargedParticles.connect(signer3).covalentBond(
+  //     proton.address,
+  //     protonId,
+  //     'generic',
+  //     lepton.address,
+  //     leptonId1,
+  //     '0x',
+  //     '0x'
+  //   );
 
-    await expect(chargedParticles.connect(signer3).covalentBond(
-      proton.address,
-      protonId,
-      'generic',
-      lepton.address,
-      leptonId2,
-      '0x',
-      '0x'
-    )).to.be.revertedWith('CP:E-430');
-  });
+  //   await expect(chargedParticles.connect(signer3).covalentBond(
+  //     proton.address,
+  //     protonId,
+  //     'generic',
+  //     lepton.address,
+  //     leptonId2,
+  //     '0x',
+  //     '0x'
+  //   )).to.be.revertedWith('CP:E-430');
+  // });
 
   it("leptons switch to the next tier after minting all the available leptons in the previous tier", async () => {
     const maxMintPerTx = 5; // presets.Lepton.maxMintPerTx;

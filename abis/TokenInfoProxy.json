@@ -59,7 +59,7 @@
         "type": "bytes4"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -78,7 +78,7 @@
         "type": "bytes4"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -171,7 +171,7 @@
         "type": "address"
       }
     ],
-    "name": "isErc721OwnerOrOperator",
+    "name": "isNFTOwnerOrOperator",
     "outputs": [
       {
         "internalType": "bool",

@@ -43,10 +43,9 @@ module.exports = async (hre) => {
       deployTransaction: genericWalletManager.deployTransaction,
     }
 
-    const tokenInfoProxyAddress = getDeployData('TokenInfoProxy', chainId).address
     await log('  Deploying GenericBasketManager...')(alchemyTimeout);
     const GenericBasketManager = await hre.ethers.getContractFactory('GenericBasketManager');
-    const GenericBasketManagerInstance = await GenericBasketManager.deploy(tokenInfoProxyAddress);
+    const GenericBasketManagerInstance = await GenericBasketManager.deploy();
     const genericBasketManager = await GenericBasketManagerInstance.deployed();
     deployData['GenericBasketManager'] = {
       abi: getContractAbi('GenericBasketManager'),

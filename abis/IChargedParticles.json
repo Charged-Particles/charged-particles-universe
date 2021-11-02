@@ -5,24 +5,17 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "chargedSettings",
+        "name": "controllerAddress",
         "type": "address"
-      }
-    ],
-    "name": "ChargedSettingsSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
+      },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "chargedState",
-        "type": "address"
+        "indexed": false,
+        "internalType": "string",
+        "name": "controllerId",
+        "type": "string"
       }
     ],
-    "name": "ChargedStateSet",
+    "name": "ControllerSet",
     "type": "event"
   },
   {
@@ -36,19 +29,6 @@
       }
     ],
     "name": "DepositFeeSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "leptonToken",
-        "type": "address"
-      }
-    ],
-    "name": "LeptonTokenSet",
     "type": "event"
   },
   {
@@ -74,19 +54,6 @@
       }
     ],
     "name": "ProtocolFeesCollected",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "universeAddress",
-        "type": "address"
-      }
-    ],
-    "name": "UniverseSet",
     "type": "event"
   },
   {
@@ -508,6 +475,19 @@
         "internalType": "uint256",
         "name": "protocolFee",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getManagersAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "managersAddress",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

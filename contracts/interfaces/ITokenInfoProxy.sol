@@ -36,19 +36,15 @@ interface ITokenInfoProxy {
   }
 
   function setContractFnOwnerOf(address contractAddress, bytes4 fnSig) external;
-
   function setContractFnCreatorOf(address contractAddress, bytes4 fnSig) external;
+  function setContractFnCollectOverride(address contractAddress, bytes4 fnSig) external;
+  function setContractFnDepositOverride(address contractAddress, bytes4 fnSig) external;
 
   function getTokenUUID(address contractAddress, uint256 tokenId) external pure returns (uint256);
-
-  function isErc721OwnerOrOperator(address contractAddress, uint256 tokenId, address sender) external view returns (bool);
-
+  function isNFTOwnerOrOperator(address contractAddress, uint256 tokenId, address sender) external returns (bool);
   function getTokenOwner(address contractAddress, uint256 tokenId) external returns (address);
-
   function getTokenCreator(address contractAddress, uint256 tokenId) external returns (address);
 
-  function getCollectOverrideFnSig(address contractAddress) external returns (bytes4);
-
-  function getDepositOverrideFnSig(address contractAddress) external returns (bytes4);
-
+  function getCollectOverrideFnSig(address contractAddress) external view returns (bytes4);
+  function getDepositOverrideFnSig(address contractAddress) external view returns (bytes4);
 }
