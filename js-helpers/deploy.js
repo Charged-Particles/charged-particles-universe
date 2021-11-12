@@ -215,6 +215,25 @@ const presets = {
       uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
       uniswapLPTokenAddress: '0xac5A8983d9289922a45f97B352Dc3c94FF55a1A6',
     },
+    3: { // Ropsten Testnet (Gelato)
+      staking: {
+        epochDuration: 2 * 60 * 60,  // 2 Hours
+        epoch1Start: dateToTimestamp(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+      },
+      ionxToken: {
+        startAmount: bn(480),
+        nrOfEpochs: bn(12),
+        deprecation: bn(0),
+      },
+      lpTokens: {
+        startAmount: bn(480),
+        nrOfEpochs: bn(12),
+        deprecation: bn(0),
+      },
+
+      uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+      uniswapLPTokenAddress: '0xac5A8983d9289922a45f97B352Dc3c94FF55a1A6',
+    },
     137: { // Polygon L2 Mainnet
 
     },

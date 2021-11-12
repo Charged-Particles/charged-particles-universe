@@ -15,6 +15,8 @@ contract IncentivesResolver is Ownable {
 
     bool internal _paused;
 
+    event PausedStateSet(bool isPaused);
+
     // addresses
     address private immutable _ionxTokenAddress;
     address private immutable _uniV2LPAddress;
@@ -53,7 +55,7 @@ contract IncentivesResolver is Ownable {
 
         //  Check canExec 1st farm
         //  Check canExec 2nd farm
-
+        return (canExec, execPayload);
     }
 
     /***********************************|
