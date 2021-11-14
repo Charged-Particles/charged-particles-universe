@@ -155,6 +155,8 @@ module.exports = {
         'Staking',
         'YieldFarm2',
         'Staking2',
+        'YieldFarm3',
+        'Staking3',
         'CommunityVault',
         'MerkleDistributor',
         'MerkleDistributor2',

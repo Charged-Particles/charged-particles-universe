@@ -198,17 +198,19 @@ const presets = {
         expiryDate: TEST_EXPIRY,
       },
       staking: {
-        epochDuration: 2 * 60 * 60,  // 2 Hours
+        epochDuration: 1 * 60 * 60,  // 1 Hour
         epoch1Start: dateToTimestamp(dateFormat(TEN_MINS_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
-        startAmount: bn(48000),
-        nrOfEpochs: bn(12),
+        // TODO V3 -- make sure these args are correct after testing
+        startAmount: bn(100),
+        nrOfEpochs: bn(24),
         deprecation: bn(0),
       },
       lpTokens: {
-        startAmount: bn(48000),
-        nrOfEpochs: bn(12),
+        // TODO V3 -- make sure these args are correct after testing
+        startAmount: bn(100),
+        nrOfEpochs: bn(24),
         deprecation: bn(0),
       },
 

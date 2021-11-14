@@ -35,7 +35,7 @@ const {
     const chainId = chainIdByName(network.name);
     const {isProd, isHardhat} = chainTypeById(chainId);
     const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
-    const __STAKING_INDEX = isHardhat ? '' : 2;
+    const __STAKING_INDEX = isHardhat ? '' : 3; // rewards V3
     const incentives = presets.Incentives[chainId];
 
     const daoSigner = ethers.provider.getSigner(protocolOwner);
