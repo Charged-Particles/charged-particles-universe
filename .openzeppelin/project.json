@@ -19,6 +19,7 @@
     "Staking": "Staking",
     "YieldFarm": "YieldFarm",
     "Staking2": "Staking2",
+    "IncentivesResolver": "IncentivesResolver",
     "YieldFarm2": "YieldFarm2",
     "CommunityVault": "CommunityVault",
     "MerkleDistributor": "MerkleDistributor",

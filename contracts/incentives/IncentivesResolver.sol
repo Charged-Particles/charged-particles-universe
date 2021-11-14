@@ -4,28 +4,28 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "../interfaces/IStaking.sol";
+import "../incentives/YieldFarm.sol";
 
-interface IYieldFarm {
-    function getGenesisEpochAmount() external view returns (uint);
-    function getCurrentEpoch() external view returns (uint);
-    function isPaused() external view returns (bool);
-}
 
 contract IncentivesResolver is Ownable {
 
-    bool internal _paused;
-
+    uint public immutable NR_OF_EPOCHS; 
+    // Is it better to store or use the call everytime to 
+    // _farmUniV2.NR_OF_EPOCHS();
     event PausedStateSet(bool isPaused);
 
     // addresses
-    address private immutable _ionxTokenAddress;
-    address private immutable _uniV2LPAddress;
+    address public immutable _ionxTokenAddress;
+    address public immutable _uniV2LPAddress;
+
 
     // contracts
     IStaking private _staking;
-    IYieldFarm private _farmIonx;
-    IYieldFarm private _farmUniV2;
+    YieldFarm private _farmIonx;
+    YieldFarm private _farmUniV2;
     
+    bool internal _paused;
+
     constructor(
         address ionxTokenAddress, 
         address uniV2LPAddress, 
@@ -46,8 +46,15 @@ contract IncentivesResolver is Ownable {
 
     }
 
-    function checker() external view returns (bool canExec, bytes memory execPayload) {
+    function doEpochInit(address stakingAddress, address tokenAddress) external returns (bool success) {
         
+    }
+
+    function checker() external pure returns (bool canExec, bytes memory execPayload) {
+        
+        canExec = false;
+
+    
         // uint256 lastExecuted = ICounter(COUNTER).lastExecuted();
         //uint256 deadline = block.timestamp + 10 minutes;
 

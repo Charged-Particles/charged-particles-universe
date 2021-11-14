@@ -95,7 +95,8 @@ module.exports = {
               mnemonic: mnemonic.testnet,
               initialIndex: 0,
               count: 10,
-          }
+          },
+          chainId: 3,
       },
         mumbai: {
             url: `https://rpc-mumbai.matic.today`,
@@ -162,6 +163,7 @@ module.exports = {
         'ERC20',
         'ERC721',
         'ExternalNFT',
+        "IncentivesResolver",
         'YieldFarm',
         'Staking',
         'YieldFarm2',

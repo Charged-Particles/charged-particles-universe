@@ -76,7 +76,7 @@ async function run() {
   // // // await verifyContract({name: 'ChargedState', networkName});
   // // await verifyContract({name: 'ChargedSettings', networkName});
   // await verifyContract({name: 'WBoson', networkName});
-  // await verifyContract({name: 'Ionx', networkName});
+  await verifyContract({name: 'Ionx', networkName});
   // await verifyContract({name: 'IonxTimelock', networkName});
 
   // Wallet Managers
@@ -93,9 +93,12 @@ async function run() {
   // Incentives
   // await verifyContract({name: 'CommunityVault', networkName});
 
+  
   // await verifyContract({name: 'Staking', networkName});
   // await verifyContract({name: 'IonxYieldFarm', networkName});
   // await verifyContract({name: 'LPYieldFarm', networkName});
+  // await verifyContract({name: 'IncentivesResolver', networkName});
+
 
   // await verifyContract({name: 'Staking2', networkName, contractRef: 'incentives/Staking2.sol:Staking2'});
   // await verifyContract({name: 'IonxYieldFarm2', networkName, contractRef: 'incentives/YieldFarm2.sol:YieldFarm2'});
@@ -108,7 +111,7 @@ async function run() {
   // await verifyContract({name: 'VestingClaim2', networkName});
   // await verifyContract({name: 'VestingClaim3', networkName});
   // await verifyContract({name: 'VestingClaim4', networkName});
-  await verifyContract({name: 'VestingClaim5', networkName});
+  //await verifyContract({name: 'VestingClaim5', networkName});
 
   success('Done!');
 };
