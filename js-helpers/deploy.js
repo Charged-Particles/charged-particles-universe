@@ -180,16 +180,16 @@ const presets = {
       },
       staking: {
         epochDuration: 7 * 24 * 60 * 60,  // 1 week
-        epoch1Start: 1629754980, // dateToTimestamp(dateFormat('23/08/2021 5:30', 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+        epoch1Start: 1637012580, // dateToTimestamp(dateFormat('23/08/2021 5:30', 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
         startAmount: bn(48000),
-        nrOfEpochs: bn(12),
+        nrOfEpochs: bn(24),
         deprecation: bn(0),
       },
       lpTokens: {
         startAmount: bn(48000),
-        nrOfEpochs: bn(12),
+        nrOfEpochs: bn(24),
         deprecation: bn(0),
       },
 
