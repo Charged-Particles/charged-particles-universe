@@ -40,6 +40,8 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
   using Counters for Counters.Counter;
   using TokenInfo for address;
 
+  ITokenInfoProxy internal _tokenInfoProxy;
+
   // The Controller Contract Address
   address internal _controller;
 
@@ -54,15 +56,12 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
   // State of Basket Manager
   bool internal _paused;
 
-  ITokenInfoProxy internal tokenInfoProxy;
-
   /***********************************|
   |          Initialization           |
   |__________________________________*/
 
-  constructor (ITokenInfoProxy _tokenInfoProxy) public {
+  constructor () public {
     _basketTemplate = address(new GenericSmartBasket());
-    tokenInfoProxy = _tokenInfoProxy;
   }
 
   /***********************************|
@@ -202,6 +201,13 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     emit ControllerSet(controller);
   }
 
+  /**
+    * @dev Connects to the Charged Particles Controller
+    */
+  function setTokenInfoProxy(address tokenInfoProxy) external onlyOwner {
+    _tokenInfoProxy = ITokenInfoProxy(tokenInfoProxy);
+  }
+
   function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount)
     external
     virtual
@@ -252,7 +258,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     returns (address)
   {
     address newBasket = _createClone(_basketTemplate);
-    GenericSmartBasket(newBasket).initialize(tokenInfoProxy);
+    GenericSmartBasket(newBasket).initialize(_tokenInfoProxy);
     return newBasket;
   }
 

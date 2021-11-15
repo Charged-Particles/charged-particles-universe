@@ -5,6 +5,7 @@ const {
 
 const {
   log,
+  toBytes,
   chainTypeById,
   chainNameById,
   chainIdByName,
@@ -46,7 +47,9 @@ module.exports = async (hre) => {
     const ddUniverse = getDeployData('Universe', chainId);
     const ddChargedState = getDeployData('ChargedState', chainId);
     const ddChargedSettings = getDeployData('ChargedSettings', chainId);
+    const ddChargedManagers = getDeployData('ChargedManagers', chainId);
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
+    const ddTokenInfoProxy = getDeployData('TokenInfoProxy', chainId);
     const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
     const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
     const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
@@ -83,6 +86,10 @@ module.exports = async (hre) => {
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     const chargedSettings = await ChargedSettings.attach(ddChargedSettings.address);
 
+    log('  Loading ChargedManagers from: ', ddChargedManagers.address);
+    const ChargedManagers = await ethers.getContractFactory('ChargedManagers');
+    const chargedManagers = await ChargedManagers.attach(ddChargedManagers.address);
+
     log('  Loading GenericWalletManager from: ', ddGenericWalletManager.address);
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const genericWalletManager = await GenericWalletManager.attach(ddGenericWalletManager.address);
@@ -94,6 +101,10 @@ module.exports = async (hre) => {
     log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
     const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
+
+    log('  Loading TokenInfoProxy from: ', ddTokenInfoProxy.address);
+    const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
+    const tokenInfoProxy = await TokenInfoProxy.attach(ddTokenInfoProxy.address);
 
     log('  Loading WBoson from: ', ddWBoson.address);
     const WBoson = await ethers.getContractFactory('WBoson');
@@ -129,28 +140,52 @@ module.exports = async (hre) => {
     );
 
     await executeTx('1-b', 'ChargedParticles: Registering Universe', async () =>
-      await chargedParticles.setUniverse(ddUniverse.address)
+      await chargedParticles.setController(ddUniverse.address, 'universe')
     );
 
     await executeTx('1-c', 'ChargedParticles: Registering ChargedState', async () =>
-      await chargedParticles.setChargedState(ddChargedState.address)
+      await chargedParticles.setController(ddChargedState.address, 'state')
     );
 
     await executeTx('1-d', 'ChargedParticles: Registering ChargedSettings', async () =>
-      await chargedParticles.setChargedSettings(ddChargedSettings.address)
+      await chargedParticles.setController(ddChargedSettings.address, 'settings')
+    );
+
+    await executeTx('1-e', 'ChargedParticles: Registering ChargedManagers', async () =>
+      await chargedParticles.setController(ddChargedManagers.address, 'managers')
+    );
+
+    await executeTx('1-f', 'ChargedParticles: Registering TokenInfoProxy', async () =>
+      await chargedParticles.setController(ddTokenInfoProxy.address, 'tokeninfo')
     );
 
     if (isHardhat) {
-      await executeTx('1-e', 'ChargedParticles: Registering Lepton', async () =>
-        await chargedParticles.setLeptonToken(ddLepton.address)
+      await executeTx('1-g', 'ChargedParticles: Registering Lepton', async () =>
+        await chargedParticles.setController(ddLepton.address, 'leptons')
       );
     }
 
-    await executeTx('1-f', 'ChargedState: Registering ChargedSettings', async () =>
-      await chargedState.setChargedSettings(ddChargedSettings.address)
+    await executeTx('1-h', 'ChargedState: Registering ChargedSettings', async () =>
+      await chargedState.setController(ddChargedSettings.address, 'settings')
     );
 
-    await executeTx('1-g', 'ChargedParticles: Setting Temp-Lock Expiry Blocks', async () =>
+    await executeTx('1-i', 'ChargedState: Registering TokenInfoProxy', async () =>
+      await chargedState.setController(ddTokenInfoProxy.address, 'tokeninfo')
+    );
+
+    await executeTx('1-j', 'ChargedManagers: Registering ChargedSettings', async () =>
+      await chargedManagers.setController(ddChargedSettings.address, 'settings')
+    );
+
+    await executeTx('1-k', 'ChargedManagers: Registering ChargedState', async () =>
+      await chargedManagers.setController(ddChargedState.address, 'state')
+    );
+
+    await executeTx('1-l', 'ChargedManagers: Registering TokenInfoProxy', async () =>
+      await chargedManagers.setController(ddTokenInfoProxy.address, 'tokeninfo')
+    );
+
+    await executeTx('1-m', 'ChargedParticles: Setting Temp-Lock Expiry Blocks', async () =>
       await chargedSettings.setTempLockExpiryBlocks(tempLockExpiryBlocks)
     );
 
@@ -164,7 +199,7 @@ module.exports = async (hre) => {
     );
 
     await executeTx('2-b', 'GenericWalletManager: Registering Generic Wallet Manager with ChargedParticles', async () =>
-      await chargedSettings.registerWalletManager('generic', ddGenericWalletManager.address)
+      await chargedManagers.registerWalletManager('generic', ddGenericWalletManager.address)
     );
 
     await executeTx('2-c', 'GenericBasketManager: Setting Charged Particles as Controller', async () =>
@@ -172,7 +207,11 @@ module.exports = async (hre) => {
     );
 
     await executeTx('2-d', 'GenericBasketManager: Registering Generic Basket Manager with ChargedParticles', async () =>
-      await chargedSettings.registerBasketManager('generic', ddGenericBasketManager.address)
+      await chargedManagers.registerBasketManager('generic', ddGenericBasketManager.address)
+    );
+
+    await executeTx('2-e', 'GenericBasketManager: Registering TokenInfoProxy', async () =>
+      await genericBasketManager.setTokenInfoProxy(ddTokenInfoProxy.address)
     );
 
 
@@ -189,7 +228,7 @@ module.exports = async (hre) => {
     );
 
     await executeTx('3-c', 'AaveWalletManager: Registering Aave as LP with ChargedParticles', async () =>
-      await chargedSettings.registerWalletManager('aave', ddAaveWalletManager.address)
+      await chargedManagers.registerWalletManager('aave', ddAaveWalletManager.address)
     );
 
     // if (referralCode.length > 0) {
@@ -359,7 +398,7 @@ module.exports = async (hre) => {
     }
 
     await executeTx('9-e', 'ChargedParticles: Registering Lepton2', async () =>
-      await chargedParticles.setLeptonToken(ddLepton2.address)
+      await chargedParticles.setController(ddLepton2.address, 'leptons')
     );
 
 

@@ -174,7 +174,7 @@ describe('YieldFarm Pool', function () {
             expect(await ionxToken.allowance(communityVaultAddr, yieldFarmLP.address)).to.equal(distributedAmount)
 
             const epochStaking = (await staking.getCurrentEpoch()).toString();
-            console.log(`Epoch Staking: ${epochStaking}`);
+            // console.log(`Epoch Staking: ${epochStaking}`);
 
             expect(await yieldFarmLP.getCurrentEpoch()).to.equal(2) // epoch on yield is staking - 1
 
@@ -192,28 +192,28 @@ describe('YieldFarm Pool', function () {
             let epochAmount = calculateEpochAmount(0);
             let epochNow = await yieldFarmIonx.getCurrentEpoch();
 
-            console.log(`Depositing ${formatUnits(amount)} IONX at epoch ${epochNow}`);
+            // console.log(`Depositing ${formatUnits(amount)} IONX at epoch ${epochNow}`);
 
             await depositIonxToken(amount); // Mints and stakes 33
 
 
             let claimableNow;
 
-            console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
-            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+            // console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
+            // console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
 
             await expect(yieldFarmIonx.getAmountClaimable()).to.be.revertedWith('SafeMath: subtraction overflow');
             await moveAtStakingEpoch(1);
 
             epochNow = await yieldFarmIonx.getCurrentEpoch();
 
-            console.log(`Depositing ${formatUnits(amount)} IONX at epoch ${epochNow}`);
+            // console.log(`Depositing ${formatUnits(amount)} IONX at epoch ${epochNow}`);
 
             await depositIonxToken(amount); // 33 more
 
             epochAmount = calculateEpochAmount(1);
-            console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
-            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+            // console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
+            // console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
 
             // Impossible to harvest epoch 1
             await expect(yieldFarmIonx.connect(user).harvest(1)).to.be.revertedWith('YLD:E-306');
@@ -223,7 +223,7 @@ describe('YieldFarm Pool', function () {
             await yieldFarmIonx.connect(deployer).massHarvest();
 
             const balanceUserTooSoon = await ionxToken.balanceOf(await user.getAddress());
-            console.log(`[Epoch-${epochNow}] After harvesting too soon [Epoch-${epochNow}], user balance: ${formatUnits(balanceUserTooSoon)} IONX`);
+            // console.log(`[Epoch-${epochNow}] After harvesting too soon [Epoch-${epochNow}], user balance: ${formatUnits(balanceUserTooSoon)} IONX`);
             expect(balanceUserTooSoon).to.be.equal(0);
 
 
@@ -231,77 +231,77 @@ describe('YieldFarm Pool', function () {
 
             claimableNow = await yieldFarmIonx.connect(user).getAmountClaimable();
 
-            console.log(`[Epoch-${epochNow}] Current Claimable at [${epochNow}]`,claimableNow,formatUnits(claimableNow));
+            // console.log(`[Epoch-${epochNow}] Current Claimable at [${epochNow}]`,claimableNow,formatUnits(claimableNow));
 
             await moveAtStakingEpoch(2);
 
             epochNow = await yieldFarmIonx.getCurrentEpoch();
 
-            console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
-            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+            // console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
+            // console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
 
             claimableNow = await yieldFarmIonx.connect(user).getAmountClaimable();
 
-            console.log(`[Epoch-${epochNow}] Current Claimable Now at ${epochNow}`,claimableNow,formatUnits(claimableNow));
+            // console.log(`[Epoch-${epochNow}] Current Claimable Now at ${epochNow}`,claimableNow,formatUnits(claimableNow));
 
             // Possible to mass harvest
             await yieldFarmIonx.connect(user).massHarvest();
 
             const balanceUser = await ionxToken.balanceOf(await user.getAddress());
-            console.log(`After harvesting epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser)} IONX`);
+            // console.log(`After harvesting epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser)} IONX`);
             expect(balanceUser).to.be.gt(0);
 
 
             await moveAtStakingEpoch(3);
 
-            console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
-            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+            // console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
+            // console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
 
             claimableNow = await yieldFarmIonx.connect(user).getAmountClaimable();
 
-            console.log(`[Epoch-${epochNow}] Current Claimable Now at ${epochNow}`,claimableNow,formatUnits(claimableNow));
+            // console.log(`[Epoch-${epochNow}] Current Claimable Now at ${epochNow}`,claimableNow,formatUnits(claimableNow));
 
             // Possible to mass harvest
             await yieldFarmIonx.connect(user).massHarvest();
 
             const balanceUser3 = await ionxToken.balanceOf(await user.getAddress());
-            console.log(`After harvesting epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser3)} IONX`);
+            // console.log(`After harvesting epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser3)} IONX`);
             expect(balanceUser3).to.be.gt(balanceUser);
 
 
             // Epoch 4
             await moveAtStakingEpoch(4);
 
-            console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
-            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+            // console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
+            // console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
 
             claimableNow = await yieldFarmIonx.connect(user).getAmountClaimable();
 
-            console.log(`[Epoch-${epochNow}] Current Claimable Now at ${epochNow}`,claimableNow,formatUnits(claimableNow));
+            // console.log(`[Epoch-${epochNow}] Current Claimable Now at ${epochNow}`,claimableNow,formatUnits(claimableNow));
 
 
             const balanceUser4 = await ionxToken.balanceOf(await user.getAddress());
-            console.log(`After SKIPPING epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser4)} IONX`);
+            // console.log(`After SKIPPING epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser4)} IONX`);
             expect(balanceUser4).to.be.equal(balanceUser3);
 
 
             await moveAtStakingEpoch(5);
             epochNow = await yieldFarmIonx.getCurrentEpoch();
 
-            console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
-            console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
+            // console.log(`[Epoch-${epochNow}] Epoch amount to distribute:`,formatUnits(calculateEpochAmount(epochNow)));
+            // console.log(`[Epoch-${epochNow}] Current Epoch Id`,epochNow.toString());
 
             const lastEpochIdHarvestedUser = await yieldFarmIonx.connect(user).userLastEpochIdHarvested();
-            console.log(`[Epoch-${epochNow}] lastEpochIdHarvestedUser: [Epoch-${lastEpochIdHarvestedUser.toString()}]`);
+            // console.log(`[Epoch-${epochNow}] lastEpochIdHarvestedUser: [Epoch-${lastEpochIdHarvestedUser.toString()}]`);
 
             claimableNow = await yieldFarmIonx.connect(user).getAmountClaimable();
 
-            console.log(`[Epoch-${epochNow}] Current Claimable Now at ${epochNow}`,claimableNow,formatUnits(claimableNow));
+            // console.log(`[Epoch-${epochNow}] Current Claimable Now at ${epochNow}`,claimableNow,formatUnits(claimableNow));
 
 
             await yieldFarmIonx.connect(user).massHarvest();
             const balanceUser5 = await ionxToken.balanceOf(await user.getAddress());
-            console.log(`After harvesting epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser5)} IONX`);
+            // console.log(`After harvesting epoch [Epoch-${epochNow}], user balance: ${formatUnits(balanceUser5)} IONX`);
             expect(balanceUser5).to.be.gt(balanceUser4);
 
             await moveAtStakingEpoch(6);
@@ -476,22 +476,22 @@ describe('YieldFarm Pool', function () {
         const ua = await u.getAddress();
 
         const balance2 = await ionxToken.balanceOf(ua);
-        console.log(`ua Funds:`,`${ethers.utils.formatUnits(balance2)} IONX`);
+        // console.log(`ua Funds:`,`${ethers.utils.formatUnits(balance2)} IONX`);
 
         const o = await ionxToken.balanceOf(ownerAddr);
-        console.log(`Owner Funds:`,`${ethers.utils.formatUnits(o)} IONX`);
+        // console.log(`Owner Funds:`,`${ethers.utils.formatUnits(o)} IONX`);
 
         const d = await ionxToken.balanceOf(deployerAddr);
-        console.log(`Deployer Funds:`,`${ethers.utils.formatUnits(d)} IONX`);
+        // console.log(`Deployer Funds:`,`${ethers.utils.formatUnits(d)} IONX`);
 
 
         const b = await ionxToken.balanceOf(communityVault.address);
-        console.log(`Vault Funds:`,`${ethers.utils.formatUnits(b)} IONX`);
+        // console.log(`Vault Funds:`,`${ethers.utils.formatUnits(b)} IONX`);
 
         await ionxToken.connect(owner).mint(ua, x);
 
         const balance3 = await ionxToken.balanceOf(ua);
-        console.log(`ua Funds:`,`${ethers.utils.formatUnits(balance3)} IONX`);
+        // console.log(`ua Funds:`,`${ethers.utils.formatUnits(balance3)} IONX`);
 
         await ionxToken.connect(u).approve(staking.address, x);
         return await staking.connect(u).deposit(ionxToken.address, x);

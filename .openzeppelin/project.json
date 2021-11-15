@@ -5,6 +5,7 @@
     "ChargedState": "ChargedState",
     "ChargedSettings": "ChargedSettings",
     "ChargedParticles": "ChargedParticles",
+    "ChargedManagers": "ChargedManagers",
     "GenericWalletManager": "GenericWalletManager",
     "GenericBasketManager": "GenericBasketManager",
     "AaveWalltManager": "AaveWalletManager",

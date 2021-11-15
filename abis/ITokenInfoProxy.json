@@ -40,7 +40,7 @@
         "type": "bytes4"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -59,7 +59,7 @@
         "type": "bytes4"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -152,7 +152,7 @@
         "type": "address"
       }
     ],
-    "name": "isErc721OwnerOrOperator",
+    "name": "isNFTOwnerOrOperator",
     "outputs": [
       {
         "internalType": "bool",
@@ -160,7 +160,25 @@
         "type": "bool"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes4",
+        "name": "fnSig",
+        "type": "bytes4"
+      }
+    ],
+    "name": "setContractFnCollectOverride",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -177,6 +195,24 @@
       }
     ],
     "name": "setContractFnCreatorOf",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes4",
+        "name": "fnSig",
+        "type": "bytes4"
+      }
+    ],
+    "name": "setContractFnDepositOverride",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

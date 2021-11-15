@@ -34,6 +34,10 @@ module.exports = async (hre) => {
     log('  - Trusted Forwarder: ', trustedForwarder);
     log(' ');
 
+    //
+    // Upgradeable Contracts
+    //
+
     log('  Deploying Universe...');
     const Universe = await ethers.getContractFactory('Universe');
     const UniverseInstance = await upgrades.deployProxy(Universe, []);
@@ -48,8 +52,8 @@ module.exports = async (hre) => {
     saveDeploymentData(chainId, deployData);
 
     await log('  Deploying ChargedState...')(alchemyTimeout);
-    const ChargedState = await hre.ethers.getContractFactory('ChargedState');
-    const ChargedStateInstance = await ChargedState.deploy();
+    const ChargedState = await ethers.getContractFactory('ChargedState');
+    const ChargedStateInstance = await upgrades.deployProxy(ChargedState, []);
     const chargedState = await ChargedStateInstance.deployed();
     deployData['ChargedState'] = {
       abi: getContractAbi('ChargedState'),
@@ -61,8 +65,8 @@ module.exports = async (hre) => {
     saveDeploymentData(chainId, deployData);
 
     await log('  Deploying ChargedSettings...')(alchemyTimeout);
-    const ChargedSettings = await hre.ethers.getContractFactory('ChargedSettings');
-    const ChargedSettingsInstance = await ChargedSettings.deploy();
+    const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
+    const ChargedSettingsInstance = await upgrades.deployProxy(ChargedSettings, []);
     const chargedSettings = await ChargedSettingsInstance.deployed();
     deployData['ChargedSettings'] = {
       abi: getContractAbi('ChargedSettings'),
@@ -72,6 +76,37 @@ module.exports = async (hre) => {
     log('  - ChargedSettings:  ', chargedSettings.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedSettings.deployTransaction }));
     saveDeploymentData(chainId, deployData);
+
+    await log('  Deploying ChargedManagers...')(alchemyTimeout);
+    const ChargedManagers = await ethers.getContractFactory('ChargedManagers');
+    const ChargedManagersInstance = await upgrades.deployProxy(ChargedManagers, []);
+    const chargedManagers = await ChargedManagersInstance.deployed();
+    deployData['ChargedManagers'] = {
+      abi: getContractAbi('ChargedManagers'),
+      address: chargedManagers.address,
+      deployTransaction: chargedManagers.deployTransaction,
+    }
+    log('  - ChargedManagers:  ', chargedManagers.address);
+    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedManagers.deployTransaction }));
+    saveDeploymentData(chainId, deployData);
+
+
+    await log('  Deploying ChargedParticles...')(alchemyTimeout);
+    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
+    const ChargedParticlesInstance = await upgrades.deployProxy(ChargedParticles, [], { unsafeAllowCustomTypes: true });
+    const chargedParticles = await ChargedParticlesInstance.deployed();
+    deployData['ChargedParticles'] = {
+      abi: getContractAbi('ChargedParticles'),
+      address: chargedParticles.address,
+      deployTransaction: chargedParticles.deployTransaction,
+    }
+    log('  - ChargedParticles: ', chargedParticles.address);
+    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedParticles.deployTransaction }));
+    saveDeploymentData(chainId, deployData);
+
+    //
+    // Non-upgradeable Contracts
+    //
 
     await log('  Deploying TokenInfoProxy...')(alchemyTimeout);
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
@@ -84,20 +119,6 @@ module.exports = async (hre) => {
     }
     log('  - TokenInfoProxy: ', tokenInfoProxy.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: tokenInfoProxy.deployTransaction }));
-    saveDeploymentData(chainId, deployData);
-
-
-    await log('  Deploying ChargedParticles...')(alchemyTimeout);
-    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
-    const ChargedParticlesInstance = await upgrades.deployProxy(ChargedParticles, [trustedForwarder, tokenInfoProxy.address], { unsafeAllowCustomTypes: true });
-    const chargedParticles = await ChargedParticlesInstance.deployed();
-    deployData['ChargedParticles'] = {
-      abi: getContractAbi('ChargedParticles'),
-      address: chargedParticles.address,
-      deployTransaction: chargedParticles.deployTransaction,
-    }
-    log('  - ChargedParticles: ', chargedParticles.address);
-    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedParticles.deployTransaction }));
     saveDeploymentData(chainId, deployData);
 
     log('\n  Contract Deployment Data saved to "deployments" directory.');

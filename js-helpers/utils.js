@@ -9,6 +9,7 @@ const toWei = ethers.utils.parseEther;
 const toEth = ethers.utils.formatEther;
 const toBN = ethers.BigNumber.from;
 const toStr = (val) => ethers.utils.toUtf8String(val).replace(/\0/g, '');
+const toBytes = ethers.utils.formatBytes32String;
 
 const bn = function(number, defaultValue = null) { if (number == null) { if (defaultValue == null) { return null } number = defaultValue } return ethers.BigNumber.from(number) }
 
@@ -93,6 +94,7 @@ module.exports = {
   toEth,
   toBN,
   toStr,
+  toBytes,
   bn,
   log,
   tokens,

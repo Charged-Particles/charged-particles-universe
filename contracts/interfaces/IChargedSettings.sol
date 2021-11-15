@@ -35,7 +35,7 @@ interface IChargedSettings {
   |             Public API            |
   |__________________________________*/
 
-  function isContractOwner(address contractAddress, address account) external view returns (bool);
+  // function isContractOwner(address contractAddress, address account) external view returns (bool);
   function getCreatorAnnuities(address contractAddress, uint256 tokenId) external view returns (address creator, uint256 annuityPct);
   function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external view returns (address);
   function getTempLockExpiryBlocks() external view returns (uint256);
@@ -46,12 +46,12 @@ interface IChargedSettings {
     returns (string memory requiredBasketManager, bool basketEnabled, uint256 maxNfts);
 
   // ERC20
-  function isWalletManagerEnabled(string calldata walletManagerId) external view returns (bool);
-  function getWalletManager(string calldata walletManagerId) external view returns (IWalletManager);
+  // function isWalletManagerEnabled(string calldata walletManagerId) external view returns (bool);
+  // function getWalletManager(string calldata walletManagerId) external view returns (IWalletManager);
 
   // ERC721
-  function isNftBasketEnabled(string calldata basketId) external view returns (bool);
-  function getBasketManager(string calldata basketId) external view returns (IBasketManager);
+  // function isNftBasketEnabled(string calldata basketId) external view returns (bool);
+  // function getBasketManager(string calldata basketId) external view returns (IBasketManager);
 
   /***********************************|
   |         Only NFT Creator          |
@@ -90,8 +90,8 @@ interface IChargedSettings {
   event DepositCapSet(address assetToken, uint256 depositCap);
   event TempLockExpirySet(uint256 expiryBlocks);
 
-  event WalletManagerRegistered(string indexed walletManagerId, address indexed walletManager);
-  event BasketManagerRegistered(string indexed basketId, address indexed basketManager);
+  // event WalletManagerRegistered(string indexed walletManagerId, address indexed walletManager);
+  // event BasketManagerRegistered(string indexed basketId, address indexed basketManager);
 
   event RequiredWalletManagerSet(address indexed contractAddress, string walletManager);
   event RequiredBasketManagerSet(address indexed contractAddress, string basketManager);

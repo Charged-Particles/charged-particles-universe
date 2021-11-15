@@ -97,25 +97,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "string",
-        "name": "basketId",
-        "type": "string"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "basketManager",
-        "type": "address"
-      }
-    ],
-    "name": "BasketManagerRegistered",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": false,
         "internalType": "address",
         "name": "assetToken",
@@ -363,25 +344,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "string",
-        "name": "walletManagerId",
-        "type": "string"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "walletManager",
-        "type": "address"
-      }
-    ],
-    "name": "WalletManagerRegistered",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
         "internalType": "address",
         "name": "receiver",
         "type": "address"
@@ -521,25 +483,6 @@
   {
     "inputs": [
       {
-        "internalType": "string",
-        "name": "basketId",
-        "type": "string"
-      }
-    ],
-    "name": "getBasketManager",
-    "outputs": [
-      {
-        "internalType": "contract IBasketManager",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "contractAddress",
         "type": "address"
@@ -662,65 +605,10 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "walletManagerId",
-        "type": "string"
-      }
-    ],
-    "name": "getWalletManager",
-    "outputs": [
-      {
-        "internalType": "contract IWalletManager",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "isContractOwner",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "basketId",
-        "type": "string"
-      }
-    ],
-    "name": "isNftBasketEnabled",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
+    "inputs": [],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -743,25 +631,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "walletManagerId",
-        "type": "string"
-      }
-    ],
-    "name": "isWalletManagerEnabled",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "owner",
     "outputs": [
@@ -772,42 +641,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "basketId",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "basketManager",
-        "type": "address"
-      }
-    ],
-    "name": "registerBasketManager",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "walletManagerId",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "walletManager",
-        "type": "address"
-      }
-    ],
-    "name": "registerWalletManager",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

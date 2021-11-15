@@ -36,11 +36,17 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "settingsController",
+        "name": "controllerAddress",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "controllerId",
+        "type": "string"
       }
     ],
-    "name": "ChargedSettingsSet",
+    "name": "ControllerSet",
     "type": "event"
   },
   {
@@ -508,7 +514,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -576,7 +582,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -644,7 +650,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -669,6 +675,13 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -697,7 +710,7 @@
         "type": "bool"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -726,7 +739,7 @@
         "type": "bool"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -755,7 +768,7 @@
         "type": "bool"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -784,7 +797,7 @@
         "type": "bool"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -947,11 +960,16 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "settingsController",
+        "name": "controller",
         "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "controllerId",
+        "type": "string"
       }
     ],
-    "name": "setChargedSettings",
+    "name": "setController",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1205,19 +1223,6 @@
       }
     ],
     "name": "setTimelockApproval",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_trustedForwarder",
-        "type": "address"
-      }
-    ],
-    "name": "setTrustedForwarder",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
