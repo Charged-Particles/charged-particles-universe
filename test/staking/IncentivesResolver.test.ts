@@ -65,18 +65,8 @@ describe('Incentives Resolver', function () {
         epochDuration = incentives.staking.epochDuration;
         NR_OF_EPOCHS = incentives.ionxToken.nrOfEpochs;
 
-        //https://en.wikipedia.org/wiki/1_%2B_2_%2B_3_%2B_4_%2B_%E2%8B%AF
         distributedAmount = getLiquidityDistributionAmount(chainId);
         distributedAmountIonx = getIonxDistributionAmount(chainId);
-
-        // console.log({
-        //     startAmount: ethers.utils.formatUnits(startAmountBn),
-        //     startAmountIonx: ethers.utils.formatUnits(startAmountIonxBn),
-        //     distributedAmount:distributedAmount.toString(),
-        //     distributedAmountIonx: distributedAmountIonx.toString(),
-        //     distributedAmountNorm: ethers.utils.formatUnits(distributedAmount),
-        //     distributedAmountNormIonx: ethers.utils.formatUnits(distributedAmountIonx),
-        // })
 
         amount = ethers.BigNumber.from(33).mul(ethers.BigNumber.from(10).pow(18));
 
@@ -99,7 +89,7 @@ describe('Incentives Resolver', function () {
 
         const Staking = await ethers.getContractFactory('Staking', deployer);
 
-     epoch1Start = (await getCurrentUnix()) + 1000;
+        epoch1Start = (await getCurrentUnix()) + 1000;
         staking = await Staking.deploy(epoch1Start, epochDuration);
         await staking.deployed();
 
@@ -174,8 +164,54 @@ describe('Incentives Resolver', function () {
     })
 
     describe('checker() tests', function () {
-        it('Should initialize', async function () {
+        it('No actions from users', async function () {
+            let [canExec, payload] = await incentivesResolver.checker();
+            expect(canExec).to.be.equal(false);
+            await moveAtAbsoluteEpoch(1);
+
+            console.log(`EPCH:  `,await staking.getCurrentEpoch(),payload);
+            console.log(`STK epoch 0 init:`,await staking.epochIsInitialized(ionxToken.address, 0));
+
+            [canExec, payload] = await incentivesResolver.checker();
+            expect(canExec).to.be.equal(false);
+
+            await moveAtAbsoluteEpoch(2);
+
+            // No action for 2 stk epochs, n-1 not initialized, impossible
+            // to deposit
+            // await depositIonxToken(100) // Would revert.
             
+            [canExec, payload] = await incentivesResolver.checker();
+            console.log(`EPCH:  `,await staking.getCurrentEpoch(),payload);
+            expect(canExec).to.be.equal(true);
+
+           // expect(payload).to.be.equal("0x3da9dea600000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001");
+            // Let's execute the payload.
+            [canExec, payload] = await incentivesResolver.checker();
+            const returnData = await ethers.provider.call({
+                to: incentivesResolver.address,
+                data: payload // 
+            });
+            
+            console.log(`Call resolved: ${returnData}`);
+            await incentivesResolver.doEpochInit(BN.from(2),false, false, true, true); // works
+            // await incentivesResolver.retroInit(1,ionxToken.address); // works
+
+            await fastForwardBlocks(1); // Must be resolved now
+            console.log(`STK epoch 0 init:`,await staking.epochIsInitialized(ionxToken.address, 0));
+
+            console.log(`STK epoch 1 init:`,await staking.epochIsInitialized(ionxToken.address, 1));
+
+            [canExec, payload] = await incentivesResolver.checker();
+            console.log(`EPCH : `,await staking.getCurrentEpoch(),payload);
+            expect(canExec).to.be.equal(false);
+         
+            await depositIonxToken(100); // Should succeed.
+
+            // await moveAtAbsoluteEpoch(3);
+            // [canExec, payload] = await incentivesResolver.checker();
+            // console.log(`EPCH:  `,await staking.getCurrentEpoch(),payload);
+            // expect(canExec).to.be.equal(true);
         })
     })
 
@@ -195,10 +231,18 @@ describe('Incentives Resolver', function () {
         await ethers.provider.send('evm_increaseTime', [diff]);
     }
 
-    async function moveAtStakingEpoch (epoch) {
-        await setNextBlockTimestamp(epoch1Start + epochDuration * epoch);
+    async function moveAtAbsoluteEpoch (epoch) {
+        let timestamp = epoch1Start + epochDuration * epoch;
+        if (epoch <=  0) timestamp == epoch1Start - 1;
+        await setNextBlockTimestamp(epoch1Start + epochDuration *(epoch-1));
         await ethers.provider.send('evm_mine');
     }
+
+    async function fastForwardBlocks (blocks) {
+        for (let index = 0; index < blocks; index++) {
+          await ethers.provider.send("evm_mine", [])
+        }
+      }
 
     async function depositUniV2Token (x, u = user) {
         const ua = await u.getAddress();
