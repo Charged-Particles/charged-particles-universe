@@ -208,12 +208,12 @@ const presets = {
       },
       ionxToken: {
         startAmount: bn(48000),
-        nrOfEpochs: bn(12),
+        nrOfEpochs: bn(24),
         deprecation: bn(0),
       },
       lpTokens: {
         startAmount: bn(48000),
-        nrOfEpochs: bn(12),
+        nrOfEpochs: bn(24),
         deprecation: bn(0),
       },
 

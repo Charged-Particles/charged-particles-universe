@@ -118,7 +118,7 @@ const {
     // Transfer ownership?
 
     // Deploying LP Yield Farm Contract
-    await log('\n  Deploying LP Yield Farm...')(alchemyTimeout);
+    await log(`\n  Deploying LP Yield Farm ${__STAKING_INDEX}...`)(alchemyTimeout);
     const lpYieldFarmDeployArgs = [
       ionx.address,
       incentives.uniswapLPTokenAddress,

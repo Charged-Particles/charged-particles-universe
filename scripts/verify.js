@@ -101,13 +101,17 @@ async function run() {
   // await verifyContract({name: 'IonxYieldFarm2', networkName, contractRef: 'incentives/YieldFarm2.sol:YieldFarm2'});
   // await verifyContract({name: 'LPYieldFarm2', networkName, contractRef: 'incentives/YieldFarm2.sol:YieldFarm2'});
 
+  await verifyContract({name: 'Staking3', networkName, contractRef: 'incentives/Staking3.sol:Staking3'});
+  await verifyContract({name: 'IonxYieldFarm3', networkName, contractRef: 'incentives/YieldFarm3.sol:YieldFarm3'});
+  await verifyContract({name: 'LPYieldFarm3', networkName, contractRef: 'incentives/YieldFarm3.sol:YieldFarm3'});
+
   // await verifyContract({name: 'MerkleDistributor', networkName});
   // await verifyContract({name: 'MerkleDistributor2', networkName});
   // await verifyContract({name: 'MerkleDistributor3', networkName});
 
   // await verifyContract({name: 'VestingClaim2', networkName});
   // await verifyContract({name: 'VestingClaim3', networkName});
-  await verifyContract({name: 'VestingClaim4', networkName});
+  // await verifyContract({name: 'VestingClaim4', networkName});
 
   success('Done!');
 };
