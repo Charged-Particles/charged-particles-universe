@@ -94,7 +94,7 @@ contract IncentivesResolver is Ownable {
 
         uint128 currentEpoch = _staking.getCurrentEpoch();
 
-        if (_paused || currentEpoch < 2) return (false, "");
+        if (_paused || currentEpoch < 1) return (false, "");
 
         canExec = false;
 
@@ -103,8 +103,8 @@ contract IncentivesResolver is Ownable {
         uint lastInitializedEpochLP =   _farmUniV2.lastInitializedEpoch();  // caps at NR_OF_EPOCHS
 
         // Condition on farms to act
-        bool farmIonxHasLaggingEpochs = currentEpoch - lastInitializedEpochIonx > 2;
-        bool farmUniV2HasLaggingEpochs = currentEpoch - lastInitializedEpochLP > 2;
+        bool farmIonxHasLaggingEpochs = (currentEpoch - lastInitializedEpochIonx) > 3;
+        bool farmUniV2HasLaggingEpochs = (currentEpoch - lastInitializedEpochLP) > 3;
 
         // Deposit & Withdraw move these, check if n-1 is not initialized = gap.
         bool stakingIonxBehind = !_staking.epochIsInitialized(_ionxTokenAddress,currentEpoch-1);
@@ -114,9 +114,7 @@ contract IncentivesResolver is Ownable {
         // or we're lagging behind in staking manualInitEpoch because no deposit or withdrawal in any
         if (stakingIonxBehind || stakingLPBehind || currentEpoch < NR_OF_EPOCHS && (farmIonxHasLaggingEpochs || farmUniV2HasLaggingEpochs)) {
             canExec = true;
-            execPayload = abi.encodeWithSelector(this.retroInit.selector, currentEpoch-1, _ionxTokenAddress);
-
-            //execPayload = abi.encodeWithSelector(this.doEpochInit.selector, currentEpoch, farmIonxHasLaggingEpochs, farmUniV2HasLaggingEpochs, stakingIonxBehind, stakingLPBehind);
+            execPayload = abi.encodeWithSelector(this.doEpochInit.selector, currentEpoch, farmIonxHasLaggingEpochs, farmUniV2HasLaggingEpochs, stakingIonxBehind, stakingLPBehind);
         }
 
         return (canExec, execPayload);
