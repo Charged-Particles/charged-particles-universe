@@ -40,10 +40,27 @@ interface IChargedSettings {
   function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external view returns (address);
   function getTempLockExpiryBlocks() external view returns (uint256);
   function getTimelockApprovals(address operator) external view returns (bool timelockAny, bool timelockOwn);
-  function getAssetRequirements(address contractAddress, address assetToken) external view
-    returns (string memory requiredWalletManager, bool energizeEnabled, bool restrictedAssets, bool validAsset, uint256 depositCap, uint256 depositMin, uint256 depositMax, bool invalidAsset);
-  function getNftAssetRequirements(address contractAddress, address nftTokenAddress) external view
-    returns (string memory requiredBasketManager, bool basketEnabled, uint256 maxNfts);
+  function getAssetRequirements(
+    address contractAddress,
+    address assetToken
+  ) external view returns (
+    string memory requiredWalletManager,
+    bool energizeEnabled,
+    bool restrictedAssets,
+    bool validAsset,
+    uint256 depositCap,
+    uint256 depositMin,
+    uint256 depositMax,
+    bool invalidAsset
+  );
+  function getNftAssetRequirements(
+    address contractAddress,
+    address nftTokenAddress
+  ) external view returns (
+    string memory requiredBasketManager,
+    bool basketEnabled,
+    uint256 maxNfts
+  );
 
   /***********************************|
   |         Only NFT Creator          |

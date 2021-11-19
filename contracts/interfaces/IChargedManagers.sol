@@ -46,8 +46,22 @@ interface IChargedManagers {
   function getBasketManager(string calldata basketId) external view returns (IBasketManager);
 
   // Validation
-  function validateDeposit(address sender, address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken, uint256 assetAmount) external;
-  function validateNftDeposit(address sender, address contractAddress, uint256 tokenId, string calldata basketManagerId, address nftTokenAddress, uint256 nftTokenId) external;
+  function validateDeposit(
+    address sender,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken,
+    uint256 assetAmount
+  ) external;
+  function validateNftDeposit(
+    address sender,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId,
+    address nftTokenAddress,
+    uint256 nftTokenId
+  ) external;
   function validateDischarge(address sender, address contractAddress, uint256 tokenId) external;
   function validateRelease(address sender, address contractAddress, uint256 tokenId) external;
   function validateBreakBond(address sender, address contractAddress, uint256 tokenId) external;
