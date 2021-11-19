@@ -40,6 +40,7 @@ interface ITokenInfoProxy {
 
   function getTokenUUID(address contractAddress, uint256 tokenId) external pure returns (uint256);
   function isNFTOwnerOrOperator(address contractAddress, uint256 tokenId, address sender) external returns (bool);
+  function isNFTContractOrCreator(address contractAddress, uint256 tokenId, address sender) external returns (bool);
   function getTokenOwner(address contractAddress, uint256 tokenId) external returns (address);
   function getTokenCreator(address contractAddress, uint256 tokenId) external returns (address);
 }

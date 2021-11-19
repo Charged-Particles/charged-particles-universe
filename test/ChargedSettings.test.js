@@ -30,6 +30,7 @@ const { max } = require('lodash');
 const EthSender = require('../build/contracts/contracts/test/EthSender.sol/EthSender.json');
 const IERC721Chargeable = require('../build/contracts/contracts/interfaces/IERC721Chargeable.sol/IERC721Chargeable.json');
 const ERC20Mintable = require('../build/contracts/contracts/test/ERC20Mintable.sol/ERC20Mintable.json');
+const TokenInfoProxy = require('../build/contracts/contracts/lib/TokenInfoProxy.sol/TokenInfoProxy.json');
 const daiABI = require('./abis/dai');
 
 const daiHodler = "0x55e4d16f9c3041EfF17Ca32850662f3e9Dddbce7"; // Hodler with the highest current amount of DAI, used for funding our operations on mainnet fork.
@@ -54,6 +55,7 @@ describe("Charged Settings", () => {
   let chargedSettings;
   let chargedManagers;
   let chargedParticles;
+  let tokenInfoProxy;
   let ethSender;
 
   // Deploy Data from Internal Contracts
@@ -100,6 +102,7 @@ describe("Charged Settings", () => {
     // Deploy Mocked Contracts
     erc20token = await deployMockContract(signerD, ERC20Mintable.abi, overrides);
     erc721chargeable = await deployMockContract(signerD, IERC721Chargeable.abi, overrides);
+    tokenInfoProxy = await deployMockContract(signerD, TokenInfoProxy.abi, overrides);
 
     // Connect to Internal Contracts
     const Universe = await ethers.getContractFactory('Universe');
@@ -107,15 +110,19 @@ describe("Charged Settings", () => {
 
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
     chargedParticles = ChargedParticles.attach(getDeployData('ChargedParticles', chainId).address);
+    await chargedParticles.setController(tokenInfoProxy.address, 'tokeninfo');
 
     const ChargedState = await ethers.getContractFactory('ChargedState');
     chargedState = ChargedState.attach(getDeployData('ChargedState', chainId).address);
+    await chargedState.setController(tokenInfoProxy.address, 'tokeninfo');
 
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     chargedSettings = ChargedSettings.attach(getDeployData('ChargedSettings', chainId).address);
+    await chargedSettings.setController(tokenInfoProxy.address, 'tokeninfo');
 
     const ChargedManagers = await ethers.getContractFactory('ChargedManagers');
     chargedManagers = ChargedManagers.attach(getDeployData('ChargedManagers', chainId).address);
+    await chargedManagers.setController(tokenInfoProxy.address, 'tokeninfo');
 
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const GenericWalletManagerInstance = await GenericWalletManager.deploy();
@@ -138,8 +145,9 @@ describe("Charged Settings", () => {
   });
 
   describe('Wallet Managers', async () => {
-    it('should have enabled "aave" and "generic" as wallet managers', async () => {
+    it('should have enabled "aave", "aave.B" and "generic" as wallet managers', async () => {
       expect(await chargedManagers.isWalletManagerEnabled('aave')).to.equal(true);
+      expect(await chargedManagers.isWalletManagerEnabled('aave.B')).to.equal(true);
       expect(await chargedManagers.isWalletManagerEnabled('generic')).to.equal(true);
     });
 
@@ -149,31 +157,33 @@ describe("Charged Settings", () => {
   });
 
   describe('Creator Annuities', async () => {
-    it('should allow the creator to set interest annuities', async () => {
+    beforeEach(async () => {
+      await erc721chargeable.mock.ownerOf.withArgs(TEST_TOKEN_ID).returns(user1);
       await erc721chargeable.mock.creatorOf.withArgs(TEST_TOKEN_ID).returns(user1);
+      await tokenInfoProxy.mock.getTokenCreator.withArgs(erc721chargeable.address, TEST_TOKEN_ID).returns(user1);
+      await tokenInfoProxy.mock.isNFTContractOrCreator.withArgs(erc721chargeable.address, TEST_TOKEN_ID, user1).returns(true);
+    });
 
+    it('should allow the creator to set interest annuities', async () => {
       const annuitiesBasisPoints = toBN('5000'); // 50%
       let tx = chargedSettings.connect(signer1).setCreatorAnnuities(erc721chargeable.address, TEST_TOKEN_ID, user1, annuitiesBasisPoints);
       await expect(tx)
         .to.emit(chargedSettings, 'TokenCreatorConfigsSet')
         .withArgs(erc721chargeable.address, TEST_TOKEN_ID, user1, annuitiesBasisPoints);
 
-      expect(await chargedSettings.getCreatorAnnuities(erc721chargeable.address, TEST_TOKEN_ID))
+      expect(await chargedSettings.callStatic.getCreatorAnnuities(erc721chargeable.address, TEST_TOKEN_ID))
         .to.deep.equal([user1, annuitiesBasisPoints]);
     });
 
     it('should not allow anyone else to set interest annuities', async () => {
-      await erc721chargeable.mock.creatorOf.withArgs(TEST_TOKEN_ID).returns(user1);
-
+      await tokenInfoProxy.mock.isNFTContractOrCreator.withArgs(erc721chargeable.address, TEST_TOKEN_ID, user2).returns(false);
       const annuitiesBasisPoints = toBN('100'); // 1%
       await expect(chargedSettings.connect(signer2).setCreatorAnnuities(erc721chargeable.address, TEST_TOKEN_ID, user1, annuitiesBasisPoints))
         .to.be.revertedWith('CP:E-104');
     });
 
     it('should allow the creator to redirect interest annuities', async () => {
-      await erc721chargeable.mock.creatorOf.withArgs(TEST_TOKEN_ID).returns(user1);
-
-      let tx = chargedSettings.connect(signer1).setCreatorAnnuitiesRedirect(erc721chargeable.address, TEST_TOKEN_ID, user1, user3);
+      let tx = chargedSettings.connect(signer1).setCreatorAnnuitiesRedirect(erc721chargeable.address, TEST_TOKEN_ID, user3);
       await expect(tx)
         .to.emit(chargedSettings, 'TokenCreatorAnnuitiesRedirected')
         .withArgs(erc721chargeable.address, TEST_TOKEN_ID, user3);
@@ -182,9 +192,8 @@ describe("Charged Settings", () => {
     });
 
     it('should not allow anyone else to redirect interest annuities', async () => {
-      await erc721chargeable.mock.creatorOf.withArgs(TEST_TOKEN_ID).returns(user1);
-
-      await expect(chargedSettings.connect(signer2).setCreatorAnnuitiesRedirect(erc721chargeable.address, TEST_TOKEN_ID, user1, user3))
+      await tokenInfoProxy.mock.isNFTContractOrCreator.withArgs(erc721chargeable.address, TEST_TOKEN_ID, user2).returns(false);
+      await expect(chargedSettings.connect(signer2).setCreatorAnnuitiesRedirect(erc721chargeable.address, TEST_TOKEN_ID, user3))
         .to.be.revertedWith('CP:E-104');
     });
   });

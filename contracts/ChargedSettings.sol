@@ -206,7 +206,7 @@ contract ChargedSettings is
     virtual
     override
   {
-    require(_tokenInfoProxy.isNFTOwnerOrOperator(contractAddress, tokenId, _msgSender()), "CP:E-104");
+    require(_tokenInfoProxy.isNFTContractOrCreator(contractAddress, tokenId, _msgSender()), "CP:E-104");
     require(annuityPercent <= MAX_ANNUITIES, "CP:E-421");
 
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
@@ -235,7 +235,7 @@ contract ChargedSettings is
     virtual
     override
   {
-    require(_tokenInfoProxy.isNFTOwnerOrOperator(contractAddress, tokenId, _msgSender()), "CP:E-104");
+    require(_tokenInfoProxy.isNFTContractOrCreator(contractAddress, tokenId, _msgSender()), "CP:E-104");
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     _creatorAnnuityRedirect[tokenUuid] = receiver;
     emit TokenCreatorAnnuitiesRedirected(contractAddress, tokenId, receiver);

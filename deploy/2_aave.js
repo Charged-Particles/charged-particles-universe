@@ -43,6 +43,22 @@ module.exports = async (hre) => {
       address: aaveWalletManager.address,
       deployTransaction: aaveWalletManager.deployTransaction,
     }
+    saveDeploymentData(chainId, deployData);
+    log('  - AaveWalletManager:  ', aaveWalletManager.address);
+    log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: aaveWalletManager.deployTransaction }));
+
+    await log('\n  Deploying AaveWalletManagerB...')(alchemyTimeout);
+    const AaveWalletManagerB = await hre.ethers.getContractFactory('AaveWalletManagerB');
+    const AaveWalletManagerBInstance = await AaveWalletManagerB.deploy();
+    const aaveWalletManagerB = await AaveWalletManagerBInstance.deployed();
+    deployData['AaveWalletManagerB'] = {
+      abi: getContractAbi('AaveWalletManagerB'),
+      address: aaveWalletManagerB.address,
+      deployTransaction: aaveWalletManagerB.deployTransaction,
+    }
+    saveDeploymentData(chainId, deployData);
+    log('  - AaveWalletManagerB: ', aaveWalletManagerB.address);
+    log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: aaveWalletManagerB.deployTransaction }));
 
     await log('\n  Deploying AaveBridgeV2 with LP Provider: ', lendingPoolProviderV2)(alchemyTimeout);
     const AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');
@@ -54,17 +70,12 @@ module.exports = async (hre) => {
       lendingPoolProvider: lendingPoolProviderV2,
       deployTransaction: aaveBridgeV2.deployTransaction,
     }
-
-    // Display Contract Addresses
-    await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
-    log('  - AaveWalletManager:  ', aaveWalletManager.address);
-    log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: aaveWalletManager.deployTransaction }));
+    saveDeploymentData(chainId, deployData);
     log('  - AaveBridgeV2:       ', aaveBridgeV2.address);
     log('     - Gas Cost:        ', getTxGasCost({deployTransaction: aaveBridgeV2.deployTransaction}));
 
-    saveDeploymentData(chainId, deployData);
-    log('\n  Contract Deployment Data saved to "deployments" directory.');
 
+    log('\n  Contract Deployment Data saved to "deployments" directory.');
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };
 

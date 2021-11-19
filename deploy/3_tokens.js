@@ -87,7 +87,7 @@ module.exports = async (hre) => {
     deployTransaction: ionx.deployTransaction,
   }
 
-  await log('\n  Deploying ExternalNFT NFT...')(alchemyTimeout);
+  await log('\n  Deploying ExternalNFT...')(alchemyTimeout);
   const ExternalNFT = await ethers.getContractFactory('ExternalNFT');
   const ExternalNFTInstance = await ExternalNFT.deploy();
   const externalNFT = await ExternalNFTInstance.deployed();

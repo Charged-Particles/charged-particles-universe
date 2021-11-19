@@ -34,32 +34,48 @@ contract TokenInfoProxy is ITokenInfoProxy, Ownable {
 
   mapping (address => FnSignatures) internal _remappedFnSigs;
 
-  function setContractFnOwnerOf(address contractAddress, bytes4 fnSig) external override onlyOwner {
+  function setContractFnOwnerOf(address contractAddress, bytes4 fnSig) external virtual override onlyOwner {
     _remappedFnSigs[contractAddress].ownerOf = fnSig;
     emit ContractFunctionSignatureSet(contractAddress, "ownerOf", fnSig);
   }
 
-  function setContractFnCreatorOf(address contractAddress, bytes4 fnSig) external override onlyOwner {
+  function setContractFnCreatorOf(address contractAddress, bytes4 fnSig) external virtual override onlyOwner {
     _remappedFnSigs[contractAddress].creatorOf = fnSig;
     emit ContractFunctionSignatureSet(contractAddress, "creatorOf", fnSig);
   }
 
 
-  function getTokenUUID(address contractAddress, uint256 tokenId) external pure override returns (uint256) {
+  function getTokenUUID(address contractAddress, uint256 tokenId) external pure virtual override returns (uint256) {
     return uint256(keccak256(abi.encodePacked(contractAddress, tokenId)));
   }
 
-  function isNFTOwnerOrOperator(address contractAddress, uint256 tokenId, address sender) external override returns (bool) {
+  function getTokenOwner(address contractAddress, uint256 tokenId) external virtual override returns (address) {
+    return _getTokenOwner(contractAddress, tokenId);
+  }
+
+  function getTokenCreator(address contractAddress, uint256 tokenId) external virtual override returns (address) {
+    return _getTokenCreator(contractAddress, tokenId);
+  }
+
+  function isNFTOwnerOrOperator(address contractAddress, uint256 tokenId, address sender) external virtual override returns (bool) {
     IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     address tokenOwner = _getTokenOwner(contractAddress, tokenId);
     return (sender == tokenOwner || tokenInterface.isApprovedForAll(tokenOwner, sender));
   }
 
-  function getTokenOwner(address contractAddress, uint256 tokenId) external override returns (address) {
-    return _getTokenOwner(contractAddress, tokenId);
+  /// @dev Checks if an account is the Creator of a Proton-based NFT or the Contract itself
+  /// @param contractAddress  The Address to the Contract of the Proton-based NFT to check
+  /// @param tokenId          The Token ID of the Proton-based NFT to check
+  /// @param sender           The Address of the Account to check
+  /// @return True if the account is the creator of the NFT or the Contract itself
+  function isNFTContractOrCreator(address contractAddress, uint256 tokenId, address sender) external virtual override returns (bool) {
+    address tokenCreator = _getTokenCreator(contractAddress, tokenId);
+    return (sender == tokenCreator || sender == contractAddress);
   }
 
-  function getTokenCreator(address contractAddress, uint256 tokenId) external override returns (address) {
+
+
+  function _getTokenCreator(address contractAddress, uint256 tokenId) internal returns (address) {
     bytes4 fnSig = IERC721Chargeable.creatorOf.selector;
     if (_remappedFnSigs[contractAddress].creatorOf != bytes4(0)) {
       fnSig = _remappedFnSigs[contractAddress].creatorOf;
@@ -67,7 +83,6 @@ contract TokenInfoProxy is ITokenInfoProxy, Ownable {
     bytes memory returnData = contractAddress.functionCall(abi.encodeWithSelector(fnSig, tokenId), "TokenInfoProxy: low-level call failed on getTokenCreator");
     return abi.decode(returnData, (address));
   }
-
 
   function _getTokenOwner(address contractAddress, uint256 tokenId) internal returns (address) {
     bytes4 fnSig = IERC721Chargeable.ownerOf.selector;

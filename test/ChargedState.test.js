@@ -115,6 +115,7 @@ describe("Charged State", () => {
 
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     chargedSettings = ChargedSettings.attach(getDeployData('ChargedSettings', chainId).address);
+    await chargedSettings.setController(tokenInfoProxy.address, 'tokeninfo');
 
     const ChargedManagers = await ethers.getContractFactory('ChargedManagers');
     chargedManagers = ChargedManagers.attach(getDeployData('ChargedManagers', chainId).address);

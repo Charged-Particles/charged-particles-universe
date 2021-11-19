@@ -47,9 +47,9 @@ module.exports = async (hre) => {
       address: universe.address,
       deployTransaction: universe.deployTransaction,
     }
+    saveDeploymentData(chainId, deployData);
     log('  - Universe:         ', universe.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
-    saveDeploymentData(chainId, deployData);
 
     await log('  Deploying ChargedState...')(alchemyTimeout);
     const ChargedState = await ethers.getContractFactory('ChargedState');
@@ -60,9 +60,9 @@ module.exports = async (hre) => {
       address: chargedState.address,
       deployTransaction: chargedState.deployTransaction,
     }
+    saveDeploymentData(chainId, deployData);
     log('  - ChargedState:     ', chargedState.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedState.deployTransaction }));
-    saveDeploymentData(chainId, deployData);
 
     await log('  Deploying ChargedSettings...')(alchemyTimeout);
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
@@ -73,9 +73,9 @@ module.exports = async (hre) => {
       address: chargedSettings.address,
       deployTransaction: chargedSettings.deployTransaction,
     }
+    saveDeploymentData(chainId, deployData);
     log('  - ChargedSettings:  ', chargedSettings.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedSettings.deployTransaction }));
-    saveDeploymentData(chainId, deployData);
 
     await log('  Deploying ChargedManagers...')(alchemyTimeout);
     const ChargedManagers = await ethers.getContractFactory('ChargedManagers');
@@ -86,9 +86,9 @@ module.exports = async (hre) => {
       address: chargedManagers.address,
       deployTransaction: chargedManagers.deployTransaction,
     }
+    saveDeploymentData(chainId, deployData);
     log('  - ChargedManagers:  ', chargedManagers.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedManagers.deployTransaction }));
-    saveDeploymentData(chainId, deployData);
 
 
     await log('  Deploying ChargedParticles...')(alchemyTimeout);
@@ -100,9 +100,9 @@ module.exports = async (hre) => {
       address: chargedParticles.address,
       deployTransaction: chargedParticles.deployTransaction,
     }
+    saveDeploymentData(chainId, deployData);
     log('  - ChargedParticles: ', chargedParticles.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedParticles.deployTransaction }));
-    saveDeploymentData(chainId, deployData);
 
     //
     // Non-upgradeable Contracts
@@ -117,9 +117,10 @@ module.exports = async (hre) => {
       address: tokenInfoProxy.address,
       deployTransaction: tokenInfoProxy.deployTransaction
     }
+    saveDeploymentData(chainId, deployData);
     log('  - TokenInfoProxy: ', tokenInfoProxy.address);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: tokenInfoProxy.deployTransaction }));
-    saveDeploymentData(chainId, deployData);
+
 
     log('\n  Contract Deployment Data saved to "deployments" directory.');
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');

@@ -167,12 +167,16 @@ describe("[INTEGRATION] Charged Particles", () => {
   it("can succesfully energize and release proton", async () => {
 
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
 
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
     const energizedParticleId = await callAndReturn({
       contractInstance: proton,
@@ -184,7 +188,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         user3,                        // referrer
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
         'aave',                       // walletManagerId
-        daiAddress, // assetToken
+        daiAddress,                   // assetToken
         toWei('10'),                  // assetAmount
         annuityPct,                   // annuityPercent
       ],
@@ -205,12 +209,16 @@ describe("[INTEGRATION] Charged Particles", () => {
   it("can discharge only after timelock expired", async () => {
 
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
 
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
     const user2BalanceBefore = await dai.balanceOf(user2);
 
@@ -263,10 +271,18 @@ describe("[INTEGRATION] Charged Particles", () => {
   });
 
   it("creator receieves royalties, old owner receives the sale price and the new owner receives the token", async () => {
+
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
     const energizedParticleId = await callAndReturn({
       contractInstance: proton,
@@ -337,12 +353,16 @@ describe("[INTEGRATION] Charged Particles", () => {
   it("generic smart wallet and manager succesfully hold erc20 tokens", async () => {
 
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
 
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
     const user2BalanceBefore = await dai.balanceOf(user2);
 
@@ -377,12 +397,16 @@ describe("[INTEGRATION] Charged Particles", () => {
   it("generic smart basket and manager succesfully hold erc721 tokens", async () => {
 
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
 
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
     const tokenId1 = await callAndReturn({
       contractInstance: proton,
@@ -425,9 +449,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       tokenId1,
       'generic',
       proton.address,
-      tokenId2,
-      '0x',
-      '0x'
+      tokenId2
     );
 
     await chargedParticles.connect(signer2).breakCovalentBond(
@@ -445,12 +467,16 @@ describe("[INTEGRATION] Charged Particles", () => {
   it("cannot discharge more than the wallet holds", async () => {
 
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
 
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
     const energizedParticleId = await callAndReturn({
       contractInstance: proton,
@@ -482,12 +508,16 @@ describe("[INTEGRATION] Charged Particles", () => {
   it("can order to release more than the wallet holds, but receive only the wallet amount", async () => {
 
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
 
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
     const energizedParticleId = await callAndReturn({
       contractInstance: proton,

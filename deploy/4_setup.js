@@ -51,6 +51,7 @@ module.exports = async (hre) => {
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
     const ddTokenInfoProxy = getDeployData('TokenInfoProxy', chainId);
     const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
+    const ddAaveWalletManagerB = getDeployData('AaveWalletManagerB', chainId);
     const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
     const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
@@ -101,6 +102,10 @@ module.exports = async (hre) => {
     log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
     const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
+
+    log('  Loading AaveWalletManagerB from: ', ddAaveWalletManagerB.address);
+    const AaveWalletManagerB = await ethers.getContractFactory('AaveWalletManagerB');
+    const aaveWalletManagerB = await AaveWalletManagerB.attach(ddAaveWalletManagerB.address);
 
     log('  Loading TokenInfoProxy from: ', ddTokenInfoProxy.address);
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
@@ -165,27 +170,31 @@ module.exports = async (hre) => {
       );
     }
 
-    await executeTx('1-h', 'ChargedState: Registering ChargedSettings', async () =>
+    await executeTx('1-h', 'ChargedSettings: Registering TokenInfoProxy', async () =>
+      await chargedSettings.setController(ddTokenInfoProxy.address, 'tokeninfo')
+    );
+
+    await executeTx('1-i', 'ChargedState: Registering ChargedSettings', async () =>
       await chargedState.setController(ddChargedSettings.address, 'settings')
     );
 
-    await executeTx('1-i', 'ChargedState: Registering TokenInfoProxy', async () =>
+    await executeTx('1-j', 'ChargedState: Registering TokenInfoProxy', async () =>
       await chargedState.setController(ddTokenInfoProxy.address, 'tokeninfo')
     );
 
-    await executeTx('1-j', 'ChargedManagers: Registering ChargedSettings', async () =>
+    await executeTx('1-k', 'ChargedManagers: Registering ChargedSettings', async () =>
       await chargedManagers.setController(ddChargedSettings.address, 'settings')
     );
 
-    await executeTx('1-k', 'ChargedManagers: Registering ChargedState', async () =>
+    await executeTx('1-l', 'ChargedManagers: Registering ChargedState', async () =>
       await chargedManagers.setController(ddChargedState.address, 'state')
     );
 
-    await executeTx('1-l', 'ChargedManagers: Registering TokenInfoProxy', async () =>
+    await executeTx('1-m', 'ChargedManagers: Registering TokenInfoProxy', async () =>
       await chargedManagers.setController(ddTokenInfoProxy.address, 'tokeninfo')
     );
 
-    await executeTx('1-m', 'ChargedParticles: Setting Temp-Lock Expiry Blocks', async () =>
+    await executeTx('1-n', 'ChargedParticles: Setting Temp-Lock Expiry Blocks', async () =>
       await chargedSettings.setTempLockExpiryBlocks(tempLockExpiryBlocks)
     );
 
@@ -237,6 +246,31 @@ module.exports = async (hre) => {
     //   );
     // }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Setup Aave Wallet Manager B
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    await executeTx('3-a', 'AaveWalletManagerB: Setting Charged Particles as Controller', async () =>
+      await aaveWalletManagerB.setController(ddChargedParticles.address)
+    );
+
+    await executeTx('3-b', 'AaveWalletManagerB: Setting Aave Bridge to V2', async () =>
+      await aaveWalletManagerB.setAaveBridge(ddAaveBridgeV2.address)
+    );
+
+    await executeTx('3-c', 'AaveWalletManagerB: Registering Aave as LP with ChargedParticles', async () =>
+      await chargedManagers.registerWalletManager('aave.B', ddAaveWalletManagerB.address)
+    );
+
+    await executeTx('3-d', 'AaveWalletManagerB: Registering ChargedSettings', async () =>
+      await aaveWalletManagerB.setChargedSettings(ddChargedSettings.address)
+    );
+
+    // if (referralCode.length > 0) {
+    //   await executeTx('3-e', 'AaveWalletManagerB: Setting Referral Code', async () =>
+    //     await aaveWalletManagerB.setReferralCode(referralCode)
+    //   );
+    // }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Proton
