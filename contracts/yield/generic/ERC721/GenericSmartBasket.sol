@@ -25,7 +25,9 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
+import "@openzeppelin/contracts/introspection/IERC165.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../../../interfaces/ISmartBasket.sol";
 import "../../../interfaces/ITokenInfoProxy.sol";
@@ -116,7 +118,11 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
 
     bool removed = _nftContractTokens[contractAddress][nftType].remove(tokenId);
     if (removed) {
-      IERC721(contractAddress).safeTransferFrom(address(this), receiver, tokenId);
+      if (_isERC1155(contractAddress)) {
+        IERC1155(contractAddress).safeTransferFrom(address(this), receiver, tokenId, 1, "");
+      } else {
+        IERC721(contractAddress).safeTransferFrom(address(this), receiver, tokenId);
+      }
     }
     return removed;
   }
@@ -158,6 +164,12 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
   /***********************************|
   |         Private Functions         |
   |__________________________________*/
+
+  /// @dev Checks if an NFT token contract supports the ERC1155 standard interface
+  function _isERC1155(address nftTokenAddress) internal view virtual returns (bool) {
+    bytes4 _INTERFACE_ID_ERC1155 = 0xd9b67a26;
+    return IERC165(nftTokenAddress).supportsInterface(_INTERFACE_ID_ERC1155);
+  }
 
   /// @dev Throws if called by any account other than the basket manager
   modifier onlyBasketManager() {

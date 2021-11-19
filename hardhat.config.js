@@ -153,6 +153,7 @@ module.exports = {
         'ChargedManagers',
         'ChargedParticles',
         'AaveWalletManager',
+        'AaveWalletManagerB',
         'AaveBridgeV2',
         'GenericWalletManager',
         'GenericBasketManager',

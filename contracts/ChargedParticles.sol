@@ -27,9 +27,11 @@ import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/introspection/IERC165Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
 
@@ -407,7 +409,6 @@ contract ChargedParticles is
   {
     address sender = _msgSender();
     address tokenCreator = _tokenInfoProxy.getTokenCreator(contractAddress, tokenId);
-
     require(sender == tokenCreator, "CP:E-104");
 
     receiverAmount = _chargedManagers.getWalletManager(walletManagerId).dischargeAmountForCreator(
@@ -530,16 +531,12 @@ contract ChargedParticles is
   /// @param basketManagerId      The Basket to Deposit the NFT into
   /// @param nftTokenAddress      The Address of the NFT Token being deposited
   /// @param nftTokenId           The ID of the NFT Token being deposited
-  /// @param collectOverride      Optional replacement for transferFrom
-  /// @param depositOverride      Optional replacement for transfer
   function covalentBond(
     address contractAddress,
     uint256 tokenId,
     string calldata basketManagerId,
     address nftTokenAddress,
-    uint256 nftTokenId,
-    bytes calldata collectOverride,
-    bytes calldata depositOverride
+    uint256 nftTokenId
   )
     external
     virtual
@@ -551,10 +548,10 @@ contract ChargedParticles is
     _validateNftDeposit(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
 
     // Transfer ERC721 Token from Caller to Contract (reverts on fail)
-    _collectNftToken(_msgSender(), nftTokenAddress, nftTokenId, collectOverride);
+    _collectNftToken(_msgSender(), nftTokenAddress, nftTokenId);
 
     // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
-    success = _depositIntoBasketManager(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId, depositOverride);
+    success = _depositIntoBasketManager(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
 
     // Signal to Universe Controller
     if (address(_universe) != address(0)) {
@@ -758,14 +755,12 @@ contract ChargedParticles is
   /// @param basketManagerId      The Wallet Manager of the Assets to Deposit
   /// @param nftTokenAddress      The Address of the Asset Token to Deposit
   /// @param nftTokenId           The specific amount of Asset Token to Deposit
-  /// @param encodedArgs          The encoded args for non-ERC721 compliant NFT tokens
   function _depositIntoBasketManager(
     address contractAddress,
     uint256 tokenId,
     string calldata basketManagerId,
     address nftTokenAddress,
-    uint256 nftTokenId,
-    bytes calldata encodedArgs
+    uint256 nftTokenId
   )
     internal
     virtual
@@ -775,12 +770,10 @@ contract ChargedParticles is
     IBasketManager basketMgr = _chargedManagers.getBasketManager(basketManagerId);
     address wallet = basketMgr.getBasketAddressById(contractAddress, tokenId);
 
-    if (encodedArgs.length > 0) {
-      bytes4 remappedFnSig = _tokenInfoProxy.getDepositOverrideFnSig(nftTokenAddress);
-      require(remappedFnSig != bytes4(0), "depositOverrideFnSig not registered");
-      nftTokenAddress.functionCall(abi.encodePacked(remappedFnSig, encodedArgs), "ChargedParticles: low-level call failed on _collectNftToken");
+    if (_isERC1155(nftTokenAddress)) {
+      IERC1155Upgradeable(nftTokenAddress).safeTransferFrom(address(this), wallet, nftTokenId, 1, "");
     } else {
-      IERC721Upgradeable(nftTokenAddress).safeTransferFrom(address(this), wallet, nftTokenId);
+      IERC721Upgradeable(nftTokenAddress).transferFrom(address(this), wallet, nftTokenId);
     }
     return basketMgr.addToBasket(contractAddress, tokenId, nftTokenAddress, nftTokenId);
   }
@@ -818,17 +811,18 @@ contract ChargedParticles is
   /// @param from             The owner address to collect the tokens from
   /// @param nftTokenAddress  The address of the NFT token to transfer
   /// @param nftTokenId       The ID of the NFT token to transfer
-  /// @param encodedArgs      The encoded args for non-ERC721 compliant NFT tokens
-  function _collectNftToken(address from, address nftTokenAddress, uint256 nftTokenId, bytes memory encodedArgs) internal virtual {
-    // NFTs that use the optional encodedArgs are assumed to be non-compliant, therefore they must have a remapped fnSig
-    // We require that the fnSig is stored in TokenInfoProxy to prevent arbitrary function calls
-    if (encodedArgs.length > 0) {
-      bytes4 remappedFnSig = _tokenInfoProxy.getCollectOverrideFnSig(nftTokenAddress);
-      require(remappedFnSig != bytes4(0), "collectOverrideFnSig not registered");
-      nftTokenAddress.functionCall(abi.encodePacked(remappedFnSig, encodedArgs), "ChargedParticles: low-level call failed on _collectNftToken");
+  function _collectNftToken(address from, address nftTokenAddress, uint256 nftTokenId) internal virtual {
+    if (_isERC1155(nftTokenAddress)) {
+      IERC1155Upgradeable(nftTokenAddress).safeTransferFrom(from, address(this), nftTokenId, 1, "");
     } else {
-      IERC721Upgradeable(nftTokenAddress).transferFrom(from, address(this), nftTokenId);
+      IERC721Upgradeable(nftTokenAddress).safeTransferFrom(from, address(this), nftTokenId);
     }
+  }
+
+  /// @dev Checks if an NFT token contract supports the ERC1155 standard interface
+  function _isERC1155(address nftTokenAddress) internal view virtual returns (bool) {
+    bytes4 _INTERFACE_ID_ERC1155 = 0xd9b67a26;
+    return IERC165Upgradeable(nftTokenAddress).supportsInterface(_INTERFACE_ID_ERC1155);
   }
 
   /// @dev See {ChargedParticles-baseParticleMass}.

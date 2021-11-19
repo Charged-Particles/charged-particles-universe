@@ -49,44 +49,6 @@
         "internalType": "address",
         "name": "contractAddress",
         "type": "address"
-      }
-    ],
-    "name": "getCollectOverrideFnSig",
-    "outputs": [
-      {
-        "internalType": "bytes4",
-        "name": "",
-        "type": "bytes4"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      }
-    ],
-    "name": "getDepositOverrideFnSig",
-    "outputs": [
-      {
-        "internalType": "bytes4",
-        "name": "",
-        "type": "bytes4"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
       },
       {
         "internalType": "uint256",
@@ -215,43 +177,7 @@
         "type": "bytes4"
       }
     ],
-    "name": "setContractFnCollectOverride",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes4",
-        "name": "fnSig",
-        "type": "bytes4"
-      }
-    ],
     "name": "setContractFnCreatorOf",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes4",
-        "name": "fnSig",
-        "type": "bytes4"
-      }
-    ],
-    "name": "setContractFnDepositOverride",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

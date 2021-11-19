@@ -801,55 +801,55 @@ describe("[INTEGRATION] Charged Particles", () => {
     ).to.be.revertedWith('CP:E-424');
   })
 
-  it("can accept a cryptopunks deposit", async () => {
-      let punksAddress = cryptoPunksMarket.address;
-      let fnSig = cryptoPunksMarket.interface.getSighash('punkIndexToAddress(uint256)');
-      expect(
-          await tokenInfoProxy.setContractFnOwnerOf(punksAddress, fnSig)
-      ).to.emit(tokenInfoProxy, 'ContractFunctionSignatureSet').withArgs(
-          punksAddress, 'ownerOf', fnSig
-      )
+  // it("can accept a cryptopunks deposit", async () => {
+  //     let punksAddress = cryptoPunksMarket.address;
+  //     let fnSig = cryptoPunksMarket.interface.getSighash('punkIndexToAddress(uint256)');
+  //     expect(
+  //         await tokenInfoProxy.setContractFnOwnerOf(punksAddress, fnSig)
+  //     ).to.emit(tokenInfoProxy, 'ContractFunctionSignatureSet').withArgs(
+  //         punksAddress, 'ownerOf', fnSig
+  //     )
 
-      fnSig = cryptoPunksMarket.interface.getSighash('buyPunk(uint256)');
-      expect(
-          await tokenInfoProxy.setContractFnCollectOverride(punksAddress, fnSig)
-      ).to.emit(tokenInfoProxy, 'ContractFunctionSignatureSet').withArgs(
-          punksAddress, 'collectOverride', fnSig
-      )
+  //     fnSig = cryptoPunksMarket.interface.getSighash('buyPunk(uint256)');
+  //     expect(
+  //         await tokenInfoProxy.setContractFnCollectOverride(punksAddress, fnSig)
+  //     ).to.emit(tokenInfoProxy, 'ContractFunctionSignatureSet').withArgs(
+  //         punksAddress, 'collectOverride', fnSig
+  //     )
 
-      fnSig = cryptoPunksMarket.interface.getSighash('transferPunk(address,uint256)');
-      expect(
-          await tokenInfoProxy.setContractFnDepositOverride(punksAddress, fnSig)
-      ).to.emit(tokenInfoProxy, 'ContractFunctionSignatureSet').withArgs(
-          punksAddress, 'depositOverride', fnSig
-      )
+  //     fnSig = cryptoPunksMarket.interface.getSighash('transferPunk(address,uint256)');
+  //     expect(
+  //         await tokenInfoProxy.setContractFnDepositOverride(punksAddress, fnSig)
+  //     ).to.emit(tokenInfoProxy, 'ContractFunctionSignatureSet').withArgs(
+  //         punksAddress, 'depositOverride', fnSig
+  //     )
 
-      // const tokenId1 = await callAndReturn({
-      //   contractInstance: proton,
-      //   contractMethod: 'createChargedParticle',
-      //   contractCaller: signer1,
-      //   contractParams: [
-      //     user1,                        // creator
-      //     user2,                        // receiver
-      //     user3,                        // referrer
-      //     TEST_NFT_TOKEN_URI,           // tokenMetaUri
-      //     'generic',                    // walletManagerId
-      //     daiAddress,                   // assetToken
-      //     toWei('3'),                   // assetAmount
-      //     annuityPct,                   // annuityPercent
-      //   ],
-      // });
-      //
-      // await chargedParticles.connect(signer1).covalentBond(
-      //   proton.address,
-      //   tokenId1,
-      //   'generic',
-      //   proton.address,
-      //   tokenId2,
-      //   '0x',
-      //   '0x'
-      // );
+  //     // const tokenId1 = await callAndReturn({
+  //     //   contractInstance: proton,
+  //     //   contractMethod: 'createChargedParticle',
+  //     //   contractCaller: signer1,
+  //     //   contractParams: [
+  //     //     user1,                        // creator
+  //     //     user2,                        // receiver
+  //     //     user3,                        // referrer
+  //     //     TEST_NFT_TOKEN_URI,           // tokenMetaUri
+  //     //     'generic',                    // walletManagerId
+  //     //     daiAddress,                   // assetToken
+  //     //     toWei('3'),                   // assetAmount
+  //     //     annuityPct,                   // annuityPercent
+  //     //   ],
+  //     // });
+  //     //
+  //     // await chargedParticles.connect(signer1).covalentBond(
+  //     //   proton.address,
+  //     //   tokenId1,
+  //     //   'generic',
+  //     //   proton.address,
+  //     //   tokenId2,
+  //     //   '0x',
+  //     //   '0x'
+  //     // );
 
-  });
+  // });
 
 });

@@ -324,7 +324,7 @@ contract ChargedState is
     override
     onlyNFTOwnerOrOperator(contractAddress, tokenId, _msgSender())
   {
-    address tokenOwner = contractAddress.getTokenOwner(tokenId);
+    address tokenOwner = _tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
     require(operator != tokenOwner, "CP:E-106");
     _setTimelockApproval(contractAddress, tokenId, tokenOwner, operator);
   }

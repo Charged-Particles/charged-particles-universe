@@ -160,16 +160,6 @@
         "internalType": "uint256",
         "name": "nftTokenId",
         "type": "uint256"
-      },
-      {
-        "internalType": "bytes",
-        "name": "collectOverride",
-        "type": "bytes"
-      },
-      {
-        "internalType": "bytes",
-        "name": "depositOverride",
-        "type": "bytes"
       }
     ],
     "name": "covalentBond",

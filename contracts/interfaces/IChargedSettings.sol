@@ -36,7 +36,7 @@ interface IChargedSettings {
   |__________________________________*/
 
   // function isContractOwner(address contractAddress, address account) external view returns (bool);
-  function getCreatorAnnuities(address contractAddress, uint256 tokenId) external view returns (address creator, uint256 annuityPct);
+  function getCreatorAnnuities(address contractAddress, uint256 tokenId) external returns (address creator, uint256 annuityPct);
   function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external view returns (address);
   function getTempLockExpiryBlocks() external view returns (uint256);
   function getTimelockApprovals(address operator) external view returns (bool timelockAny, bool timelockOwn);
@@ -45,20 +45,12 @@ interface IChargedSettings {
   function getNftAssetRequirements(address contractAddress, address nftTokenAddress) external view
     returns (string memory requiredBasketManager, bool basketEnabled, uint256 maxNfts);
 
-  // ERC20
-  // function isWalletManagerEnabled(string calldata walletManagerId) external view returns (bool);
-  // function getWalletManager(string calldata walletManagerId) external view returns (IWalletManager);
-
-  // ERC721
-  // function isNftBasketEnabled(string calldata basketId) external view returns (bool);
-  // function getBasketManager(string calldata basketId) external view returns (IBasketManager);
-
   /***********************************|
   |         Only NFT Creator          |
   |__________________________________*/
 
   function setCreatorAnnuities(address contractAddress, uint256 tokenId, address creator, uint256 annuityPercent) external;
-  function setCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId, address creator, address receiver) external;
+  function setCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId, address receiver) external;
 
 
   /***********************************|
@@ -87,11 +79,9 @@ interface IChargedSettings {
   |          Particle Events          |
   |__________________________________*/
 
+  event ControllerSet(address indexed controllerAddress, string controllerId);
   event DepositCapSet(address assetToken, uint256 depositCap);
   event TempLockExpirySet(uint256 expiryBlocks);
-
-  // event WalletManagerRegistered(string indexed walletManagerId, address indexed walletManager);
-  // event BasketManagerRegistered(string indexed basketId, address indexed basketManager);
 
   event RequiredWalletManagerSet(address indexed contractAddress, string walletManager);
   event RequiredBasketManagerSet(address indexed contractAddress, string basketManager);

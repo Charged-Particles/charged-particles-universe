@@ -44,18 +44,6 @@ contract TokenInfoProxy is ITokenInfoProxy, Ownable {
     emit ContractFunctionSignatureSet(contractAddress, "creatorOf", fnSig);
   }
 
-  function setContractFnCollectOverride(address contractAddress, bytes4 fnSig) external override onlyOwner {
-    require(_remappedFnSigs[contractAddress].collectOverride == bytes4(0));
-    _remappedFnSigs[contractAddress].collectOverride = fnSig;
-    emit ContractFunctionSignatureSet(contractAddress, "collectOverride", fnSig);
-  }
-
-  function setContractFnDepositOverride(address contractAddress, bytes4 fnSig) external override onlyOwner {
-    require(_remappedFnSigs[contractAddress].depositOverride == bytes4(0));
-    _remappedFnSigs[contractAddress].depositOverride = fnSig;
-    emit ContractFunctionSignatureSet(contractAddress, "depositOverride", fnSig);
-  }
-
 
   function getTokenUUID(address contractAddress, uint256 tokenId) external pure override returns (uint256) {
     return uint256(keccak256(abi.encodePacked(contractAddress, tokenId)));
@@ -79,15 +67,6 @@ contract TokenInfoProxy is ITokenInfoProxy, Ownable {
     bytes memory returnData = contractAddress.functionCall(abi.encodeWithSelector(fnSig, tokenId), "TokenInfoProxy: low-level call failed on getTokenCreator");
     return abi.decode(returnData, (address));
   }
-
-  function getCollectOverrideFnSig(address contractAddress) external view override returns (bytes4) {
-    return _remappedFnSigs[contractAddress].collectOverride;
-  }
-
-  function getDepositOverrideFnSig(address contractAddress) external view override returns (bytes4) {
-    return _remappedFnSigs[contractAddress].depositOverride;
-  }
-
 
 
   function _getTokenOwner(address contractAddress, uint256 tokenId) internal returns (address) {
