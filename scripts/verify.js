@@ -93,15 +93,15 @@ async function run() {
   // Incentives
   // await verifyContract({name: 'CommunityVault', networkName});
 
-  // await verifyContract({name: 'Staking', networkName});
-  // await verifyContract({name: 'IonxYieldFarm', networkName});
-  // await verifyContract({name: 'LPYieldFarm', networkName});
+  // await verifyContract({ name: 'Staking', networkName, contractRef: 'incentives/Staking.sol:Staking'});
+  // await verifyContract({ name: 'IonxYieldFarm', networkName, contractRef: 'incentives/YieldFarm.sol:YieldFarm' });
+  // await verifyContract({ name: 'LPYieldFarm', networkName, contractRef: 'incentives/YieldFarm.sol:YieldFarm' });
 
   // await verifyContract({name: 'Staking2', networkName, contractRef: 'incentives/Staking2.sol:Staking2'});
   // await verifyContract({name: 'IonxYieldFarm2', networkName, contractRef: 'incentives/YieldFarm2.sol:YieldFarm2'});
   // await verifyContract({name: 'LPYieldFarm2', networkName, contractRef: 'incentives/YieldFarm2.sol:YieldFarm2'});
 
-  await verifyContract({name: 'Staking3', networkName, contractRef: 'incentives/Staking2.sol:Staking3'});
+  await verifyContract({name: 'Staking3', networkName, contractRef: 'incentives/Staking3.sol:Staking3'});
   await verifyContract({name: 'IonxYieldFarm3', networkName, contractRef: 'incentives/YieldFarm3.sol:YieldFarm3'});
   await verifyContract({name: 'LPYieldFarm3', networkName, contractRef: 'incentives/YieldFarm3.sol:YieldFarm3'});
 
