@@ -204,13 +204,13 @@ const presets = {
       ionxToken: {
         // TODO V3 -- make sure these args are correct after testing
         startAmount: bn(100),
-        nrOfEpochs: bn(24),
+        nrOfEpochs: bn(48),
         deprecation: bn(0),
       },
       lpTokens: {
         // TODO V3 -- make sure these args are correct after testing
         startAmount: bn(100),
-        nrOfEpochs: bn(24),
+        nrOfEpochs: bn(48),
         deprecation: bn(0),
       },
 
