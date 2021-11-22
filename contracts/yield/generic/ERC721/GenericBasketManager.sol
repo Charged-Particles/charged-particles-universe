@@ -27,7 +27,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "../../../interfaces/IBasketManager.sol";
 import "../../../interfaces/ISmartBasket.sol";
-import "../../../interfaces/ITokenInfoProxy.sol";
 import "../../../lib/BlackholePrevention.sol";
 import "../../../lib/TokenInfo.sol";
 import "./GenericSmartBasket.sol";
@@ -39,8 +38,6 @@ import "./GenericSmartBasket.sol";
 contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
   using Counters for Counters.Counter;
   using TokenInfo for address;
-
-  ITokenInfoProxy internal _tokenInfoProxy;
 
   // The Controller Contract Address
   address internal _controller;
@@ -201,13 +198,6 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     emit ControllerSet(controller);
   }
 
-  /**
-    * @dev Connects to the Charged Particles Controller
-    */
-  function setTokenInfoProxy(address tokenInfoProxy) external onlyOwner {
-    _tokenInfoProxy = ITokenInfoProxy(tokenInfoProxy);
-  }
-
   function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount)
     external
     virtual
@@ -244,6 +234,18 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     return ISmartBasket(basket).withdrawERC721(receiver, nftTokenAddress, nftTokenId);
   }
 
+  function withdrawERC1155(address contractAddress, uint256 tokenId, address payable receiver, address nftTokenAddress, uint256 nftTokenId, uint256 amount)
+    external
+    virtual
+    override
+    onlyOwner
+  {
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
+    address basket = _baskets[uuid];
+    _withdrawERC1155(receiver, nftTokenAddress, nftTokenId, amount);
+    return ISmartBasket(basket).withdrawERC1155(receiver, nftTokenAddress, nftTokenId, amount);
+  }
+
 
   /***********************************|
   |         Private Functions         |
@@ -258,7 +260,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     returns (address)
   {
     address newBasket = _createClone(_basketTemplate);
-    GenericSmartBasket(newBasket).initialize(_tokenInfoProxy);
+    GenericSmartBasket(newBasket).initialize();
     return newBasket;
   }
 

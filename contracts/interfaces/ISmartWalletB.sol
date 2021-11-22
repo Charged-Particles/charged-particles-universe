@@ -73,4 +73,5 @@ interface ISmartWalletB {
   function withdrawEther(address payable receiver, uint256 amount) external;
   function withdrawERC20(address payable receiver, address tokenAddress, uint256 amount) external;
   function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external;
+  function withdrawERC1155(address payable receiver, address tokenAddress, uint256 tokenId, uint256 amount) external;
 }

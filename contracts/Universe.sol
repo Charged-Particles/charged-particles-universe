@@ -318,6 +318,10 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     _withdrawERC721(receiver, tokenAddress, tokenId);
   }
 
+  function withdrawERC1155(address payable receiver, address tokenAddress, uint256 tokenId, uint256 amount) external virtual onlyOwner {
+    _withdrawERC1155(receiver, tokenAddress, tokenId, amount);
+  }
+
 
 
   /***********************************|

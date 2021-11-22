@@ -59,6 +59,19 @@ module.exports = async (hre) => {
     log('  - GenericBasketManager:  ', genericBasketManager.address);
     log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericBasketManager.deployTransaction }));
 
+    await log('  Deploying GenericBasketManagerB...')(alchemyTimeout);
+    const GenericBasketManagerB = await hre.ethers.getContractFactory('GenericBasketManagerB');
+    const GenericBasketManagerBInstance = await GenericBasketManagerB.deploy();
+    const genericBasketManagerB = await GenericBasketManagerBInstance.deployed();
+    deployData['GenericBasketManagerB'] = {
+      abi: getContractAbi('GenericBasketManagerB'),
+      address: genericBasketManagerB.address,
+      deployTransaction: genericBasketManagerB.deployTransaction,
+    }
+    saveDeploymentData(chainId, deployData);
+    log('  - GenericBasketManagerB:  ', genericBasketManagerB.address);
+    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericBasketManagerB.deployTransaction }));
+
 
     log('\n  Contract Deployment Data saved to "deployments" directory.');
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');

@@ -25,12 +25,8 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
-import "@openzeppelin/contracts/introspection/IERC165.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../../../interfaces/ISmartBasket.sol";
-import "../../../interfaces/ITokenInfoProxy.sol";
 import "../../../lib/BlackholePrevention.sol";
 import "../../../lib/NftTokenType.sol";
 
@@ -39,12 +35,10 @@ import "../../../lib/NftTokenType.sol";
  * @notice Generic ERC721-Token Smart-Basket
  * @dev Non-upgradeable Contract
  */
-contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receiver, IERC1155Receiver {
+contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receiver {
   using EnumerableSet for EnumerableSet.UintSet;
   using EnumerableSet for EnumerableSet.AddressSet;
   using NftTokenType for address;
-
-  ITokenInfoProxy internal _tokenInfoProxy;
 
   address internal _basketManager;
 
@@ -56,10 +50,9 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
   |          Initialization           |
   |__________________________________*/
 
-  function initialize(ITokenInfoProxy tokenInfoProxy) public {
+  function initialize() public {
     require(_basketManager == address(0x0), "GSB:E-002");
     _basketManager = msg.sender;
-    _tokenInfoProxy = tokenInfoProxy;
   }
 
 
@@ -76,19 +69,6 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
     return IERC721Receiver(0).onERC721Received.selector;
   }
 
-  function onERC1155Received(address, address, uint256, uint256, bytes calldata) external override returns (bytes4) {
-    return IERC1155Receiver(0).onERC1155Received.selector;
-  }
-
-  // Unimplemented
-  function onERC1155BatchReceived(address, address, uint256[] calldata, uint256[] calldata, bytes calldata) external override returns (bytes4) {
-    return ""; // IERC1155ReceiverUpgradeable(0).onERC1155BatchReceived.selector;
-  }
-
-  function supportsInterface(bytes4 interfaceId) external view override returns (bool) {
-    return (interfaceId == 0x0);
-  }
-
   function addToBasket(address contractAddress, uint256 tokenId)
     external
     override
@@ -101,8 +81,7 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
     bool added = _nftContractTokens[contractAddress][nftType].add(tokenId);
     if (added) {
       // NFT should have been Transferred into here via Charged-Particles
-      address ownerOf = _tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
-      added = (ownerOf == address(this));
+      added = (IERC721(contractAddress).ownerOf(tokenId) == address(this));
     }
     return added;
   }
@@ -118,11 +97,7 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
 
     bool removed = _nftContractTokens[contractAddress][nftType].remove(tokenId);
     if (removed) {
-      if (_isERC1155(contractAddress)) {
-        IERC1155(contractAddress).safeTransferFrom(address(this), receiver, tokenId, 1, "");
-      } else {
-        IERC721(contractAddress).safeTransferFrom(address(this), receiver, tokenId);
-      }
+      IERC721(contractAddress).safeTransferFrom(address(this), receiver, tokenId);
     }
     return removed;
   }
@@ -160,16 +135,14 @@ contract GenericSmartBasket is ISmartBasket, BlackholePrevention, IERC721Receive
     _withdrawERC721(receiver, tokenAddress, tokenId);
   }
 
+  function withdrawERC1155(address payable receiver, address tokenAddress, uint256 tokenId, uint256 amount) external virtual override onlyBasketManager {
+    _withdrawERC1155(receiver, tokenAddress, tokenId, amount);
+  }
+
 
   /***********************************|
   |         Private Functions         |
   |__________________________________*/
-
-  /// @dev Checks if an NFT token contract supports the ERC1155 standard interface
-  function _isERC1155(address nftTokenAddress) internal view virtual returns (bool) {
-    bytes4 _INTERFACE_ID_ERC1155 = 0xd9b67a26;
-    return IERC165(nftTokenAddress).supportsInterface(_INTERFACE_ID_ERC1155);
-  }
 
   /// @dev Throws if called by any account other than the basket manager
   modifier onlyBasketManager() {

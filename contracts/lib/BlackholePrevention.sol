@@ -27,6 +27,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
 /**
  * @notice Prevents ETH or Tokens from getting stuck in a contract by allowing
@@ -40,6 +41,7 @@ contract BlackholePrevention {
   event WithdrawStuckEther(address indexed receiver, uint256 amount);
   event WithdrawStuckERC20(address indexed receiver, address indexed tokenAddress, uint256 amount);
   event WithdrawStuckERC721(address indexed receiver, address indexed tokenAddress, uint256 indexed tokenId);
+  event WithdrawStuckERC1155(address indexed receiver, address indexed tokenAddress, uint256 indexed tokenId, uint256 amount);
 
   function _withdrawEther(address payable receiver, uint256 amount) internal virtual {
     require(receiver != address(0x0), "BHP:E-403");
@@ -62,6 +64,14 @@ contract BlackholePrevention {
     if (IERC721(tokenAddress).ownerOf(tokenId) == address(this)) {
       IERC721(tokenAddress).transferFrom(address(this), receiver, tokenId);
       emit WithdrawStuckERC721(receiver, tokenAddress, tokenId);
+    }
+  }
+
+  function _withdrawERC1155(address payable receiver, address tokenAddress, uint256 tokenId, uint256 amount) internal virtual {
+    require(receiver != address(0x0), "BHP:E-403");
+    if (IERC1155(tokenAddress).balanceOf(address(this), tokenId) >= amount) {
+      IERC1155(tokenAddress).safeTransferFrom(address(this), receiver, tokenId, amount, "");
+      emit WithdrawStuckERC1155(receiver, tokenAddress, tokenId, amount);
     }
   }
 }

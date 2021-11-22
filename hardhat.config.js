@@ -157,6 +157,7 @@ module.exports = {
         'AaveBridgeV2',
         'GenericWalletManager',
         'GenericBasketManager',
+        'GenericBasketManagerB',
         'Ionx',
         'IonxTimelock',
         'Proton',

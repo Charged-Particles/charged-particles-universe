@@ -144,7 +144,9 @@ contract ChargedParticles is
   }
 
   function supportsInterface(bytes4 interfaceId) external view virtual override returns (bool) {
-    return (interfaceId == 0x0);
+    return  interfaceId == 0x01ffc9a7 ||    // ERC-165
+            interfaceId == 0x80ac58cd ||    // ERC-721
+            interfaceId == 0x4e2312e0;      // ERC-1155
   }
 
   /// @notice Calculates the amount of Fees to be paid for a specific deposit amount
@@ -659,6 +661,10 @@ contract ChargedParticles is
 
   function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external onlyOwner {
     _withdrawERC721(receiver, tokenAddress, tokenId);
+  }
+
+  function withdrawERC1155(address payable receiver, address tokenAddress, uint256 tokenId, uint256 amount) external onlyOwner {
+    _withdrawERC1155(receiver, tokenAddress, tokenId, amount);
   }
 
 

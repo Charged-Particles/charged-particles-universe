@@ -8,6 +8,7 @@
     "ChargedManagers": "ChargedManagers",
     "GenericWalletManager": "GenericWalletManager",
     "GenericBasketManager": "GenericBasketManager",
+    "GenericBasketManagerB": "GenericBasketManagerB",
     "AaveWalltManager": "AaveWalletManager",
     "AaveWalltManagerB": "AaveWalletManagerB",
     "AaveBridgeV2": "AaveBridgeV2",

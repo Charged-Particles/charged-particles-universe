@@ -101,6 +101,10 @@ abstract contract SmartWalletBaseB is ISmartWalletB, BlackholePrevention {
     _withdrawERC721(receiver, tokenAddress, tokenId);
   }
 
+  function withdrawERC1155(address payable receiver, address tokenAddress, uint256 tokenId, uint256 amount) external virtual override onlyWalletManager {
+    _withdrawERC1155(receiver, tokenAddress, tokenId, amount);
+  }
+
 
   /***********************************|
   |         Private Functions         |

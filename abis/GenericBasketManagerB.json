@@ -1,17 +1,6 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_epoch1Start",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_epochDuration",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
@@ -21,23 +10,29 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "user",
+        "name": "contractAddress",
         "type": "address"
       },
       {
         "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
-        "name": "tokenAddress",
+        "name": "basketTokenAddress",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount",
+        "name": "basketTokenId",
         "type": "uint256"
       }
     ],
-    "name": "Deposit",
+    "name": "BasketAdd",
     "type": "event"
   },
   {
@@ -46,23 +41,35 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "user",
+        "name": "receiver",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "tokenAddress",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "basketTokenAddress",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount",
+        "name": "basketTokenId",
         "type": "uint256"
       }
     ],
-    "name": "EmergencyWithdraw",
+    "name": "BasketRemove",
     "type": "event"
   },
   {
@@ -71,23 +78,36 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "caller",
+        "name": "controller",
+        "type": "address"
+      }
+    ],
+    "name": "ControllerSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
         "type": "address"
       },
       {
         "indexed": true,
-        "internalType": "uint128",
-        "name": "epochId",
-        "type": "uint128"
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
       },
       {
-        "indexed": false,
-        "internalType": "address[]",
-        "name": "tokens",
-        "type": "address[]"
+        "indexed": true,
+        "internalType": "address",
+        "name": "smartBasket",
+        "type": "address"
       }
     ],
-    "name": "ManualEpochInit",
+    "name": "NewSmartBasket",
     "type": "event"
   },
   {
@@ -120,31 +140,6 @@
       }
     ],
     "name": "PausedStateSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "Withdraw",
     "type": "event"
   },
   {
@@ -251,181 +246,123 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "user",
+        "name": "contractAddress",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "token",
-        "type": "address"
-      }
-    ],
-    "name": "balanceOf",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "prevBalance",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint128",
-        "name": "prevMultiplier",
-        "type": "uint128"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint128",
-        "name": "currentMultiplier",
-        "type": "uint128"
-      }
-    ],
-    "name": "computeNewMultiplier",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "",
-        "type": "uint128"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "currentEpochMultiplier",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "",
-        "type": "uint128"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "tokenAddress",
+        "name": "basketTokenAddress",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "amount",
+        "name": "basketTokenId",
         "type": "uint256"
       }
     ],
-    "name": "deposit",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "emergencyWithdraw",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "epoch1Start",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "epochDuration",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint128",
-        "name": "epochId",
-        "type": "uint128"
-      }
-    ],
-    "name": "epochIsInitialized",
+    "name": "addToBasket",
     "outputs": [
       {
         "internalType": "bool",
-        "name": "",
+        "name": "added",
         "type": "bool"
       }
     ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getCurrentEpoch",
-    "outputs": [
-      {
-        "internalType": "uint128",
-        "name": "",
-        "type": "uint128"
-      }
-    ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "address",
-        "name": "tokenAddress",
+        "name": "contractAddress",
         "type": "address"
       },
       {
-        "internalType": "uint128",
-        "name": "epochId",
-        "type": "uint128"
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "externalAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "ethValue",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "encodedParams",
+        "type": "bytes"
       }
     ],
-    "name": "getEpochPoolSize",
+    "name": "executeForAccount",
+    "outputs": [
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getBasketAddressById",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "basketTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "basketTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getTokenCountByType",
     "outputs": [
       {
         "internalType": "uint256",
@@ -433,28 +370,23 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "address",
-        "name": "user",
+        "name": "contractAddress",
         "type": "address"
       },
       {
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint128",
-        "name": "epochId",
-        "type": "uint128"
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
       }
     ],
-    "name": "getEpochUserBalance",
+    "name": "getTokenTotalCount",
     "outputs": [
       {
         "internalType": "uint256",
@@ -479,24 +411,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "tokens",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint128",
-        "name": "epochId",
-        "type": "uint128"
-      }
-    ],
-    "name": "manualEpochInit",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "owner",
     "outputs": [
@@ -510,8 +424,60 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "basketTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "basketTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "removeFromBasket",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "removed",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "controller",
+        "type": "address"
+      }
+    ],
+    "name": "setController",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -533,6 +499,19 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "tokenInfoProxy",
+        "type": "address"
+      }
+    ],
+    "name": "setTokenInfoProxy",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "newOwner",
         "type": "address"
       }
@@ -546,6 +525,59 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address payable",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "nftTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawERC1155",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address payable",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "tokenAddress",
         "type": "address"
       },
@@ -555,13 +587,56 @@
         "type": "uint256"
       }
     ],
-    "name": "withdraw",
+    "name": "withdrawERC20",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address payable",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "nftTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawERC721",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
       {
         "internalType": "address payable",
         "name": "receiver",

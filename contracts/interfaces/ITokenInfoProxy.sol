@@ -31,8 +31,6 @@ interface ITokenInfoProxy {
   struct FnSignatures {
     bytes4 ownerOf;
     bytes4 creatorOf;
-    bytes4 collectOverride;
-    bytes4 depositOverride;
   }
 
   function setContractFnOwnerOf(address contractAddress, bytes4 fnSig) external;

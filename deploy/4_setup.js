@@ -55,6 +55,7 @@ module.exports = async (hre) => {
     const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
     const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
+    const ddGenericBasketManagerB = getDeployData('GenericBasketManagerB', chainId);
     const ddWBoson = getDeployData('WBoson', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton2 = getDeployData('Lepton2', chainId);
@@ -98,6 +99,10 @@ module.exports = async (hre) => {
     log('  Loading GenericBasketManager from: ', ddGenericBasketManager.address);
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const genericBasketManager = await GenericBasketManager.attach(ddGenericBasketManager.address);
+
+    log('  Loading GenericBasketManagerB from: ', ddGenericBasketManagerB.address);
+    const GenericBasketManagerB = await ethers.getContractFactory('GenericBasketManagerB');
+    const genericBasketManagerB = await GenericBasketManagerB.attach(ddGenericBasketManagerB.address);
 
     log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
@@ -219,8 +224,16 @@ module.exports = async (hre) => {
       await chargedManagers.registerBasketManager('generic', ddGenericBasketManager.address)
     );
 
-    await executeTx('2-e', 'GenericBasketManager: Registering TokenInfoProxy', async () =>
-      await genericBasketManager.setTokenInfoProxy(ddTokenInfoProxy.address)
+    await executeTx('2-e', 'GenericBasketManagerB: Setting Charged Particles as Controller', async () =>
+      await genericBasketManagerB.setController(ddChargedParticles.address)
+    );
+
+    await executeTx('2-f', 'GenericBasketManagerB: Registering Generic Basket Manager "B" with ChargedParticles', async () =>
+      await chargedManagers.registerBasketManager('generic.B', ddGenericBasketManagerB.address)
+    );
+
+    await executeTx('2-g', 'GenericBasketManagerB: Registering TokenInfoProxy', async () =>
+      await genericBasketManagerB.setTokenInfoProxy(ddTokenInfoProxy.address)
     );
 
 

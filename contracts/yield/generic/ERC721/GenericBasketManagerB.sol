@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// PunksBasketManager.sol -- Part of the Charged Particles Protocol
+// GenericBasketManager.sol -- Part of the Charged Particles Protocol
 // Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,19 +25,22 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "../../interfaces/IBasketManager.sol";
-import "../../interfaces/ISmartBasket.sol";
-import "../../lib/BlackholePrevention.sol";
-import "../../lib/TokenInfo.sol";
-import "./PunksSmartBasket.sol";
+import "../../../interfaces/IBasketManager.sol";
+import "../../../interfaces/ISmartBasket.sol";
+import "../../../interfaces/ITokenInfoProxy.sol";
+import "../../../lib/BlackholePrevention.sol";
+import "../../../lib/TokenInfo.sol";
+import "./GenericSmartBasketB.sol";
 
 /**
- * @notice Punks ERC721 Basket Manager
+ * @notice Generic ERC721 Basket Manager
  * @dev Non-upgradeable Contract
  */
-contract PunksBasketManager is Ownable, BlackholePrevention, IBasketManager {
+contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   using Counters for Counters.Counter;
   using TokenInfo for address;
+
+  ITokenInfoProxy internal _tokenInfoProxy;
 
   // The Controller Contract Address
   address internal _controller;
@@ -58,7 +61,7 @@ contract PunksBasketManager is Ownable, BlackholePrevention, IBasketManager {
   |__________________________________*/
 
   constructor () public {
-    _basketTemplate = address(new PunksSmartBasket());
+    _basketTemplate = address(new GenericSmartBasketB());
   }
 
   /***********************************|
@@ -93,7 +96,7 @@ contract PunksBasketManager is Ownable, BlackholePrevention, IBasketManager {
     returns (uint256)
   {
     address basket = getBasketAddressById(contractAddress, tokenId);
-    return PunksSmartBasket(basket).getTokenCountByType(basketTokenAddress, basketTokenId);
+    return GenericSmartBasketB(basket).getTokenCountByType(basketTokenAddress, basketTokenId);
   }
 
   function addToBasket(
@@ -111,7 +114,7 @@ contract PunksBasketManager is Ownable, BlackholePrevention, IBasketManager {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
 
-    added = PunksSmartBasket(basket).addToBasket(basketTokenAddress, basketTokenId);
+    added = GenericSmartBasketB(basket).addToBasket(basketTokenAddress, basketTokenId);
 
     // Log Event
     if (added) {
@@ -135,9 +138,9 @@ contract PunksBasketManager is Ownable, BlackholePrevention, IBasketManager {
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
-    require(basket != address(0x0), "PBM:E-403");
+    require(basket != address(0x0), "GBM:E-403");
 
-    removed = PunksSmartBasket(basket).removeFromBasket(receiver, basketTokenAddress, basketTokenId);
+    removed = GenericSmartBasketB(basket).removeFromBasket(receiver, basketTokenAddress, basketTokenId);
 
     // Log Event
     if (removed) {
@@ -155,7 +158,7 @@ contract PunksBasketManager is Ownable, BlackholePrevention, IBasketManager {
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
-    return PunksSmartBasket(basket).executeForAccount(externalAddress, ethValue, encodedParams);
+    return GenericSmartBasketB(basket).executeForAccount(externalAddress, ethValue, encodedParams);
   }
 
   function getBasketAddressById(address contractAddress, uint256 tokenId)
@@ -198,6 +201,13 @@ contract PunksBasketManager is Ownable, BlackholePrevention, IBasketManager {
     emit ControllerSet(controller);
   }
 
+  /**
+    * @dev Connects to the Charged Particles Controller
+    */
+  function setTokenInfoProxy(address tokenInfoProxy) external onlyOwner {
+    _tokenInfoProxy = ITokenInfoProxy(tokenInfoProxy);
+  }
+
   function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount)
     external
     virtual
@@ -234,6 +244,18 @@ contract PunksBasketManager is Ownable, BlackholePrevention, IBasketManager {
     return ISmartBasket(basket).withdrawERC721(receiver, nftTokenAddress, nftTokenId);
   }
 
+  function withdrawERC1155(address contractAddress, uint256 tokenId, address payable receiver, address nftTokenAddress, uint256 nftTokenId, uint256 amount)
+    external
+    virtual
+    override
+    onlyOwner
+  {
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
+    address basket = _baskets[uuid];
+    _withdrawERC1155(receiver, nftTokenAddress, nftTokenId, amount);
+    return ISmartBasket(basket).withdrawERC1155(receiver, nftTokenAddress, nftTokenId, amount);
+  }
+
 
   /***********************************|
   |         Private Functions         |
@@ -248,7 +270,7 @@ contract PunksBasketManager is Ownable, BlackholePrevention, IBasketManager {
     returns (address)
   {
     address newBasket = _createClone(_basketTemplate);
-    PunksSmartBasket(newBasket).initialize();
+    GenericSmartBasketB(newBasket).initialize(_tokenInfoProxy);
     return newBasket;
   }
 
@@ -274,13 +296,13 @@ contract PunksBasketManager is Ownable, BlackholePrevention, IBasketManager {
 
   /// @dev Throws if called by any account other than the Controller contract
   modifier onlyController() {
-    require(_controller == msg.sender, "PBM:E-108");
+    require(_controller == msg.sender, "GBM:E-108");
     _;
   }
 
   // Throws if called by any account other than the Charged Particles Escrow Controller.
   modifier whenNotPaused() {
-    require(_paused != true, "PBM:E-101");
+    require(_paused != true, "GBM:E-101");
     _;
   }
 

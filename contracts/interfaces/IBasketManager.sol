@@ -49,4 +49,5 @@ interface IBasketManager {
   function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount) external;
   function withdrawERC20(address contractAddress, uint256 tokenId, address payable receiver, address tokenAddress, uint256 amount) external;
   function withdrawERC721(address contractAddress, uint256 tokenId, address payable receiver, address nftTokenAddress, uint256 nftTokenId) external;
+  function withdrawERC1155(address contractAddress, uint256 tokenId, address payable receiver, address nftTokenAddress, uint256 nftTokenId, uint256 amount) external;
 }
