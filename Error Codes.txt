@@ -44,7 +44,7 @@ Codes:
     E-203 - TokenID not in posession of smart wallet.
     E-204 - invalid chronological order
     E-205 - amount must be positive
-    E-206 - 
+    E-206 -
     E-207 -
     E-208 -
     E-209 -
@@ -95,3 +95,4 @@ Codes:
     E-430 - only 1 lepton per NFT allowed
     E-431 - portion already claimed
     E-432 - balance too small
+    E-433 - Cannot deposit NFT inside itself

@@ -333,6 +333,9 @@ contract ChargedManagers is
     internal
     virtual
   {
+    // Prevent Ouroboros NFTs
+    require(contractAddress.getTokenUUID(tokenId) != nftTokenAddress.getTokenUUID(nftTokenId), "CP:E-433");
+
     if (_chargedState.isCovalentBondRestricted(contractAddress, tokenId)) {
       bool isNFTOwnerOrOperator = _tokenInfoProxy.isNFTOwnerOrOperator(contractAddress, tokenId, sender);
       require(isNFTOwnerOrOperator, "CP:E-105");

@@ -149,6 +149,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       .map(ionxTimelock => (IonxTimelock.attach(ionxTimelock.address)));
     tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address);
 
+    await proton.connect(signerD).setPausedState(false);
     await lepton.connect(signerD).setPausedState(false);
   });
 
@@ -462,6 +463,39 @@ describe("[INTEGRATION] Charged Particles", () => {
     );
 
     expect(await proton.ownerOf(tokenId2)).to.be.equal(user1);
+  });
+
+  it("prevents an NFT from being deposited into itself", async () => {
+
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+    const tokenId1 = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createProton',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        annuityPct,                   // annuityPercent
+      ],
+    });
+    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, tokenId1.toString()).returns(user2);
+
+    await proton.connect(signer2).approve(chargedParticles.address, tokenId1);
+
+    await expect(chargedParticles.connect(signer2).covalentBond(
+      proton.address,
+      tokenId1,
+      'generic',
+      proton.address,
+      tokenId1
+    )).to.be.revertedWith('CP:E-433');
   });
 
   it("cannot discharge more than the wallet holds", async () => {
