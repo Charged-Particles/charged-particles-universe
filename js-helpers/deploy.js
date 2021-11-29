@@ -204,18 +204,18 @@ const presets = {
       ionxToken: {
         // TODO V3 -- make sure these args are correct after testing
         startAmount: bn(100),
-        nrOfEpochs: bn(48),
+        nrOfEpochs: bn(47),
         deprecation: bn(0),
       },
       lpTokens: {
         // TODO V3 -- make sure these args are correct after testing
         startAmount: bn(100),
-        nrOfEpochs: bn(48),
+        nrOfEpochs: bn(47),
         deprecation: bn(0),
       },
 
       uniswapV2Addr : '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-      uniswapLPTokenAddress: '0xac5A8983d9289922a45f97B352Dc3c94FF55a1A6',
+      uniswapLPTokenAddress: '0x27125750e4D487cF4FbE65b12B6665062820a816',
     },
     137: { // Polygon L2 Mainnet
 
