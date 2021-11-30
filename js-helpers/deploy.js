@@ -288,6 +288,14 @@ const presets = {
       totalIonx: tokensBN(bn(1_516_631)),
       expiryDate: dateToTimestamp(dateFormat(ONE_MONTH_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')),
     },
+    month6: {
+      merkleRoot: '0x857cbf75cef2bfa807523ac7fcda259ddc01a95e02afc262c0cb4207c3c70510',
+      // TODO -- delete below line after Kovan testing
+      totalIonx: tokensBN(bn(10)),
+      // TODO -- uncomment below line after Kovan testing
+      // totalIonx: tokensBN(bn(1_516_631)),
+      expiryDate: dateToTimestamp(dateFormat(ONE_MONTH_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')),
+    },
   },
 };
 
