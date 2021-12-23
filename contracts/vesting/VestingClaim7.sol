@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "../interfaces/IMerkleDistributor.sol";
 
-contract VestingClaim5 is IMerkleDistributor {
+contract VestingClaim7 is IMerkleDistributor {
     address public immutable override token;
     bytes32 public immutable override merkleRoot;
 
@@ -39,33 +39,33 @@ contract VestingClaim5 is IMerkleDistributor {
     }
 
     function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof) external override {
-        require(!isClaimed(index), "VestingClaim5: Drop already claimed.");
+        require(!isClaimed(index), "VestingClaim7: Drop already claimed.");
 
         // Verify the merkle proof.
         bytes32 node = keccak256(abi.encodePacked(index, account, amount));
-        require(MerkleProof.verify(merkleProof, merkleRoot, node), "VestingClaim5: Invalid proof.");
+        require(MerkleProof.verify(merkleProof, merkleRoot, node), "VestingClaim7: Invalid proof.");
 
         // Mark it claimed and send the token.
         _setClaimed(index);
-        require(IERC20(token).transfer(account, amount), "VestingClaim5: Transfer failed.");
+        require(IERC20(token).transfer(account, amount), "VestingClaim7: Transfer failed.");
 
         emit Claimed(index, account, amount);
     }
 
     function expire(address exitAddress) external onlyOwner {
-        require(block.timestamp >= expiryDate, "VestingClaim5: expiry date not reached");
+        require(block.timestamp >= expiryDate, "VestingClaim7: expiry date not reached");
         uint256 remainingBalance = IERC20(token).balanceOf(address(this));
         IERC20(token).transfer(exitAddress, remainingBalance);
     }
 
     function transferOwnership(address newOwner) external onlyOwner {
-        require(newOwner != address(0), "VestingClaim5: new owner is the zero address");
+        require(newOwner != address(0), "VestingClaim7: new owner is the zero address");
         emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "VestingClaim5: not owner");
+        require(msg.sender == owner, "VestingClaim7: not owner");
         _;
     }
 }

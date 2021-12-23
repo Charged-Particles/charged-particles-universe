@@ -28,7 +28,9 @@
     "VestingClaim2": "VestingClaim2",
     "VestingClaim3": "VestingClaim3",
     "VestingClaim4": "VestingClaim4",
-    "VestingClaim5": "VestingClaim5"
+    "VestingClaim5": "VestingClaim5",
+    "VestingClaim6": "VestingClaim6",
+    "VestingClaim7": "VestingClaim7"
   },
   "dependencies": {
   },
