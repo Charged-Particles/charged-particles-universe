@@ -38,6 +38,25 @@
 				{
 					"indexed": true,
 					"internalType": "address",
+					"name": "initiator",
+					"type": "address"
+				},
+				{
+					"indexed": true,
+					"internalType": "address",
+					"name": "newOwner",
+					"type": "address"
+				}
+			],
+			"name": "Initialized",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"internalType": "address",
 					"name": "previousOwner",
 					"type": "address"
 				},
@@ -46,6 +65,12 @@
 					"internalType": "address",
 					"name": "newOwner",
 					"type": "address"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "feesCollected",
+					"type": "uint256"
 				}
 			],
 			"name": "OwnershipTransferred",
@@ -70,6 +95,12 @@
 					"indexed": false,
 					"internalType": "uint256",
 					"name": "feesCollected",
+					"type": "uint256"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "amount",
 					"type": "uint256"
 				}
 			],
@@ -158,23 +189,41 @@
 			"type": "event"
 		},
 		{
-			"anonymous": false,
 			"inputs": [
 				{
-					"indexed": true,
 					"internalType": "address",
 					"name": "receiver",
-					"type": "address"
+					"type": "address",
+					"indexed": true
 				},
 				{
-					"indexed": false,
 					"internalType": "uint256",
 					"name": "amount",
-					"type": "uint256"
+					"type": "uint256",
+					"indexed": false
+				},
+				{
+					"internalType": "string",
+					"name": "walletManagerId",
+					"type": "string"
+				},
+				{
+					"internalType": "address",
+					"name": "assetToken",
+					"type": "address"
 				}
 			],
 			"name": "WithdrawStuckEther",
-			"type": "event"
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "event",
+			"anonymous": false
 		},
 		{
 			"inputs": [
@@ -197,6 +246,16 @@
 					"internalType": "address",
 					"name": "assetToken",
 					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "nftTokenAddress",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "nftTokenId",
+					"type": "uint256"
 				}
 			],
 			"name": "baseParticleMass",
@@ -343,6 +402,11 @@
 					"internalType": "string",
 					"name": "basketManagerId",
 					"type": "string"
+				},
+				{
+					"internalType": "address",
+					"name": "assetToken",
+					"type": "address"
 				}
 			],
 			"name": "currentParticleCovalentBonds",
@@ -377,6 +441,11 @@
 					"internalType": "address",
 					"name": "assetToken",
 					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "assetToken",
+					"type": "address"
 				}
 			],
 			"name": "currentParticleKinetics",
@@ -384,6 +453,11 @@
 				{
 					"internalType": "uint256",
 					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "receiverAmount",
 					"type": "uint256"
 				}
 			],
@@ -416,6 +490,11 @@
 					"internalType": "address",
 					"name": "assetToken",
 					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "assetAmount",
+					"type": "uint256"
 				}
 			],
 			"name": "dischargeParticle",
@@ -591,7 +670,13 @@
 			"type": "function"
 		},
 		{
-			"inputs": [],
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_trustedForwarder",
+					"type": "address"
+				}
+			],
 			"name": "getManagersAddress",
 			"outputs": [
 				{
@@ -607,7 +692,7 @@
 			"inputs": [
 				{
 					"internalType": "address",
-					"name": "_trustedForwarder",
+					"name": "forwarder",
 					"type": "address"
 				}
 			],
@@ -616,25 +701,6 @@
 				{
 					"internalType": "address",
 					"name": "settingsAddress",
-					"type": "address"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "forwarder",
-					"type": "address"
-				}
-			],
-			"name": "getStateAddress",
-			"outputs": [
-				{
-					"internalType": "address",
-					"name": "stateAddress",
 					"type": "address"
 				}
 			],
@@ -664,12 +730,31 @@
 					"type": "bytes"
 				}
 			],
+			"name": "getStateAddress",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "stateAddress",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "initiator",
+					"type": "address"
+				}
+			],
 			"name": "initialize",
 			"outputs": [
 				{
-					"internalType": "bytes4",
+					"internalType": "bool",
 					"name": "",
-					"type": "bytes4"
+					"type": "bool"
 				}
 			],
 			"stateMutability": "nonpayable",
@@ -681,6 +766,26 @@
 					"internalType": "address",
 					"name": "forwarder",
 					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256[]",
+					"name": "",
+					"type": "uint256[]"
+				},
+				{
+					"internalType": "uint256[]",
+					"name": "",
+					"type": "uint256[]"
+				},
+				{
+					"internalType": "bytes",
+					"name": "",
+					"type": "bytes"
 				}
 			],
 			"name": "isTrustedForwarder",
@@ -689,6 +794,11 @@
 					"internalType": "bool",
 					"name": "",
 					"type": "bool"
+				},
+				{
+					"internalType": "uint256",
+					"name": "receiverAmount",
+					"type": "uint256"
 				}
 			],
 			"stateMutability": "view",
@@ -720,6 +830,11 @@
 					"internalType": "bytes",
 					"name": "",
 					"type": "bytes"
+				},
+				{
+					"internalType": "uint256",
+					"name": "assetAmount",
+					"type": "uint256"
 				}
 			],
 			"name": "onERC1155BatchReceived",
@@ -764,11 +879,6 @@
 					"internalType": "bytes",
 					"name": "",
 					"type": "bytes"
-				},
-				{
-					"internalType": "uint256",
-					"name": "assetAmount",
-					"type": "uint256"
 				}
 			],
 			"name": "onERC1155Received",
@@ -777,11 +887,6 @@
 					"internalType": "bytes4",
 					"name": "",
 					"type": "bytes4"
-				},
-				{
-					"internalType": "uint256",
-					"name": "receiverAmount",
-					"type": "uint256"
 				}
 			],
 			"stateMutability": "nonpayable",
@@ -825,7 +930,27 @@
 			"inputs": [
 				{
 					"internalType": "address",
-					"name": "settingsController",
+					"name": "receiver",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "contractAddress",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "tokenId",
+					"type": "uint256"
+				},
+				{
+					"internalType": "string",
+					"name": "walletManagerId",
+					"type": "string"
+				},
+				{
+					"internalType": "address",
+					"name": "assetToken",
 					"type": "address"
 				}
 			],
@@ -835,6 +960,11 @@
 					"internalType": "address",
 					"name": "",
 					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "receiverAmount",
+					"type": "uint256"
 				}
 			],
 			"stateMutability": "view",
@@ -866,6 +996,11 @@
 					"internalType": "address",
 					"name": "assetToken",
 					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "assetAmount",
+					"type": "uint256"
 				}
 			],
 			"name": "releaseParticle",
@@ -937,8 +1072,13 @@
 			"inputs": [
 				{
 					"internalType": "address",
-					"name": "_trustedForwarder",
+					"name": "controller",
 					"type": "address"
+				},
+				{
+					"internalType": "string",
+					"name": "controllerId",
+					"type": "string"
 				}
 			],
 			"name": "renounceOwnership",
@@ -973,7 +1113,13 @@
 				}
 			],
 			"name": "setDepositFee",
-			"outputs": [],
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
 			"stateMutability": "nonpayable",
 			"type": "function"
 		},
@@ -1002,14 +1148,24 @@
 					"internalType": "address",
 					"name": "newOwner",
 					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "tokenAddress",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "tokenId",
+					"type": "uint256"
 				}
 			],
 			"name": "transferOwnership",
 			"outputs": [
 				{
-					"internalType": "string",
+					"internalType": "address",
 					"name": "",
-					"type": "string"
+					"type": "address"
 				}
 			],
 			"stateMutability": "nonpayable",
@@ -1029,7 +1185,7 @@
 				},
 				{
 					"internalType": "uint256",
-					"name": "tokenId",
+					"name": "amount",
 					"type": "uint256"
 				}
 			],
@@ -1055,6 +1211,11 @@
 					"internalType": "address",
 					"name": "tokenAddress",
 					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "tokenId",
+					"type": "uint256"
 				},
 				{
 					"internalType": "uint256",
@@ -1197,7 +1358,7 @@
 		"chainId": 42
 	},
 	"upgradeTransaction": {
-		"hash": "0xda597f840d9045538e6f18a94741ab8b88cf01d448dca1f990d0380e173337d9",
+		"hash": "0xb5c417f77349be635ef5fa77159be781e76e0e1169eb7d41c1a018df53aa27b7",
 		"type": 0,
 		"accessList": null,
 		"blockHash": null,
@@ -1218,13 +1379,13 @@
 			"type": "BigNumber",
 			"hex": "0x00"
 		},
-		"nonce": 2541,
-		"data": "0x99a88ec4000000000000000000000000f03eab2b60efb6e24c1b254a2d6fc91eb639d6d30000000000000000000000006943e8f09a9f4a2fb26bdaa1dc1d4f867bd568fe",
-		"r": "0x38dc8e9cb907bcdde6c01c17f340649e5acdc1cdbbd5769db76ef53fa15026a9",
-		"s": "0x28e5946d42092bb271cae1437cc7f42c24aa8afec64f6d17722421aa0258ab61",
-		"v": 120,
+		"nonce": 3420,
+		"data": "0x99a88ec4000000000000000000000000f03eab2b60efb6e24c1b254a2d6fc91eb639d6d30000000000000000000000004c8b14411db1437148b3320760794807437c36b6",
+		"r": "0x070c2f51cbf9271a91749ed6ac9cb954664b0eb78c3d097e840f2e90db9a9172",
+		"s": "0x76be33601d5b449f740ea188d832660d4a4b5a0bb289e88a5328ee2cb87c4807",
+		"v": 119,
 		"creates": null,
-		"raw": "0xf8ab8209ed8502540be40082968d9457e00fe4242020f6a0a68f7ed72215908a17831280b84499a88ec4000000000000000000000000f03eab2b60efb6e24c1b254a2d6fc91eb639d6d30000000000000000000000006943e8f09a9f4a2fb26bdaa1dc1d4f867bd568fe78a038dc8e9cb907bcdde6c01c17f340649e5acdc1cdbbd5769db76ef53fa15026a9a028e5946d42092bb271cae1437cc7f42c24aa8afec64f6d17722421aa0258ab61",
+		"raw": "0xf8ab820d5c8502540be40082968d9457e00fe4242020f6a0a68f7ed72215908a17831280b84499a88ec4000000000000000000000000f03eab2b60efb6e24c1b254a2d6fc91eb639d6d30000000000000000000000004c8b14411db1437148b3320760794807437c36b677a0070c2f51cbf9271a91749ed6ac9cb954664b0eb78c3d097e840f2e90db9a9172a076be33601d5b449f740ea188d832660d4a4b5a0bb289e88a5328ee2cb87c4807",
 		"chainId": 42
 	}
 }

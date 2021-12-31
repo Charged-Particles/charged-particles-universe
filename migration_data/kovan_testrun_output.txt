@@ -1,0 +1,239 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Charged Particles Protocol - Contract Upgrades & Migrations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Using Network: Kovan (kovan:42)
+  Using Accounts:
+  - Deployer:           0x6d46b37708dA7Ed4E5C4509495768Fecd3D17C01
+  - Owner:              0x67C4F8Ea8C641B0637A8F617B48f453dE620480A
+
+  Deploying New ChargedState...
+  - ChargedState:      0x7d7240891fFa9775Ca639262379A31A4AEB69698
+     - Gas Cost:       0.00643095 ETH
+  Deploying New ChargedSettings...
+  - ChargedSettings:   0x77e8e955848ca6345C1A02c0811B2d5d725a80E2
+     - Gas Cost:       0.00643061 ETH
+  Deploying New ChargedManagers...
+  - ChargedManagers:   0xBDb944EF92Cc6217F90Ff9F3Ce8fc4B8F7b7EDA4
+     - Gas Cost:       0.0064295 ETH
+  Deploying TokenInfoProxy...
+  - TokenInfoProxy:  0x87345f8E478513E5f26b2498601d51aF4CB36A21
+     - Gas Cost:       0.007371 ETH
+  Deploying GenericBasketManagerB...
+  - GenericBasketManagerB:   0xF9D0893D547CD0a3EC7184C8af7B551E26Aa9a09
+     - Gas Cost:            0.03342411 ETH
+  Deploying AaveWalletManagerB...
+  - AaveWalletManagerB:  0xC8963355C787448C4598Bd82321A4398560526b0
+     - Gas Cost:         0.05004399 ETH
+  Upgrading ChargedParticles...
+  - ChargedParticles:  0xF03EAB2b60eFB6E24C1b254A2D6fC91Eb639D6d3
+     - Gas Cost:       0.00035697 ETH
+
+  Contract Deployment Complete - data saved to "deployments" directory.
+     - Total Gas Cost
+       @ 10 gwei:   0.11048713 ETH
+       @ 100 gwei:  1.1048713 ETH
+       @ 150 gwei:  1.65730695 ETH
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Loading Proton from:  0xD4F7389297d9cea850777EA6ccBD7Db5817a12b2
+
+
+  - [TX-1-a] ChargedParticles: Registering ChargedState
+  - [TX-1-b] ChargedParticles: Registering ChargedSettings
+  - [TX-1-c] ChargedParticles: Registering ChargedManagers
+  - [TX-1-d] ChargedParticles: Registering TokenInfoProxy
+  - [TX-2-a] ChargedSettings: Registering TokenInfoProxy
+  - [TX-2-b] ChargedState: Registering ChargedSettings
+  - [TX-2-c] ChargedState: Registering TokenInfoProxy
+  - [TX-3-a] ChargedManagers: Registering ChargedSettings
+  - [TX-3-b] ChargedManagers: Registering ChargedState
+  - [TX-3-c] ChargedManagers: Registering TokenInfoProxy
+  - [TX-4-a] GenericBasketManagerB: Setting Charged Particles as Controller
+  - [TX-4-b] GenericBasketManagerB: Registering Generic Basket Manager "B" with ChargedParticles
+  - [TX-4-c] GenericBasketManagerB: Registering TokenInfoProxy
+  - [TX-5-a] AaveWalletManagerB: Setting Charged Particles as Controller
+  - [TX-5-b] AaveWalletManagerB: Setting Aave Bridge to V2
+  - [TX-5-c] AaveWalletManagerB: Registering Aave as LP with ChargedParticles
+  - [TX-5-d] AaveWalletManagerB: Registering ChargedSettings
+  - [TX-6-a] Proton: Registering ChargedState
+  - [TX-6-b] Proton: Registering ChargedSettings
+  - [TX-6-c] ChargedSettings: Enabling Proton for Charge
+  - [TX-7-a] GenericWalletManager: Registering Generic Wallet Manager with ChargedParticles
+  - [TX-7-b] ChargedSettings: Setting Temp-Lock Expiry Blocks
+
+  Contract Configuration Complete.
+     - Total Gas Cost
+       @ 10 gwei:   0.01118311 ETH
+       @ 100 gwei:  0.1118311 ETH
+       @ 150 gwei:  0.16774665 ETH
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+  Migrating ChargedSettings for 100 Accounts...
+  - [TX-8-a-0] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-100-0x6a85bf836a4a87ace31aa18d04761287555a178e
+  - [TX-8-a-1] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-10-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1
+  - [TX-8-a-2] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-101-0x883ab2ae1bdda0531078b27dd45600193aba1f34
+  - [TX-8-a-3] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-102-0x6da0a1784de1abdde1734ba37eca3d560bf044c0
+  - [TX-8-a-4] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-103-0x03828b7129d49313b2cdc966e50369b75ec79a48
+  - [TX-8-a-5] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-104-0xee96703614ea707b0b99ecb55da74c04ff70f2ed
+  - [TX-8-a-6] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-105-0x4c91cf4c27d95fcb2d134b6151508b8e570fa4f2
+  - [TX-8-a-7] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-106-0x7f35c86974d3176f3352191ad99029ec1ceb00e5
+  - [TX-8-a-8] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-107-0x7f35c86974d3176f3352191ad99029ec1ceb00e5
+  - [TX-8-a-9] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-108-0x3049c80bdd527128eb4e7886ab1db1e8042a8eb7
+  - [TX-8-a-10] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-109-0x4f50d47d20380172746527bbeaa274940c38efac
+  - [TX-8-a-11] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-1-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1
+  - [TX-8-a-12] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-110-0x3a410d310b4bad69aefc98342f8955c3e5a03086
+  - [TX-8-a-13] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-11-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1
+  - [TX-8-a-14] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-111-0xa214384fd96d0883a4e4c75036c2863f0f5995f5
+  - [TX-8-a-15] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-112-0x3a3355805181ba5752cb52cebe8c95c0f3ed3d61
+  - [TX-8-a-16] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-113-0xa214384fd96d0883a4e4c75036c2863f0f5995f5
+  - [TX-8-a-17] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-114-0x068d9f17fbf0ccbf39bd8da421731fe86986bd3a
+  - [TX-8-a-18] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-115-0xa214384fd96d0883a4e4c75036c2863f0f5995f5
+  - [TX-8-a-19] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-116-0x03828b7129d49313b2cdc966e50369b75ec79a48
+  - [TX-8-a-20] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-117-0xa1aae46d0758e701f909141b22e396d3315b5250
+  - [TX-8-a-21] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-118-0x99744276eeb1ddbc42222376b8ca0a7b529b8ea1
+  - [TX-8-a-22] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-119-0xa214384fd96d0883a4e4c75036c2863f0f5995f5
+  - [TX-8-a-23] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-120-0xa214384fd96d0883a4e4c75036c2863f0f5995f5
+  - [TX-8-a-24] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-12-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1
+  - [TX-8-a-25] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-121-0xbd75be714d2e3160974c8efa63007db2bcf91c23
+  - [TX-8-a-26] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-122-0x2ffa60a14dd2eb156d64390d545b819e40fc87f2
+  - [TX-8-a-27] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-123-0xe83addbe930e1c242536717ff5d72df6e9264af1
+  - [TX-8-a-28] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-124-0x167539702b5501aadd9b0b85e53532fd57cc71a9
+  - [TX-8-a-29] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-125-0x33b8e9ec30bf9d4c57a747bfea3dead35cdc7ceb
+  - [TX-8-a-30] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-126-0x27710c6d04d5127bb16bcc6e8fac548380a63f71
+  - [TX-8-a-31] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-127-0x27710c6d04d5127bb16bcc6e8fac548380a63f71
+  - [TX-8-a-32] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-128-0x0951df14fe6cf17b0c716826a3af7bd1bcf7f460
+  - [TX-8-a-33] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-129-0x27710c6d04d5127bb16bcc6e8fac548380a63f71
+  - [TX-8-a-34] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-130-0x27710c6d04d5127bb16bcc6e8fac548380a63f71
+  - [TX-8-a-35] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-13-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1
+  - [TX-8-a-36] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-131-0x27710c6d04d5127bb16bcc6e8fac548380a63f71
+  - [TX-8-a-37] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-132-0x27710c6d04d5127bb16bcc6e8fac548380a63f71
+  - [TX-8-a-38] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-133-0xa666b6baf887e3d157d0618855d1c3b67229e0b7
+  - [TX-8-a-39] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-134-0x333940bdcc7429db906b9f7942d53252e5ebc966
+  - [TX-8-a-40] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-135-0x333940bdcc7429db906b9f7942d53252e5ebc966
+  - [TX-8-a-41] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-136-0x27b09d167d8ed88563d81ed766cbd280c8b434c5
+  - [TX-8-a-42] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-137-0x27b09d167d8ed88563d81ed766cbd280c8b434c5
+  - [TX-8-a-43] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-138-0x27b09d167d8ed88563d81ed766cbd280c8b434c5
+  - [TX-8-a-44] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-139-0xf91ba1faf962b672a7ae12815afd2f432bc74186
+  - [TX-8-a-45] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-140-0xf91ba1faf962b672a7ae12815afd2f432bc74186
+  - [TX-8-a-46] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-14-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1
+  - [TX-8-a-47] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-141-0xf91ba1faf962b672a7ae12815afd2f432bc74186
+  - [TX-8-a-48] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-142-0xf0f36a1cec7d7efdb27057b615cfd4fa5b732e3e
+  - [TX-8-a-49] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-143-0xf0f36a1cec7d7efdb27057b615cfd4fa5b732e3e
+  - [TX-8-a-50] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-144-0xa666b6baf887e3d157d0618855d1c3b67229e0b7
+  - [TX-8-a-51] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-145-0xf0f36a1cec7d7efdb27057b615cfd4fa5b732e3e
+  - [TX-8-a-52] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-146-0x27710c6d04d5127bb16bcc6e8fac548380a63f71
+  - [TX-8-a-53] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-147-0x68b18d388994336f341b4997360bb45f9f8701c9
+  - [TX-8-a-54] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-148-0xad4edf48a844f9ba5cd7af0c86dd8f3a09a588a6
+  - [TX-8-a-55] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-149-0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55
+  - [TX-8-a-56] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-150-0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55
+  - [TX-8-a-57] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-15-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1
+  - [TX-8-a-58] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-151-0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55
+  - [TX-8-a-59] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-152-0x3a410d310b4bad69aefc98342f8955c3e5a03086
+  - [TX-8-a-60] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-153-0x3929eff8e0feb3166992942d8b9030d95646c3ce
+  - [TX-8-a-61] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-154-0x18c6a47aca1c6a237e53ed2fc3a8fb392c97169b
+  - [TX-8-a-62] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-155-0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55
+  - [TX-8-a-63] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-156-0xa214384fd96d0883a4e4c75036c2863f0f5995f5
+  - [TX-8-a-64] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-157-0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55
+  - [TX-8-a-65] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-158-0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55
+  - [TX-8-a-66] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-159-0x18c6a47aca1c6a237e53ed2fc3a8fb392c97169b
+  - [TX-8-a-67] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-160-0xf91ba1faf962b672a7ae12815afd2f432bc74186
+  - [TX-8-a-68] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-16-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1
+  - [TX-8-a-69] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-161-0xf91ba1faf962b672a7ae12815afd2f432bc74186
+  - [TX-8-a-70] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-162-0x18c6a47aca1c6a237e53ed2fc3a8fb392c97169b
+  - [TX-8-a-71] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-163-0x27710c6d04d5127bb16bcc6e8fac548380a63f71
+  - [TX-8-a-72] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-164-0x7616e594f1832d0dc7aad3923967d76fd98416e2
+  - [TX-8-a-73] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-165-0xf91ba1faf962b672a7ae12815afd2f432bc74186
+  - [TX-8-a-74] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-166-0xf91ba1faf962b672a7ae12815afd2f432bc74186
+  - [TX-8-a-75] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-167-0xf91ba1faf962b672a7ae12815afd2f432bc74186
+  - [TX-8-a-76] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-168-0xa5b641cffb0b475c2c1b90e841fe4ff47fd20b49
+  - [TX-8-a-77] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-169-0x0c88f0f125c59cad35c704b8044107f2e51d28fe
+  - [TX-8-a-78] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-170-0x0c88f0f125c59cad35c704b8044107f2e51d28fe
+  - [TX-8-a-79] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-17-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1
+  - [TX-8-a-80] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-171-0x0c88f0f125c59cad35c704b8044107f2e51d28fe
+  - [TX-8-a-81] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-172-0x801abde79477c69720008e273fe267806c28c7c1
+  - [TX-8-a-82] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-173-0x3929eff8e0feb3166992942d8b9030d95646c3ce
+  - [TX-8-a-83] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-174-0x3929eff8e0feb3166992942d8b9030d95646c3ce
+  - [TX-8-a-84] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-175-0x3929eff8e0feb3166992942d8b9030d95646c3ce
+  - [TX-8-a-85] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-176-0x3929eff8e0feb3166992942d8b9030d95646c3ce
+  - [TX-8-a-86] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-177-0x0c88f0f125c59cad35c704b8044107f2e51d28fe
+  - [TX-8-a-87] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-178-0x0c88f0f125c59cad35c704b8044107f2e51d28fe
+  - [TX-8-a-88] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-180-0x27b09d167d8ed88563d81ed766cbd280c8b434c5
+  - [TX-8-a-89] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-18-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1
+  - [TX-8-a-90] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-181-0x27b09d167d8ed88563d81ed766cbd280c8b434c5
+  - [TX-8-a-91] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-182-0x5e58538cc693b1099c68d7fef963c1f148dae8cb
+  - [TX-8-a-92] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-183-0x5e58538cc693b1099c68d7fef963c1f148dae8cb
+  - [TX-8-a-93] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-184-0x5e58538cc693b1099c68d7fef963c1f148dae8cb
+  - [TX-8-a-94] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-187-0x5e58538cc693b1099c68d7fef963c1f148dae8cb
+  - [TX-8-a-95] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-188-0x5e58538cc693b1099c68d7fef963c1f148dae8cb
+  - [TX-8-a-96] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-189-0x8a45152bcf6542811571849b88f18c7a0736677d
+  - [TX-8-a-97] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-190-0xac6be0f5dec557f243d3f0ca3a6d6452e24a172c
+  - [TX-8-a-98] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-19-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1
+  - [TX-8-a-99] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-191-0xac6be0f5dec557f243d3f0ca3a6d6452e24a172c
+
+
+  Migrating ChargedSettings for 8 Contracts...
+  - [TX-8-b-0] Migrating ChargedSettings for: 0x3cd2410eaa9c2dce50af6ccab72dc93879a09c1f
+  - [TX-8-b-1] Migrating ChargedSettings for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f
+  - [TX-8-b-2] Migrating ChargedSettings for: 0x929167191ca41a4753eda357bb6e5ad6f15fb89b
+  - [TX-8-b-3] Migrating ChargedSettings for: 0xc0cb81c1f89ab0873653f67eea42652f13cd8416
+  - [TX-8-b-4] Migrating ChargedSettings for: 0xccc441ac31f02cd96c153db6fd5fe0a2f4e6a68d
+  - [TX-8-b-5] Migrating ChargedSettings for: 0xd07dc4262bcdbf85190c01c996b4c06a461d2430
+  - [TX-8-b-6] Migrating ChargedSettings for: 0xd86898728aa9921101515a38b7d15d16c682e8ce
+  - [TX-8-b-7] Migrating ChargedSettings for: 0xdfe3ac769b2d8e382cb86143e0b0b497e1ed5447
+
+
+  Migrating ChargedState for 38 NFTs...
+  - [TX-8-c-0] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-100
+  - [TX-8-c-1] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-103
+  - [TX-8-c-2] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-104
+  - [TX-8-c-3] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-105
+  - [TX-8-c-4] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-106
+  - [TX-8-c-5] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-108
+  - [TX-8-c-6] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-110
+  - [TX-8-c-7] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-111
+  - [TX-8-c-8] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-115
+  - [TX-8-c-9] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-116
+  - [TX-8-c-10] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-118
+  - [TX-8-c-11] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-122
+  - [TX-8-c-12] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-123
+  - [TX-8-c-13] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-124
+  - [TX-8-c-14] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-125
+  - [TX-8-c-15] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-126
+  - [TX-8-c-16] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-127
+  - [TX-8-c-17] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-128
+  - [TX-8-c-18] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-129
+  - [TX-8-c-19] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-13
+  - [TX-8-c-20] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-130
+  - [TX-8-c-21] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-131
+  - [TX-8-c-22] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-132
+  - [TX-8-c-23] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-133
+  - [TX-8-c-24] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-14
+  - [TX-8-c-25] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-142
+  - [TX-8-c-26] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-143
+  - [TX-8-c-27] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-144
+  - [TX-8-c-28] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-145
+  - [TX-8-c-29] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-147
+  - [TX-8-c-30] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-15
+  - [TX-8-c-31] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-159
+  - [TX-8-c-32] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-16
+  - [TX-8-c-33] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-162
+  - [TX-8-c-34] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-163
+  - [TX-8-c-35] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-164
+  - [TX-8-c-36] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-172
+  - [TX-8-c-37] Migrating ChargedState for: 0x63174fa9680c674a5580f7d747832b2a2133ad8f-182
+
+  Contract Migration Complete.
+     - Total Gas Cost
+       @ 10 gwei:   0.07732298 ETH
+       @ 100 gwei:  0.7732298 ETH
+       @ 150 gwei:  1.1598447 ETH
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+✨  Done in 2725.14s.
+yarn deploy-upgrades kovan  20.83s user 3.93s system 0% cpu 45:25.32 total

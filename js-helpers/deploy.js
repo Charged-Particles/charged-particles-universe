@@ -327,6 +327,34 @@ const getDeployData = (contractName, chainId = 31337) => {
   return contractJson;
 }
 
+
+const saveMigrationData = (chainId, migrationData) => {
+  const network = chainNameById(chainId).toLowerCase();
+  const deployPath = path.join(__dirname, '..', 'migration_data', network);
+
+  _.forEach(_.keys(migrationData), (dataTypeId) => {
+    const filename = `${deployPath}/${dataTypeId}.json`;
+
+    let existingData = {};
+    if (fs.existsSync(filename)) {
+      existingData = JSON.parse(fs.readFileSync(filename));
+    }
+
+    const newData = _.merge(existingData, migrationData[dataTypeId]);
+    ensureDirectoryExistence(filename);
+    fs.writeFileSync(filename, JSON.stringify(newData, null, "\t"));
+  });
+};
+
+const getMigrationData = (dataTypeId, chainId = 31337) => {
+  const network = chainNameById(chainId).toLowerCase();
+  const deployPath = path.join(__dirname, '..', 'migration_data', network);
+  const filename = `${deployPath}/${dataTypeId}.json`;
+  const migrationJson = (fs.existsSync(filename)) ? require(filename) : {};
+  return migrationJson;
+}
+
+
 const getTxGasCost = ({deployTransaction}) => {
   const gasCost = toEth(deployTransaction.gasLimit.mul(deployTransaction.gasPrice));
   return `${gasCost} ETH`;
@@ -380,8 +408,10 @@ const distributeInitialFunds = async (tokenContract, contract, amount, signer) =
 module.exports = {
   txOverrides,
   saveDeploymentData,
+  saveMigrationData,
   getContractAbi,
   getDeployData,
+  getMigrationData,
   getTxGasCost,
   getActualTxGasCost,
   getIonxDistributionAmount,

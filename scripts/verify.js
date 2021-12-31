@@ -53,14 +53,20 @@ async function run() {
   // Upgradeable Contracts; need to get implementation adderss from `.openzeppelin/__network__.json`
   let universeAddress = null;
   let chargedParticlesAddress = null;
+  let chargedStateAddress = null;
+  let chargedSettingsAddress = null;
+  let chargedManagersAddress = null;
   // if (networkName === 'mainnet') {
   //   universeAddress = '0xd6ed8455903CBd94d8F432eC4059197984baA65e';
   //   chargedParticlesAddress = '0x660De54CEA09838d11Df0812E2754eD8D08CD2f7';
   // }
-  // if (networkName === 'kovan') {
-  //   universeAddress = '0xeC08CB0f69E2095CF27eCB6E9D4BB60b430334Ad';
-  //   chargedParticlesAddress = '0x0cFAAD8cD948A0BAe647615ecc8DfeFD0294a5f2';
-  // }
+  if (networkName === 'kovan') {
+    universeAddress = '0x854A9E0B6Adc2d74Ab2C7f3a2FAE99Ea5356CDE6';
+    chargedParticlesAddress = '0x6943e8F09A9f4a2fB26bDAa1dc1d4F867Bd568fE'; // '0x0cFAAD8cD948A0BAe647615ecc8DfeFD0294a5f2';
+    chargedStateAddress = '0x1Af67Ea10245E08f1508Ca5bb040249a7452a48A';
+    chargedSettingsAddress = '0x2c8436235A61bBE9008fd99671135acFb137C7d2';
+    chargedManagersAddress = '0xc81d56C048fD6bB5Cd66Fb99da12F32e0f85E150';
+  }
   // if (networkName === 'polygon') {
   //   universeAddress = '0x1E70aa1599a624880e91103738591C920cCbb925';
   //   chargedParticlesAddress = '0xB29256073C63960daAa398f1227D0adBC574341C';
@@ -70,19 +76,20 @@ async function run() {
   //   chargedParticlesAddress = '0xA85B3d84f54Fb238Ef257158da99FdfCe905C7aA';
   // }
 
-  // // // Protocol
-  // // await verifyContract({name: 'Universe', networkName, addressOverride: universeAddress});
-  // // await verifyContract({name: 'ChargedParticles', networkName, addressOverride: chargedParticlesAddress});
-  // // // await verifyContract({name: 'ChargedState', networkName});
-  // // await verifyContract({name: 'ChargedSettings', networkName});
+  // Protocol
+  // await verifyContract({name: 'Universe', networkName, addressOverride: universeAddress});
+  await verifyContract({name: 'ChargedParticles', networkName, addressOverride: chargedParticlesAddress});
+  await verifyContract({name: 'ChargedState', networkName, addressOverride: chargedStateAddress});
+  await verifyContract({name: 'ChargedSettings', networkName, addressOverride: chargedSettingsAddress});
+  await verifyContract({name: 'ChargedManagers', networkName, addressOverride: chargedManagersAddress});
   // await verifyContract({name: 'WBoson', networkName});
   // await verifyContract({name: 'Ionx', networkName});
   // await verifyContract({name: 'IonxTimelock', networkName});
 
   // Wallet Managers
   // await verifyContract({name: 'GenericWalletManager', networkName});
-  // await verifyContract({name: 'GenericBasketManager', networkName});
-  // await verifyContract({name: 'AaveWalletManager', networkName});
+  await verifyContract({name: 'GenericBasketManagerB', networkName});
+  await verifyContract({name: 'AaveWalletManagerB', networkName});
 
   // NFTs
   // await verifyContract({name: 'Proton', networkName});
@@ -101,9 +108,9 @@ async function run() {
   // await verifyContract({name: 'IonxYieldFarm2', networkName, contractRef: 'incentives/YieldFarm2.sol:YieldFarm2'});
   // await verifyContract({name: 'LPYieldFarm2', networkName, contractRef: 'incentives/YieldFarm2.sol:YieldFarm2'});
 
-  await verifyContract({name: 'Staking3', networkName, contractRef: 'incentives/Staking3.sol:Staking3'});
-  await verifyContract({name: 'IonxYieldFarm3', networkName, contractRef: 'incentives/YieldFarm3.sol:YieldFarm3'});
-  await verifyContract({name: 'LPYieldFarm3', networkName, contractRef: 'incentives/YieldFarm3.sol:YieldFarm3'});
+  // await verifyContract({name: 'Staking3', networkName, contractRef: 'incentives/Staking3.sol:Staking3'});
+  // await verifyContract({name: 'IonxYieldFarm3', networkName, contractRef: 'incentives/YieldFarm3.sol:YieldFarm3'});
+  // await verifyContract({name: 'LPYieldFarm3', networkName, contractRef: 'incentives/YieldFarm3.sol:YieldFarm3'});
 
   // await verifyContract({name: 'MerkleDistributor', networkName});
   // await verifyContract({name: 'MerkleDistributor2', networkName});

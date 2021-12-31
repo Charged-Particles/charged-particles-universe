@@ -70,6 +70,7 @@ interface IChargedManagers {
   |          Particle Events          |
   |__________________________________*/
 
+  event Initialized(address indexed initiator);
   event ControllerSet(address indexed controllerAddress, string controllerId);
   event WalletManagerRegistered(string indexed walletManagerId, address indexed walletManager);
   event BasketManagerRegistered(string indexed basketId, address indexed basketManager);

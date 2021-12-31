@@ -115,10 +115,27 @@ interface IChargedParticles {
     uint256 nftTokenId
   ) external returns (bool success);
 
+  function executeForWallet(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address externalAddress,
+    bytes memory encodedParams
+  ) external payable returns (bytes memory);
+
+  function executeForBasket(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId,
+    address externalAddress,
+    bytes memory encodedParams
+  ) external payable returns (bytes memory);
+
   /***********************************|
   |          Particle Events          |
   |__________________________________*/
 
+  event Initialized(address indexed initiator);
   event ControllerSet(address indexed controllerAddress, string controllerId);
   // event ChargedStateSet(address indexed chargedState);
   // event ChargedSettingsSet(address indexed chargedSettings);

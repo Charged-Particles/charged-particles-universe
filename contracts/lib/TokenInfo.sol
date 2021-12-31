@@ -130,11 +130,13 @@ library TokenInfo {
     * {ReentrancyGuard} or the
     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
     */
-  function sendValue(address payable recipient, uint256 amount) internal {
+  function sendValue(address payable recipient, uint256 amount, uint256 gasLimit) internal {
     require(address(this).balance >= amount, "TokenInfo: insufficient balance");
 
     // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
-    (bool success, ) = recipient.call{ value: amount }("");
+    (bool success, ) = (gasLimit > 0)
+      ? recipient.call{ value: amount, gas: gasLimit }("")
+      : recipient.call{ value: amount }("");
     require(success, "TokenInfo: unable to send value, recipient may have reverted");
   }
 }

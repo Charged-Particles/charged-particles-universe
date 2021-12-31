@@ -60,8 +60,9 @@ contract ChargedManagers is
   |          Initialization           |
   |__________________________________*/
 
-  function initialize() public initializer {
+  function initialize(address initiator) public initializer {
     __Ownable_init();
+    emit Initialized(initiator);
   }
 
 

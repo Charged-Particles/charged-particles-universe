@@ -93,8 +93,9 @@ contract ChargedState is
   |          Initialization           |
   |__________________________________*/
 
-  function initialize() public initializer {
+  function initialize(address initiator) public initializer {
     __Ownable_init();
+    emit Initialized(initiator);
   }
 
   /***********************************|
@@ -553,6 +554,30 @@ contract ChargedState is
     }
 
     emit ControllerSet(controller, controllerId);
+  }
+
+  function migrateToken(
+    address contractAddress,
+    uint256 tokenId,
+    uint256 releaseTimelockExpiry,
+    address releaseTimelockLockedBy,
+    uint256 tempLockExpiry
+  )
+    external
+    onlyOwner
+  {
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
+
+    if (releaseTimelockExpiry > block.number && releaseTimelockLockedBy != address(0)) {
+      _nftReleaseTimelockUnlockBlock[tokenUuid] = releaseTimelockExpiry;
+      _nftReleaseTimelockLockedBy[tokenUuid] = releaseTimelockLockedBy;
+      emit TokenReleaseTimelock(contractAddress, tokenId, releaseTimelockLockedBy, releaseTimelockExpiry);
+    }
+
+    if (tempLockExpiry > 0) {
+      _nftTempLockExpiry[tokenUuid] = tempLockExpiry;
+      emit TokenTempLock(contractAddress, tokenId, tempLockExpiry);
+    }
   }
 
   /***********************************|

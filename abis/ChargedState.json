@@ -86,6 +86,19 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "initiator",
+        "type": "address"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "previousOwner",
         "type": "address"
       },
@@ -709,7 +722,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "initiator",
+        "type": "address"
+      }
+    ],
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -896,6 +915,39 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "releaseTimelockExpiry",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "releaseTimelockLockedBy",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tempLockExpiry",
+        "type": "uint256"
+      }
+    ],
+    "name": "migrateToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

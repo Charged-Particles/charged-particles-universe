@@ -101,6 +101,7 @@ interface IChargedState {
   |          Particle Events          |
   |__________________________________*/
 
+  event Initialized(address indexed initiator);
   event ControllerSet(address indexed controllerAddress, string controllerId);
 
   event DischargeApproval(address indexed contractAddress, uint256 indexed tokenId, address indexed owner, address operator);

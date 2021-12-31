@@ -1,0 +1,927 @@
+{
+  "nftCreatorSettings": [
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x6a85bf836a4a87ace31aa18d04761287555a178e",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-100-0x6a85bf836a4a87ace31aa18d04761287555a178e",
+      "tokenId": "100"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-10-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "tokenId": "10"
+    },
+    {
+      "annuityPercent": "1500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x883ab2ae1bdda0531078b27dd45600193aba1f34",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-101-0x883ab2ae1bdda0531078b27dd45600193aba1f34",
+      "tokenId": "101"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x6da0a1784de1abdde1734ba37eca3d560bf044c0",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-102-0x6da0a1784de1abdde1734ba37eca3d560bf044c0",
+      "tokenId": "102"
+    },
+    {
+      "annuityPercent": "3500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x03828b7129d49313b2cdc966e50369b75ec79a48",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-103-0x03828b7129d49313b2cdc966e50369b75ec79a48",
+      "tokenId": "103"
+    },
+    {
+      "annuityPercent": "700",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xee96703614ea707b0b99ecb55da74c04ff70f2ed",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-104-0xee96703614ea707b0b99ecb55da74c04ff70f2ed",
+      "tokenId": "104"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x4c91cf4c27d95fcb2d134b6151508b8e570fa4f2",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-105-0x4c91cf4c27d95fcb2d134b6151508b8e570fa4f2",
+      "tokenId": "105"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x7f35c86974d3176f3352191ad99029ec1ceb00e5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-106-0x7f35c86974d3176f3352191ad99029ec1ceb00e5",
+      "tokenId": "106"
+    },
+    {
+      "annuityPercent": "700",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x7f35c86974d3176f3352191ad99029ec1ceb00e5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-107-0x7f35c86974d3176f3352191ad99029ec1ceb00e5",
+      "tokenId": "107"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x3049c80bdd527128eb4e7886ab1db1e8042a8eb7",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-108-0x3049c80bdd527128eb4e7886ab1db1e8042a8eb7",
+      "tokenId": "108"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x4f50d47d20380172746527bbeaa274940c38efac",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-109-0x4f50d47d20380172746527bbeaa274940c38efac",
+      "tokenId": "109"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-1-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "tokenId": "1"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x3a410d310b4bad69aefc98342f8955c3e5a03086",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-110-0x3a410d310b4bad69aefc98342f8955c3e5a03086",
+      "tokenId": "110"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-11-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "tokenId": "11"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xa214384fd96d0883a4e4c75036c2863f0f5995f5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-111-0xa214384fd96d0883a4e4c75036c2863f0f5995f5",
+      "tokenId": "111"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x3a3355805181ba5752cb52cebe8c95c0f3ed3d61",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-112-0x3a3355805181ba5752cb52cebe8c95c0f3ed3d61",
+      "tokenId": "112"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xa214384fd96d0883a4e4c75036c2863f0f5995f5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-113-0xa214384fd96d0883a4e4c75036c2863f0f5995f5",
+      "tokenId": "113"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x068d9f17fbf0ccbf39bd8da421731fe86986bd3a",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-114-0x068d9f17fbf0ccbf39bd8da421731fe86986bd3a",
+      "tokenId": "114"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xa214384fd96d0883a4e4c75036c2863f0f5995f5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-115-0xa214384fd96d0883a4e4c75036c2863f0f5995f5",
+      "tokenId": "115"
+    },
+    {
+      "annuityPercent": "1000",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x03828b7129d49313b2cdc966e50369b75ec79a48",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-116-0x03828b7129d49313b2cdc966e50369b75ec79a48",
+      "tokenId": "116"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xa1aae46d0758e701f909141b22e396d3315b5250",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-117-0xa1aae46d0758e701f909141b22e396d3315b5250",
+      "tokenId": "117"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x99744276eeb1ddbc42222376b8ca0a7b529b8ea1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-118-0x99744276eeb1ddbc42222376b8ca0a7b529b8ea1",
+      "tokenId": "118"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xa214384fd96d0883a4e4c75036c2863f0f5995f5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-119-0xa214384fd96d0883a4e4c75036c2863f0f5995f5",
+      "tokenId": "119"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xa214384fd96d0883a4e4c75036c2863f0f5995f5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-120-0xa214384fd96d0883a4e4c75036c2863f0f5995f5",
+      "tokenId": "120"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-12-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "tokenId": "12"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xbd75be714d2e3160974c8efa63007db2bcf91c23",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-121-0xbd75be714d2e3160974c8efa63007db2bcf91c23",
+      "tokenId": "121"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x2ffa60a14dd2eb156d64390d545b819e40fc87f2",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-122-0x2ffa60a14dd2eb156d64390d545b819e40fc87f2",
+      "tokenId": "122"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xe83addbe930e1c242536717ff5d72df6e9264af1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-123-0xe83addbe930e1c242536717ff5d72df6e9264af1",
+      "tokenId": "123"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x167539702b5501aadd9b0b85e53532fd57cc71a9",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-124-0x167539702b5501aadd9b0b85e53532fd57cc71a9",
+      "tokenId": "124"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x33b8e9ec30bf9d4c57a747bfea3dead35cdc7ceb",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-125-0x33b8e9ec30bf9d4c57a747bfea3dead35cdc7ceb",
+      "tokenId": "125"
+    },
+    {
+      "annuityPercent": "200",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-126-0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "tokenId": "126"
+    },
+    {
+      "annuityPercent": "200",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-127-0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "tokenId": "127"
+    },
+    {
+      "annuityPercent": "1500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x0951df14fe6cf17b0c716826a3af7bd1bcf7f460",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-128-0x0951df14fe6cf17b0c716826a3af7bd1bcf7f460",
+      "tokenId": "128"
+    },
+    {
+      "annuityPercent": "200",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-129-0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "tokenId": "129"
+    },
+    {
+      "annuityPercent": "200",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-130-0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "tokenId": "130"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-13-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "tokenId": "13"
+    },
+    {
+      "annuityPercent": "200",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-131-0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "tokenId": "131"
+    },
+    {
+      "annuityPercent": "200",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-132-0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "tokenId": "132"
+    },
+    {
+      "annuityPercent": "200",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xa666b6baf887e3d157d0618855d1c3b67229e0b7",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-133-0xa666b6baf887e3d157d0618855d1c3b67229e0b7",
+      "tokenId": "133"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x333940bdcc7429db906b9f7942d53252e5ebc966",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-134-0x333940bdcc7429db906b9f7942d53252e5ebc966",
+      "tokenId": "134"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x333940bdcc7429db906b9f7942d53252e5ebc966",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-135-0x333940bdcc7429db906b9f7942d53252e5ebc966",
+      "tokenId": "135"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27b09d167d8ed88563d81ed766cbd280c8b434c5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-136-0x27b09d167d8ed88563d81ed766cbd280c8b434c5",
+      "tokenId": "136"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27b09d167d8ed88563d81ed766cbd280c8b434c5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-137-0x27b09d167d8ed88563d81ed766cbd280c8b434c5",
+      "tokenId": "137"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27b09d167d8ed88563d81ed766cbd280c8b434c5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-138-0x27b09d167d8ed88563d81ed766cbd280c8b434c5",
+      "tokenId": "138"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-139-0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "tokenId": "139"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-140-0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "tokenId": "140"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-14-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "tokenId": "14"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-141-0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "tokenId": "141"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xf0f36a1cec7d7efdb27057b615cfd4fa5b732e3e",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-142-0xf0f36a1cec7d7efdb27057b615cfd4fa5b732e3e",
+      "tokenId": "142"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xf0f36a1cec7d7efdb27057b615cfd4fa5b732e3e",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-143-0xf0f36a1cec7d7efdb27057b615cfd4fa5b732e3e",
+      "tokenId": "143"
+    },
+    {
+      "annuityPercent": "200",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xa666b6baf887e3d157d0618855d1c3b67229e0b7",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-144-0xa666b6baf887e3d157d0618855d1c3b67229e0b7",
+      "tokenId": "144"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xf0f36a1cec7d7efdb27057b615cfd4fa5b732e3e",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-145-0xf0f36a1cec7d7efdb27057b615cfd4fa5b732e3e",
+      "tokenId": "145"
+    },
+    {
+      "annuityPercent": "200",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-146-0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "tokenId": "146"
+    },
+    {
+      "annuityPercent": "200",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x68b18d388994336f341b4997360bb45f9f8701c9",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-147-0x68b18d388994336f341b4997360bb45f9f8701c9",
+      "tokenId": "147"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xad4edf48a844f9ba5cd7af0c86dd8f3a09a588a6",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-148-0xad4edf48a844f9ba5cd7af0c86dd8f3a09a588a6",
+      "tokenId": "148"
+    },
+    {
+      "annuityPercent": "1500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-149-0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55",
+      "tokenId": "149"
+    },
+    {
+      "annuityPercent": "1500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-150-0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55",
+      "tokenId": "150"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-15-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "tokenId": "15"
+    },
+    {
+      "annuityPercent": "1500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-151-0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55",
+      "tokenId": "151"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x3a410d310b4bad69aefc98342f8955c3e5a03086",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-152-0x3a410d310b4bad69aefc98342f8955c3e5a03086",
+      "tokenId": "152"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x3929eff8e0feb3166992942d8b9030d95646c3ce",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-153-0x3929eff8e0feb3166992942d8b9030d95646c3ce",
+      "tokenId": "153"
+    },
+    {
+      "annuityPercent": "1000",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x18c6a47aca1c6a237e53ed2fc3a8fb392c97169b",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-154-0x18c6a47aca1c6a237e53ed2fc3a8fb392c97169b",
+      "tokenId": "154"
+    },
+    {
+      "annuityPercent": "1500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-155-0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55",
+      "tokenId": "155"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xa214384fd96d0883a4e4c75036c2863f0f5995f5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-156-0xa214384fd96d0883a4e4c75036c2863f0f5995f5",
+      "tokenId": "156"
+    },
+    {
+      "annuityPercent": "1500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-157-0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55",
+      "tokenId": "157"
+    },
+    {
+      "annuityPercent": "1500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-158-0x6c31b772cc57cac99c85d2d0b0df8e54b07a7a55",
+      "tokenId": "158"
+    },
+    {
+      "annuityPercent": "1000",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x18c6a47aca1c6a237e53ed2fc3a8fb392c97169b",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-159-0x18c6a47aca1c6a237e53ed2fc3a8fb392c97169b",
+      "tokenId": "159"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-160-0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "tokenId": "160"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-16-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "tokenId": "16"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-161-0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "tokenId": "161"
+    },
+    {
+      "annuityPercent": "1000",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x18c6a47aca1c6a237e53ed2fc3a8fb392c97169b",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-162-0x18c6a47aca1c6a237e53ed2fc3a8fb392c97169b",
+      "tokenId": "162"
+    },
+    {
+      "annuityPercent": "200",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-163-0x27710c6d04d5127bb16bcc6e8fac548380a63f71",
+      "tokenId": "163"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x7616e594f1832d0dc7aad3923967d76fd98416e2",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-164-0x7616e594f1832d0dc7aad3923967d76fd98416e2",
+      "tokenId": "164"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-165-0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "tokenId": "165"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-166-0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "tokenId": "166"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-167-0xf91ba1faf962b672a7ae12815afd2f432bc74186",
+      "tokenId": "167"
+    },
+    {
+      "annuityPercent": "1200",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xa5b641cffb0b475c2c1b90e841fe4ff47fd20b49",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-168-0xa5b641cffb0b475c2c1b90e841fe4ff47fd20b49",
+      "tokenId": "168"
+    },
+    {
+      "annuityPercent": "1000",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x0c88f0f125c59cad35c704b8044107f2e51d28fe",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-169-0x0c88f0f125c59cad35c704b8044107f2e51d28fe",
+      "tokenId": "169"
+    },
+    {
+      "annuityPercent": "1000",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x0c88f0f125c59cad35c704b8044107f2e51d28fe",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-170-0x0c88f0f125c59cad35c704b8044107f2e51d28fe",
+      "tokenId": "170"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-17-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "tokenId": "17"
+    },
+    {
+      "annuityPercent": "1000",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x0c88f0f125c59cad35c704b8044107f2e51d28fe",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-171-0x0c88f0f125c59cad35c704b8044107f2e51d28fe",
+      "tokenId": "171"
+    },
+    {
+      "annuityPercent": "2500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x801abde79477c69720008e273fe267806c28c7c1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-172-0x801abde79477c69720008e273fe267806c28c7c1",
+      "tokenId": "172"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x3929eff8e0feb3166992942d8b9030d95646c3ce",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-173-0x3929eff8e0feb3166992942d8b9030d95646c3ce",
+      "tokenId": "173"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x3929eff8e0feb3166992942d8b9030d95646c3ce",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-174-0x3929eff8e0feb3166992942d8b9030d95646c3ce",
+      "tokenId": "174"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x3929eff8e0feb3166992942d8b9030d95646c3ce",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-175-0x3929eff8e0feb3166992942d8b9030d95646c3ce",
+      "tokenId": "175"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x3929eff8e0feb3166992942d8b9030d95646c3ce",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-176-0x3929eff8e0feb3166992942d8b9030d95646c3ce",
+      "tokenId": "176"
+    },
+    {
+      "annuityPercent": "1000",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x0c88f0f125c59cad35c704b8044107f2e51d28fe",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-177-0x0c88f0f125c59cad35c704b8044107f2e51d28fe",
+      "tokenId": "177"
+    },
+    {
+      "annuityPercent": "1000",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x0c88f0f125c59cad35c704b8044107f2e51d28fe",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-178-0x0c88f0f125c59cad35c704b8044107f2e51d28fe",
+      "tokenId": "178"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27b09d167d8ed88563d81ed766cbd280c8b434c5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-180-0x27b09d167d8ed88563d81ed766cbd280c8b434c5",
+      "tokenId": "180"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-18-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "tokenId": "18"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x27b09d167d8ed88563d81ed766cbd280c8b434c5",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-181-0x27b09d167d8ed88563d81ed766cbd280c8b434c5",
+      "tokenId": "181"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x5e58538cc693b1099c68d7fef963c1f148dae8cb",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-182-0x5e58538cc693b1099c68d7fef963c1f148dae8cb",
+      "tokenId": "182"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x5e58538cc693b1099c68d7fef963c1f148dae8cb",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-183-0x5e58538cc693b1099c68d7fef963c1f148dae8cb",
+      "tokenId": "183"
+    },
+    {
+      "annuityPercent": "2000",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x5e58538cc693b1099c68d7fef963c1f148dae8cb",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-184-0x5e58538cc693b1099c68d7fef963c1f148dae8cb",
+      "tokenId": "184"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x5e58538cc693b1099c68d7fef963c1f148dae8cb",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-187-0x5e58538cc693b1099c68d7fef963c1f148dae8cb",
+      "tokenId": "187"
+    },
+    {
+      "annuityPercent": "2000",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x5e58538cc693b1099c68d7fef963c1f148dae8cb",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-188-0x5e58538cc693b1099c68d7fef963c1f148dae8cb",
+      "tokenId": "188"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0x8a45152bcf6542811571849b88f18c7a0736677d",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-189-0x8a45152bcf6542811571849b88f18c7a0736677d",
+      "tokenId": "189"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xac6be0f5dec557f243d3f0ca3a6d6452e24a172c",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-190-0xac6be0f5dec557f243d3f0ca3a6d6452e24a172c",
+      "tokenId": "190"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-19-0xcd1344ced74e14e0d9e5ee4e689390626e1cfeb1",
+      "tokenId": "19"
+    },
+    {
+      "annuityPercent": "1000",
+      "annuityRedirect": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "creatorAddress": "0xac6be0f5dec557f243d3f0ca3a6d6452e24a172c",
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f-191-0xac6be0f5dec557f243d3f0ca3a6d6452e24a172c",
+      "tokenId": "191"
+    }
+  ],
+  "nftSettings": [
+    {
+      "allowBond": true,
+      "allowCharge": true,
+      "allowTimelockAnyNft": false,
+      "allowTimelockOwnNft": true,
+      "allowedAssetTokens": [],
+      "assetDepositMax": null,
+      "assetDepositMin": null,
+      "contractAddress": "0x3cd2410eaa9c2dce50af6ccab72dc93879a09c1f",
+      "hasRestrictedAssets": false,
+      "id": "0x3cd2410eaa9c2dce50af6ccab72dc93879a09c1f",
+      "maxNfts": [],
+      "requiredBasketManager": null,
+      "requiredWalletManager": null
+    },
+    {
+      "allowBond": true,
+      "allowCharge": true,
+      "allowTimelockAnyNft": false,
+      "allowTimelockOwnNft": true,
+      "allowedAssetTokens": [],
+      "assetDepositMax": null,
+      "assetDepositMin": null,
+      "contractAddress": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "hasRestrictedAssets": false,
+      "id": "0x63174fa9680c674a5580f7d747832b2a2133ad8f",
+      "maxNfts": [],
+      "requiredBasketManager": null,
+      "requiredWalletManager": null
+    },
+    {
+      "allowBond": true,
+      "allowCharge": true,
+      "allowTimelockAnyNft": false,
+      "allowTimelockOwnNft": true,
+      "allowedAssetTokens": [],
+      "assetDepositMax": null,
+      "assetDepositMin": null,
+      "contractAddress": "0x929167191ca41a4753eda357bb6e5ad6f15fb89b",
+      "hasRestrictedAssets": false,
+      "id": "0x929167191ca41a4753eda357bb6e5ad6f15fb89b",
+      "maxNfts": [],
+      "requiredBasketManager": null,
+      "requiredWalletManager": null
+    },
+    {
+      "allowBond": true,
+      "allowCharge": true,
+      "allowTimelockAnyNft": false,
+      "allowTimelockOwnNft": true,
+      "allowedAssetTokens": [],
+      "assetDepositMax": null,
+      "assetDepositMin": null,
+      "contractAddress": "0xc0cb81c1f89ab0873653f67eea42652f13cd8416",
+      "hasRestrictedAssets": false,
+      "id": "0xc0cb81c1f89ab0873653f67eea42652f13cd8416",
+      "maxNfts": [],
+      "requiredBasketManager": null,
+      "requiredWalletManager": null
+    },
+    {
+      "allowBond": true,
+      "allowCharge": true,
+      "allowTimelockAnyNft": false,
+      "allowTimelockOwnNft": true,
+      "allowedAssetTokens": [],
+      "assetDepositMax": null,
+      "assetDepositMin": null,
+      "contractAddress": "0xccc441ac31f02cd96c153db6fd5fe0a2f4e6a68d",
+      "hasRestrictedAssets": false,
+      "id": "0xccc441ac31f02cd96c153db6fd5fe0a2f4e6a68d",
+      "maxNfts": [],
+      "requiredBasketManager": null,
+      "requiredWalletManager": null
+    },
+    {
+      "allowBond": true,
+      "allowCharge": true,
+      "allowTimelockAnyNft": false,
+      "allowTimelockOwnNft": true,
+      "allowedAssetTokens": [],
+      "assetDepositMax": null,
+      "assetDepositMin": null,
+      "contractAddress": "0xd07dc4262bcdbf85190c01c996b4c06a461d2430",
+      "hasRestrictedAssets": false,
+      "id": "0xd07dc4262bcdbf85190c01c996b4c06a461d2430",
+      "maxNfts": [],
+      "requiredBasketManager": null,
+      "requiredWalletManager": null
+    },
+    {
+      "allowBond": true,
+      "allowCharge": true,
+      "allowTimelockAnyNft": false,
+      "allowTimelockOwnNft": true,
+      "allowedAssetTokens": [],
+      "assetDepositMax": null,
+      "assetDepositMin": null,
+      "contractAddress": "0xd86898728aa9921101515a38b7d15d16c682e8ce",
+      "hasRestrictedAssets": false,
+      "id": "0xd86898728aa9921101515a38b7d15d16c682e8ce",
+      "maxNfts": [],
+      "requiredBasketManager": null,
+      "requiredWalletManager": null
+    },
+    {
+      "allowBond": true,
+      "allowCharge": true,
+      "allowTimelockAnyNft": false,
+      "allowTimelockOwnNft": true,
+      "allowedAssetTokens": [],
+      "assetDepositMax": null,
+      "assetDepositMin": null,
+      "contractAddress": "0xdfe3ac769b2d8e382cb86143e0b0b497e1ed5447",
+      "hasRestrictedAssets": false,
+      "id": "0xdfe3ac769b2d8e382cb86143e0b0b497e1ed5447",
+      "maxNfts": [],
+      "requiredBasketManager": null,
+      "requiredWalletManager": null
+    }
+  ],
+  "tempLockExpiryBlocks": "5760"
+}

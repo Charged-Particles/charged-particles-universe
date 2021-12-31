@@ -161,6 +161,7 @@ module.exports = {
         'Ionx',
         'IonxTimelock',
         'Proton',
+        'ProtonB',
         'WBoson',
         'Lepton',
         'Lepton2',

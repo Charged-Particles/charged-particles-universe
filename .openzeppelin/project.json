@@ -17,6 +17,7 @@
     "IonxTimelock": "IonxTimelock",
     "WBoson": "WBoson",
     "Proton": "Proton",
+    "ProtonB": "ProtonB",
     "Lepton": "Lepton",
     "Lepton2": "Lepton2",
     "ExternalNFT": "ExternalNFT",
@@ -42,7 +43,7 @@
     "solcVersion": "0.6.12",
     "compilerSettings": {
       "optimizer": {
-        "enabled": true,
+        "enabled": false,
         "runs": "200"
       },
       "evmVersion": "istanbul"

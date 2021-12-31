@@ -27,6 +27,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/introspection/IERC165Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
@@ -108,9 +109,10 @@ contract ChargedParticles is
   |          Initialization           |
   |__________________________________*/
 
-  function initialize() public initializer {
+  function initialize(address initiator) public initializer {
     __Ownable_init();
     __ReentrancyGuard_init();
+    emit Initialized(initiator);
   }
 
 
@@ -600,6 +602,79 @@ contract ChargedParticles is
     }
   }
 
+
+
+  /***********************************|
+  |        Execute for Account        |
+  |__________________________________*/
+
+  /// @notice Executes an arbitrary command on an NFT Wallet
+  /// @param contractAddress      The Address to the Contract of the Token
+  /// @param tokenId              The ID of the Token
+  /// @param walletManagerId      The Wallet Manager controlling the NFT Wallet to execute on
+  /// @param externalAddress      The Address of the External Contract to execute on
+  /// @param encodedParams        The encoded function call to execute
+  function executeForWallet(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address externalAddress,
+    bytes memory encodedParams
+  )
+    external
+    payable
+    virtual
+    override
+    managerEnabled(walletManagerId)
+    nonReentrant
+    returns (bytes memory)
+  {
+    // Get appropriate Wallet Manager
+    IWalletManager walletMgr = _chargedManagers.getWalletManager(walletManagerId);
+
+    // Get Address of Wallet to send any ETH into
+    if (msg.value > 0) {
+      address wallet = walletMgr.getWalletAddressById(contractAddress, tokenId, address(0), 0);
+      payable(wallet).sendValue(msg.value);
+    }
+
+    // Execute command for NFT Wallet
+    return walletMgr.executeForAccount(contractAddress, tokenId, externalAddress, msg.value, encodedParams);
+  }
+
+  /// @notice Executes an arbitrary command on an NFT Basket
+  /// @param contractAddress      The Address to the Contract of the Token
+  /// @param tokenId              The ID of the Token
+  /// @param basketManagerId      The Basket Manager controlling the NFT Wallet to execute on
+  /// @param externalAddress      The Address of the External Contract to execute on
+  /// @param encodedParams        The encoded function call to execute
+  function executeForBasket(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId,
+    address externalAddress,
+    bytes memory encodedParams
+  )
+    external
+    payable
+    virtual
+    override
+    basketEnabled(basketManagerId)
+    nonReentrant
+    returns (bytes memory)
+  {
+    // Get appropriate Basket Manager
+    IBasketManager basketMgr = _chargedManagers.getBasketManager(basketManagerId);
+
+    // Get Address of Wallet to send any ETH into
+    if (msg.value > 0) {
+      address wallet = basketMgr.getBasketAddressById(contractAddress, tokenId);
+      payable(wallet).sendValue(msg.value);
+    }
+
+    // Execute command for NFT Wallet
+    return basketMgr.executeForAccount(contractAddress, tokenId, externalAddress, msg.value, encodedParams);
+  }
 
   /***********************************|
   |          Only Admin/DAO           |

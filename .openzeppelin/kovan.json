@@ -39,6 +39,91 @@
       "address": "0x1B3b3Cd9866B99a3e4005DDEF9cA9Cebbed6E879",
       "txHash": "0x3c244f8fab3e3df27bf1dad230767169868dfd2f9630c168633c2f08d637076a",
       "kind": "transparent"
+    },
+    {
+      "address": "0x5D8E10B5B1B571DBcBCD1f8560067ecc3BF656BE",
+      "txHash": "0x82039b46517b985e90f25bf7cf0065bebebc3e4b34d88bcd364cfd33c76b0b1f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x35d66503d0bc439E39923F16a1Af7cd879e09cBf",
+      "txHash": "0x88d4f98c0c6009d65a0cc07995e541f81b824ffa657e843e1cf3f340f5525ba2",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x4FF1C5A3F6733e55b2Fab88793b846d5b28df08A",
+      "txHash": "0xa2aaecb12f662ad483112a3c968dd97d8e9e5f8843ea2e6cf1ac79a4b202b0b9",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1Bff61D1B550dCD171967CF11671a52b226020D6",
+      "txHash": "0xce062b282950f6b3fd87df3b38e20ca7dc1ca1c2b805cc8f6411ad2eef95f92e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x47A1b94195c3c5D59d70CdAA3AE589C72d48E651",
+      "txHash": "0x69fb6a520e173ea80eb3fc36f38eb54fca19ae8a0493a6b3ab362549495f73bc",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xDE1f659706ae06A5b3A82e40f1C47c91D73c8CBD",
+      "txHash": "0x25ff961bc4bdf092b5ce7fcbd98d9f2e69bd8b8c30f1f51abfee69d99f6e8174",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x0C5C5B9675988962D2c19F846D815FAae8254b1B",
+      "txHash": "0x19f4e077752fd639c90c2be848fe1c08073f6371ad4976fe6230debdbdb72760",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xd2d364773ce2b19b4B3dA5CBA712700FBd5FfBF1",
+      "txHash": "0x60a3f3d82a29c16c516990377e3f0696d6f28f84a03849d30b450c922a78454c",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x3D95a5280Ca670F1212336ba8b2f2246CaCB66E0",
+      "txHash": "0x6265a973f14de1347c4ddf15fb7d4ee76d373227d6dd6a1a0a29ad0d06c476e1",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xEF4280342A40598528863789D5Af902F80C96Aaa",
+      "txHash": "0x9154f4a189b1f843c0f144661bdf40b53fee32d9d416fd24215e8cb86d74b3ad",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7d7240891fFa9775Ca639262379A31A4AEB69698",
+      "txHash": "0xedc38f87cd3456e9d6efe72deefaa0cd2d908f7e5616d2b073f992fd112e4f99",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x77e8e955848ca6345C1A02c0811B2d5d725a80E2",
+      "txHash": "0x0bb5b59e0bd7b3614ab462dc13038f4f90890e300161e185b9080fd6cec05248",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xBDb944EF92Cc6217F90Ff9F3Ce8fc4B8F7b7EDA4",
+      "txHash": "0x97db14a21a6a3254a5a73b433c276845e27aa8cf9bd9afb7111c405bdd7875f0",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x3a80fd45bAb6a306420155D20D20b6eb860381f6",
+      "txHash": "0x67eab6eebb0ca01a3dadb26f1df6a56c8e3d2f9a6890fa086ab4406d4f0c4603",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x0Df830A72FD3cB9EE2CA6eC5a17cd470dA9c2f17",
+      "txHash": "0x9379650f6c807168a675f9b7173e803e77849be2d538fb2b311672a832bf9515",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x98F153C72ffcD5D519Fff5BC1f0D59732201b757",
+      "txHash": "0xf211698f53cc4e7c32d5ee24b3f3e542d54040f882f0e495c0a147445019e659",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x5621c383A46F4c340e6C80C167fE810eE5E2fA22",
+      "txHash": "0xd366120073690d1268110ccdb3d5cd3482e7971e99c06feeaf1907a8f6bb1587",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -793,19 +878,19 @@
           {
             "contract": "ChargedParticles",
             "label": "_universe",
-            "type": "t_contract(IUniverse)24905",
+            "type": "t_contract(IUniverse)25053",
             "src": "contracts/ChargedParticles.sol:98"
           },
           {
             "contract": "ChargedParticles",
             "label": "_chargedState",
-            "type": "t_contract(IChargedState)23616",
+            "type": "t_contract(IChargedState)23762",
             "src": "contracts/ChargedParticles.sol:99"
           },
           {
             "contract": "ChargedParticles",
             "label": "_chargedSettings",
-            "type": "t_contract(IChargedSettings)23221",
+            "type": "t_contract(IChargedSettings)23367",
             "src": "contracts/ChargedParticles.sol:100"
           },
           {
@@ -823,24 +908,24 @@
           {
             "contract": "ChargedParticles",
             "label": "_tokenInfoProxy",
-            "type": "t_contract(ITokenInfoProxy)24744",
+            "type": "t_contract(ITokenInfoProxy)24892",
             "src": "contracts/ChargedParticles.sol:103"
           },
           {
             "contract": "ChargedParticles",
             "label": "_chargedManagers",
-            "type": "t_contract(IChargedManagers)22694",
+            "type": "t_contract(IChargedManagers)22840",
             "src": "contracts/ChargedParticles.sol:104"
           }
         ],
         "types": {
-          "t_contract(IUniverse)24905": {
+          "t_contract(IUniverse)25053": {
             "label": "contract IUniverse"
           },
-          "t_contract(IChargedState)23616": {
+          "t_contract(IChargedState)23762": {
             "label": "contract IChargedState"
           },
-          "t_contract(IChargedSettings)23221": {
+          "t_contract(IChargedSettings)23367": {
             "label": "contract IChargedSettings"
           },
           "t_address": {
@@ -849,10 +934,931 @@
           "t_uint256": {
             "label": "uint256"
           },
-          "t_contract(ITokenInfoProxy)24744": {
+          "t_contract(ITokenInfoProxy)24892": {
             "label": "contract ITokenInfoProxy"
           },
-          "t_contract(IChargedManagers)22694": {
+          "t_contract(IChargedManagers)22840": {
+            "label": "contract IChargedManagers"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "f324461aaff3efa11266bca9838b31f634a8544ab75e046558f66f6cbe840052": {
+      "address": "0x1Af67Ea10245E08f1508Ca5bb040249a7452a48A",
+      "txHash": "0x797c55cd1069aa19ee62f8a902f7a2fec528732c7532ddbcefda8205b0786543",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "BaseRelayRecipient",
+            "label": "trustedForwarder",
+            "type": "t_address",
+            "src": "@opengsn/gsn/contracts/BaseRelayRecipient.sol:16"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_chargedSettings",
+            "type": "t_contract(IChargedSettings)23367",
+            "src": "contracts/ChargedState.sol:62"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_tokenInfoProxy",
+            "type": "t_contract(ITokenInfoProxy)24890",
+            "src": "contracts/ChargedState.sol:63"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftDischargeTimelockUnlockBlock",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedState.sol:67"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftDischargeTimelockLockedBy",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "contracts/ChargedState.sol:68"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftReleaseTimelockUnlockBlock",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedState.sol:71"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftReleaseTimelockLockedBy",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "contracts/ChargedState.sol:72"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftBreakBondTimelockUnlockBlock",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedState.sol:75"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftBreakBondTimelockLockedBy",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "contracts/ChargedState.sol:76"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftActionPerms",
+            "type": "t_mapping(t_uint256,t_uint32)",
+            "src": "contracts/ChargedState.sol:80"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftTempLockExpiry",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedState.sol:83"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftDischargeApproval",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
+            "src": "contracts/ChargedState.sol:86"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftReleaseApproval",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
+            "src": "contracts/ChargedState.sol:87"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftBreakBondApproval",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
+            "src": "contracts/ChargedState.sol:88"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftTimelockApproval",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
+            "src": "contracts/ChargedState.sol:89"
+          }
+        ],
+        "types": {
+          "t_contract(IChargedSettings)23367": {
+            "label": "contract IChargedSettings"
+          },
+          "t_contract(ITokenInfoProxy)24890": {
+            "label": "contract ITokenInfoProxy"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_uint256,t_uint32)": {
+            "label": "mapping(uint256 => uint32)"
+          },
+          "t_uint32": {
+            "label": "uint32"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_address))": {
+            "label": "mapping(uint256 => mapping(address => address))"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "0ce2cb9323836fedbffb2b9965a650ed7f112db7238ca41a5b2e4b3a26849fb3": {
+      "address": "0x2c8436235A61bBE9008fd99671135acFb137C7d2",
+      "txHash": "0x060d5415e505e4bb314dd4586559ef27f0c306364eeebccdbc1621b2681f1a2e",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "BaseRelayRecipient",
+            "label": "trustedForwarder",
+            "type": "t_address",
+            "src": "@opengsn/gsn/contracts/BaseRelayRecipient.sol:16"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_tokenInfoProxy",
+            "type": "t_contract(ITokenInfoProxy)24890",
+            "src": "contracts/ChargedSettings.sol:63"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftActionPerms",
+            "type": "t_mapping(t_address,t_uint32)",
+            "src": "contracts/ChargedSettings.sol:69"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftRequiredWalletManager",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "src": "contracts/ChargedSettings.sol:71"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftRequiredBasketManager",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "src": "contracts/ChargedSettings.sol:72"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftAllowedAssetTokens",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+            "src": "contracts/ChargedSettings.sol:75"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftDepositMin",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "contracts/ChargedSettings.sol:76"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftDepositMax",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "contracts/ChargedSettings.sol:77"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftMaxNfts",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "contracts/ChargedSettings.sol:80"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_creatorAnnuityPercent",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedSettings.sol:83"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_creatorAnnuityRedirect",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "contracts/ChargedSettings.sol:84"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_depositCap",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/ChargedSettings.sol:86"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_tempLockExpiryBlocks",
+            "type": "t_uint256",
+            "src": "contracts/ChargedSettings.sol:87"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_invalidAssets",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts/ChargedSettings.sol:90"
+          }
+        ],
+        "types": {
+          "t_contract(ITokenInfoProxy)24890": {
+            "label": "contract ITokenInfoProxy"
+          },
+          "t_mapping(t_address,t_uint32)": {
+            "label": "mapping(address => uint32)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_uint32": {
+            "label": "uint32"
+          },
+          "t_mapping(t_address,t_string_storage)": {
+            "label": "mapping(address => string)"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+            "label": "mapping(address => mapping(address => bool))"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "3a5d836982e044a414f93d1ab86df5895a60df1608f8a8c2af540ecaf0a2ace8": {
+      "address": "0xa2C154a90e35ab776059ca3E32B925a439C675b0",
+      "txHash": "0x4bfacd1b5a3498217c1beb9325a78deba044ea0a14391b3a7401bcd1c8a13a26",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "BaseRelayRecipient",
+            "label": "trustedForwarder",
+            "type": "t_address",
+            "src": "@opengsn/gsn/contracts/BaseRelayRecipient.sol:16"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_chargedSettings",
+            "type": "t_contract(IChargedSettings)23403",
+            "src": "contracts/ChargedState.sol:62"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_tokenInfoProxy",
+            "type": "t_contract(ITokenInfoProxy)24932",
+            "src": "contracts/ChargedState.sol:63"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftDischargeTimelockUnlockBlock",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedState.sol:67"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftDischargeTimelockLockedBy",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "contracts/ChargedState.sol:68"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftReleaseTimelockUnlockBlock",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedState.sol:71"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftReleaseTimelockLockedBy",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "contracts/ChargedState.sol:72"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftBreakBondTimelockUnlockBlock",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedState.sol:75"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftBreakBondTimelockLockedBy",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "contracts/ChargedState.sol:76"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftActionPerms",
+            "type": "t_mapping(t_uint256,t_uint32)",
+            "src": "contracts/ChargedState.sol:80"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftTempLockExpiry",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedState.sol:83"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftDischargeApproval",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
+            "src": "contracts/ChargedState.sol:86"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftReleaseApproval",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
+            "src": "contracts/ChargedState.sol:87"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftBreakBondApproval",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
+            "src": "contracts/ChargedState.sol:88"
+          },
+          {
+            "contract": "ChargedState",
+            "label": "_nftTimelockApproval",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_address))",
+            "src": "contracts/ChargedState.sol:89"
+          }
+        ],
+        "types": {
+          "t_contract(IChargedSettings)23403": {
+            "label": "contract IChargedSettings"
+          },
+          "t_contract(ITokenInfoProxy)24932": {
+            "label": "contract ITokenInfoProxy"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_uint256,t_uint32)": {
+            "label": "mapping(uint256 => uint32)"
+          },
+          "t_uint32": {
+            "label": "uint32"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_address))": {
+            "label": "mapping(uint256 => mapping(address => address))"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "bffd46d1cf3b0a55cf120a82bf6ea70e398b7a4fa726288ddbc1fbeaf63bb3a2": {
+      "address": "0xACb5880Fba80B16C87be0E6682D33823007f1c1E",
+      "txHash": "0x145c45bd01aa279ea5b3cfb23c1c9b7122e71389c987bee600aac6239a7a24f4",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "BaseRelayRecipient",
+            "label": "trustedForwarder",
+            "type": "t_address",
+            "src": "@opengsn/gsn/contracts/BaseRelayRecipient.sol:16"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_tokenInfoProxy",
+            "type": "t_contract(ITokenInfoProxy)24932",
+            "src": "contracts/ChargedSettings.sol:63"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftActionPerms",
+            "type": "t_mapping(t_address,t_uint32)",
+            "src": "contracts/ChargedSettings.sol:69"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftRequiredWalletManager",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "src": "contracts/ChargedSettings.sol:71"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftRequiredBasketManager",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "src": "contracts/ChargedSettings.sol:72"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftAllowedAssetTokens",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+            "src": "contracts/ChargedSettings.sol:75"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftDepositMin",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "contracts/ChargedSettings.sol:76"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftDepositMax",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "contracts/ChargedSettings.sol:77"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_nftMaxNfts",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "contracts/ChargedSettings.sol:80"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_creatorAnnuityPercent",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/ChargedSettings.sol:83"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_creatorAnnuityRedirect",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "contracts/ChargedSettings.sol:84"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_depositCap",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/ChargedSettings.sol:86"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_tempLockExpiryBlocks",
+            "type": "t_uint256",
+            "src": "contracts/ChargedSettings.sol:87"
+          },
+          {
+            "contract": "ChargedSettings",
+            "label": "_invalidAssets",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts/ChargedSettings.sol:90"
+          }
+        ],
+        "types": {
+          "t_contract(ITokenInfoProxy)24932": {
+            "label": "contract ITokenInfoProxy"
+          },
+          "t_mapping(t_address,t_uint32)": {
+            "label": "mapping(address => uint32)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_uint32": {
+            "label": "uint32"
+          },
+          "t_mapping(t_address,t_string_storage)": {
+            "label": "mapping(address => string)"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+            "label": "mapping(address => mapping(address => bool))"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "b69b96265d7dd802d5930cc105be638b59439907e2e7b386a0ccbbb1289a7be7": {
+      "address": "0xA69a606677Bb545Ad5eF2B645ddaD7e88C4bf649",
+      "txHash": "0x3085f1bf153d0ac236634ea33a7cce3f9539459df0d3bf0ef8336b2eda195c9e",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ChargedManagers",
+            "label": "_chargedSettings",
+            "type": "t_contract(IChargedSettings)23403",
+            "src": "contracts/ChargedManagers.sol:50"
+          },
+          {
+            "contract": "ChargedManagers",
+            "label": "_chargedState",
+            "type": "t_contract(IChargedState)23802",
+            "src": "contracts/ChargedManagers.sol:51"
+          },
+          {
+            "contract": "ChargedManagers",
+            "label": "_tokenInfoProxy",
+            "type": "t_contract(ITokenInfoProxy)24932",
+            "src": "contracts/ChargedManagers.sol:52"
+          },
+          {
+            "contract": "ChargedManagers",
+            "label": "_ftWalletManager",
+            "type": "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)25440)",
+            "src": "contracts/ChargedManagers.sol:55"
+          },
+          {
+            "contract": "ChargedManagers",
+            "label": "_nftBasketManager",
+            "type": "t_mapping(t_string_memory_ptr,t_contract(IBasketManager)22746)",
+            "src": "contracts/ChargedManagers.sol:56"
+          }
+        ],
+        "types": {
+          "t_contract(IChargedSettings)23403": {
+            "label": "contract IChargedSettings"
+          },
+          "t_contract(IChargedState)23802": {
+            "label": "contract IChargedState"
+          },
+          "t_contract(ITokenInfoProxy)24932": {
+            "label": "contract ITokenInfoProxy"
+          },
+          "t_mapping(t_string_memory_ptr,t_contract(IWalletManager)25440)": {
+            "label": "mapping(string => contract IWalletManager)"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_contract(IWalletManager)25440": {
+            "label": "contract IWalletManager"
+          },
+          "t_mapping(t_string_memory_ptr,t_contract(IBasketManager)22746)": {
+            "label": "mapping(string => contract IBasketManager)"
+          },
+          "t_contract(IBasketManager)22746": {
+            "label": "contract IBasketManager"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "c644ba98f63f118291a7bd6d164cdd788efe9642a0aea98ef257162028f659cd": {
+      "address": "0x4c8B14411Db1437148b3320760794807437c36b6",
+      "txHash": "0x7489a9130a2f2dbeeccc5345e06e3764ba9a6adbb09c3f9e67ce74d6ac224219",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "BaseRelayRecipient",
+            "label": "trustedForwarder",
+            "type": "t_address",
+            "src": "@opengsn/gsn/contracts/BaseRelayRecipient.sol:16"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_universe",
+            "type": "t_contract(IUniverse)25093",
+            "src": "contracts/ChargedParticles.sol:98"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_chargedState",
+            "type": "t_contract(IChargedState)23802",
+            "src": "contracts/ChargedParticles.sol:99"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_chargedSettings",
+            "type": "t_contract(IChargedSettings)23403",
+            "src": "contracts/ChargedParticles.sol:100"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_lepton",
+            "type": "t_address",
+            "src": "contracts/ChargedParticles.sol:101"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "depositFee",
+            "type": "t_uint256",
+            "src": "contracts/ChargedParticles.sol:102"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_tokenInfoProxy",
+            "type": "t_contract(ITokenInfoProxy)24932",
+            "src": "contracts/ChargedParticles.sol:103"
+          },
+          {
+            "contract": "ChargedParticles",
+            "label": "_chargedManagers",
+            "type": "t_contract(IChargedManagers)22868",
+            "src": "contracts/ChargedParticles.sol:104"
+          }
+        ],
+        "types": {
+          "t_contract(IUniverse)25093": {
+            "label": "contract IUniverse"
+          },
+          "t_contract(IChargedState)23802": {
+            "label": "contract IChargedState"
+          },
+          "t_contract(IChargedSettings)23403": {
+            "label": "contract IChargedSettings"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_contract(ITokenInfoProxy)24932": {
+            "label": "contract ITokenInfoProxy"
+          },
+          "t_contract(IChargedManagers)22868": {
             "label": "contract IChargedManagers"
           },
           "t_array(t_uint256)49_storage": {

@@ -53,7 +53,7 @@ module.exports = async (hre) => {
 
     await log('  Deploying ChargedState...')(alchemyTimeout);
     const ChargedState = await ethers.getContractFactory('ChargedState');
-    const ChargedStateInstance = await upgrades.deployProxy(ChargedState, []);
+    const ChargedStateInstance = await upgrades.deployProxy(ChargedState, [deployer]);
     const chargedState = await ChargedStateInstance.deployed();
     deployData['ChargedState'] = {
       abi: getContractAbi('ChargedState'),
@@ -66,7 +66,7 @@ module.exports = async (hre) => {
 
     await log('  Deploying ChargedSettings...')(alchemyTimeout);
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
-    const ChargedSettingsInstance = await upgrades.deployProxy(ChargedSettings, []);
+    const ChargedSettingsInstance = await upgrades.deployProxy(ChargedSettings, [deployer]);
     const chargedSettings = await ChargedSettingsInstance.deployed();
     deployData['ChargedSettings'] = {
       abi: getContractAbi('ChargedSettings'),
@@ -79,7 +79,7 @@ module.exports = async (hre) => {
 
     await log('  Deploying ChargedManagers...')(alchemyTimeout);
     const ChargedManagers = await ethers.getContractFactory('ChargedManagers');
-    const ChargedManagersInstance = await upgrades.deployProxy(ChargedManagers, []);
+    const ChargedManagersInstance = await upgrades.deployProxy(ChargedManagers, [deployer]);
     const chargedManagers = await ChargedManagersInstance.deployed();
     deployData['ChargedManagers'] = {
       abi: getContractAbi('ChargedManagers'),
@@ -93,7 +93,7 @@ module.exports = async (hre) => {
 
     await log('  Deploying ChargedParticles...')(alchemyTimeout);
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
-    const ChargedParticlesInstance = await upgrades.deployProxy(ChargedParticles, [], { unsafeAllowCustomTypes: true });
+    const ChargedParticlesInstance = await upgrades.deployProxy(ChargedParticles, [deployer], { unsafeAllowCustomTypes: true });
     const chargedParticles = await ChargedParticlesInstance.deployed();
     deployData['ChargedParticles'] = {
       abi: getContractAbi('ChargedParticles'),

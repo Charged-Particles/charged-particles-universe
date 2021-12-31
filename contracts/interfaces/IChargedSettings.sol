@@ -96,6 +96,7 @@ interface IChargedSettings {
   |          Particle Events          |
   |__________________________________*/
 
+  event Initialized(address indexed initiator);
   event ControllerSet(address indexed controllerAddress, string controllerId);
   event DepositCapSet(address assetToken, uint256 depositCap);
   event TempLockExpirySet(uint256 expiryBlocks);

@@ -94,8 +94,9 @@ contract ChargedSettings is
   |          Initialization           |
   |__________________________________*/
 
-  function initialize() public initializer {
+  function initialize(address initiator) public initializer {
     __Ownable_init();
+    emit Initialized(initiator);
   }
 
 
@@ -207,19 +208,7 @@ contract ChargedSettings is
     override
   {
     require(_tokenInfoProxy.isNFTContractOrCreator(contractAddress, tokenId, _msgSender()), "CP:E-104");
-    require(annuityPercent <= MAX_ANNUITIES, "CP:E-421");
-
-    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
-
-    // Update Configs for External Token Creator
-    _creatorAnnuityPercent[tokenUuid] = annuityPercent;
-
-    emit TokenCreatorConfigsSet(
-      contractAddress,
-      tokenId,
-      creator,
-      annuityPercent
-    );
+    _setCreatorAnnuities(contractAddress, tokenId, creator, annuityPercent);
   }
 
   /// @notice Sets a Custom Receiver Address for the Creator Annuities
@@ -236,13 +225,7 @@ contract ChargedSettings is
     override
   {
     require(_tokenInfoProxy.isNFTContractOrCreator(contractAddress, tokenId, _msgSender()), "CP:E-104");
-    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
-    _creatorAnnuityRedirect[tokenUuid] = receiver;
-    emit TokenCreatorAnnuitiesRedirected(contractAddress, tokenId, receiver);
-  }
-
-  function setTrustedForwarder(address _trustedForwarder) external onlyOwner {
-    trustedForwarder = _trustedForwarder;
+    _setCreatorAnnuitiesRedirect(contractAddress, tokenId, receiver);
   }
 
 
@@ -424,6 +407,10 @@ contract ChargedSettings is
     emit ControllerSet(controller, controllerId);
   }
 
+  function setTrustedForwarder(address _trustedForwarder) external onlyOwner {
+    trustedForwarder = _trustedForwarder;
+  }
+
   function setAssetInvalidity(address assetToken, bool invalidity) external virtual override onlyOwner {
     _invalidAssets[assetToken] = invalidity;
     emit AssetInvaliditySet(assetToken, invalidity);
@@ -446,6 +433,22 @@ contract ChargedSettings is
       _setPermsForCharge(tokenContract, true);
       _setPermsForBasket(tokenContract, true);
       _setPermsForTimelockSelf(tokenContract, true);
+    }
+  }
+
+  function migrateToken(
+    address contractAddress,
+    uint256 tokenId,
+    address creator,
+    uint256 annuityPercent,
+    address annuityReceiver
+  )
+    external
+    onlyOwner
+  {
+    _setCreatorAnnuities(contractAddress, tokenId, creator, annuityPercent);
+    if (annuityReceiver != address(0)) {
+      _setCreatorAnnuitiesRedirect(contractAddress, tokenId, annuityReceiver);
     }
   }
 
@@ -554,6 +557,44 @@ contract ChargedSettings is
       _nftActionPerms[contractAddress] = _nftActionPerms[contractAddress].clearBit(PERM_TIMELOCK_OWN_NFT);
     }
     emit PermsSetForTimelockSelf(contractAddress, state);
+  }
+
+  /// @dev see setCreatorAnnuities()
+  function _setCreatorAnnuities(
+    address contractAddress,
+    uint256 tokenId,
+    address creator,
+    uint256 annuityPercent
+  )
+    internal
+    virtual
+  {
+    require(annuityPercent <= MAX_ANNUITIES, "CP:E-421");
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
+
+    // Update Configs for External Token Creator
+    _creatorAnnuityPercent[tokenUuid] = annuityPercent;
+
+    emit TokenCreatorConfigsSet(
+      contractAddress,
+      tokenId,
+      creator,
+      annuityPercent
+    );
+  }
+
+  /// @dev see setCreatorAnnuitiesRedirect()
+  function _setCreatorAnnuitiesRedirect(
+    address contractAddress,
+    uint256 tokenId,
+    address receiver
+  )
+    internal
+    virtual
+  {
+    uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
+    _creatorAnnuityRedirect[tokenUuid] = receiver;
+    emit TokenCreatorAnnuitiesRedirected(contractAddress, tokenId, receiver);
   }
 
 
