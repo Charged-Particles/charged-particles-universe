@@ -38,6 +38,9 @@ const accumulatedGasCost = (tx) => {
   __accumulatedGasCost = gasCost.add(__accumulatedGasCost);
 };
 const getAccumulatedGasCost = () => {
+  if (__accumulatedGasCost === 0) {
+    return ['0 ETH', '0 ETH', '0 ETH'];
+  }
   const gwei10 = `${toEth(__accumulatedGasCost)} ETH`;
   const gwei100 = `${toEth(__accumulatedGasCost.mul(10))} ETH`;
   const gwei150 = `${toEth(__accumulatedGasCost.mul(15))} ETH`;
