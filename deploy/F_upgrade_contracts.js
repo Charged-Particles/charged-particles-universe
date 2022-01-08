@@ -29,14 +29,15 @@ const _migrationSubgraphDump = {
 
 let __accumulatedGasCost = bn(0);
 const accumulatedGasCost = (tx) => {
-  let gasCost = 0;
-  if (_.get(tx, 'gasUsed', false)) {
+  let gasCost = bn(0);
+  if (_.get(tx, 'gasUsed', false) && _.get(tx, 'effectiveGasPrice', false)) {
     gasCost = tx.gasUsed.mul(tx.effectiveGasPrice);
-  } else {
+  } else if (_.get(tx, 'gasPrice', false) && _.get(tx, 'gasLimit', false)) {
     gasCost = tx.gasLimit.mul(tx.gasPrice);
   }
-  __accumulatedGasCost = gasCost.add(__accumulatedGasCost);
+  __accumulatedGasCost = __accumulatedGasCost.add(gasCost);
 };
+
 const getAccumulatedGasCost = () => {
   if (__accumulatedGasCost === 0) {
     return ['0 ETH', '0 ETH', '0 ETH'];
@@ -44,7 +45,7 @@ const getAccumulatedGasCost = () => {
   const gwei10 = `${toEth(__accumulatedGasCost)} ETH`;
   const gwei100 = `${toEth(__accumulatedGasCost.mul(10))} ETH`;
   const gwei150 = `${toEth(__accumulatedGasCost.mul(15))} ETH`;
-  __accumulatedGasCost = 0;
+  __accumulatedGasCost = bn(0);
   return [gwei10, gwei100, gwei150];
 };
 
