@@ -145,14 +145,16 @@ describe("Charged Settings", () => {
   });
 
   describe('Wallet Managers', async () => {
-    it('should have enabled "aave", "aave.B" and "generic" as wallet managers', async () => {
+    it('should have enabled "aave", "aave.B", "generic" and "generic.B" as wallet managers', async () => {
       expect(await chargedManagers.isWalletManagerEnabled('aave')).to.equal(true);
       expect(await chargedManagers.isWalletManagerEnabled('aave.B')).to.equal(true);
       expect(await chargedManagers.isWalletManagerEnabled('generic')).to.equal(true);
+      expect(await chargedManagers.isWalletManagerEnabled('generic.B')).to.equal(true);
     });
 
-    it('should have enabled "generic" as a basket manager', async () => {
+    it('should have enabled "generic" and "generic.B" as a basket managers', async () => {
       expect(await chargedManagers.isNftBasketEnabled('generic')).to.equal(true);
+      expect(await chargedManagers.isNftBasketEnabled('generic.B')).to.equal(true);
     });
   });
 

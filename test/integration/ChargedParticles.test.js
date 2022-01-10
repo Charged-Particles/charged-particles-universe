@@ -165,7 +165,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     });
   });
 
-  it("can succesfully energize and release proton", async () => {
+  it("can succesfully energize and release proton on 'aave'", async () => {
 
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
@@ -205,6 +205,136 @@ describe("[INTEGRATION] Charged Particles", () => {
     );
 
     expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
+  });
+
+  it("can succesfully energize and release proton on 'aave.B'", async () => {
+
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
+    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+
+    await dai.connect(daiSigner).transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+    const energizedParticleId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'aave.B',                     // walletManagerId
+        daiAddress,                   // assetToken
+        toWei('10'),                  // assetAmount
+        annuityPct,                   // annuityPercent
+      ],
+    });
+
+    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
+    await chargedParticles.connect(signer2).releaseParticle(
+      user2,
+      proton.address,
+      energizedParticleId,
+      'aave.B',
+      daiAddress
+    );
+
+    expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
+  });
+
+  it("can succesfully energize and release proton on 'generic'", async () => {
+    const amountToTransfer = toWei('10');
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
+    await signerD.sendTransaction({ to: daiHodler, value: amountToTransfer }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+
+    await dai.connect(daiSigner).transfer(user1, amountToTransfer);
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, amountToTransfer);
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+    const initalBalance = await dai.balanceOf(user2);
+
+    const energizedParticleId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'generic',                     // walletManagerId
+        daiAddress,                   // assetToken
+        amountToTransfer,                  // assetAmount
+        annuityPct,                   // annuityPercent
+      ],
+    });
+
+    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
+    await chargedParticles.connect(signer2).releaseParticle(
+      user2,
+      proton.address,
+      energizedParticleId,
+      'generic',
+      daiAddress
+    );
+
+    expect(await dai.balanceOf(user2)).to.be.equal(initalBalance.add(amountToTransfer));
+  });
+
+  it("can succesfully energize and release proton on 'generic.B'", async () => {
+    const amountToTransfer = toWei('10');
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
+    await signerD.sendTransaction({ to: daiHodler, value: amountToTransfer }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+
+    await dai.connect(daiSigner).transfer(user1, amountToTransfer);
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, amountToTransfer);
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+    const initalBalance = await dai.balanceOf(user2);
+
+    const energizedParticleId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'generic.B',                     // walletManagerId
+        daiAddress,                   // assetToken
+        amountToTransfer,                  // assetAmount
+        annuityPct,                   // annuityPercent
+      ],
+    });
+
+    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
+    await chargedParticles.connect(signer2).releaseParticle(
+      user2,
+      proton.address,
+      energizedParticleId,
+      'generic.B',
+      daiAddress
+    );
+
+    expect(await dai.balanceOf(user2)).to.be.equal(initalBalance.add(amountToTransfer));
   });
 
   it("can discharge only after timelock expired", async () => {
