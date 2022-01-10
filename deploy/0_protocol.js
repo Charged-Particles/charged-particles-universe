@@ -122,6 +122,20 @@ module.exports = async (hre) => {
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: tokenInfoProxy.deployTransaction }));
 
 
+    await log('  Deploying ParticleSplitter...')(alchemyTimeout);
+    const ParticleSplitter = await ethers.getContractFactory('ParticleSplitter');
+    const ParticleSplitterInstance = await ParticleSplitter.deploy();
+    const particleSplitter = await ParticleSplitterInstance.deployed();
+    deployData['ParticleSplitter'] = {
+      abi: getContractAbi('ParticleSplitter'),
+      address: particleSplitter.address,
+      deployTransaction: particleSplitter.deployTransaction
+    }
+    saveDeploymentData(chainId, deployData);
+    log('  - ParticleSplitter: ', particleSplitter.address);
+    log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: particleSplitter.deployTransaction }));
+
+
     log('\n  Contract Deployment Data saved to "deployments" directory.');
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };

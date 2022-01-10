@@ -49,6 +49,19 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "executor",
+        "type": "address"
+      }
+    ],
+    "name": "ExecutorSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "contractAddress",
         "type": "address"
       },
@@ -1041,6 +1054,19 @@
       }
     ],
     "name": "setController",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "executor",
+        "type": "address"
+      }
+    ],
+    "name": "setExecutor",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

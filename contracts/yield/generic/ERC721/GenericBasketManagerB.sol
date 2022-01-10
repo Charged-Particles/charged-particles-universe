@@ -45,6 +45,9 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   // The Controller Contract Address
   address internal _controller;
 
+  // The Executor Contract Address
+  address internal _executor;
+
   // Template Contract for creating Token Smart-Baskets
   address internal _basketTemplate;
 
@@ -153,7 +156,7 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   function executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes memory encodedParams)
     public
     override
-    onlyController
+    onlyControllerOrExecutor
     returns (bytes memory)
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
@@ -164,7 +167,7 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   function getBasketAddressById(address contractAddress, uint256 tokenId)
     public
     override
-    onlyController
+    onlyControllerOrExecutor
     returns (address)
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
@@ -199,6 +202,14 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   function setController(address controller) external onlyOwner {
     _controller = controller;
     emit ControllerSet(controller);
+  }
+
+  /**
+    * @dev Connects to the ExecForAccount Controller
+    */
+  function setExecutor(address executor) external onlyOwner {
+    _executor = executor;
+    emit ExecutorSet(executor);
   }
 
   /**
@@ -297,6 +308,12 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   /// @dev Throws if called by any account other than the Controller contract
   modifier onlyController() {
     require(_controller == msg.sender, "GBM:E-108");
+    _;
+  }
+
+  /// @dev Throws if called by any account other than the Controller or Executor contract
+  modifier onlyControllerOrExecutor() {
+    require(_executor == msg.sender || _controller == msg.sender, "WMB:E-108");
     _;
   }
 

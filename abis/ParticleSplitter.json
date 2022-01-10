@@ -1,101 +1,15 @@
 [
   {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
     "anonymous": false,
     "inputs": [
       {
         "indexed": true,
         "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "basketTokenAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "basketTokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "BasketAdd",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "basketTokenAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "basketTokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "BasketRemove",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "controller",
+        "name": "chargedManagers",
         "type": "address"
       }
     ],
-    "name": "ControllerSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "executor",
-        "type": "address"
-      }
-    ],
-    "name": "ExecutorSet",
+    "name": "ChargedManagersSet",
     "type": "event"
   },
   {
@@ -108,19 +22,80 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
       },
       {
+        "indexed": false,
+        "internalType": "string",
+        "name": "basketManagerId",
+        "type": "string"
+      },
+      {
         "indexed": true,
         "internalType": "address",
-        "name": "smartBasket",
+        "name": "externalAddress",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "encodedParams",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "ethValue",
+        "type": "uint256"
       }
     ],
-    "name": "NewSmartBasket",
+    "name": "ExecuteForBasket",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "walletManagerId",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "externalAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "encodedParams",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "ethValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "ExecuteForWallet",
     "type": "event"
   },
   {
@@ -140,19 +115,6 @@
       }
     ],
     "name": "OwnershipTransferred",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "isPaused",
-        "type": "bool"
-      }
-    ],
-    "name": "PausedStateSet",
     "type": "event"
   },
   {
@@ -268,38 +230,9 @@
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "basketTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "basketTokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "addToBasket",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "added",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "basketManagerId",
+        "type": "string"
       },
       {
         "internalType": "address",
@@ -307,9 +240,43 @@
         "type": "address"
       },
       {
+        "internalType": "bytes",
+        "name": "encodedParams",
+        "type": "bytes"
+      }
+    ],
+    "name": "executeForBasket",
+    "outputs": [
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "ethValue",
+        "name": "tokenId",
         "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "walletManagerId",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "externalAddress",
+        "type": "address"
       },
       {
         "internalType": "bytes",
@@ -317,7 +284,7 @@
         "type": "bytes"
       }
     ],
-    "name": "executeForAccount",
+    "name": "executeForWallet",
     "outputs": [
       {
         "internalType": "bytes",
@@ -325,102 +292,7 @@
         "type": "bytes"
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getBasketAddressById",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "basketTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "basketTokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getTokenCountByType",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getTokenTotalCount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "isPaused",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -437,45 +309,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "basketTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "basketTokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "removeFromBasket",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "removed",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "renounceOwnership",
     "outputs": [],
@@ -486,50 +319,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "controller",
+        "name": "chargedManagers",
         "type": "address"
       }
     ],
-    "name": "setController",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "executor",
-        "type": "address"
-      }
-    ],
-    "name": "setExecutor",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bool",
-        "name": "paused",
-        "type": "bool"
-      }
-    ],
-    "name": "setPausedState",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "tokenInfoProxy",
-        "type": "address"
-      }
-    ],
-    "name": "setTokenInfoProxy",
+    "name": "setChargedManagers",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -550,28 +344,18 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
         "internalType": "address payable",
         "name": "receiver",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "nftTokenAddress",
+        "name": "tokenAddress",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "nftTokenId",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
@@ -588,15 +372,28 @@
   {
     "inputs": [
       {
+        "internalType": "address payable",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
         "internalType": "address",
-        "name": "contractAddress",
+        "name": "tokenAddress",
         "type": "address"
       },
       {
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
-      },
+      }
+    ],
+    "name": "withdrawERC721",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
         "internalType": "address payable",
         "name": "receiver",
@@ -613,56 +410,13 @@
         "type": "uint256"
       }
     ],
-    "name": "withdrawERC20",
+    "name": "withdrawErc20",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address payable",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "nftTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nftTokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdrawERC721",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
       {
         "internalType": "address payable",
         "name": "receiver",

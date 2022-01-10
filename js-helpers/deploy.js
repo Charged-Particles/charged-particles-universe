@@ -294,7 +294,7 @@ const presets = {
 
 const txOverrides = (options = {}) => ({gasLimit: 15000000, ...options});
 
-const saveDeploymentData = (chainId, deployData) => {
+const saveDeploymentData = (chainId, deployData, overwrite = false) => {
   const network = chainNameById(chainId).toLowerCase();
   const deployPath = path.join(__dirname, '..', 'deployments', network);
 
@@ -302,7 +302,7 @@ const saveDeploymentData = (chainId, deployData) => {
     const filename = `${deployPath}/${contractName}.json`;
 
     let existingData = {};
-    if (fs.existsSync(filename)) {
+    if (!overwrite && fs.existsSync(filename)) {
       existingData = JSON.parse(fs.readFileSync(filename));
     }
 
@@ -323,6 +323,7 @@ const getDeployData = (contractName, chainId = 31337) => {
   const network = chainNameById(chainId).toLowerCase();
   const deployPath = path.join(__dirname, '..', 'deployments', network);
   const filename = `${deployPath}/${contractName}.json`;
+  delete require.cache[require.resolve(filename)]; // Prevent requiring cached deps
   const contractJson = require(filename);
   return contractJson;
 }

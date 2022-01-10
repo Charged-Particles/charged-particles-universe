@@ -3,6 +3,10 @@ const {
 } = require('../js-helpers/deploy');
 
 const {
+  executeTx,
+} = require('../js-helpers/executeTx');
+
+const {
   log,
   chainTypeById,
   chainNameById,
@@ -21,21 +25,6 @@ module.exports = async (hre) => {
     const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
 
     if (chainId !== 42) { return; } // Kovan only
-
-    const executeTx = async (txId, txDesc, callback, increaseDelay = 0) => {
-      try {
-        if (txId === '1-a') {
-          log(`\n`);
-        }
-        await log(`  - [TX-${txId}] ${txDesc}`)(alchemyTimeout + increaseDelay);
-        await callback();
-      }
-      catch (err) {
-        log(`  - Transaction ${txId} Failed: ${err}`);
-        log(`  - Retrying;`);
-        await executeTx(txId, txDesc, callback, 3);
-      }
-    }
 
     const ddChargedSettings = getDeployData('ChargedSettings', chainId);
 

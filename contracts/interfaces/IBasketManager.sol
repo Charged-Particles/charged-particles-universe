@@ -31,6 +31,7 @@ pragma solidity >=0.6.0;
 interface IBasketManager {
 
   event ControllerSet(address indexed controller);
+  event ExecutorSet(address indexed executor);
   event PausedStateSet(bool isPaused);
   event NewSmartBasket(address indexed contractAddress, uint256 indexed tokenId, address indexed smartBasket);
   event BasketAdd(address indexed contractAddress, uint256 indexed tokenId, address basketTokenAddress, uint256 basketTokenId);

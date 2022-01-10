@@ -46,6 +46,19 @@ module.exports = async (hre) => {
     log('  - GenericWalletManager:  ', genericWalletManager.address);
     log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
 
+    await log('\n  Deploying GenericWalletManagerB...')(alchemyTimeout);
+    const GenericWalletManagerB = await hre.ethers.getContractFactory('GenericWalletManagerB');
+    const GenericWalletManagerBInstance = await GenericWalletManagerB.deploy();
+    const genericWalletManagerB = await GenericWalletManagerBInstance.deployed();
+    deployData['GenericWalletManagerB'] = {
+      abi: getContractAbi('GenericWalletManagerB'),
+      address: genericWalletManagerB.address,
+      deployTransaction: genericWalletManagerB.deployTransaction,
+    }
+    saveDeploymentData(chainId, deployData);
+    log('  - GenericWalletManagerB:  ', genericWalletManagerB.address);
+    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManagerB.deployTransaction }));
+
     await log('  Deploying GenericBasketManager...')(alchemyTimeout);
     const GenericBasketManager = await hre.ethers.getContractFactory('GenericBasketManager');
     const GenericBasketManagerInstance = await GenericBasketManager.deploy();

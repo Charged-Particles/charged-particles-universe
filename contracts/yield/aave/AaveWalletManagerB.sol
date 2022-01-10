@@ -330,7 +330,7 @@ contract AaveWalletManagerB is WalletManagerBase {
   )
     external
     override
-    onlyController
+    onlyControllerOrExecutor
     returns (bytes memory)
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
@@ -346,7 +346,7 @@ contract AaveWalletManagerB is WalletManagerBase {
   )
     external
     override
-    onlyController
+    onlyControllerOrExecutor
     returns (address)
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
