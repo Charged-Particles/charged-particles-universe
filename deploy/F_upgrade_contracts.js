@@ -34,7 +34,6 @@ module.exports = async (hre) => {
 
   // if (chainId !== 42) { return; } // Kovan only
 
-
   // V1 Contracts
   const ddChargedParticles = getDeployData('ChargedParticles', chainId);
 
