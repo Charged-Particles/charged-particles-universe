@@ -340,7 +340,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(await dai.balanceOf(user2)).to.be.equal(initalBalance.add(amountToTransfer));
   });
 
-  it.only("can execute for account on energized proton", async () => {
+  it("can execute for account on energized proton", async () => {
     const amountToTransfer = toWei('10');
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
