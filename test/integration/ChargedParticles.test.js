@@ -56,6 +56,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   let chargedSettings;
   let chargedManagers;
   let chargedParticles;
+  let particleSplitter;
   let aaveWalletManager;
   let genericWalletManager;
   let genericBasketManager;
@@ -125,6 +126,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     const ChargedManagers = await ethers.getContractFactory('ChargedManagers');
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
+    const ParticleSplitter = await ethers.getContractFactory('ParticleSplitter');
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
@@ -139,6 +141,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     chargedSettings = ChargedSettings.attach(getDeployData('ChargedSettings', chainId).address);
     chargedManagers = ChargedManagers.attach(getDeployData('ChargedManagers', chainId).address);
     chargedParticles = ChargedParticles.attach(getDeployData('ChargedParticles', chainId).address);
+    particleSplitter = ParticleSplitter.attach(getDeployData('ParticleSplitter', chainId).address);
     aaveWalletManager = AaveWalletManager.attach(getDeployData('AaveWalletManager', chainId).address);
     genericWalletManager = GenericWalletManager.attach(getDeployData('GenericWalletManager', chainId).address);
     genericBasketManager = GenericBasketManager.attach(getDeployData('GenericBasketManager', chainId).address);
@@ -332,6 +335,57 @@ describe("[INTEGRATION] Charged Particles", () => {
       energizedParticleId,
       'generic.B',
       daiAddress
+    );
+
+    expect(await dai.balanceOf(user2)).to.be.equal(initalBalance.add(amountToTransfer));
+  });
+
+  it.only("can execute for account on energized proton", async () => {
+    const amountToTransfer = toWei('10');
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
+    await signerD.sendTransaction({ to: daiHodler, value: amountToTransfer }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+
+    await dai.connect(daiSigner).transfer(user1, amountToTransfer);
+    await dai.connect(signer1)['approve(address,uint256)'](proton.address, amountToTransfer);
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+    const initalBalance = await dai.balanceOf(user2);
+
+    const energizedParticleId = await callAndReturn({
+      contractInstance: proton,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'generic.B',                     // walletManagerId
+        daiAddress,                   // assetToken
+        amountToTransfer,                  // assetAmount
+        annuityPct,                   // annuityPercent
+      ],
+    });
+
+    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
+
+
+    // Encoded Transfer function to transfer the DAI out
+    var iDAI = new ethers.utils.Interface(daiABI);
+    const encodedParams = iDAI.encodeFunctionData('transfer', [user2, amountToTransfer]);
+    // console.log('encodedParams = ', encodedParams);
+
+    await particleSplitter.connect(signer2).executeForWallet(
+      proton.address,
+      energizedParticleId,
+      'generic.B',
+      daiAddress,
+      encodedParams
     );
 
     expect(await dai.balanceOf(user2)).to.be.equal(initalBalance.add(amountToTransfer));
