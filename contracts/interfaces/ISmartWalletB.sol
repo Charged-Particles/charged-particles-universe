@@ -69,6 +69,7 @@ interface ISmartWalletB {
   );
   function withdrawRewards(address receiver, address rewardsToken, uint256 rewardsAmount) external returns (uint256);
   function executeForAccount(address contractAddress, uint256 ethValue, bytes memory encodedParams) external returns (bytes memory);
+  function refreshPrincipal(address assetToken) external;
 
   function withdrawEther(address payable receiver, uint256 amount) external;
   function withdrawERC20(address payable receiver, address tokenAddress, uint256 amount) external;

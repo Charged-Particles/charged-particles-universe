@@ -48,12 +48,21 @@ interface IParticleSplitter {
     bytes memory encodedParams
   ) external payable returns (bytes memory);
 
+  function refreshWalletPrincipal(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken
+  ) external;
+
 
   /***********************************|
   |          Particle Events          |
   |__________________________________*/
 
   event ChargedManagersSet(address indexed chargedManagers);
+  event TokenInfoProxySet(address indexed tokenInfoProxy);
+
   event ExecuteForWallet(
     address indexed contractAddress,
     uint256 tokenId,
@@ -69,5 +78,11 @@ interface IParticleSplitter {
     address indexed externalAddress,
     bytes encodedParams,
     uint256 ethValue
+  );
+  event PrincipalRefreshed(
+    address contractAddress,
+    uint256 tokenId,
+    string walletManagerId,
+    address assetToken
   );
 }

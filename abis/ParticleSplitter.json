@@ -123,6 +123,19 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "tokenInfoProxy",
+        "type": "address"
+      }
+    ],
+    "name": "TokenInfoProxySet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "receiver",
         "type": "address"
       },
@@ -309,6 +322,34 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "walletManagerId",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      }
+    ],
+    "name": "refreshWalletPrincipal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "renounceOwnership",
     "outputs": [],
@@ -324,6 +365,19 @@
       }
     ],
     "name": "setChargedManagers",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "tokenInfoProxy",
+        "type": "address"
+      }
+    ],
+    "name": "setTokenInfoProxy",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

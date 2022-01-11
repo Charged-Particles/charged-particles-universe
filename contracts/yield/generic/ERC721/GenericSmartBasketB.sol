@@ -48,7 +48,7 @@ contract GenericSmartBasketB is ISmartBasket, BlackholePrevention, IERC721Receiv
 
   address internal _basketManager;
 
-  // NFT contract address => Token Ids in Basket
+  // NFT contract address => Token Type => Token ID     (ERC721 = Type 0, ERC1155 = Type is Bit Mask of Token ID)
   mapping (address => mapping(uint256 => EnumerableSet.UintSet)) internal _nftContractTokens;
 
 

@@ -199,6 +199,10 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await particleSplitter.setChargedManagers(ddChargedManagers.address)
     );
 
+    await executeTx('1-n', 'ParticleSplitter: Registering TokenInfoProxy', async () =>
+      await particleSplitter.setTokenInfoProxy(ddTokenInfoProxy.address)
+    );
+
     await executeTx('1-o', 'ChargedParticles: Setting Temp-Lock Expiry Blocks', async () =>
       await chargedSettings.setTempLockExpiryBlocks(tempLockExpiryBlocks)
     );

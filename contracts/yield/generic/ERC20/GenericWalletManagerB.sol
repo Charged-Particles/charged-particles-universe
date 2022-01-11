@@ -25,7 +25,7 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../../../lib/WalletManagerBase.sol";
-import "./GenericSmartWallet.sol";
+import "./GenericSmartWalletB.sol";
 
 /**
  * @notice Generic ERC20 Wallet Manager B
@@ -39,7 +39,7 @@ contract GenericWalletManagerB is WalletManagerBase {
   |__________________________________*/
 
   constructor () public {
-    _walletTemplate = address(new GenericSmartWallet());
+    _walletTemplate = address(new GenericSmartWalletB());
   }
 
   /***********************************|
@@ -54,7 +54,7 @@ contract GenericWalletManagerB is WalletManagerBase {
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] == address(0x0)) { return false; }
-    return GenericSmartWallet(_wallets[uuid]).isReserveActive(assetToken);
+    return GenericSmartWalletB(_wallets[uuid]).isReserveActive(assetToken);
   }
 
   function getReserveInterestToken(address contractAddress, uint256 tokenId, address assetToken)
@@ -65,7 +65,7 @@ contract GenericWalletManagerB is WalletManagerBase {
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] == address(0x0)) { return address(0x0); }
-    return GenericSmartWallet(_wallets[uuid]).getReserveInterestToken(assetToken);
+    return GenericSmartWalletB(_wallets[uuid]).getReserveInterestToken(assetToken);
   }
 
   /**
@@ -81,7 +81,7 @@ contract GenericWalletManagerB is WalletManagerBase {
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] == address(0x0)) { return 0; }
-    return GenericSmartWallet(_wallets[uuid]).getTotal(assetToken);
+    return GenericSmartWalletB(_wallets[uuid]).getTotal(assetToken);
   }
 
   /**
@@ -97,7 +97,7 @@ contract GenericWalletManagerB is WalletManagerBase {
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] == address(0x0)) { return 0; }
-    return GenericSmartWallet(_wallets[uuid]).getPrincipal(assetToken);
+    return GenericSmartWalletB(_wallets[uuid]).getPrincipal(assetToken);
   }
 
   /**
@@ -114,7 +114,7 @@ contract GenericWalletManagerB is WalletManagerBase {
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] != address(0x0)) {
-    return GenericSmartWallet(_wallets[uuid]).getInterest(assetToken);
+    return GenericSmartWalletB(_wallets[uuid]).getInterest(assetToken);
     }
   }
 
@@ -125,7 +125,7 @@ contract GenericWalletManagerB is WalletManagerBase {
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] == address(0x0)) { return 0; }
-    return GenericSmartWallet(_wallets[uuid]).getRewards(rewardToken);
+    return GenericSmartWalletB(_wallets[uuid]).getRewards(rewardToken);
   }
 
   function energize(address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount)
@@ -138,7 +138,7 @@ contract GenericWalletManagerB is WalletManagerBase {
     address wallet = _wallets[uuid];
 
     // Deposit into Smart-Wallet
-    yieldTokensAmount = GenericSmartWallet(wallet).deposit(assetToken, assetAmount, 0);
+    yieldTokensAmount = GenericSmartWalletB(wallet).deposit(assetToken, assetAmount, 0);
 
     // Log Event
     emit WalletEnergized(contractAddress, tokenId, assetToken, assetAmount, yieldTokensAmount);
@@ -195,8 +195,8 @@ contract GenericWalletManagerB is WalletManagerBase {
     require(wallet != address(0x0), "GWM:E-403");
 
     // Release Principal + Interest
-    principalAmount = GenericSmartWallet(wallet).getPrincipal(assetToken);
-    (creatorAmount, receiverAmount) = GenericSmartWallet(wallet).withdraw(receiver, creatorRedirect, assetToken);
+    principalAmount = GenericSmartWalletB(wallet).getPrincipal(assetToken);
+    (creatorAmount, receiverAmount) = GenericSmartWalletB(wallet).withdraw(receiver, creatorRedirect, assetToken);
 
     // Log Event
     emit WalletReleased(contractAddress, tokenId, receiver, assetToken, principalAmount, creatorAmount, receiverAmount);
@@ -220,8 +220,8 @@ contract GenericWalletManagerB is WalletManagerBase {
     require(wallet != address(0x0), "GWM:E-403");
 
     // Release from interest first + principal if needed
-    principalAmount = GenericSmartWallet(wallet).getPrincipal(assetToken);
-    (creatorAmount, receiverAmount) = GenericSmartWallet(wallet).withdrawAmount(receiver, creatorRedirect, assetToken, assetAmount);
+    principalAmount = GenericSmartWalletB(wallet).getPrincipal(assetToken);
+    (creatorAmount, receiverAmount) = GenericSmartWalletB(wallet).withdrawAmount(receiver, creatorRedirect, assetToken, assetAmount);
 
     // Log Event
     emit WalletReleased(contractAddress, tokenId, receiver, assetToken, principalAmount, creatorAmount, receiverAmount);
@@ -238,7 +238,7 @@ contract GenericWalletManagerB is WalletManagerBase {
     require(wallet != address(0x0), "genericERC20WalletManager:E-403");
 
     // Withdraw Rewards to Receiver
-    amount = GenericSmartWallet(wallet).withdrawRewards(receiver, rewardsToken, rewardsAmount);
+    amount = GenericSmartWalletB(wallet).withdrawRewards(receiver, rewardsToken, rewardsAmount);
 
     // Log Event
     emit WalletRewarded(contractAddress, tokenId, receiver, rewardsToken, amount);
@@ -252,7 +252,17 @@ contract GenericWalletManagerB is WalletManagerBase {
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
-    return GenericSmartWallet(wallet).executeForAccount(externalAddress, ethValue, encodedParams);
+    return GenericSmartWalletB(wallet).executeForAccount(externalAddress, ethValue, encodedParams);
+  }
+
+  function refreshPrincipal(address contractAddress, uint256 tokenId, address assetToken)
+    external
+    override
+    onlyControllerOrExecutor
+  {
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
+    address wallet = _wallets[uuid];
+    GenericSmartWalletB(wallet).refreshPrincipal(assetToken);
   }
 
   function getWalletAddressById(address contractAddress, uint256 tokenId, address creator, uint256 annuityPct)
@@ -270,7 +280,7 @@ contract GenericWalletManagerB is WalletManagerBase {
       _wallets[uuid] = wallet;
 
       if (creator != address(0x0)) {
-        GenericSmartWallet(wallet).setNftCreator(creator, annuityPct);
+        GenericSmartWalletB(wallet).setNftCreator(creator, annuityPct);
       }
 
       emit NewSmartWallet(contractAddress, tokenId, wallet, creator, annuityPct);
@@ -288,7 +298,7 @@ contract GenericWalletManagerB is WalletManagerBase {
     returns (address)
   {
     address newWallet = _createClone(_walletTemplate);
-    GenericSmartWallet(newWallet).initialize();
+    GenericSmartWalletB(newWallet).initialize();
     return newWallet;
   }
 

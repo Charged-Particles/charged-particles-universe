@@ -44,6 +44,8 @@ contract AaveSmartWalletB is SmartWalletBaseB {
 
   uint256 internal _nftCreatorAmountDischarged;
 
+  mapping (address => address) internal _assetATokens;
+
   /***********************************|
   |          Initialization           |
   |__________________________________*/
@@ -156,6 +158,13 @@ contract AaveSmartWalletB is SmartWalletBaseB {
     returns (uint256)
   {
     return _withdrawRewards(receiver, rewardsToken, rewardsAmount);
+  }
+
+  function refreshPrincipal(address assetToken) external virtual override onlyWalletManager {
+    uint256 aTokenBalance = IERC20(_assetATokens[assetToken]).balanceOf(address(this));
+    if (_assetPrincipalBalance[assetToken] > aTokenBalance) {
+      _assetPrincipalBalance[assetToken] = aTokenBalance;
+    }
   }
 
   /***********************************|
@@ -321,6 +330,14 @@ contract AaveSmartWalletB is SmartWalletBaseB {
 
     // Owner Portion
     ownerInterest = interest.sub(creatorInterest);
+  }
+
+  function _trackAssetToken(address assetToken) internal override {
+    if (!_assetTokens.contains(assetToken)) {
+      _assetTokens.add(assetToken);
+      address aTokenAddress = _bridge.getReserveInterestToken(assetToken);
+      _assetATokens[assetToken] = aTokenAddress;
+    }
   }
 
   function _sendToken(address to, address token, uint256 amount) internal {

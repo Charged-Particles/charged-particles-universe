@@ -255,6 +255,14 @@ contract GenericWalletManager is WalletManagerBase {
     return GenericSmartWallet(wallet).executeForAccount(externalAddress, ethValue, encodedParams);
   }
 
+  function refreshPrincipal(address contractAddress, uint256 tokenId, address assetToken)
+    external
+    override
+    onlyControllerOrExecutor
+  {
+    // no-op
+  }
+
   function getWalletAddressById(address contractAddress, uint256 tokenId, address creator, uint256 annuityPct)
     external
     override

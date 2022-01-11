@@ -29,6 +29,7 @@ import "./interfaces/IParticleSplitter.sol";
 import "./interfaces/IChargedManagers.sol";
 import "./interfaces/IWalletManager.sol";
 import "./interfaces/IBasketManager.sol";
+import "./interfaces/ITokenInfoProxy.sol";
 import "./lib/BlackholePrevention.sol";
 
 /**
@@ -38,6 +39,7 @@ import "./lib/BlackholePrevention.sol";
 contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, BlackholePrevention
 {
   IChargedManagers internal _chargedManagers;
+  ITokenInfoProxy internal _tokenInfoProxy;
 
   /***********************************|
   |        Execute for Account        |
@@ -60,10 +62,11 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
     payable
     virtual
     override
+    onlyTokenOwner(contractAddress, tokenId)
     nonReentrant
     returns (bytes memory)
   {
-    require(_chargedManagers.isWalletManagerEnabled(walletManagerId), "CP:E-419");
+    require(_chargedManagers.isWalletManagerEnabled(walletManagerId), "PS:E-419");
 
     // Get appropriate Wallet Manager
     IWalletManager walletMgr = _chargedManagers.getWalletManager(walletManagerId);
@@ -97,10 +100,11 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
     payable
     virtual
     override
+    onlyTokenOwner(contractAddress, tokenId)
     nonReentrant
     returns (bytes memory)
   {
-    require(_chargedManagers.isNftBasketEnabled(basketManagerId), "CP:E-419");
+    require(_chargedManagers.isNftBasketEnabled(basketManagerId), "PS:E-419");
 
     // Get appropriate Basket Manager
     IBasketManager basketMgr = _chargedManagers.getBasketManager(basketManagerId);
@@ -117,6 +121,23 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
     return basketMgr.executeForAccount(contractAddress, tokenId, externalAddress, msg.value, encodedParams);
   }
 
+  function refreshWalletPrincipal(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken
+  )
+    external
+    virtual
+    override
+  {
+    require(_chargedManagers.isWalletManagerEnabled(walletManagerId), "PS:E-419");
+
+    IWalletManager walletMgr = _chargedManagers.getWalletManager(walletManagerId);
+    walletMgr.refreshPrincipal(contractAddress, tokenId, assetToken);
+
+    emit PrincipalRefreshed(contractAddress, tokenId, walletManagerId, assetToken);
+  }
 
 
   /***********************************|
@@ -129,6 +150,14 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
   function setChargedManagers(address chargedManagers) external virtual onlyOwner {
     _chargedManagers = IChargedManagers(chargedManagers);
     emit ChargedManagersSet(chargedManagers);
+  }
+
+  /**
+    * @dev Setup the ChargedManagers Interface
+    */
+  function setTokenInfoProxy(address tokenInfoProxy) external virtual onlyOwner {
+    _tokenInfoProxy = ITokenInfoProxy(tokenInfoProxy);
+    emit TokenInfoProxySet(tokenInfoProxy);
   }
 
 
@@ -151,5 +180,17 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
 
   function withdrawERC1155(address payable receiver, address tokenAddress, uint256 tokenId, uint256 amount) external onlyOwner {
     _withdrawERC1155(receiver, tokenAddress, tokenId, amount);
+  }
+
+
+
+  /***********************************|
+  |             Modifiers             |
+  |__________________________________*/
+
+  modifier onlyTokenOwner(address contractAddress, uint256 tokenId) {
+    address tokenOwner = _tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
+    require(msg.sender == tokenOwner, "PS:E-102");
+    _;
   }
 }
