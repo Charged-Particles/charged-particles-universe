@@ -100,8 +100,8 @@ module.exports = {
             }
         },
         mumbai: {
-            url: `https://rpc-mumbai.matic.today`,
-            // url: `https://rpc-mumbai.maticvigil.com`,
+            // url: `https://rpc-mumbai.matic.today`,
+            url: `https://rpc-mumbai.maticvigil.com`,
             gasPrice: 1e9,
             accounts: {
                 mnemonic: mnemonic.testnet,
@@ -132,11 +132,16 @@ module.exports = {
         },
     },
     etherscan: {
-      apiKey: process.env.ETHERSCAN_APIKEY
+      apiKey: {
+        mainnet: process.env.ETHERSCAN_APIKEY,
+        kovan: process.env.ETHERSCAN_APIKEY,
+        polygon: process.env.POLYGONSCAN_APIKEY,
+        polygonMumbai: process.env.POLYGONSCAN_APIKEY,
+      }
     },
-    polygonscan: {
-      apiKey: process.env.POLYGONSCAN_APIKEY
-    },
+    // polygonscan: {
+    //   apiKey: process.env.POLYGONSCAN_APIKEY
+    // },
     gasReporter: {
         currency: 'USD',
         gasPrice: 1,
