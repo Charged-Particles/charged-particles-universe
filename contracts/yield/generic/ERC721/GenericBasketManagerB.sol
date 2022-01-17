@@ -152,6 +152,23 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
     }
   }
 
+  function withdrawRewards(address receiver, address contractAddress, uint256 tokenId, address rewardsToken, uint256 rewardsAmount)
+    external
+    override
+    onlyControllerOrExecutor
+    returns (uint256 amount)
+  {
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
+    address basket = _baskets[uuid];
+    require(basket != address(0x0), "GWM:E-403");
+
+    // Withdraw Rewards to Receiver
+    amount = GenericSmartBasketB(basket).withdrawRewards(receiver, rewardsToken, rewardsAmount);
+
+    // Log Event
+    emit BasketRewarded(contractAddress, tokenId, receiver, rewardsToken, amount);
+  }
+
 
   function executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes memory encodedParams)
     public

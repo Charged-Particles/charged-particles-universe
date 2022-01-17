@@ -68,6 +68,9 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
   {
     require(_chargedManagers.isWalletManagerEnabled(walletManagerId), "PS:E-419");
 
+    // Validate Owner/Operator & Timelocks
+    _chargedManagers.validateRelease(msg.sender, contractAddress, tokenId);
+
     // Get appropriate Wallet Manager
     IWalletManager walletMgr = _chargedManagers.getWalletManager(walletManagerId);
 
@@ -106,6 +109,9 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
   {
     require(_chargedManagers.isNftBasketEnabled(basketManagerId), "PS:E-419");
 
+    // Validate Owner/Operator & Timelocks
+    _chargedManagers.validateRelease(msg.sender, contractAddress, tokenId);
+
     // Get appropriate Basket Manager
     IBasketManager basketMgr = _chargedManagers.getBasketManager(basketManagerId);
 
@@ -119,6 +125,60 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
 
     // Execute command for NFT Wallet
     return basketMgr.executeForAccount(contractAddress, tokenId, externalAddress, msg.value, encodedParams);
+  }
+
+  function withdrawWalletRewards(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address rewardsToken,
+    uint256 rewardsAmount
+  )
+    external
+    virtual
+    override
+    onlyTokenOwner(contractAddress, tokenId)
+    nonReentrant
+    returns (uint256 amountWithdrawn)
+  {
+    require(_chargedManagers.isWalletManagerEnabled(walletManagerId), "PS:E-419");
+
+    // Validate Owner/Operator & Timelocks
+    _chargedManagers.validateRelease(msg.sender, contractAddress, tokenId);
+
+    // Get appropriate Wallet Manager
+    IWalletManager walletMgr = _chargedManagers.getWalletManager(walletManagerId);
+
+    // Withdraw Rewards for NFT Wallet
+    return walletMgr.withdrawRewards(receiver, contractAddress, tokenId, rewardsToken, rewardsAmount);
+  }
+
+  function withdrawBasketRewards(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId,
+    address rewardsToken,
+    uint256 rewardsAmount
+  )
+    external
+    virtual
+    override
+    onlyTokenOwner(contractAddress, tokenId)
+    nonReentrant
+    returns (uint256 amountWithdrawn)
+  {
+    require(_chargedManagers.isNftBasketEnabled(basketManagerId), "PS:E-419");
+
+    // Validate Owner/Operator & Timelocks
+    _chargedManagers.validateRelease(msg.sender, contractAddress, tokenId);
+
+    // Get appropriate Basket Manager
+    IBasketManager basketMgr = _chargedManagers.getBasketManager(basketManagerId);
+
+    // Withdraw Rewards for NFT Basket
+    return basketMgr.withdrawRewards(receiver, contractAddress, tokenId, rewardsToken, rewardsAmount);
   }
 
   function refreshWalletPrincipal(

@@ -48,6 +48,24 @@ interface IParticleSplitter {
     bytes memory encodedParams
   ) external payable returns (bytes memory);
 
+  function withdrawWalletRewards(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address rewardsToken,
+    uint256 rewardsAmount
+  ) external returns (uint256 amountWithdrawn);
+
+  function withdrawBasketRewards(
+    address receiver,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata basketManagerId,
+    address rewardsToken,
+    uint256 rewardsAmount
+  ) external returns (uint256 amountWithdrawn);
+
   function refreshWalletPrincipal(
     address contractAddress,
     uint256 tokenId,

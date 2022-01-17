@@ -23,13 +23,14 @@
 
 pragma solidity 0.6.12;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/introspection/IERC165.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
-import "../../../interfaces/ISmartBasket.sol";
+import "../../../interfaces/ISmartBasketB.sol";
 import "../../../interfaces/ITokenInfoProxy.sol";
 import "../../../lib/BlackholePrevention.sol";
 import "../../../lib/NftTokenType.sol";
@@ -39,7 +40,7 @@ import "../../../lib/NftTokenType.sol";
  * @notice Generic ERC721-Token Smart-Basket
  * @dev Non-upgradeable Contract
  */
-contract GenericSmartBasketB is ISmartBasket, BlackholePrevention, IERC721Receiver, IERC1155Receiver {
+contract GenericSmartBasketB is ISmartBasketB, BlackholePrevention, IERC721Receiver, IERC1155Receiver {
   using EnumerableSet for EnumerableSet.UintSet;
   using EnumerableSet for EnumerableSet.AddressSet;
   using NftTokenType for address;
@@ -127,6 +128,23 @@ contract GenericSmartBasketB is ISmartBasket, BlackholePrevention, IERC721Receiv
       }
     }
     return removed;
+  }
+
+  function withdrawRewards(address receiver, address rewardsTokenAddress, uint256 rewardsAmount)
+    external
+    override
+    onlyBasketManager
+    returns (uint256)
+  {
+    address self = address(this);
+    IERC20 rewardsToken = IERC20(rewardsTokenAddress);
+
+    uint256 walletBalance = rewardsToken.balanceOf(self);
+    require(walletBalance >= rewardsAmount, "GSB:E-411");
+
+    // Transfer Rewards to Receiver
+    rewardsToken.safeTransfer(receiver, rewardsAmount);
+    return rewardsAmount;
   }
 
   function executeForAccount(

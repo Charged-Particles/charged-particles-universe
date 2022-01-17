@@ -146,6 +146,14 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     }
   }
 
+  function withdrawRewards(address receiver, address contractAddress, uint256 tokenId, address rewardsToken, uint256 rewardsAmount)
+    external
+    override
+    onlyController
+    returns (uint256 amount)
+  {
+    // no-op
+  }
 
   function executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes memory encodedParams)
     public

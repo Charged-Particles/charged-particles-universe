@@ -230,12 +230,12 @@ contract GenericWalletManagerB is WalletManagerBase {
   function withdrawRewards(address receiver, address contractAddress, uint256 tokenId, address rewardsToken, uint256 rewardsAmount)
     external
     override
-    onlyController
+    onlyControllerOrExecutor
     returns (uint256 amount)
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
-    require(wallet != address(0x0), "genericERC20WalletManager:E-403");
+    require(wallet != address(0x0), "GWM:E-403");
 
     // Withdraw Rewards to Receiver
     amount = GenericSmartWalletB(wallet).withdrawRewards(receiver, rewardsToken, rewardsAmount);
