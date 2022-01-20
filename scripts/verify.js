@@ -61,11 +61,11 @@ async function run() {
   //   chargedParticlesAddress = '0x660De54CEA09838d11Df0812E2754eD8D08CD2f7';
   // }
   if (networkName === 'kovan') {
-    universeAddress = '0xb76AeDf49FEB6D422EE12F1A7aa60C7108D8d47f';
-    chargedParticlesAddress = '0x0deAEDEbb9C9f442e879C766885B015D78C51B09'; // '0x0cFAAD8cD948A0BAe647615ecc8DfeFD0294a5f2';
-    chargedStateAddress = '0x4f872DEc367070b5610dD6498D4bcE70147dA2D4';
-    chargedSettingsAddress = '0xD45adfB70fb6D094F9bB4Ee742B01d8c58FF4Ec6';
-    chargedManagersAddress = '0x4578Db8063eef5D965e240af45B5e2fD86570c4A';
+    universeAddress = '0x9D7E02Dc1Ca078035bd16DcE7f985BAa60EC0562';
+    chargedParticlesAddress = '0x87a7e6AD611993f4E2bE80B50EccB876581bb0d6';
+    chargedStateAddress = '0xfa4c35914d61913b66f1718dd8255a431545A41f';
+    chargedSettingsAddress = '0x84BfFa63cBEB8A5C907534887723feC45cFE9265';
+    chargedManagersAddress = '0x9D973C6034995e11abeE7bC77f1E78c51D2C064c';
   }
   // if (networkName === 'polygon') {
   //   universeAddress = '0x1E70aa1599a624880e91103738591C920cCbb925';
@@ -77,22 +77,26 @@ async function run() {
   // }
 
   // Protocol
-  await verifyContract({name: 'Universe', networkName, addressOverride: universeAddress});
+  // await verifyContract({name: 'Universe', networkName, addressOverride: universeAddress});
   await verifyContract({name: 'ChargedParticles', networkName, addressOverride: chargedParticlesAddress});
-  await verifyContract({name: 'ChargedState', networkName, addressOverride: chargedStateAddress});
-  await verifyContract({name: 'ChargedSettings', networkName, addressOverride: chargedSettingsAddress});
-  await verifyContract({name: 'ChargedManagers', networkName, addressOverride: chargedManagersAddress});
-  await verifyContract({name: 'Ionx', networkName});
+  // await verifyContract({name: 'ChargedState', networkName, addressOverride: chargedStateAddress});
+  // await verifyContract({name: 'ChargedSettings', networkName, addressOverride: chargedSettingsAddress});
+  // await verifyContract({name: 'ChargedManagers', networkName, addressOverride: chargedManagersAddress});
+  // await verifyContract({name: 'Ionx', networkName});
 
   // Wallet Managers
-  await verifyContract({name: 'GenericWalletManager', networkName});
-  await verifyContract({name: 'GenericBasketManagerB', networkName});
-  await verifyContract({name: 'AaveWalletManagerB', networkName});
+  // await verifyContract({name: 'GenericWalletManager', networkName});
+  // await verifyContract({name: 'GenericWalletManagerB', networkName});
+  // await verifyContract({name: 'GenericBasketManager', networkName});
+  // await verifyContract({name: 'GenericBasketManagerB', networkName});
+  // await verifyContract({name: 'AaveWalletManager', networkName});
+  // await verifyContract({name: 'AaveWalletManagerB', networkName});
 
   // NFTs
-  await verifyContract({name: 'Proton', networkName});
+  // await verifyContract({name: 'Proton', networkName});
+  // await verifyContract({name: 'ProtonB', networkName});
   // await verifyContract({name: 'Lepton', networkName});
-  await verifyContract({name: 'Lepton2', networkName});
+  // await verifyContract({name: 'Lepton2', networkName});
   // await verifyContract({name: 'ExternalNFT', networkName});
 
   // Incentives

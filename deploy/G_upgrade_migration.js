@@ -13,7 +13,6 @@ const {
   chainIdByName,
 } = require('../js-helpers/utils');
 
-const configProtocol = require('../js-helpers/configProtocol');
 const { AddressZero } = require('ethers').constants
 const _ = require('lodash');
 
@@ -36,14 +35,6 @@ module.exports = async (hre) => {
     nfts: getMigrationData('nfts', chainId),
   };
   const isMigrated = (typeId, dataId) => _.has(migrationTracking[typeId], dataId);
-
-
-  log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-  log('Charged Particles Protocol - Contract Configurations');
-  log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
-
-  // Original Configs
-  await configProtocol(hre, true);
 
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');

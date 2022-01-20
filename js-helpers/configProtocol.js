@@ -326,7 +326,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await lepton.setMaxMintPerTx(leptonMaxMint)
     );
 
-    await executeTx('5-c', 'ChargedParticles: Registering Lepton', async () =>
+    !afterUpgradesV2 && await executeTx('5-c', 'ChargedParticles: Registering Lepton', async () =>
       await chargedSettings.enableNftContracts([ddLepton.address])
     );
 
@@ -419,6 +419,10 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     );
 
     await executeTx('9-b', 'ChargedParticles: Registering Lepton2', async () =>
+      await chargedParticles.setController(ddLepton2.address, 'leptons')
+    );
+
+    await executeTx('9-c', 'ChargedParticles: Enabling Lepton2', async () =>
       await chargedSettings.enableNftContracts([ddLepton2.address])
     );
 
@@ -431,7 +435,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       for (let i = 0; i < presets.Lepton.types.length; i++) {
         lepton2Type = presets.Lepton.types[i];
 
-        await executeTx(`9-c-${i}`, `Lepton2: Adding Lepton Type: ${lepton2Type.name}`, async () =>
+        await executeTx(`9-d-${i}`, `Lepton2: Adding Lepton Type: ${lepton2Type.name}`, async () =>
           await lepton2.addLeptonType(
             lepton2Type.tokenUri,
             lepton2Type.price[useChainId],
@@ -442,10 +446,6 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
         );
       }
     }
-
-    await executeTx('9-e', 'ChargedParticles: Registering Lepton2', async () =>
-      await chargedParticles.setController(ddLepton2.address, 'leptons')
-    );
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

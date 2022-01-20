@@ -33,7 +33,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155ReceiverUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
 
 import "./interfaces/IUniverse.sol";
@@ -51,7 +51,7 @@ import "./lib/RelayRecipient.sol";
 import "./lib/BlackholePrevention.sol";
 
 /**
- * @notice Charged Particles Contract
+ * @notice Charged Particles V2 Contract
  * @dev Upgradeable Contract
  */
 contract ChargedParticles is
@@ -62,7 +62,7 @@ contract ChargedParticles is
   RelayRecipient,
   IERC721ReceiverUpgradeable,
   BlackholePrevention,
-  ERC1155ReceiverUpgradeable
+  IERC1155ReceiverUpgradeable
 {
   using SafeMathUpgradeable for uint256;
   using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -139,6 +139,10 @@ contract ChargedParticles is
   // Unimplemented
   function onERC1155BatchReceived(address, address, uint256[] calldata, uint256[] calldata, bytes calldata) external virtual override returns (bytes4) {
     return ""; // IERC1155ReceiverUpgradeable(0).onERC1155BatchReceived.selector;
+  }
+
+  function supportsInterface(bytes4 /* interfaceId */) external view virtual override returns (bool) {
+      return false;
   }
 
   /// @notice Calculates the amount of Fees to be paid for a specific deposit amount
