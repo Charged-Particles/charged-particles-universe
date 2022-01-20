@@ -770,12 +770,12 @@
       },
       {
         "internalType": "address",
-        "name": "creator",
+        "name": "",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "annuityPct",
+        "name": "",
         "type": "uint256"
       }
     ],

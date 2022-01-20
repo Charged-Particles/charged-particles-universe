@@ -27,8 +27,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
-import "@openzeppelin/contracts/introspection/IERC165.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155Receiver.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../../../interfaces/ISmartBasketB.sol";
 import "../../../interfaces/ITokenInfoProxy.sol";
@@ -40,7 +39,7 @@ import "../../../lib/NftTokenType.sol";
  * @notice Generic ERC721-Token Smart-Basket
  * @dev Non-upgradeable Contract
  */
-contract GenericSmartBasketB is ISmartBasketB, BlackholePrevention, IERC721Receiver, IERC1155Receiver {
+contract GenericSmartBasketB is ISmartBasketB, BlackholePrevention, IERC721Receiver, ERC1155Receiver {
   using EnumerableSet for EnumerableSet.UintSet;
   using EnumerableSet for EnumerableSet.AddressSet;
   using NftTokenType for address;
@@ -84,12 +83,6 @@ contract GenericSmartBasketB is ISmartBasketB, BlackholePrevention, IERC721Recei
   // Unimplemented
   function onERC1155BatchReceived(address, address, uint256[] calldata, uint256[] calldata, bytes calldata) external override returns (bytes4) {
     return ""; // IERC1155ReceiverUpgradeable(0).onERC1155BatchReceived.selector;
-  }
-
-  function supportsInterface(bytes4 interfaceId) external view override returns (bool) {
-    return  interfaceId == 0x01ffc9a7 ||    // ERC-165
-            interfaceId == 0x80ac58cd ||    // ERC-721
-            interfaceId == 0x4e2312e0;      // ERC-1155
   }
 
   function addToBasket(address contractAddress, uint256 tokenId)

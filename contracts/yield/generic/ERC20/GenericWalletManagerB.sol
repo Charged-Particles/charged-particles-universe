@@ -265,7 +265,7 @@ contract GenericWalletManagerB is WalletManagerBase {
     GenericSmartWalletB(wallet).refreshPrincipal(assetToken);
   }
 
-  function getWalletAddressById(address contractAddress, uint256 tokenId, address creator, uint256 annuityPct)
+  function getWalletAddressById(address contractAddress, uint256 tokenId, address /* creator */, uint256 /* annuityPct */)
     external
     override
     onlyControllerOrExecutor
@@ -278,12 +278,7 @@ contract GenericWalletManagerB is WalletManagerBase {
     if (wallet == address(0x0)) {
       wallet = _createWallet();
       _wallets[uuid] = wallet;
-
-      if (creator != address(0x0)) {
-        GenericSmartWalletB(wallet).setNftCreator(creator, annuityPct);
-      }
-
-      emit NewSmartWallet(contractAddress, tokenId, wallet, creator, annuityPct);
+      emit NewSmartWallet(contractAddress, tokenId, wallet, address(0), 0);
     }
 
     return wallet;

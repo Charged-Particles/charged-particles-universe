@@ -46,6 +46,7 @@ module.exports = async (hre) => {
   let particleSplitter;
   let aaveWalletManagerB;
   let genericBasketManagerB;
+  let protonB;
 
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
@@ -177,6 +178,20 @@ module.exports = async (hre) => {
   log('  - AaveWalletManagerB: ', aaveWalletManagerB.address);
   log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: aaveWalletManagerB.deployTransaction }));
   accumulatedGasCost(aaveWalletManagerB.deployTransaction);
+
+  await log('  Deploying ProtonB...')(alchemyTimeout);
+  const ProtonB = await hre.ethers.getContractFactory('ProtonB');
+  const ProtonBInstance = await ProtonB.deploy();
+  protonB = await ProtonBInstance.deployed();
+  deployData['ProtonB'] = {
+    abi: getContractAbi('ProtonB'),
+    address: protonB.address,
+    deployTransaction: protonB.deployTransaction,
+  }
+  saveDeploymentData(chainId, deployData, true);
+  log('  - ProtonB: ', protonB.address);
+  log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: protonB.deployTransaction }));
+  accumulatedGasCost(protonB.deployTransaction);
 
 
   //

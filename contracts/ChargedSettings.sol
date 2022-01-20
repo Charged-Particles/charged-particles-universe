@@ -182,7 +182,7 @@ contract ChargedSettings is
     virtual
     returns (string memory requiredBasketManager, bool basketEnabled, uint256 maxNfts)
   {
-    requiredBasketManager = _nftRequiredWalletManager[contractAddress];
+    requiredBasketManager = _nftRequiredBasketManager[contractAddress];
     basketEnabled = _nftActionPerms[contractAddress].hasBit(PERM_BASKET_NFT);
     maxNfts = _nftMaxNfts[contractAddress][nftTokenAddress];
   }

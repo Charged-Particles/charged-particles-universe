@@ -133,7 +133,6 @@ describe("[INTEGRATION] Charged Particles", () => {
     const Proton = await ethers.getContractFactory('Proton');
     const Lepton = await ethers.getContractFactory('Lepton2');
     const Ionx = await ethers.getContractFactory('Ionx');
-    const IonxTimelock = await ethers.getContractFactory('IonxTimelock');
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy')
 
     universe = Universe.attach(getDeployData('Universe', chainId).address);
@@ -148,8 +147,6 @@ describe("[INTEGRATION] Charged Particles", () => {
     proton = Proton.attach(getDeployData('Proton', chainId).address);
     lepton = Lepton.attach(getDeployData('Lepton2', chainId).address);
     ionx = Ionx.attach(getDeployData('Ionx', chainId).address);
-    timelocks = Object.values(getDeployData('IonxTimelocks', chainId))
-      .map(ionxTimelock => (IonxTimelock.attach(ionxTimelock.address)));
     tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address);
 
     await proton.connect(signerD).setPausedState(false);
@@ -508,31 +505,6 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(await proton.connect(signer1).claimCreatorRoyalties())
       .to.emit(proton, 'RoyaltiesClaimed')
       .withArgs(user1, toWei('0.045'));
-  });
-
-  it("IonxTimelocks succesfully release Ionx to receivers", async () => {
-    const receivers = await Promise.all(timelocks.map(async timelock => await timelock.receiver()));
-
-    const balancesBefore = await Promise.all(receivers.map(async receiver => await ionx.balanceOf(receiver)));
-
-    const releaseTimes = await Promise.all(timelocks.map(async timelock => await timelock.nextReleaseTime()));
-
-    await Promise.all(timelocks.map(async timelock => {
-      await expect(timelock.release('0', '0')).to.not.emit(timelock, 'PortionReleased');
-    }));
-
-    const maxReleaseTime = max(releaseTimes);
-
-    await setNetworkAfterTimestamp(Number(maxReleaseTime.toString()));
-
-    await Promise.all(timelocks.map(async timelock => {
-      await expect(timelock.release('0', '0')).to.emit(timelock, 'PortionReleased');
-    }));
-
-    await Promise.all(receivers.map(async (receiver, i) => {
-      expect(await ionx.balanceOf(receiver)).to.be.above(balancesBefore[i]);
-    }));
-
   });
 
   it("generic smart wallet and manager succesfully hold erc20 tokens", async () => {

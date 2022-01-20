@@ -33,7 +33,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155ReceiverUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
 
 import "./interfaces/IUniverse.sol";
@@ -62,7 +62,7 @@ contract ChargedParticles is
   RelayRecipient,
   IERC721ReceiverUpgradeable,
   BlackholePrevention,
-  IERC1155ReceiverUpgradeable
+  ERC1155ReceiverUpgradeable
 {
   using SafeMathUpgradeable for uint256;
   using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -86,10 +86,6 @@ contract ChargedParticles is
   //   Proton                 - NFTs minted from the Charged Particle Accelerator
   //                            - A proton is a subatomic particle, symbol p or p⁺, with a positive electric charge of +1e elementary
   //                              charge and a mass slightly less than that of a neutron.
-  //   WBoson                 - Membership Classification
-  //                            - The wBoson is a type of elementary particle. It is the quantum of the electromagnetic field including
-  //                              electromagnetic radiation such as light and radio waves, and the force carrier for the electromagnetic force.
-  //                              WBosons are massless, so they always move at the speed of light in vacuum.
   //   Ion                    - Platform Governance Token
   //                            - A charged subatomic particle. An atom or group of atoms that carries a positive or negative electric charge
   //                              as a result of having lost or gained one or more electrons.
@@ -143,12 +139,6 @@ contract ChargedParticles is
   // Unimplemented
   function onERC1155BatchReceived(address, address, uint256[] calldata, uint256[] calldata, bytes calldata) external virtual override returns (bytes4) {
     return ""; // IERC1155ReceiverUpgradeable(0).onERC1155BatchReceived.selector;
-  }
-
-  function supportsInterface(bytes4 interfaceId) external view virtual override returns (bool) {
-    return  interfaceId == 0x01ffc9a7 ||    // ERC-165
-            interfaceId == 0x80ac58cd ||    // ERC-721
-            interfaceId == 0x4e2312e0;      // ERC-1155
   }
 
   /// @notice Calculates the amount of Fees to be paid for a specific deposit amount

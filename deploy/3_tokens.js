@@ -34,16 +34,6 @@ module.exports = async (hre) => {
   log('  - Trusted Forwarder: ', trustedForwarder);
   log(' ');
 
-  await log('\n  Deploying WBoson...')(alchemyTimeout);
-  const WBoson = await ethers.getContractFactory('WBoson');
-  const WBosonInstance = await WBoson.deploy();
-  const wBoson = await WBosonInstance.deployed();
-  deployData['WBoson'] = {
-    abi: getContractAbi('WBoson'),
-    address: wBoson.address,
-    deployTransaction: wBoson.deployTransaction,
-  }
-
   await log('\n  Deploying Proton NFT...')(alchemyTimeout);
   const Proton = await ethers.getContractFactory('Proton');
   const ProtonInstance = await Proton.deploy();
@@ -99,8 +89,6 @@ module.exports = async (hre) => {
 
   // Display Contract Addresses
   await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
-  log('  - WBoson:      ', wBoson.address);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: wBoson.deployTransaction }));
   log('  - Proton:      ', proton.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
   if (isHardhat) {

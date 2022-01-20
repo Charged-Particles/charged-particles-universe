@@ -48,7 +48,6 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ddGenericWalletManagerB = getDeployData('GenericWalletManagerB', chainId);
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddGenericBasketManagerB = getDeployData('GenericBasketManagerB', chainId);
-    const ddWBoson = getDeployData('WBoson', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddLepton2 = getDeployData('Lepton2', chainId);
     const ddIonx = getDeployData('Ionx', chainId);
@@ -111,10 +110,6 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     log('  Loading TokenInfoProxy from: ', ddTokenInfoProxy.address);
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
     const tokenInfoProxy = await TokenInfoProxy.attach(ddTokenInfoProxy.address);
-
-    log('  Loading WBoson from: ', ddWBoson.address);
-    const WBoson = await ethers.getContractFactory('WBoson');
-    const wBoson = await WBoson.attach(ddWBoson.address);
 
     log('  Loading Proton from: ', ddProton.address);
     const Proton = await ethers.getContractFactory('Proton');
@@ -414,12 +409,6 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     //   await executeTx('8-c', 'Proton: Set TrustedForwarder', async () =>
     //     await proton.setTrustedForwarder(trustedForwarder)
     //   );
-
-    //   await executeTx('8-d', 'WBoson: Set TrustedForwarder', async () =>
-    //     await wBoson.setTrustedForwarder(trustedForwarder)
-    //   );
-    // }
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Lepton2
