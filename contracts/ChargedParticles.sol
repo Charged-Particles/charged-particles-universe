@@ -79,7 +79,7 @@ contract ChargedParticles is
   //   Charge                 - Accrued Interest on the Underlying Asset of a Token
   //   Charged Particle       - Any NFT that has a Mass and a Positive Charge
   //   Neutral Particle       - Any NFT that has a Mass and No Charge
-  //   Energize / Recharge    - Deposit of an Underlying Asset into an NFT
+  //   Energize               - To deposit an Underlying Asset into an NFT
   //   Discharge              - Withdraw the Accrued Interest of an NFT leaving the Particle with its initial Mass
   //   Release                - Withdraw the Underlying Asset & Accrued Interest of an NFT leaving the Particle with No Mass or Charge
   //
@@ -90,7 +90,7 @@ contract ChargedParticles is
   //                            - The wBoson is a type of elementary particle. It is the quantum of the electromagnetic field including
   //                              electromagnetic radiation such as light and radio waves, and the force carrier for the electromagnetic force.
   //                              WBosons are massless, so they always move at the speed of light in vacuum.
-  //   Ion                    - Platform Governance Token
+  //   Ionx                    - Platform Governance Token
   //                            - A charged subatomic particle. An atom or group of atoms that carries a positive or negative electric charge
   //                              as a result of having lost or gained one or more electrons.
   //
@@ -140,7 +140,7 @@ contract ChargedParticles is
     return IERC1155ReceiverUpgradeable(0).onERC1155Received.selector;
   }
 
-  // Unimplemented
+  /// @dev Unimplemented
   function onERC1155BatchReceived(address, address, uint256[] calldata, uint256[] calldata, bytes calldata) external virtual override returns (bytes4) {
     return ""; // IERC1155ReceiverUpgradeable(0).onERC1155BatchReceived.selector;
   }
@@ -151,9 +151,9 @@ contract ChargedParticles is
             interfaceId == 0x4e2312e0;      // ERC-1155
   }
 
-  /// @notice Calculates the amount of Fees to be paid for a specific deposit amount
-  /// @param assetAmount The Amount of Assets to calculate Fees on
-  /// @return protocolFee The amount of deposit fees for the protocol
+  /// @notice Calculates the amount of fees to be paid for a specific deposit amount
+  /// @param assetAmount    The amount of assets to calculate fees on
+  /// @return               protocolFee The amount of deposit fees for the protocol
   function getFeesForDeposit(
     uint256 assetAmount
   )
@@ -165,13 +165,13 @@ contract ChargedParticles is
     protocolFee = _getFeesForDeposit(assetAmount);
   }
 
-  /// @notice Gets the Amount of Asset Tokens that have been Deposited into the Particle
-  /// representing the Mass of the Particle.
-  /// @param contractAddress      The Address to the Contract of the Token
-  /// @param tokenId              The ID of the Token
-  /// @param walletManagerId  The Liquidity-Provider ID to check the Asset balance of
-  /// @param assetToken           The Address of the Asset Token to check
-  /// @return The Amount of underlying Assets held within the Token
+  /// @notice Gets the amount of asset tokens that have been deposited into the Particle
+  /// representing the Mass of the Particle
+  /// @param contractAddress    The address to the contract of the token (Particle)
+  /// @param tokenId            The ID of the token (Particle)
+  /// @param walletManagerId    The liquidity provider ID to check the asset balance of
+  /// @param assetToken         The address of the asset token to check
+  /// @return                   The amount of underlying asset held within the token (principal)
   function baseParticleMass(
     address contractAddress,
     uint256 tokenId,
@@ -187,13 +187,13 @@ contract ChargedParticles is
     return _baseParticleMass(contractAddress, tokenId, walletManagerId, assetToken);
   }
 
-  /// @notice Gets the amount of Interest that the Particle has generated representing
+  /// @notice Gets the amount of interest that the Particle has generated representing
   /// the Charge of the Particle
-  /// @param contractAddress      The Address to the Contract of the Token
-  /// @param tokenId              The ID of the Token
-  /// @param walletManagerId  The Liquidity-Provider ID to check the Interest balance of
-  /// @param assetToken           The Address of the Asset Token to check
-  /// @return The amount of interest the Token has generated (in Asset Token)
+  /// @param contractAddress      The address to the contract of the token (Particle)
+  /// @param tokenId              The ID of the token (Particle)
+  /// @param walletManagerId      The liquidity provider ID to check the interest balance of
+  /// @param assetToken           The address of the asset token to check
+  /// @return                     The amount of interest the token (Particle) has generated (for a given asset token)
   function currentParticleCharge(
     address contractAddress,
     uint256 tokenId,
@@ -211,11 +211,11 @@ contract ChargedParticles is
 
   /// @notice Gets the amount of LP Tokens that the Particle has generated representing
   /// the Kinetics of the Particle
-  /// @param contractAddress      The Address to the Contract of the Token
-  /// @param tokenId              The ID of the Token
-  /// @param walletManagerId  The Liquidity-Provider ID to check the Kinetics balance of
-  /// @param assetToken           The Address of the Asset Token to check
-  /// @return The amount of LP tokens that have been generated
+  /// @param contractAddress      The address to the contract of the token (Particle)
+  /// @param tokenId              The ID of the token (Particle)
+  /// @param walletManagerId      The liquidity provider ID to check the Kinetics balance of
+  /// @param assetToken           The address of the asset token to check
+  /// @return                     The amount of LP tokens that have been generated
   function currentParticleKinetics(
     address contractAddress,
     uint256 tokenId,
@@ -232,10 +232,10 @@ contract ChargedParticles is
   }
 
   /// @notice Gets the total amount of ERC721 Tokens that the Particle holds
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param basketManagerId  The ID of the BasketManager to check the token balance of
-  /// @return The total amount of ERC721 tokens that are held  within the Particle
+  /// @param contractAddress  The address to the contract of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param basketManagerId  The ID of the Basket Manager to check the token balance of
+  /// @return                 The total amount of ERC721 tokens that are held within the Particle
   function currentParticleCovalentBonds(
     address contractAddress,
     uint256 tokenId,
@@ -256,20 +256,16 @@ contract ChargedParticles is
   |        Energize Particles         |
   |__________________________________*/
 
-  /// @notice Fund Particle with Asset Token
-  ///    Must be called by the account providing the Asset
-  ///    Account must Approve THIS contract as Operator of Asset
+  /// @notice Fund a Particle with an asset token (ERC20)
+  ///    Must be called by the account providing the asset
+  ///    The account must approve THIS (ChargedParticles.sol) contract as Operator of the asset
   ///
-  /// NOTE: DO NOT Energize an ERC20 Token, as anyone who holds any amount
-  ///       of the same ERC20 token could discharge or release the funds.
-  ///       All holders of the ERC20 token would essentially be owners of the Charged Particle.
-  ///
-  /// @param contractAddress      The Address to the Contract of the Token to Energize
-  /// @param tokenId              The ID of the Token to Energize
-  /// @param walletManagerId  The Asset-Pair to Energize the Token with
-  /// @param assetToken           The Address of the Asset Token being used
-  /// @param assetAmount          The Amount of Asset Token to Energize the Token with
-  /// @return yieldTokensAmount The amount of Yield-bearing Tokens added to the escrow for the Token
+  /// @param contractAddress      The address to the contract of the token (Particle) to Energize
+  /// @param tokenId              The ID of the token (Particle) to Energize
+  /// @param walletManagerId      The asset pair to Energize the token (Particle) with
+  /// @param assetToken           The address of the asset token being deposited
+  /// @param assetAmount          The amount of asset token to Energize with
+  /// @return                     yieldTokensAmount The amount of yield-bearing tokens added to the Particle
   function energizeParticle(
     address contractAddress,
     uint256 tokenId,
@@ -290,7 +286,7 @@ contract ChargedParticles is
     // Transfer ERC20 Token from Caller to Contract (reverts on fail)
     uint256 feeAmount = _collectAssetToken(_msgSender(), assetToken, assetAmount);
 
-    // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
+    // Deposit asset token directly into Smart Wallet (reverts on fail) and Update WalletManager
     yieldTokensAmount = _depositIntoWalletManager(contractAddress, tokenId, walletManagerId, assetToken, assetAmount, feeAmount);
 
     // Signal to Universe Controller
@@ -299,20 +295,19 @@ contract ChargedParticles is
     }
   }
 
-
   /***********************************|
   |        Discharge Particles        |
   |__________________________________*/
 
-  /// @notice Allows the owner or operator of the Token to collect or transfer the interest generated
-  ///         from the token without removing the underlying Asset that is held within the token.
-  /// @param receiver             The Address to Receive the Discharged Asset Tokens
-  /// @param contractAddress      The Address to the Contract of the Token to Discharge
-  /// @param tokenId              The ID of the Token to Discharge
-  /// @param walletManagerId      The Wallet Manager of the Assets to Discharge from the Token
-  /// @param assetToken           The Address of the Asset Token being discharged
-  /// @return creatorAmount Amount of Asset Token discharged to the Creator
-  /// @return receiverAmount Amount of Asset Token discharged to the Receiver
+  /// @notice Allows the owner or operator of the token (Particle) to collect or transfer the interest generated
+  ///         from the token without removing the underlying asset
+  /// @param receiver             The address to receive the discharged asset tokens
+  /// @param contractAddress      The address to the contract of the token (Particle) to Discharge
+  /// @param tokenId              The ID of token (Particle) to Discharge
+  /// @param walletManagerId      The Wallet Manager of the assets to Discharge from the token (Particle)
+  /// @param assetToken           The address of the asset token being discharged
+  /// @return                     creatorAmount the amount of asset token discharged to the Creator
+  /// @return                     receiverAmount the amount of asset token discharged to the Receiver
   function dischargeParticle(
     address receiver,
     address contractAddress,
@@ -344,16 +339,16 @@ contract ChargedParticles is
     }
   }
 
-  /// @notice Allows the owner or operator of the Token to collect or transfer a specific amount of the interest
-  ///         generated from the token without removing the underlying Asset that is held within the token.
-  /// @param receiver             The Address to Receive the Discharged Asset Tokens
-  /// @param contractAddress      The Address to the Contract of the Token to Discharge
-  /// @param tokenId              The ID of the Token to Discharge
-  /// @param walletManagerId  The Wallet Manager of the Assets to Discharge from the Token
-  /// @param assetToken           The Address of the Asset Token being discharged
-  /// @param assetAmount          The specific amount of Asset Token to Discharge from the Token
-  /// @return creatorAmount Amount of Asset Token discharged to the Creator
-  /// @return receiverAmount Amount of Asset Token discharged to the Receiver
+  /// @notice Allows the owner or operator of the token (Particle) to collect or transfer a specific amount of the interest
+  ///         generated from the token without removing the underlying asset from the Particle
+  /// @param receiver             The address to receive the Discharged asset tokens
+  /// @param contractAddress      The address to the contract of the token (Particle) to Discharge
+  /// @param tokenId              The ID of the token (Particle) to Discharge
+  /// @param walletManagerId      The Wallet Manager of the assets to Discharge from the token (Particle)
+  /// @param assetToken           The address of the asset token being discharged
+  /// @param assetAmount          The specific amount of asset token to Discharge from token (Particle)
+  /// @return                     creatorAmount The amount of asset token discharged to the Creator
+  /// @return                     receiverAmount The amount of asset token discharged to the Receiver
   function dischargeParticleAmount(
     address receiver,
     address contractAddress,
@@ -387,15 +382,15 @@ contract ChargedParticles is
     }
   }
 
-  /// @notice Allows the Creator of the Token to collect or transfer a their portion of the interest (if any)
-  ///         generated from the token without removing the underlying Asset that is held within the token.
-  /// @param receiver             The Address to Receive the Discharged Asset Tokens
-  /// @param contractAddress      The Address to the Contract of the Token to Discharge
+  /// @notice Allows the creator of the token (Particle) to collect or transfer a their portion of the interest (if any)
+  ///         generated from the token without removing the underlying asset that is held within the Particle
+  /// @param receiver             The address to receive the Discharged asset tokens
+  /// @param contractAddress      The address to the contract of the token (Particle) to Discharge
   /// @param tokenId              The ID of the Token to Discharge
-  /// @param walletManagerId  The Wallet Manager of the Assets to Discharge from the Token
-  /// @param assetToken           The Address of the Asset Token being discharged
-  /// @param assetAmount          The specific amount of Asset Token to Discharge from the Particle
-  /// @return receiverAmount      Amount of Asset Token discharged to the Receiver
+  /// @param walletManagerId      The Wallet Manager of the assets to Discharge from the Token
+  /// @param assetToken           The address of the asset token being discharged
+  /// @param assetAmount          The specific amount of asset token to Discharge from the Particle
+  /// @return receiverAmount      The amount of asset token discharged to the Receiver
   function dischargeParticleForCreator(
     address receiver,
     address contractAddress,
@@ -436,13 +431,13 @@ contract ChargedParticles is
   |__________________________________*/
 
   /// @notice Releases the Full amount of Asset + Interest held within the Particle by LP of the Assets
-  /// @param receiver             The Address to Receive the Released Asset Tokens
-  /// @param contractAddress      The Address to the Contract of the Token to Release
+  /// @param receiver             The address to Receive the Released asset tokens
+  /// @param contractAddress      The address to the contract of the token (Particle) to Release
   /// @param tokenId              The ID of the Token to Release
-  /// @param walletManagerId  The Wallet Manager of the Assets to Release from the Token
-  /// @param assetToken           The Address of the Asset Token being released
-  /// @return creatorAmount Amount of Asset Token released to the Creator
-  /// @return receiverAmount Amount of Asset Token released to the Receiver (includes principalAmount)
+  /// @param walletManagerId      The Wallet Manager of the Assets to Release from the Token
+  /// @param assetToken           The address of the asset token being released
+  /// @return                     creatorAmount The amount of asset token released to the Creator
+  /// @return                     receiverAmount The amount of asset token released to the Receiver (includes principalAmount)
   function releaseParticle(
     address receiver,
     address contractAddress,
@@ -477,15 +472,15 @@ contract ChargedParticles is
   }
 
 
-  /// @notice Releases a partial amount of Asset + Interest held within the Particle by LP of the Assets
-  /// @param receiver             The Address to Receive the Released Asset Tokens
-  /// @param contractAddress      The Address to the Contract of the Token to Release
-  /// @param tokenId              The ID of the Token to Release
-  /// @param walletManagerId      The Wallet Manager of the Assets to Release from the Token
-  /// @param assetToken           The Address of the Asset Token being released
-  /// @param assetAmount          The specific amount of Asset Token to Release from the Particle
-  /// @return creatorAmount Amount of Asset Token released to the Creator
-  /// @return receiverAmount Amount of Asset Token released to the Receiver (includes principalAmount)
+  /// @notice Releases a partial amount of principal + interest held within the Particle by LP of the Assets
+  /// @param receiver             The address to receive the Released asset tokens
+  /// @param contractAddress      The address to the contract of the token (Particle) to Release
+  /// @param tokenId              The ID of the token (Particle) to Release
+  /// @param walletManagerId      The Wallet Manager of the assets to Release from the token (Particle)
+  /// @param assetToken           The address of the asset token being released
+  /// @param assetAmount          The specific amount of asset token to Release from the Particle
+  /// @return                     creatorAmount The amount of asset token released to the Creator
+  /// @return                     receiverAmount The amount of asset token released to the Receiver (includes principalAmount)
   function releaseParticleAmount(
     address receiver,
     address contractAddress,
@@ -530,11 +525,11 @@ contract ChargedParticles is
   ///    Must be called by the account providing the Asset
   ///    Account must Approve THIS contract as Operator of Asset
   ///
-  /// @param contractAddress      The Address to the Contract of the Token to Energize
-  /// @param tokenId              The ID of the Token to Energize
-  /// @param basketManagerId      The Basket to Deposit the NFT into
-  /// @param nftTokenAddress      The Address of the NFT Token being deposited
-  /// @param nftTokenId           The ID of the NFT Token being deposited
+  /// @param contractAddress      The address to the contract of the token (Particle) to Energize
+  /// @param tokenId              The ID of the token (Particle) to Energize
+  /// @param basketManagerId      The Basket to deposit the NFT into
+  /// @param nftTokenAddress      The address of the NFT being deposited
+  /// @param nftTokenId           The ID of the NFT being deposited
   function covalentBond(
     address contractAddress,
     uint256 tokenId,
@@ -554,7 +549,7 @@ contract ChargedParticles is
     // Transfer ERC721 Token from Caller to Contract (reverts on fail)
     _collectNftToken(_msgSender(), nftTokenAddress, nftTokenId);
 
-    // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
+    // Deposit asset token directly into Smart Wallet (reverts on fail) and Update WalletManager
     success = _depositIntoBasketManager(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
 
     // Signal to Universe Controller
@@ -564,12 +559,12 @@ contract ChargedParticles is
   }
 
   /// @notice Release NFT Assets from the Particle
-  /// @param receiver             The Address to Receive the Released Asset Tokens
-  /// @param contractAddress      The Address to the Contract of the Token to Energize
-  /// @param tokenId              The ID of the Token to Energize
-  /// @param basketManagerId      The Basket to Deposit the NFT into
-  /// @param nftTokenAddress      The Address of the NFT Token being deposited
-  /// @param nftTokenId           The ID of the NFT Token being deposited
+  /// @param receiver             The address to receive the Released asset tokens
+  /// @param contractAddress      The contract address of the token (Particle) to Energize
+  /// @param tokenId              The ID of the token (Particle) to Release from
+  /// @param basketManagerId      The Basket to Release the NFT from
+  /// @param nftTokenAddress      The address of the NFT Token being Released
+  /// @param nftTokenId           The ID of the NFT Token being Released
   function breakCovalentBond(
     address receiver,
     address contractAddress,
@@ -640,7 +635,7 @@ contract ChargedParticles is
   |          Protocol Fees            |
   |__________________________________*/
 
-  /// @dev Setup the Base Deposit Fee for the Protocol
+  /// @dev Setup the base deposit fee for the protocol
   function setDepositFee(uint256 fee) external onlyOwner {
     require(fee < PERCENTAGE_SCALE, "CP:E-421");
     depositFee = fee;
@@ -673,12 +668,12 @@ contract ChargedParticles is
   |         Private Functions         |
   |__________________________________*/
 
-  /// @dev Validates a Deposit according to the rules set by the Token Contract
-  /// @param contractAddress      The Address to the Contract of the External NFT to check
-  /// @param tokenId              The Token ID of the External NFT to check
-  /// @param walletManagerId  The Wallet Manager of the Assets to Deposit
-  /// @param assetToken           The Address of the Asset Token to Deposit
-  /// @param assetAmount          The specific amount of Asset Token to Deposit
+  /// @dev Validates a deposit according to the rules set by the token contract
+  /// @param contractAddress      The contract address of the asset token to check
+  /// @param tokenId              The token ID of the asset token to check
+  /// @param walletManagerId      The Wallet Manager of the assets to deposit
+  /// @param assetToken           The address of the asset token to deposit
+  /// @param assetAmount          The specific amount of asset token to deposit
   function _validateDeposit(
     address contractAddress,
     uint256 tokenId,
@@ -692,11 +687,11 @@ contract ChargedParticles is
     _chargedManagers.validateDeposit(_msgSender(), contractAddress, tokenId, walletManagerId, assetToken, assetAmount);
   }
 
-  /// @dev Validates an NFT Deposit according to the rules set by the Token Contract
-  /// @param contractAddress      The Address to the Contract of the External NFT to check
+  /// @dev Validates an NFT deposit according to the rules set by the token contract
+  /// @param contractAddress      The address to the Contract of the External NFT to check
   /// @param tokenId              The Token ID of the External NFT to check
-  /// @param basketManagerId      The Basket to Deposit the NFT into
-  /// @param nftTokenAddress      The Address of the NFT Token being deposited
+  /// @param basketManagerId      The Basket to deposit the NFT into
+  /// @param nftTokenAddress      The address of the NFT Token being deposited
   /// @param nftTokenId           The ID of the NFT Token being deposited
   function _validateNftDeposit(
     address contractAddress,
@@ -723,13 +718,13 @@ contract ChargedParticles is
     _chargedManagers.validateBreakBond(_msgSender(), contractAddress, tokenId);
   }
 
-  /// @dev Deposit Asset Tokens into an NFT via the Wallet Manager
-  /// @param contractAddress      The Address to the Contract of the NFT
+  /// @dev Deposit asset tokens into an NFT via the Wallet Manager
+  /// @param contractAddress      The contract address of the Particle
   /// @param tokenId              The Token ID of the NFT
-  /// @param walletManagerId  The Wallet Manager of the Assets to Deposit
-  /// @param assetToken           The Address of the Asset Token to Deposit
-  /// @param assetAmount          The specific amount of Asset Token to Deposit
-  /// @param feeAmount            The Amount of Protocol Fees charged
+  /// @param walletManagerId      The Wallet Manager of the assets to deposit
+  /// @param assetToken           The address of the asset token to deposit
+  /// @param assetAmount          The specific amount of asset token to deposit
+  /// @param feeAmount            The amount of protocol fees charged
   function _depositIntoWalletManager(
     address contractAddress,
     uint256 tokenId,
@@ -747,7 +742,7 @@ contract ChargedParticles is
 
     (address creator, uint256 annuityPct) = _chargedSettings.getCreatorAnnuities(contractAddress, tokenId);
 
-    // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
+    // Deposit asset token directly into Smart Wallet (reverts on fail) and Update WalletManager
     address wallet = lpWalletMgr.getWalletAddressById(contractAddress, tokenId, creator, annuityPct);
     IERC20Upgradeable(assetToken).transfer(wallet, assetAmount);
 
@@ -756,12 +751,12 @@ contract ChargedParticles is
     return lpWalletMgr.energize(contractAddress, tokenId, assetToken, assetAmount);
   }
 
-  /// @dev Deposit NFT Tokens into the Basket Manager
-  /// @param contractAddress      The Address to the Contract of the NFT
+  /// @dev Deposit NFTs into the Basket Manager
+  /// @param contractAddress      The contract address of the token (Particle)
   /// @param tokenId              The Token ID of the NFT
-  /// @param basketManagerId      The Wallet Manager of the Assets to Deposit
-  /// @param nftTokenAddress      The Address of the Asset Token to Deposit
-  /// @param nftTokenId           The specific amount of Asset Token to Deposit
+  /// @param basketManagerId      The Wallet Manager of the Assets to deposit
+  /// @param nftTokenAddress      The address of the NFT to deposit
+  /// @param nftTokenId           The specific amount of asset token to deposit
   function _depositIntoBasketManager(
     address contractAddress,
     uint256 tokenId,
@@ -786,10 +781,9 @@ contract ChargedParticles is
   }
 
   /**
-    * @dev Calculates the amount of Fees to be paid for a specific deposit amount
-    *   Fees are calculated in Interest-Token as they are the type collected for Fees
-    * @param assetAmount The Amount of Assets to calculate Fees on
-    * @return protocolFee The amount of fees reserved for the protocol
+    * @dev Calculates the amount of fees to be paid for a specific deposit amount; fees are calculated in terms of the interest token
+    * @param assetAmount      The amount of assets to calculate fees on
+    * @return                 protocolFee The amount of fees reserved for the protocol
     */
   function _getFeesForDeposit(
     uint256 assetAmount
@@ -803,21 +797,19 @@ contract ChargedParticles is
     }
   }
 
-  /// @dev Collects the Required ERC20 Token(s) from the users wallet
-  ///   Be sure to Approve this Contract to transfer your Token(s)
-  /// @param from         The owner address to collect the tokens from
-  /// @param tokenAddress  The addres of the token to transfer
-  /// @param tokenAmount  The amount of tokens to collect
+  /// @dev Collects the Required ERC20 Token(s) from the user's wallet; be sure to approve this contract (ChargedParticles.sol) to transfer your token(s)
+  /// @param from               The owner address to collect the tokens from
+  /// @param tokenAddress       The address of the token to transfer
+  /// @param tokenAmount        The amount of tokens to collect
   function _collectAssetToken(address from, address tokenAddress, uint256 tokenAmount) internal virtual returns (uint256 protocolFee) {
     protocolFee = _getFeesForDeposit(tokenAmount);
     IERC20Upgradeable(tokenAddress).safeTransferFrom(from, address(this), tokenAmount.add(protocolFee));
   }
 
-  /// @dev Collects the Required ERC721 Token(s) from the users wallet
-  ///   Be sure to Approve this Contract to transfer your Token(s)
-  /// @param from             The owner address to collect the tokens from
-  /// @param nftTokenAddress  The address of the NFT token to transfer
-  /// @param nftTokenId       The ID of the NFT token to transfer
+  /// @dev Collects the Required ERC721 token(s) from the user's wallet; be sure to approve this contract (ChargedParticles.sol) to transfer your nft(s)
+  /// @param from               The owner address to collect the tokens from
+  /// @param nftTokenAddress    The address of the NFT token to transfer
+  /// @param nftTokenId         The ID of the NFT token to transfer
   function _collectNftToken(address from, address nftTokenAddress, uint256 nftTokenId) internal virtual {
     if (_isERC1155(nftTokenAddress)) {
       IERC1155Upgradeable(nftTokenAddress).safeTransferFrom(from, address(this), nftTokenId, 1, "");
@@ -826,7 +818,7 @@ contract ChargedParticles is
     }
   }
 
-  /// @dev Checks if an NFT token contract supports the ERC1155 standard interface
+  /// @dev Checks if an NFT contract supports the ERC1155 standard interface
   function _isERC1155(address nftTokenAddress) internal view virtual returns (bool) {
     bytes4 _INTERFACE_ID_ERC1155 = 0xd9b67a26;
     return IERC165Upgradeable(nftTokenAddress).supportsInterface(_INTERFACE_ID_ERC1155);
