@@ -62,8 +62,8 @@ contract ChargedSettings is
 
   ITokenInfoProxy internal _tokenInfoProxy;
 
-  // Current Settings for External NFT Token Contracts;
-  //  - Any user can add any ERC721 or ERC1155 token as a Charged Particle without Limits,
+  // Current settings for External NFT contracts;
+  //  - Any user can add any ERC721 or ERC1155 token (with a clearly identifiable owner) as a Charged Particle without Limits,
   //    unless the Owner of the ERC721 or ERC1155 token contract registers the token
   //    and sets the Custom Settings for their token(s)
   mapping (address => uint32) internal _nftActionPerms;
@@ -105,10 +105,10 @@ contract ChargedSettings is
   |__________________________________*/
 
   /// @dev Gets the amount of creator annuities reserved for the creator for the specified NFT
-  /// @param contractAddress The Address to the Contract of the NFT
-  /// @param tokenId         The Token ID of the NFT
-  /// @return creator The address of the creator
-  /// @return annuityPct The percentage amount of annuities reserved for the creator
+  /// @param contractAddress The contract address of the NFT (Particle)
+  /// @param tokenId         The token ID of the NFT (Particle)
+  /// @return                creator The creator's address
+  /// @return                annuityPct The percentage of annuities reserved for the creator
   function getCreatorAnnuities(
     address contractAddress,
     uint256 tokenId
@@ -192,11 +192,11 @@ contract ChargedSettings is
   |         Only NFT Creator          |
   |__________________________________*/
 
-  /// @notice Sets the Custom Configuration for Creators of Proton-based NFTs
-  /// @param contractAddress  The Address to the Proton-based NFT to configure
+  /// @notice Sets a custom configuration for the Creator Annuities of a Proton-based NFT
+  /// @param contractAddress  The address of the Proton-based NFT to configure
   /// @param tokenId          The token ID of the Proton-based NFT to configure
   /// @param creator          The creator of the Proton-based NFT
-  /// @param annuityPercent   The percentage of interest-annuities to reserve for the creator
+  /// @param annuityPercent   The percentage of interest annuities to reserve for the creator
   function setCreatorAnnuities(
     address contractAddress,
     uint256 tokenId,
@@ -211,10 +211,10 @@ contract ChargedSettings is
     _setCreatorAnnuities(contractAddress, tokenId, creator, annuityPercent);
   }
 
-  /// @notice Sets a Custom Receiver Address for the Creator Annuities
-  /// @param contractAddress  The Address to the Proton-based NFT to configure
+  /// @notice Sets a custom receiver address for the Creator Annuities
+  /// @param contractAddress  The address to the Proton-based NFT to configure
   /// @param tokenId          The token ID of the Proton-based NFT to configure
-  /// @param receiver         The receiver of the Creator interest-annuities
+  /// @param receiver         The receiver of the creator's interest annuities
   function setCreatorAnnuitiesRedirect(
     address contractAddress,
     uint256 tokenId,
@@ -234,9 +234,9 @@ contract ChargedSettings is
   |(For External Contract Integration)|
   |__________________________________*/
 
-  /// @notice Sets a Required Wallet-Manager for External NFT Contracts (otherwise set to "none" to allow any Wallet-Manager)
-  /// @param contractAddress    The Address to the External NFT Contract to configure
-  /// @param walletManager      If set, will only allow deposits from this specific Wallet-Manager
+  /// @notice Sets a required Wallet Manager for External NFT contracts (otherwise set to "none" to allow any Wallet Manager)
+  /// @param contractAddress    The contract address of the External NFT to configure
+  /// @param walletManager      If set, will only allow deposits from this specific Wallet Manager
   function setRequiredWalletManager(
     address contractAddress,
     string calldata walletManager
@@ -260,9 +260,9 @@ contract ChargedSettings is
     );
   }
 
-  /// @notice Sets a Required Basket-Manager for External NFT Contracts (otherwise set to "none" to allow any Basket-Manager)
-  /// @param contractAddress    The Address to the External Contract to configure
-  /// @param basketManager      If set, will only allow deposits from this specific Basket-Manager
+  /// @notice Sets a required Basket Manager for External NFT contracts (otherwise set to "none" to allow any Basket Manager)
+  /// @param contractAddress    The contract address of the External NFT to configure
+  /// @param basketManager      If set, will only allow deposits from this specific Basket Manager
   function setRequiredBasketManager(
     address contractAddress,
     string calldata basketManager
@@ -273,7 +273,7 @@ contract ChargedSettings is
     onlyValidExternalContract(contractAddress)
     onlyContractOwnerOrAdmin(contractAddress, msg.sender)
   {
-    // Update Configs for External Token Contract
+    // Update configs for External token contract
     if (keccak256(bytes(basketManager)) == keccak256(bytes("none"))) {
       _nftRequiredBasketManager[contractAddress] = "";
     } else {
@@ -286,9 +286,9 @@ contract ChargedSettings is
     );
   }
 
-  /// @notice Enables or Disables Asset-Token Restrictions for External NFT Contracts
-  /// @param contractAddress      The Address to the External NFT Contract to configure
-  /// @param restrictionsEnabled  If set, will only allow deposits from Allowed Asset Tokens
+  /// @notice Enables or disables asset token restrictions for External NFT contracts
+  /// @param contractAddress      The contract address of the External NFT contract to configure
+  /// @param restrictionsEnabled  If set, only allowed asset tokens can be deposited
   function setAssetTokenRestrictions(
     address contractAddress,
     bool restrictionsEnabled
@@ -299,7 +299,7 @@ contract ChargedSettings is
     onlyValidExternalContract(contractAddress)
     onlyContractOwnerOrAdmin(contractAddress, msg.sender)
   {
-    // Update Configs for External Token Contract
+    // Update configs for External token contract
     if (restrictionsEnabled) {
       _nftActionPerms[contractAddress] = _nftActionPerms[contractAddress].setBit(PERM_RESTRICTED_ASSETS);
     } else {
@@ -312,10 +312,10 @@ contract ChargedSettings is
     );
   }
 
-  /// @notice Enables or Disables Allowed Asset Tokens for External NFT Contracts
-  /// @param contractAddress  The Address to the External NFT Contract to configure
-  /// @param assetToken       The Address of the Asset Token to Allow or Disallow
-  /// @param isAllowed        True if the Asset Token is allowed
+  /// @notice Enables or disables allowed asset tokens for External NFT contracts
+  /// @param contractAddress  The contract address of the External NFT to configure
+  /// @param assetToken       The address of the asset token to allow or disallow
+  /// @param isAllowed        True if the asset token is allowed
   function setAllowedAssetToken(
     address contractAddress,
     address assetToken,
@@ -327,7 +327,7 @@ contract ChargedSettings is
     onlyValidExternalContract(contractAddress)
     onlyContractOwnerOrAdmin(contractAddress, msg.sender)
   {
-    // Update Configs for External Token Contract
+    // Update configs for External token contract
     _nftAllowedAssetTokens[contractAddress][assetToken] = isAllowed;
 
     emit AllowedAssetTokenSet(
@@ -337,9 +337,9 @@ contract ChargedSettings is
     );
   }
 
-  /// @notice Sets the Custom Configuration for External Contracts
-  /// @param contractAddress  The Address to the External Contract to configure
-  /// @param assetToken       The address of the Asset Token to set Limits for
+  /// @notice Sets the custom configuration for External contracts
+  /// @param contractAddress  The address of the External contract to configure
+  /// @param assetToken       The address of the asset token to set limits for
   /// @param depositMin       If set, will define the minimum amount of Asset tokens the NFT may hold, otherwise any amount
   /// @param depositMax       If set, will define the maximum amount of Asset tokens the NFT may hold, otherwise any amount
   function setAssetTokenLimits(
@@ -354,7 +354,7 @@ contract ChargedSettings is
     onlyValidExternalContract(contractAddress)
     onlyContractOwnerOrAdmin(contractAddress, msg.sender)
   {
-    // Update Configs for External Token Contract
+    // Update configs for External token contract
     _nftDepositMin[contractAddress][assetToken] = depositMin;
     _nftDepositMax[contractAddress][assetToken] = depositMax;
 
@@ -366,9 +366,9 @@ contract ChargedSettings is
     );
   }
 
-  /// @notice Sets the Max Number of NFTs that can be held by a Charged Particle NFT
-  /// @param contractAddress  The Address to the External Contract to configure
-  /// @param nftTokenAddress  The address of the NFT Token to set a Max for
+  /// @notice Sets the maximum number of NFTs that can be held by a Charged Particle NFT
+  /// @param contractAddress  The address of the External contract to configure
+  /// @param nftTokenAddress  The address of the NFT to set a maximum for
   /// @param maxNfts          The maximum numbers of NFTs that can be held by a given NFT (0 = unlimited)
   function setMaxNfts(
     address contractAddress,
@@ -381,7 +381,7 @@ contract ChargedSettings is
     onlyValidExternalContract(contractAddress)
     onlyContractOwnerOrAdmin(contractAddress, msg.sender)
   {
-    // Update Configs for External Token Contract
+    // Update configs for External token contract
     _nftMaxNfts[contractAddress][nftTokenAddress] = maxNfts;
 
     emit MaxNftsSet(
@@ -472,7 +472,7 @@ contract ChargedSettings is
     _setPermsForBasket(contractAddress, state);
   }
 
-  /// @dev Update the list of NFT contracts that can Timelock any NFT for Front-run Protection
+  /// @dev Update the list of NFT contracts that can Timelock any NFT for front-running protection
   function setPermsForTimelockAny(address contractAddress, bool state)
     external
     override
@@ -539,7 +539,7 @@ contract ChargedSettings is
     emit PermsSetForBasket(contractAddress, state);
   }
 
-  /// @dev Update the list of NFT contracts that can Timelock any NFT for Front-run Protection
+  /// @dev Update the list of NFT contracts that can Timelock any NFT for front-running protection
   function _setPermsForTimelockAny(address contractAddress, bool state) internal virtual {
     if (state) {
       _nftActionPerms[contractAddress] = _nftActionPerms[contractAddress].setBit(PERM_TIMELOCK_ANY_NFT);
@@ -572,7 +572,7 @@ contract ChargedSettings is
     require(annuityPercent <= MAX_ANNUITIES, "CP:E-421");
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
 
-    // Update Configs for External Token Creator
+    // Update configs for External token creator
     _creatorAnnuityPercent[tokenUuid] = annuityPercent;
 
     emit TokenCreatorConfigsSet(
