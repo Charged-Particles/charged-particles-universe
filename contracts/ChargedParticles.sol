@@ -86,10 +86,6 @@ contract ChargedParticles is
   //   Proton                 - NFTs minted from the Charged Particle Accelerator
   //                            - A proton is a subatomic particle, symbol p or p⁺, with a positive electric charge of +1e elementary
   //                              charge and a mass slightly less than that of a neutron.
-  //   WBoson                 - Membership Classification
-  //                            - The wBoson is a type of elementary particle. It is the quantum of the electromagnetic field including
-  //                              electromagnetic radiation such as light and radio waves, and the force carrier for the electromagnetic force.
-  //                              WBosons are massless, so they always move at the speed of light in vacuum.
   //   Ionx                    - Platform Governance Token
   //                            - A charged subatomic particle. An atom or group of atoms that carries a positive or negative electric charge
   //                              as a result of having lost or gained one or more electrons.
