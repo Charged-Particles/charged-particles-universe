@@ -136,38 +136,38 @@ contract ChargedState is
   }
 
 
-  /// @notice Checks if an operator is allowed to Discharge a specific Token
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the operator to check
-  /// @return True if the operator is Approved
+  /// @notice Checks if an operator is allowed to Discharge a specific token (Particle)
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param operator         The address of the operator to check
+  /// @return                 True if the operator is approved
   function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external virtual override returns (bool) {
     return _isApprovedForDischarge(contractAddress, tokenId, operator);
   }
 
-  /// @notice Checks if an operator is allowed to Release a specific Token
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the operator to check
-  /// @return True if the operator is Approved
+  /// @notice Checks if an operator is allowed to Release a specific token (Particle)
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param operator         The address of the operator to check
+  /// @return                 True if the operator is approved
   function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external virtual override returns (bool) {
     return _isApprovedForRelease(contractAddress, tokenId, operator);
   }
 
-  /// @notice Checks if an operator is allowed to Break Covalent Bonds on a specific Token
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the operator to check
-  /// @return True if the operator is Approved
+  /// @notice Checks if an operator is allowed to break Covalent Bonds on a specific token (Particle)
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param operator         The address of the operator to check
+  /// @return                 True if the operator is approved
   function isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) external virtual override returns (bool) {
     return _isApprovedForBreakBond(contractAddress, tokenId, operator);
   }
 
-  /// @notice Checks if an operator is allowed to Timelock a specific Token
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the operator to check
-  /// @return True if the operator is Approved
+  /// @notice Checks if an operator is allowed to Timelock a specific token (Particle)
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param operator         The address of the operator to check
+  /// @return                 True if the operator is approved
   function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external virtual override returns (bool) {
     return _isApprovedForTimelock(contractAddress, tokenId, operator);
   }
@@ -250,11 +250,10 @@ contract ChargedState is
   |      Only NFT Owner/Operator      |
   |__________________________________*/
 
-  /// @notice Sets an Operator as Approved to Discharge a specific Token
-  /// This allows an operator to withdraw the interest-portion only
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the Operator to Approve
+  /// @notice Sets an operator as approved to Discharge a specific token (Particle); This allows an operator to withdraw the interest-portion only
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param operator         The address of the operator to approve
   function setDischargeApproval(
     address contractAddress,
     uint256 tokenId,
@@ -270,11 +269,10 @@ contract ChargedState is
     _setDischargeApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
-  /// @notice Sets an Operator as Approved to Release a specific Token
-  /// This allows an operator to withdraw the principal + interest
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the Operator to Approve
+  /// @notice Sets an operator as approved to Release a specific token (Particle); This allows an operator to withdraw the principal + interest
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param operator         The address of the operator to approve
   function setReleaseApproval(
     address contractAddress,
     uint256 tokenId,
@@ -290,11 +288,10 @@ contract ChargedState is
     _setReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
-  /// @notice Sets an Operator as Approved to Break Covalent Bonds on a specific Token
-  /// This allows an operator to withdraw Basket NFTs
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the Operator to Approve
+  /// @notice Sets an operator as approved to break Covalent Bonds on a specific token (Particle); This allows an operator to withdraw NFTs
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param operator         The address of the operator to approve
   function setBreakBondApproval(
     address contractAddress,
     uint256 tokenId,
@@ -310,11 +307,10 @@ contract ChargedState is
     _setBreakBondApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
-  /// @notice Sets an Operator as Approved to Timelock a specific Token
-  /// This allows an operator to timelock the principal or interest
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the Operator to Approve
+  /// @notice Sets an operator as approved to Timelock a specific token (Particle); This allows an operator to timelock the principal or interest
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param operator         The address of the operator to approve
   function setTimelockApproval(
     address contractAddress,
     uint256 tokenId,
@@ -330,10 +326,10 @@ contract ChargedState is
     _setTimelockApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
-  /// @notice Sets an Operator as Approved to Discharge/Release/Timelock a specific Token
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param operator         The Address of the Operator to Approve
+  /// @notice Sets an operator as approved to Discharge/Release/Timelock a specific token (Particle)
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param operator         The address of the operator to approve
   function setApprovalForAll(
     address contractAddress,
     uint256 tokenId,
@@ -352,7 +348,7 @@ contract ChargedState is
     _setTimelockApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
-  /// @dev Updates Restrictions on Energizing an NFT
+  /// @dev Updates restrictions on Energizing an NFT
   function setPermsForRestrictCharge(address contractAddress, uint256 tokenId, bool state)
     external
     virtual
@@ -362,7 +358,7 @@ contract ChargedState is
     _setPermsForRestrictCharge(contractAddress, tokenId, state);
   }
 
-  /// @dev Updates Allowance on Discharging an NFT by Anyone
+  /// @dev Updates allowance on Discharging an NFT by anyone
   function setPermsForAllowDischarge(address contractAddress, uint256 tokenId, bool state)
     external
     virtual
@@ -372,7 +368,7 @@ contract ChargedState is
     _setPermsForAllowDischarge(contractAddress, tokenId, state);
   }
 
-  /// @dev Updates Allowance on Discharging an NFT by Anyone
+  /// @dev Updates allowance on Discharging an NFT by anyone
   function setPermsForAllowRelease(address contractAddress, uint256 tokenId, bool state)
     external
     virtual
@@ -382,7 +378,7 @@ contract ChargedState is
     _setPermsForAllowRelease(contractAddress, tokenId, state);
   }
 
-  /// @dev Updates Restrictions on Covalent Bonds on an NFT
+  /// @dev Updates restrictions on Covalent Bonds on an NFT
   function setPermsForRestrictBond(address contractAddress, uint256 tokenId, bool state)
     external
     virtual
@@ -392,7 +388,7 @@ contract ChargedState is
     _setPermsForRestrictBond(contractAddress, tokenId, state);
   }
 
-  /// @dev Updates Allowance on Breaking Covalent Bonds on an NFT by Anyone
+  /// @dev Updates allowance on Breaking Covalent Bonds on an NFT by anyone
   function setPermsForAllowBreakBond(address contractAddress, uint256 tokenId, bool state)
     external
     virtual
@@ -402,10 +398,10 @@ contract ChargedState is
     _setPermsForAllowBreakBond(contractAddress, tokenId, state);
   }
 
-  /// @notice Sets a Timelock on the ability to Discharge the Interest of a Particle
-  /// @param contractAddress  The Address to the NFT to Timelock
+  /// @notice Sets a Timelock on the ability to Discharge the interest of a Particle
+  /// @param contractAddress  The address to the NFT to Timelock
   /// @param tokenId          The token ID of the NFT to Timelock
-  /// @param unlockBlock      The Ethereum Block-number to Timelock until (~15 seconds per block)
+  /// @param unlockBlock      The block number to Timelock until
   function setDischargeTimelock(
     address contractAddress,
     uint256 tokenId,
@@ -436,10 +432,10 @@ contract ChargedState is
     emit TokenDischargeTimelock(contractAddress, tokenId, sender, unlockBlock);
   }
 
-  /// @notice Sets a Timelock on the ability to Release the Assets of a Particle
-  /// @param contractAddress  The Address to the NFT to Timelock
+  /// @notice Sets a Timelock on the ability to Release the assets of a Particle
+  /// @param contractAddress  The address to the NFT to Timelock
   /// @param tokenId          The token ID of the NFT to Timelock
-  /// @param unlockBlock      The Ethereum Block-number to Timelock until (~15 seconds per block)
+  /// @param unlockBlock      The block number to Timelock until
   function setReleaseTimelock(
     address contractAddress,
     uint256 tokenId,
@@ -470,10 +466,10 @@ contract ChargedState is
     emit TokenReleaseTimelock(contractAddress, tokenId, sender, unlockBlock);
   }
 
-  /// @notice Sets a Timelock on the ability to Break the Covalent Bond of a Particle
-  /// @param contractAddress  The Address to the NFT to Timelock
+  /// @notice Sets a Timelock on the ability to break the Covalent Bond of a Particle
+  /// @param contractAddress  The address to the NFT to Timelock
   /// @param tokenId          The token ID of the NFT to Timelock
-  /// @param unlockBlock      The Ethereum Block-number to Timelock until (~15 seconds per block)
+  /// @param unlockBlock      The block number to Timelock until
   function setBreakBondTimelock(
     address contractAddress,
     uint256 tokenId,
@@ -509,8 +505,8 @@ contract ChargedState is
   |         Only NFT Contract         |
   |__________________________________*/
 
-  /// @notice Sets a Temporary-Lock on the ability to Release/Discharge the Assets of a Particle
-  /// @param contractAddress  The Address to the NFT to Timelock
+  /// @notice Sets a temporary Timelock on the ability to Release/Discharge the assets of a Particle
+  /// @param contractAddress  The address to the NFT to Timelock
   /// @param tokenId          The token ID of the NFT to Timelock
   /// @param isLocked         The locked state; contracts are expected to disable this lock before expiry
   function setTemporaryLock(
@@ -637,12 +633,11 @@ contract ChargedState is
     return tokenOwner == operator || _nftTimelockApproval[tokenUuid][tokenOwner] == operator;
   }
 
-  /// @notice Sets an Operator as Approved to Discharge a specific Token
-  /// This allows an operator to withdraw the interest-portion only
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param tokenOwner       The Owner Address of the Token
-  /// @param operator         The Address of the Operator to Approve
+  /// @notice Sets an operator as approved to Discharge a specific token; This allows an operator to withdraw the interest only
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param tokenOwner       The Particle owner's address
+  /// @param operator         The address of the operator to approve
   function _setDischargeApproval(
     address contractAddress,
     uint256 tokenId,
@@ -657,12 +652,11 @@ contract ChargedState is
     emit DischargeApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
-  /// @notice Sets an Operator as Approved to Release a specific Token
-  /// This allows an operator to withdraw the principal + interest
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param tokenOwner       The Owner Address of the Token
-  /// @param operator         The Address of the Operator to Approve
+  /// @notice Sets an Operator as Approved to Release a specific Token; This allows an operator to withdraw the principal + interest
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param tokenOwner       The Particle owner's address
+  /// @param operator         The address of the operator to approve
   function _setReleaseApproval(
     address contractAddress,
     uint256 tokenId,
@@ -677,12 +671,11 @@ contract ChargedState is
     emit ReleaseApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
-  /// @notice Sets an Operator as Approved to Break Covalent Bonds on a specific Token
-  /// This allows an operator to withdraw Basket NFTs
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param tokenOwner       The Owner Address of the Token
-  /// @param operator         The Address of the Operator to Approve
+  /// @notice Sets an operator as approved to break Covalent Bonds on a specific Token; This allows an operator to withdraw NFTs
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param tokenOwner       The Particle owner's address
+  /// @param operator         The address of the operator to approve
   function _setBreakBondApproval(
     address contractAddress,
     uint256 tokenId,
@@ -697,12 +690,11 @@ contract ChargedState is
     emit BreakBondApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
-  /// @notice Sets an Operator as Approved to Timelock a specific Token
-  /// This allows an operator to timelock the principal or interest
-  /// @param contractAddress  The Address to the Contract of the Token
-  /// @param tokenId          The ID of the Token
-  /// @param tokenOwner       The Owner Address of the Token
-  /// @param operator         The Address of the Operator to Approve
+  /// @notice Sets an operator as approved to Timelock a specific Token; This allows an operator to timelock the principal or interest
+  /// @param contractAddress  The contract address of the token (Particle)
+  /// @param tokenId          The ID of the token (Particle)
+  /// @param tokenOwner       The Particle owner's address'
+  /// @param operator         The address of the operator to approve
   function _setTimelockApproval(
     address contractAddress,
     uint256 tokenId,
@@ -717,7 +709,7 @@ contract ChargedState is
     emit TimelockApproval(contractAddress, tokenId, tokenOwner, operator);
   }
 
-  /// @dev Updates Restrictions on Energizing an NFT
+  /// @dev Updates restrictions on Energizing an NFT
   function _setPermsForRestrictCharge(address contractAddress, uint256 tokenId, bool state) internal virtual {
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (state) {
@@ -728,7 +720,7 @@ contract ChargedState is
     emit PermsSetForRestrictCharge(contractAddress, tokenId, state);
   }
 
-  /// @dev Updates Allowance on Discharging an NFT by Anyone
+  /// @dev Updates allowance on Discharging an NFT by anyone
   function _setPermsForAllowDischarge(address contractAddress, uint256 tokenId, bool state) internal virtual {
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (state) {
@@ -739,7 +731,7 @@ contract ChargedState is
     emit PermsSetForAllowDischarge(contractAddress, tokenId, state);
   }
 
-  /// @dev Updates Allowance on Discharging an NFT by Anyone
+  /// @dev Updates allowance on Discharging an NFT by anyone
   function _setPermsForAllowRelease(address contractAddress, uint256 tokenId, bool state) internal virtual {
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (state) {
@@ -750,7 +742,7 @@ contract ChargedState is
     emit PermsSetForAllowRelease(contractAddress, tokenId, state);
   }
 
-  /// @dev Updates Restrictions on Covalent Bonds on an NFT
+  /// @dev Updates restrictions on Covalent Bonds on an NFT
   function _setPermsForRestrictBond(address contractAddress, uint256 tokenId, bool state) internal virtual {
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (state) {
@@ -761,7 +753,7 @@ contract ChargedState is
     emit PermsSetForRestrictBond(contractAddress, tokenId, state);
   }
 
-  /// @dev Updates Allowance on Breaking Covalent Bonds on an NFT by Anyone
+  /// @dev Updates allowance on Breaking Covalent Bonds on an NFT by anyone
   function _setPermsForAllowBreakBond(address contractAddress, uint256 tokenId, bool state) internal virtual {
     uint256 tokenUuid = contractAddress.getTokenUUID(tokenId);
     if (state) {
