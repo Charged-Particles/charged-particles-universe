@@ -49,6 +49,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddGenericBasketManagerB = getDeployData('GenericBasketManagerB', chainId);
     const ddProton = getDeployData('Proton', chainId);
+    const ddProtonB = getDeployData('ProtonB', chainId);
     const ddLepton2 = getDeployData('Lepton2', chainId);
     const ddIonx = getDeployData('Ionx', chainId);
 
@@ -114,6 +115,10 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     log('  Loading Proton from: ', ddProton.address);
     const Proton = await ethers.getContractFactory('Proton');
     const proton = await Proton.attach(ddProton.address);
+
+    log('  Loading ProtonB from: ', ddProtonB.address);
+    const ProtonB = await ethers.getContractFactory('ProtonB');
+    const protonB = await ProtonB.attach(ddProtonB.address);
 
     let ddLepton, Lepton, lepton;
     if (isHardhat) {
@@ -314,6 +319,34 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
 
     !afterUpgradesV2 && await executeTx('4-f', 'Universe: Registering Proton', async () =>
       await universe.setProtonToken(ddProton.address)
+    );
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Setup ProtonB
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    await executeTx('4-a', 'ProtonB: Registering Universe', async () =>
+      await protonB.setUniverse(ddUniverse.address)
+    );
+
+    await executeTx('4-b', 'ProtonB: Registering ChargedState', async () =>
+      await protonB.setChargedState(ddChargedState.address)
+    );
+
+    await executeTx('4-c', 'ProtonB: Registering ChargedSettings', async () =>
+      await protonB.setChargedSettings(ddChargedSettings.address)
+    );
+
+    await executeTx('4-d', 'Proton: Registering ChargedParticles', async () =>
+      await protonB.setChargedParticles(ddChargedParticles.address)
+    );
+
+    await executeTx('4-e', 'ChargedSettings: Enabling ProtonB for Charge', async () =>
+      await chargedSettings.enableNftContracts([ddProtonB.address])
+    );
+
+    await executeTx('4-f', 'Universe: Registering ProtonB', async () =>
+      await universe.setProtonToken(ddProtonB.address)
     );
 
 

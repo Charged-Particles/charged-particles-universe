@@ -11,23 +11,24 @@ const {
 const {
   log,
   chainIdByName,
+  chainNameById,
 } = require('../js-helpers/utils');
 
 const { AddressZero } = require('ethers').constants
 const _ = require('lodash');
 
 
-const _migrationSubgraphDump = {
-  chargedSettings: require('../migration_data/subgraph_dump/ChargedSettings'),
-  chargedState: require('../migration_data/subgraph_dump/ChargedState'),
-};
-
-
 module.exports = async (hre) => {
   const network = await hre.network;
   const chainId = chainIdByName(network.name);
+  const networkName = chainNameById(chainId).toLowerCase();
 
   // if (chainId !== 42) { return; } // Kovan only
+
+  const _migrationSubgraphDump = {
+    chargedSettings: require(`../migration_data/subgraph_dump/${networkName}/ChargedSettings`),
+    chargedState: require(`../migration_data/subgraph_dump/${networkName}/ChargedState`),
+  };
 
   const migrationTracking = {
     accounts: getMigrationData('accounts', chainId),
