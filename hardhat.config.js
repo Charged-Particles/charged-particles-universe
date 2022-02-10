@@ -101,8 +101,9 @@ module.exports = {
         },
         mumbai: {
             // url: `https://rpc-mumbai.matic.today`,
-            url: `https://rpc-mumbai.maticvigil.com`,
-            gasPrice: 1e9,
+            // url: `https://rpc-mumbai.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
+            url: `https://matic-mumbai.chainstacklabs.com/`,
+            gasPrice: 10e9,
             accounts: {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
@@ -111,7 +112,7 @@ module.exports = {
             chainId: 80001
         },
         polygon: {
-            url: `https://rpc-mainnet.maticvigil.com`,
+            url: `https://rpc-mainnet.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
             gasPrice: 15e9,
             accounts: {
                 mnemonic: mnemonic.mainnet,

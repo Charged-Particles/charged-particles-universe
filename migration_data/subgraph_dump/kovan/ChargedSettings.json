@@ -1,0 +1,77 @@
+{
+  "nftCreatorSettings": [
+    {
+      "annuityPercent": "700",
+      "annuityRedirect": null,
+      "contractAddress": "0xfb6075a3f960dbcd28ae4bb45092ce33d2909060",
+      "creatorAddress": "0x67c4f8ea8c641b0637a8f617b48f453de620480a",
+      "id": "0xfb6075a3f960dbcd28ae4bb45092ce33d2909060-2-0x67c4f8ea8c641b0637a8f617b48f453de620480a",
+      "tokenId": "2"
+    },
+    {
+      "annuityPercent": "500",
+      "annuityRedirect": null,
+      "contractAddress": "0xfb6075a3f960dbcd28ae4bb45092ce33d2909060",
+      "creatorAddress": "0x67c4f8ea8c641b0637a8f617b48f453de620480a",
+      "id": "0xfb6075a3f960dbcd28ae4bb45092ce33d2909060-3-0x67c4f8ea8c641b0637a8f617b48f453de620480a",
+      "tokenId": "3"
+    },
+    {
+      "annuityPercent": "300",
+      "annuityRedirect": null,
+      "contractAddress": "0xfb6075a3f960dbcd28ae4bb45092ce33d2909060",
+      "creatorAddress": "0x67c4f8ea8c641b0637a8f617b48f453de620480a",
+      "id": "0xfb6075a3f960dbcd28ae4bb45092ce33d2909060-4-0x67c4f8ea8c641b0637a8f617b48f453de620480a",
+      "tokenId": "4"
+    },
+    {
+      "annuityPercent": "200",
+      "annuityRedirect": null,
+      "contractAddress": "0xfb6075a3f960dbcd28ae4bb45092ce33d2909060",
+      "creatorAddress": "0x67c4f8ea8c641b0637a8f617b48f453de620480a",
+      "id": "0xfb6075a3f960dbcd28ae4bb45092ce33d2909060-5-0x67c4f8ea8c641b0637a8f617b48f453de620480a",
+      "tokenId": "5"
+    },
+    {
+      "annuityPercent": "1000",
+      "annuityRedirect": null,
+      "contractAddress": "0xfb6075a3f960dbcd28ae4bb45092ce33d2909060",
+      "creatorAddress": "0x67c4f8ea8c641b0637a8f617b48f453de620480a",
+      "id": "0xfb6075a3f960dbcd28ae4bb45092ce33d2909060-6-0x67c4f8ea8c641b0637a8f617b48f453de620480a",
+      "tokenId": "6"
+    }
+  ],
+  "nftSettings": [
+    {
+      "allowBond": true,
+      "allowCharge": true,
+      "allowTimelockAnyNft": false,
+      "allowTimelockOwnNft": true,
+      "allowedAssetTokens": [],
+      "assetDepositMax": null,
+      "assetDepositMin": null,
+      "contractAddress": "0x038eb00391bd21b424eb09e8420f88e71f6c4db2",
+      "hasRestrictedAssets": false,
+      "id": "0x038eb00391bd21b424eb09e8420f88e71f6c4db2",
+      "maxNfts": [],
+      "requiredBasketManager": null,
+      "requiredWalletManager": null
+    },
+    {
+      "allowBond": true,
+      "allowCharge": true,
+      "allowTimelockAnyNft": false,
+      "allowTimelockOwnNft": true,
+      "allowedAssetTokens": [],
+      "assetDepositMax": null,
+      "assetDepositMin": null,
+      "contractAddress": "0xfb6075a3f960dbcd28ae4bb45092ce33d2909060",
+      "hasRestrictedAssets": false,
+      "id": "0xfb6075a3f960dbcd28ae4bb45092ce33d2909060",
+      "maxNfts": [],
+      "requiredBasketManager": null,
+      "requiredWalletManager": null
+    }
+  ],
+  "tempLockExpiryBlocks": "5760"
+}
