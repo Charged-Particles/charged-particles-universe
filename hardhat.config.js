@@ -149,6 +149,9 @@ module.exports = {
     },
     abiExporter: {
       path: './abis',
+      runOnCompile: true, 
+      // Mindful of https://github.com/ItsNickBarry/hardhat-abi-exporter/pull/29/files
+      // and https://github.com/ItsNickBarry/hardhat-abi-exporter/pull/35 as they heavily change behavior around this package
       clear: true,
       flat: true,
       only: [

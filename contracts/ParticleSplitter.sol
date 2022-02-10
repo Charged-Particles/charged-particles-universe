@@ -41,6 +41,9 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
   IChargedManagers internal _chargedManagers;
   ITokenInfoProxy internal _tokenInfoProxy;
 
+  mapping (address => bool) internal _externalAddressesAllowed;
+
+
   /***********************************|
   |        Execute for Account        |
   |__________________________________*/
@@ -67,6 +70,8 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
     returns (bytes memory)
   {
     require(_chargedManagers.isWalletManagerEnabled(walletManagerId), "PS:E-419");
+    
+    require(_externalAddressesAllowed[externalAddress] == true, "PS:E-117");
 
     // Validate Owner/Operator & Timelocks
     _chargedManagers.validateRelease(msg.sender, contractAddress, tokenId);
@@ -108,6 +113,8 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
     returns (bytes memory)
   {
     require(_chargedManagers.isNftBasketEnabled(basketManagerId), "PS:E-419");
+
+    require(_externalAddressesAllowed[externalAddress] == true, "PS-E117");
 
     // Validate Owner/Operator & Timelocks
     _chargedManagers.validateRelease(msg.sender, contractAddress, tokenId);
@@ -220,11 +227,18 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
     emit TokenInfoProxySet(tokenInfoProxy);
   }
 
+  /**
+    * @dev Allows/Disallows execute from on specific contracts
+    */
+  function setExternalContracts(address[] calldata contracts, bool state) external onlyOwner {
+    uint count = contracts.length;
+    for (uint i = 0; i < count; i++) {
+      address externalContract = contracts[i];
+      _externalAddressesAllowed[externalContract] = state;
+      emit PermsSetForExternal(externalContract, state);
+    }
+  }
 
-  /***********************************|
-  |          Only Admin/DAO           |
-  |      (blackhole prevention)       |
-  |__________________________________*/
 
   function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
     _withdrawEther(receiver, amount);

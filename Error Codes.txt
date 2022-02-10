@@ -35,6 +35,7 @@ Codes:
     E-114 - minting not allowed yet
     E-115 - already activated
     E-116 - not yet activated
+    E-117 - address not allowed
 
 
   2. Find, Inequalities & Range

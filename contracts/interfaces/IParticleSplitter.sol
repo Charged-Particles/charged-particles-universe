@@ -103,4 +103,8 @@ interface IParticleSplitter {
     string walletManagerId,
     address assetToken
   );
+  event PermsSetForExternal(
+    address indexed contractAddress,
+    bool state
+  );
 }

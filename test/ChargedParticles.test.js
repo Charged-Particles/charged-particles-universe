@@ -92,7 +92,7 @@ describe("Charged Particles", () => {
     signer3 = ethers.provider.getSigner(user3);
 
     // With Forked Mainnet
-    dai = new ethers.Contract(daiAddress, daiABI, daiSigner);
+    // dai = new ethers.Contract(daiAddress, daiABI, daiSigner);
 
     // Deploy Mocked Contracts
     erc20token = await deployMockContract(signerD, ERC20Mintable.abi, overrides);
