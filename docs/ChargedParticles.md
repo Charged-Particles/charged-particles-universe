@@ -196,7 +196,9 @@ function currentParticleCovalentBonds(
 | --------- | ----------- | ---- |
 | amount    | The total amount of NFTs that are held within the Particle | uint256 |
 
+## Particle Mechanics
 
+> Interact with Particles
 ### energizeParticle
 
 Fund a Particle with an asset token (ERC20). Must be called by the account providing the asset. The account must approve THIS (ChargedParticles.sol) contract as operator of the asset.
