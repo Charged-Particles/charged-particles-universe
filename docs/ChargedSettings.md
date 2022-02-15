@@ -1,4 +1,4 @@
-# `ChargedSettings`
+# ChargedSettings
 
 ## Get Particles' Settings
 ### getCreatorAnnuities
