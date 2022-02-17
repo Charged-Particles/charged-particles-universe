@@ -17,6 +17,7 @@ const {
 
 const _ = require('lodash');
 
+const { AddressZero } = require('ethers').constants;
 
 
 module.exports = async (hre, afterUpgradesV2 = false) => {
@@ -349,6 +350,9 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await universe.setProtonToken(ddProtonB.address)
     );
 
+    afterUpgradesV2 && await executeTx('4-g', 'Proton A: Disable universe after v2', async () =>
+      await proton.setUniverse(AddressZero)
+    );
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Lepton

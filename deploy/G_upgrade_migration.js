@@ -24,7 +24,7 @@ module.exports = async (hre) => {
   const networkName = chainNameById(chainId).toLowerCase();
 
   // if (chainId !== 42) { return; } // Kovan only
-
+  if (chainId == 31337) { return; } // Hardhat Skip
   const _migrationSubgraphDump = {
     chargedSettings: require(`../migration_data/subgraph_dump/${networkName}/ChargedSettings`),
     chargedState: require(`../migration_data/subgraph_dump/${networkName}/ChargedState`),

@@ -27,6 +27,8 @@ const {
 const { expect, assert } = require('chai');
 const { max } = require('lodash');
 
+const { AddressZero } = require('ethers').constants;
+
 const CryptoPunksMarket = require('../../build/contracts/contracts/test/CryptoPunks.sol/CryptoPunksMarket.json');
 const TokenInfoProxyMock = require('../../build/contracts/contracts/lib/TokenInfoProxy.sol/TokenInfoProxy.json');
 
@@ -133,6 +135,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const Proton = await ethers.getContractFactory('Proton');
 
+    const ProtonB = await ethers.getContractFactory('ProtonB');
+
     const Lepton = await ethers.getContractFactory('Lepton2');
     const Ionx = await ethers.getContractFactory('Ionx');
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy')
@@ -147,12 +151,14 @@ describe("[INTEGRATION] Charged Particles", () => {
     genericWalletManager = GenericWalletManager.attach(getDeployData('GenericWalletManager', chainId).address);
     genericBasketManager = GenericBasketManager.attach(getDeployData('GenericBasketManager', chainId).address);
     proton = Proton.attach(getDeployData('Proton', chainId).address);
-    
+    protonB = Proton.attach(getDeployData('Proton', chainId).address);
+
     lepton = Lepton.attach(getDeployData('Lepton2', chainId).address);
     ionx = Ionx.attach(getDeployData('Ionx', chainId).address);
     tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address);
 
     await proton.connect(signerD).setPausedState(false);
+    await protonB.connect(signerD).setPausedState(false);
 
     await lepton.connect(signerD).setPausedState(false);
   });
@@ -343,26 +349,8 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   it("can execute for account on energized protonB", async () => {
 
-    // For protonB for now we deploy and configure it on the fly since no deploydata.
-    const ProtonB = await ethers.getContractFactory('ProtonB');
-    console.log('  Deploying ProtonB...');
-    const ProtonBInstance = await ProtonB.deploy();
-    protonB = await ProtonBInstance.deployed();
-    console.log('  - ProtonB: ', protonB.address);
-
-    // Configuring ProtonB
-    await protonB.setUniverse(universe.address);
-    await protonB.setChargedState(chargedState.address);
-    await protonB.setChargedSettings(chargedSettings.address);
-    await protonB.setChargedParticles(chargedParticles.address);
-    await protonB.connect(signerD).setPausedState(false);
-    await chargedSettings.enableNftContracts([protonB.address]);
-
     // Switch to protonB
     await universe.setProtonToken(protonB.address);
-    // End protonB Config
-
-
 
     const amountToTransfer = toWei('10');
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
@@ -439,21 +427,6 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   it.only("can execute for account on basket", async () => {
 
-    // For protonB for now we deploy and configure it on the fly since no deploydata.
-    const ProtonB = await ethers.getContractFactory('ProtonB');
-    console.log('  Deploying ProtonB...');
-    const ProtonBInstance = await ProtonB.deploy();
-    protonB = await ProtonBInstance.deployed();
-    console.log('  - ProtonB: ', protonB.address);
-    
-    // Configuring ProtonB
-    await protonB.setUniverse(universe.address);
-    await protonB.setChargedState(chargedState.address);
-    await protonB.setChargedSettings(chargedSettings.address);
-    await protonB.setChargedParticles(chargedParticles.address);
-    await protonB.connect(signerD).setPausedState(false);
-    await chargedSettings.enableNftContracts([protonB.address]);
-
     // Switch to protonB
     await universe.setProtonToken(protonB.address);
     // End protonB Config
@@ -508,7 +481,13 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     await protonB.connect(signer2).approve(chargedParticles.address, tokenId2);
 
-    console.log('Attempt final covalenting')
+    console.log('Attempt final covalenting');
+    console.log({
+      user1,
+      user2,
+      univ: chargedParticles.address,
+    });
+    
     await chargedParticles.connect(signer2).covalentBond(
       protonB.address,
       tokenId1,
@@ -517,19 +496,31 @@ describe("[INTEGRATION] Charged Particles", () => {
       tokenId2
     );
 
-    expect(await proton.ownerOf(tokenId2)).to.be.equal(user1);
-    expect(await proton.ownerOf(tokenId1)).to.not.be.equal(user1);
-    
+     // In smart wallet now
+    expect(await proton.ownerOf(tokenId2)).to.not.be.equal(user2);
+
+     // Line could be redundant because testing the mock
+    expect(await proton.ownerOf(tokenId1)).to.be.equal(user2);
+      
 
     console.log('Attempt execute')
     // Encoded Transfer function to transfer the DAI out
     var iDAI = new ethers.utils.Interface(daiABI);
     const encodedParams = iDAI.encodeFunctionData('transfer', [user2, amountToTransfer]);
     
-    // Should fail before setExternalContracts is called
+    // signer2 owns tokenId1 at the root so acting on tokenId2 will revert
     await expect(particleSplitter.connect(signer2).executeForBasket(
       proton.address,
       tokenId2,
+      'generic.B',
+      daiAddress,
+      encodedParams
+    )).to.be.revertedWith('PS:E-102');
+
+    // Should fail before setExternalContracts is called
+    await expect(particleSplitter.connect(signer2).executeForBasket(
+      proton.address,
+      tokenId1,
       'generic.B',
       daiAddress,
       encodedParams
@@ -668,7 +659,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       .withArgs(user1, toWei('0.045'));
   });
 
-  it.only('Can buy old and new protons', async () => {
+  it('Can buy old and new protons', async () => {
 
     await signerD.sendTransaction({ to: user2, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
@@ -692,27 +683,13 @@ describe("[INTEGRATION] Charged Particles", () => {
     });
 
     await proton.connect(signer1).setSalePrice(energizedParticleId, toWei('0.1'));
-    await proton.connect(signer2).buyProton(energizedParticleId, { value: toWei('0.1') })
+    await proton.connect(signer2).buyProton(energizedParticleId, { value: toWei('0.1') });
     expect(await proton.ownerOf(energizedParticleId)).to.be.equal(user2);
 
-    // For protonB for now we deploy and configure it on the fly since no deploydata.
-    const ProtonB = await ethers.getContractFactory('ProtonB');
-    console.log('  Deploying ProtonB...');
-    const ProtonBInstance = await ProtonB.deploy();
-    protonB = await ProtonBInstance.deployed();
-    console.log('  - ProtonB: ', protonB.address);
-
-    // Configuring ProtonB
-    await protonB.setUniverse(universe.address);
-    await protonB.setChargedState(chargedState.address);
-    await protonB.setChargedSettings(chargedSettings.address);
-    await protonB.setChargedParticles(chargedParticles.address);
-    await protonB.connect(signerD).setPausedState(false);
-    await chargedSettings.enableNftContracts([protonB.address]);
-    // End protonB Config
 
     // Switch to protonB
     await universe.setProtonToken(protonB.address);
+    await proton.setUniverse(AddressZero);
 
     const protonBenergizedParticleId = await callAndReturn({
       contractInstance: protonB,
@@ -725,16 +702,8 @@ describe("[INTEGRATION] Charged Particles", () => {
       ],
     });
 
-   
-    console.log('check balances');
     await protonB.connect(signer1).setSalePrice(protonBenergizedParticleId, toWei('0.1'));
-
-    const balanceUser1 = await ethers.provider.getBalance(user1);
-    const balanceUser2 = await ethers.provider.getBalance(user2);
-
-    console.log({balanceUser1:balanceUser1.toString(),balanceUser2:balanceUser2.toString()})
     
-    console.log('gonna buy');
     await protonB.connect(signer2).buyProton(protonBenergizedParticleId, { value: toWei('0.1') })
     expect(await protonB.ownerOf(energizedParticleId)).to.be.equal(user2);
    

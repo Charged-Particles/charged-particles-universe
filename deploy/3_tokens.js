@@ -44,6 +44,19 @@ module.exports = async (hre) => {
     deployTransaction: proton.deployTransaction,
   }
 
+  await log('  Deploying ProtonB...')(alchemyTimeout);
+  const ProtonB = await hre.ethers.getContractFactory('ProtonB');
+  const ProtonBInstance = await ProtonB.deploy();
+  const protonB = await ProtonBInstance.deployed();
+  deployData['ProtonB'] = {
+    abi: getContractAbi('ProtonB'),
+    address: protonB.address,
+    deployTransaction: protonB.deployTransaction,
+  }
+  saveDeploymentData(chainId, deployData, true);
+  log('  - ProtonB: ', protonB.address);
+  log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: protonB.deployTransaction }));
+
   let LeptonInstance, Lepton, lepton;
   if (isHardhat) {
     await log('\n  Deploying Lepton NFT...')(alchemyTimeout);

@@ -114,7 +114,7 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
   {
     require(_chargedManagers.isNftBasketEnabled(basketManagerId), "PS:E-419");
 
-    require(_externalAddressesAllowed[externalAddress] == true, "PS-E117");
+    require(_externalAddressesAllowed[externalAddress] == true, "PS:E-117");
 
     // Validate Owner/Operator & Timelocks
     _chargedManagers.validateRelease(msg.sender, contractAddress, tokenId);
