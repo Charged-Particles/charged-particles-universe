@@ -150,8 +150,10 @@ describe("[INTEGRATION] Charged Particles", () => {
     aaveWalletManager = AaveWalletManager.attach(getDeployData('AaveWalletManager', chainId).address);
     genericWalletManager = GenericWalletManager.attach(getDeployData('GenericWalletManager', chainId).address);
     genericBasketManager = GenericBasketManager.attach(getDeployData('GenericBasketManager', chainId).address);
+
     proton = Proton.attach(getDeployData('Proton', chainId).address);
-    protonB = Proton.attach(getDeployData('Proton', chainId).address);
+
+    protonB = ProtonB.attach(getDeployData('ProtonB', chainId).address);
 
     lepton = Lepton.attach(getDeployData('Lepton2', chainId).address);
     ionx = Ionx.attach(getDeployData('Ionx', chainId).address);
@@ -425,7 +427,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     
   });
 
-  it.only("can execute for account on basket", async () => {
+  it("can execute for account on basket", async () => {
 
     // Switch to protonB
     await universe.setProtonToken(protonB.address);
