@@ -92,6 +92,26 @@ contract ProtonB is BaseProton, IProtonB {
     );
   }
 
+  /// @dev for backwards compatibility with v1
+  function createBasicProton(
+    address creator,
+    address receiver,
+    string memory tokenMetaUri
+  )
+    external
+    virtual
+    whenNotPaused
+    returns (uint256 newTokenId)
+  {
+    newTokenId = _createProton(
+      creator,
+      receiver,
+      tokenMetaUri,
+      0, // royaltiesPercent
+      0  // salePrice
+    );
+  }
+
 
   /***********************************|
   |          Only Admin/DAO           |

@@ -114,7 +114,7 @@ contract GenericWalletManagerB is WalletManagerBase {
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     if (_wallets[uuid] != address(0x0)) {
-    return GenericSmartWalletB(_wallets[uuid]).getInterest(assetToken);
+    return GenericSmartWalletB(_wallets[uuid]).getInterest(assetToken, 0);
     }
   }
 
@@ -196,7 +196,7 @@ contract GenericWalletManagerB is WalletManagerBase {
 
     // Release Principal + Interest
     principalAmount = GenericSmartWalletB(wallet).getPrincipal(assetToken);
-    (creatorAmount, receiverAmount) = GenericSmartWalletB(wallet).withdraw(receiver, creatorRedirect, assetToken);
+    (creatorAmount, receiverAmount) = GenericSmartWalletB(wallet).withdraw(receiver, creatorRedirect, 0, assetToken);
 
     // Log Event
     emit WalletReleased(contractAddress, tokenId, receiver, assetToken, principalAmount, creatorAmount, receiverAmount);
@@ -221,7 +221,7 @@ contract GenericWalletManagerB is WalletManagerBase {
 
     // Release from interest first + principal if needed
     principalAmount = GenericSmartWalletB(wallet).getPrincipal(assetToken);
-    (creatorAmount, receiverAmount) = GenericSmartWalletB(wallet).withdrawAmount(receiver, creatorRedirect, assetToken, assetAmount);
+    (creatorAmount, receiverAmount) = GenericSmartWalletB(wallet).withdrawAmount(receiver, creatorRedirect, 0, assetToken, assetAmount);
 
     // Log Event
     emit WalletReleased(contractAddress, tokenId, receiver, assetToken, principalAmount, creatorAmount, receiverAmount);

@@ -325,35 +325,33 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // Setup ProtonB
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    if (afterUpgradesV2) {
-      await executeTx('4-a', 'ProtonB: Registering Universe', async () =>
-        await protonB.setUniverse(ddUniverse.address)
-      );
+    await executeTx('4-a', 'ProtonB: Registering Universe', async () =>
+      await protonB.setUniverse(ddUniverse.address)
+    );
 
-      await executeTx('4-b', 'ProtonB: Registering ChargedState', async () =>
-        await protonB.setChargedState(ddChargedState.address)
-      );
+    await executeTx('4-b', 'ProtonB: Registering ChargedState', async () =>
+      await protonB.setChargedState(ddChargedState.address)
+    );
 
-      await executeTx('4-c', 'ProtonB: Registering ChargedSettings', async () =>
-        await protonB.setChargedSettings(ddChargedSettings.address)
-      );
+    await executeTx('4-c', 'ProtonB: Registering ChargedSettings', async () =>
+      await protonB.setChargedSettings(ddChargedSettings.address)
+    );
 
-      await executeTx('4-d', 'Proton: Registering ChargedParticles', async () =>
-        await protonB.setChargedParticles(ddChargedParticles.address)
-      );
+    await executeTx('4-d', 'ProtonB: Registering ChargedParticles', async () =>
+      await protonB.setChargedParticles(ddChargedParticles.address)
+    );
 
-      await executeTx('4-e', 'ChargedSettings: Enabling ProtonB for Charge', async () =>
-        await chargedSettings.enableNftContracts([ddProtonB.address])
-      );
+    await executeTx('4-e', 'ChargedSettings: Enabling ProtonB for Charge', async () =>
+      await chargedSettings.enableNftContracts([ddProtonB.address])
+    );
 
-      await executeTx('4-f', 'Proton: Unregistering Universe', async () =>
-        await proton.setUniverse(ethers.constants.AddressZero)
-      );
+    afterUpgradesV2 && await executeTx('4-f', 'ProtonA: Unregistering Universe', async () =>
+      await proton.setUniverse(ethers.constants.AddressZero)
+    );
 
-      await executeTx('4-g', 'Universe: Registering ProtonB', async () =>
-        await universe.setProtonToken(ddProtonB.address)
-      );
-    }
+    afterUpgradesV2 && await executeTx('4-g', 'Universe: Registering ProtonB', async () =>
+      await universe.setProtonToken(ddProtonB.address)
+    );
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Lepton

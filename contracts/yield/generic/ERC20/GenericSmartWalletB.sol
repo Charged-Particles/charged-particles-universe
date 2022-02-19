@@ -26,14 +26,14 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "../../../lib/SmartWalletBase.sol";
+import "../../../lib/SmartWalletBaseB.sol";
 
 
 /**
  * @notice Generic ERC20-Token Smart-Wallet Bridge
  * @dev Non-upgradeable Contract
  */
-contract GenericSmartWalletB is SmartWalletBase {
+contract GenericSmartWalletB is SmartWalletBaseB {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
@@ -44,7 +44,7 @@ contract GenericSmartWalletB is SmartWalletBase {
   function initialize()
     public
   {
-    SmartWalletBase.initializeBase();
+    SmartWalletBaseB.initializeBase();
   }
 
   function isReserveActive(address assetToken)
@@ -73,7 +73,7 @@ contract GenericSmartWalletB is SmartWalletBase {
     return _getPrincipal(assetToken);
   }
 
-  function getInterest(address /* assetToken */)
+  function getInterest(address /* assetToken */,  uint256 /* creatorPct */)
     external
     override
     returns (uint256 creatorInterest, uint256 ownerInterest)
@@ -108,7 +108,7 @@ contract GenericSmartWalletB is SmartWalletBase {
     _assetPrincipalBalance[assetToken] = _assetPrincipalBalance[assetToken].add(assetAmount);
   }
 
-  function withdraw(address receiver, address /* creatorRedirect */, address assetToken)
+  function withdraw(address receiver, address /* creator */, uint256 /* creatorPct */, address assetToken)
     external
     override
     onlyWalletManager
@@ -121,7 +121,7 @@ contract GenericSmartWalletB is SmartWalletBase {
     IERC20(assetToken).safeTransfer(receiver, receiverAmount);
   }
 
-  function withdrawAmount(address receiver, address /* creatorRedirect */, address assetToken, uint256 assetAmount)
+  function withdrawAmount(address receiver, address /* creator */, uint256 /* creatorPct */, address assetToken, uint256 assetAmount)
     external
     override
     onlyWalletManager
@@ -139,6 +139,7 @@ contract GenericSmartWalletB is SmartWalletBase {
 
   function withdrawAmountForCreator(
     address /* receiver */,
+    uint256 /* creatorPct */,
     address /* assetToken */,
     uint256 /* assetID */
   )

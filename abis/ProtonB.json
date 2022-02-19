@@ -500,6 +500,35 @@
         "type": "address"
       },
       {
+        "internalType": "string",
+        "name": "tokenMetaUri",
+        "type": "string"
+      }
+    ],
+    "name": "createBasicProton",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "newTokenId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
         "internalType": "address",
         "name": "referrer",
         "type": "address"

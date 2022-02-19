@@ -19,13 +19,14 @@ const { deployMockContract } = require('../../js-helpers/deployMockContract');
 
 const {
   callAndReturn,
+  callAndReturnWithLogs,
   getNetworkBlockNumber,
   setNetworkAfterBlockNumber,
   setNetworkAfterTimestamp
 } = require('../../js-helpers/test')(network);
 
 const { expect, assert } = require('chai');
-const { max } = require('lodash');
+const _ = require('lodash');
 
 const { AddressZero } = require('ethers').constants;
 
@@ -41,6 +42,7 @@ const daiHodler = "0x55e4d16f9c3041EfF17Ca32850662f3e9Dddbce7"; // Hodler with t
 const amplHodler = "0x6723B7641c8Ac48a61F5f505aB1E9C03Bb44a301";
 
 let overrides = { gasLimit: 20000000 }
+const buyProtonGasLimit = toWei('0.5');
 
 describe("[INTEGRATION] Charged Particles", () => {
   let chainId;
@@ -269,7 +271,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
     await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
-    const initalBalance = await dai.balanceOf(user2);
+    const initialBalance = await dai.balanceOf(user2);
 
     const energizedParticleId = await callAndReturn({
       contractInstance: proton,
@@ -296,7 +298,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       daiAddress
     );
 
-    expect(await dai.balanceOf(user2)).to.be.equal(initalBalance.add(amountToTransfer));
+    expect(await dai.balanceOf(user2)).to.be.equal(initialBalance.add(amountToTransfer));
   });
 
   it("can succesfully energize and release proton on 'generic.B'", async () => {
@@ -313,7 +315,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
     await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
-    const initalBalance = await dai.balanceOf(user2);
+    const initialBalance = await dai.balanceOf(user2);
 
     const energizedParticleId = await callAndReturn({
       contractInstance: proton,
@@ -340,7 +342,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       daiAddress
     );
 
-    expect(await dai.balanceOf(user2)).to.be.equal(initalBalance.add(amountToTransfer));
+    expect(await dai.balanceOf(user2)).to.be.equal(initialBalance.add(amountToTransfer));
   });
 
   it("can execute for account on energized protonB", async () => {
@@ -361,7 +363,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
     await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
-    const initalBalance = await dai.balanceOf(user2);
+    const initialBalance = await dai.balanceOf(user2);
 
     const energizedParticleId = await callAndReturn({
       contractInstance: protonB,
@@ -405,8 +407,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       daiAddress,
       encodedParams
     );
-
-    expect(await dai.balanceOf(user2)).to.be.equal(initalBalance.add(amountToTransfer));
+    expect(await dai.balanceOf(user2)).to.be.equal(initialBalance.add(amountToTransfer));
 
     await particleSplitter.setExternalContracts([daiAddress], false);
 
@@ -417,29 +418,26 @@ describe("[INTEGRATION] Charged Particles", () => {
       daiAddress,
       encodedParams
     )).to.be.revertedWith('PS:E-117');
-
   });
 
-  it.only("can execute for account on basket", async () => {
+  it("can execute for account on basket", async () => {
 
     // Switch to protonB
     await universe.setProtonToken(protonB.address);
-    // End protonB Config
 
-    const amountToTransfer = toWei('7');
-
+    const amountToTransfer = toWei('10');
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
 
-    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
-
-    await dai.connect(daiSigner).transfer(user1, toWei('10'));
-    await dai.connect(signer1)['approve(address,uint256)'](protonB.address, toWei('10'));
+    await signerD.sendTransaction({ to: daiHodler, value: amountToTransfer }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
     await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
+    const initialBalance = await dai.balanceOf(user2);
+
+    // Create Charged Particle #1
     const tokenId1 = await callAndReturn({
       contractInstance: protonB,
       contractMethod: 'createChargedParticle',
@@ -449,46 +447,60 @@ describe("[INTEGRATION] Charged Particles", () => {
         user2,                        // receiver
         user3,                        // referrer
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
-        'generic.B',                    // walletManagerId
+        'generic.B',                  // walletManagerId
         daiAddress,                   // assetToken
-        toWei('3'),                   // assetAmount
+        '0',                          // assetAmount  -- We dont want to Energize here, as the assets will go into a WalletManager not a BasketManager
         annuityPct,                   // annuityPercent
       ],
     });
     await tokenInfoProxyMock.mock.getTokenOwner.withArgs(protonB.address, tokenId1.toString()).returns(user2);
 
+    // Create Charged Particle #2
     const tokenId2 = await callAndReturn({
       contractInstance: protonB,
       contractMethod: 'createChargedParticle',
       contractCaller: signer1,
       contractParams: [
-        user3,                        // creator
+        user1,                        // creator
         user2,                        // receiver
-        user1,                        // referrer
+        user3,                        // referrer
         TEST_NFT_TOKEN_URI,           // tokenMetaUri
-        'generic.B',                    // walletManagerId
+        'generic.B',                  // walletManagerId
         daiAddress,                   // assetToken
-        amountToTransfer,                   // assetAmount
+        '0',                          // assetAmount  -- We dont want to Energize here, as the assets will go into a WalletManager not a BasketManager
         annuityPct,                   // annuityPercent
       ],
     });
     await tokenInfoProxyMock.mock.getTokenOwner.withArgs(protonB.address, tokenId2.toString()).returns(user2);
 
+    // Deposit Charged Particle #2 inside of #1
     await protonB.connect(signer2).approve(chargedParticles.address, tokenId2);
+    const bondResults = await callAndReturnWithLogs({
+      contractInstance: chargedParticles,
+      contractMethod: 'covalentBond',
+      contractCaller: signer2,
+      contractParams: [
+        protonB.address,
+        tokenId1,
+        'generic.B',
+        protonB.address,
+        tokenId2
+      ],
+    });
+    expect(await chargedParticles.currentParticleCovalentBonds(protonB.address, tokenId1, 'generic.B')).to.be.equal(1);
 
-    await chargedParticles.connect(signer2).covalentBond(
-      protonB.address,
-      tokenId1,
-      'generic.B',
-      protonB.address,
-      tokenId2
-    );
+    // Get Basket Address from NewSmartBasket event
+    let smartBasketAddress = false;
+    const eventHash = ethers.utils.solidityKeccak256(['string'], ['NewSmartBasket(address,uint256,address)']);
+    _.forEach(bondResults.txResults.events, (e) => {
+      if (e.topics[0] === eventHash) {
+        smartBasketAddress = '0x' + e.topics[3].slice(26); // addresses are padded to fill 32 bytes (0x + 24 leading zeroes)
+      }
+    })
+    expect(smartBasketAddress).to.not.be.equal(false);
 
-     // In smart wallet now
-    expect(await proton.ownerOf(tokenId2)).to.not.be.equal(user2);
-
-     // Line could be redundant because testing the mock
-    expect(await proton.ownerOf(tokenId1)).to.be.equal(user2);
+    // Deposit DAI directly into the SmartBasket of Charged Particle #1
+    await dai.connect(daiSigner).transfer(smartBasketAddress, amountToTransfer);
 
     // Encoded Transfer function to transfer the DAI out
     var iDAI = new ethers.utils.Interface(daiABI);
@@ -496,32 +508,33 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     // signer2 owns tokenId1 at the root so acting on tokenId2 will revert
     await expect(particleSplitter.connect(signer2).executeForBasket(
-      proton.address,
+      protonB.address,
       tokenId2,
       'generic.B',
       daiAddress,
       encodedParams
     )).to.be.revertedWith('PS:E-102');
 
-    // Should fail before setExternalContracts is called
+    // "daiAddress" is not whitelisted, so this should fail before setExternalContracts is called
     await expect(particleSplitter.connect(signer2).executeForBasket(
-      proton.address,
+      protonB.address,
       tokenId1,
       'generic.B',
       daiAddress,
       encodedParams
     )).to.be.revertedWith('PS:E-117');
 
-
+    // Whitelist DAI, and try again, this time should pass
     await particleSplitter.setExternalContracts([daiAddress], true);
 
-    await particleSplitter.connect(signer2).executeForWallet(
-      proton.address,
+    particleSplitter.connect(signer2).executeForBasket(
+      protonB.address,
       tokenId1,
       'generic.B',
       daiAddress,
       encodedParams
     );
+    expect(await dai.balanceOf(user2)).to.be.equal(initialBalance.add(amountToTransfer));
   });
 
   it("can discharge only after timelock expired", async () => {
@@ -590,6 +603,9 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   it("creator receieves royalties, old owner receives the sale price and the new owner receives the token", async () => {
 
+    // Switch to protonB
+    await universe.setProtonToken(protonB.address);
+
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
@@ -597,13 +613,13 @@ describe("[INTEGRATION] Charged Particles", () => {
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
-    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](protonB.address, toWei('10'));
 
     await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
     await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
     const energizedParticleId = await callAndReturn({
-      contractInstance: proton,
+      contractInstance: protonB,
       contractMethod: 'createChargedParticle',
       contractCaller: signer1,
       contractParams: [
@@ -618,28 +634,28 @@ describe("[INTEGRATION] Charged Particles", () => {
       ],
     });
 
-    await proton.connect(signer1).setSalePrice(energizedParticleId, toWei('0.1'));
-    await proton.connect(signer1).setRoyaltiesPct(energizedParticleId, 500); // royaltyPct = 5%
+    await protonB.connect(signer1).setSalePrice(energizedParticleId, toWei('0.1'));
+    await protonB.connect(signer1).setRoyaltiesPct(energizedParticleId, 500); // royaltyPct = 5%
     const user1Balance1 = await ethers.provider.getBalance(user1);
-    await proton.connect(signer2).buyProton(energizedParticleId, { value: toWei('0.1') })
+    await protonB.connect(signer2).buyProton(energizedParticleId, buyProtonGasLimit, { value: toWei('0.1') })
     const user1Balance2 = await ethers.provider.getBalance(user1);
 
     expect(user1Balance2.sub(user1Balance1)).to.be.equal(toWei('0.1'));
-    expect(await proton.ownerOf(energizedParticleId)).to.be.equal(user2);
+    expect(await protonB.ownerOf(energizedParticleId)).to.be.equal(user2);
 
-    await proton.connect(signer2).setSalePrice(energizedParticleId, toWei('1'));
+    await protonB.connect(signer2).setSalePrice(energizedParticleId, toWei('1'));
     const user2Balance1 = await ethers.provider.getBalance(user2);
-    await proton.connect(signer3).buyProton(energizedParticleId, { value: toWei('1') })
+    await protonB.connect(signer3).buyProton(energizedParticleId, buyProtonGasLimit, { value: toWei('1') })
     const user1Balance3 = await ethers.provider.getBalance(user1);
     const user2Balance2 = await ethers.provider.getBalance(user2);
 
     expect(user2Balance2.sub(user2Balance1)).to.be.equal(toWei('0.955'));
-    expect(await proton.ownerOf(energizedParticleId)).to.be.equal(user3);
+    expect(await protonB.ownerOf(energizedParticleId)).to.be.equal(user3);
 
     // Creator Royalties (not transferred at time of sale, must be claimed by receiver)
     expect(user1Balance3.sub(user1Balance2)).to.be.equal(toWei('0'));
-    expect(await proton.connect(signer1).claimCreatorRoyalties())
-      .to.emit(proton, 'RoyaltiesClaimed')
+    expect(await protonB.connect(signer1).claimCreatorRoyalties())
+      .to.emit(protonB, 'RoyaltiesClaimed')
       .withArgs(user1, toWei('0.045'));
   });
 
@@ -647,13 +663,15 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     await signerD.sendTransaction({ to: user2, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
 
-
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
 
     await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
     await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+    // Switch to protonA
+    await universe.setProtonToken(proton.address);
 
     const energizedParticleId = await callAndReturn({
       contractInstance: proton,
@@ -670,12 +688,11 @@ describe("[INTEGRATION] Charged Particles", () => {
     await proton.connect(signer2).buyProton(energizedParticleId, { value: toWei('0.1') });
     expect(await proton.ownerOf(energizedParticleId)).to.be.equal(user2);
 
-
     // Switch to protonB
     await universe.setProtonToken(protonB.address);
     await proton.setUniverse(AddressZero);
 
-    const protonBenergizedParticleId = await callAndReturn({
+    const energizedParticleIdProtonB = await callAndReturn({
       contractInstance: protonB,
       contractMethod: 'createBasicProton',
       contractCaller: signer1,
@@ -686,11 +703,10 @@ describe("[INTEGRATION] Charged Particles", () => {
       ],
     });
 
-    await protonB.connect(signer1).setSalePrice(protonBenergizedParticleId, toWei('0.1'));
+    await protonB.connect(signer1).setSalePrice(energizedParticleIdProtonB, toWei('0.1'));
 
-    await protonB.connect(signer2).buyProton(protonBenergizedParticleId, { value: toWei('0.1') })
-    expect(await protonB.ownerOf(energizedParticleId)).to.be.equal(user2);
-
+    await protonB.connect(signer2).buyProton(energizedParticleIdProtonB, buyProtonGasLimit, { value: toWei('0.1') })
+    expect(await protonB.ownerOf(energizedParticleIdProtonB)).to.be.equal(user2);
   });
 
   it("generic smart wallet and manager succesfully hold erc20 tokens", async () => {
