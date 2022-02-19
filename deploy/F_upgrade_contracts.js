@@ -33,7 +33,7 @@ module.exports = async (hre) => {
   const { isProd, isHardhat } = chainTypeById(chainId);
   const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 5);
 
-  // if (chainId !== 42) { return; } // Kovan only
+  if (chainId === 31337) { return; } // Don't upgrade for Unit-Tests
 
   // V1 Contracts
   const ddChargedParticles = getDeployData('ChargedParticles', chainId);
@@ -199,27 +199,12 @@ module.exports = async (hre) => {
   log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: aaveWalletManagerB.deployTransaction }));
   accumulatedGasCost(aaveWalletManagerB.deployTransaction);
 
-  // await log('  Deploying ProtonB...')(alchemyTimeout);
-  // const ProtonB = await hre.ethers.getContractFactory('ProtonB');
-  // const ProtonBInstance = await ProtonB.deploy();
-  // protonB = await ProtonBInstance.deployed();
-  // deployData['ProtonB'] = {
-  //   abi: getContractAbi('ProtonB'),
-  //   address: protonB.address,
-  //   deployTransaction: protonB.deployTransaction,
-  // }
-  // saveDeploymentData(chainId, deployData, true);
-  // log('  - ProtonB: ', protonB.address);
-  // log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: protonB.deployTransaction }));
-  // accumulatedGasCost(protonB.deployTransaction);
-
-
   log('\n  Contract Deployment Complete - data saved to "deployments" directory.');
   const gasCosts = getAccumulatedGasCost();
   log('     - Total Gas Cost');
-  log('       @ 10 gwei:  ', gasCosts[0]);
-  log('       @ 100 gwei: ', gasCosts[1]);
-  log('       @ 150 gwei: ', gasCosts[2]);
+  log('       @ 10 gwei:  ', gasCosts[1]);
+  log('       @ 100 gwei: ', gasCosts[2]);
+  log('       @ 150 gwei: ', gasCosts[3]);
 
 
 

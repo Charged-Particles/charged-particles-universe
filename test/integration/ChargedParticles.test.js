@@ -134,9 +134,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const Proton = await ethers.getContractFactory('Proton');
-
     const ProtonB = await ethers.getContractFactory('ProtonB');
-
     const Lepton = await ethers.getContractFactory('Lepton2');
     const Ionx = await ethers.getContractFactory('Ionx');
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy')
@@ -150,18 +148,14 @@ describe("[INTEGRATION] Charged Particles", () => {
     aaveWalletManager = AaveWalletManager.attach(getDeployData('AaveWalletManager', chainId).address);
     genericWalletManager = GenericWalletManager.attach(getDeployData('GenericWalletManager', chainId).address);
     genericBasketManager = GenericBasketManager.attach(getDeployData('GenericBasketManager', chainId).address);
-
     proton = Proton.attach(getDeployData('Proton', chainId).address);
-
     protonB = ProtonB.attach(getDeployData('ProtonB', chainId).address);
-
     lepton = Lepton.attach(getDeployData('Lepton2', chainId).address);
     ionx = Ionx.attach(getDeployData('Ionx', chainId).address);
     tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address);
 
     await proton.connect(signerD).setPausedState(false);
     await protonB.connect(signerD).setPausedState(false);
-
     await lepton.connect(signerD).setPausedState(false);
   });
 
@@ -391,7 +385,6 @@ describe("[INTEGRATION] Charged Particles", () => {
     // Encoded Transfer function to transfer the DAI out
     var iDAI = new ethers.utils.Interface(daiABI);
     const encodedParams = iDAI.encodeFunctionData('transfer', [user2, amountToTransfer]);
-    // console.log('encodedParams = ', encodedParams);
 
     // Should fail before setExternalContracts is called
     await expect(particleSplitter.connect(signer2).executeForWallet(
@@ -401,8 +394,8 @@ describe("[INTEGRATION] Charged Particles", () => {
       daiAddress,
       encodedParams
     )).to.be.revertedWith('PS:E-117');
-    
-  
+
+
     await particleSplitter.setExternalContracts([daiAddress], true);
 
     await particleSplitter.connect(signer2).executeForWallet(
@@ -424,10 +417,10 @@ describe("[INTEGRATION] Charged Particles", () => {
       daiAddress,
       encodedParams
     )).to.be.revertedWith('PS:E-117');
-    
+
   });
 
-  it("can execute for account on basket", async () => {
+  it.only("can execute for account on basket", async () => {
 
     // Switch to protonB
     await universe.setProtonToken(protonB.address);
@@ -483,13 +476,6 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     await protonB.connect(signer2).approve(chargedParticles.address, tokenId2);
 
-    console.log('Attempt final covalenting');
-    console.log({
-      user1,
-      user2,
-      univ: chargedParticles.address,
-    });
-    
     await chargedParticles.connect(signer2).covalentBond(
       protonB.address,
       tokenId1,
@@ -503,13 +489,11 @@ describe("[INTEGRATION] Charged Particles", () => {
 
      // Line could be redundant because testing the mock
     expect(await proton.ownerOf(tokenId1)).to.be.equal(user2);
-      
 
-    console.log('Attempt execute')
     // Encoded Transfer function to transfer the DAI out
     var iDAI = new ethers.utils.Interface(daiABI);
     const encodedParams = iDAI.encodeFunctionData('transfer', [user2, amountToTransfer]);
-    
+
     // signer2 owns tokenId1 at the root so acting on tokenId2 will revert
     await expect(particleSplitter.connect(signer2).executeForBasket(
       proton.address,
@@ -527,8 +511,8 @@ describe("[INTEGRATION] Charged Particles", () => {
       daiAddress,
       encodedParams
     )).to.be.revertedWith('PS:E-117');
-    
-  
+
+
     await particleSplitter.setExternalContracts([daiAddress], true);
 
     await particleSplitter.connect(signer2).executeForWallet(
@@ -538,8 +522,6 @@ describe("[INTEGRATION] Charged Particles", () => {
       daiAddress,
       encodedParams
     );
-
- 
   });
 
   it("can discharge only after timelock expired", async () => {
@@ -705,10 +687,10 @@ describe("[INTEGRATION] Charged Particles", () => {
     });
 
     await protonB.connect(signer1).setSalePrice(protonBenergizedParticleId, toWei('0.1'));
-    
+
     await protonB.connect(signer2).buyProton(protonBenergizedParticleId, { value: toWei('0.1') })
     expect(await protonB.ownerOf(energizedParticleId)).to.be.equal(user2);
-   
+
   });
 
   it("generic smart wallet and manager succesfully hold erc20 tokens", async () => {

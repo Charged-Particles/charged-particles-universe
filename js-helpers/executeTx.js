@@ -22,11 +22,12 @@ const getAccumulatedGasCost = () => {
   if (__accumulatedGasCost === 0) {
     return ['0 ETH', '0 ETH', '0 ETH'];
   }
-  const gwei10 = `${toEth(__accumulatedGasCost)} ETH`;
+  const gwei1   = `${toEth(__accumulatedGasCost.div(10))} ETH`;
+  const gwei10  = `${toEth(__accumulatedGasCost)} ETH`;
   const gwei100 = `${toEth(__accumulatedGasCost.mul(10))} ETH`;
   const gwei150 = `${toEth(__accumulatedGasCost.mul(15))} ETH`;
   __accumulatedGasCost = bn(0);
-  return [gwei10, gwei100, gwei150];
+  return [gwei1, gwei10, gwei100, gwei150];
 };
 
 const resetAccumulatedGasCost = () => {

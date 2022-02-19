@@ -44,8 +44,8 @@ module.exports = async (hre) => {
     deployTransaction: proton.deployTransaction,
   }
 
-  await log('  Deploying ProtonB...')(alchemyTimeout);
-  const ProtonB = await hre.ethers.getContractFactory('ProtonB');
+  await log('\n  Deploying ProtonB NFT...')(alchemyTimeout);
+  const ProtonB = await ethers.getContractFactory('ProtonB');
   const ProtonBInstance = await ProtonB.deploy();
   const protonB = await ProtonBInstance.deployed();
   deployData['ProtonB'] = {
@@ -53,9 +53,6 @@ module.exports = async (hre) => {
     address: protonB.address,
     deployTransaction: protonB.deployTransaction,
   }
-  saveDeploymentData(chainId, deployData, true);
-  log('  - ProtonB: ', protonB.address);
-  log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: protonB.deployTransaction }));
 
   let LeptonInstance, Lepton, lepton;
   if (isHardhat) {
@@ -104,6 +101,8 @@ module.exports = async (hre) => {
   await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
   log('  - Proton:      ', proton.address);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
+  log('  - ProtonB:     ', protonB.address);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: protonB.deployTransaction }));
   if (isHardhat) {
     log('  - Lepton:      ', lepton.address);
     log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));

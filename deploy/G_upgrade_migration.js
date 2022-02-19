@@ -23,8 +23,9 @@ module.exports = async (hre) => {
   const chainId = chainIdByName(network.name);
   const networkName = chainNameById(chainId).toLowerCase();
 
-  // if (chainId !== 42) { return; } // Kovan only
   if (chainId == 31337) { return; } // Hardhat Skip
+
+
   const _migrationSubgraphDump = {
     chargedSettings: require(`../migration_data/subgraph_dump/${networkName}/ChargedSettings`),
     chargedState: require(`../migration_data/subgraph_dump/${networkName}/ChargedState`),
@@ -119,9 +120,9 @@ module.exports = async (hre) => {
   log('\n  Contract Migration Complete.');
   const gasCosts = getAccumulatedGasCost();
   log('     - Total Gas Cost');
-  log('       @ 10 gwei:  ', gasCosts[0]);
-  log('       @ 100 gwei: ', gasCosts[1]);
-  log('       @ 150 gwei: ', gasCosts[2]);
+  log('       @ 10 gwei:  ', gasCosts[1]);
+  log('       @ 100 gwei: ', gasCosts[2]);
+  log('       @ 150 gwei: ', gasCosts[3]);
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };
 

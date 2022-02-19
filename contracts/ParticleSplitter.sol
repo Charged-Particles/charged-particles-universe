@@ -70,8 +70,7 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
     returns (bytes memory)
   {
     require(_chargedManagers.isWalletManagerEnabled(walletManagerId), "PS:E-419");
-    
-    require(_externalAddressesAllowed[externalAddress] == true, "PS:E-117");
+    require(_externalAddressesAllowed[externalAddress], "PS:E-117");
 
     // Validate Owner/Operator & Timelocks
     _chargedManagers.validateRelease(msg.sender, contractAddress, tokenId);
@@ -113,8 +112,7 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
     returns (bytes memory)
   {
     require(_chargedManagers.isNftBasketEnabled(basketManagerId), "PS:E-419");
-
-    require(_externalAddressesAllowed[externalAddress] == true, "PS:E-117");
+    require(_externalAddressesAllowed[externalAddress], "PS:E-117");
 
     // Validate Owner/Operator & Timelocks
     _chargedManagers.validateRelease(msg.sender, contractAddress, tokenId);
@@ -232,7 +230,7 @@ contract ParticleSplitter is IParticleSplitter, Ownable, ReentrancyGuard, Blackh
     */
   function setExternalContracts(address[] calldata contracts, bool state) external onlyOwner {
     uint count = contracts.length;
-    for (uint i = 0; i < count; i++) {
+    for (uint i; i < count; i++) {
       address externalContract = contracts[i];
       _externalAddressesAllowed[externalContract] = state;
       emit PermsSetForExternal(externalContract, state);
