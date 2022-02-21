@@ -35,9 +35,6 @@ import "./lib/TokenInfo.sol";
 import "./lib/RelayRecipient.sol";
 import "./lib/BlackholePrevention.sol";
 
-import "hardhat/console.sol";
-
-
 /**
  * @notice Charged Particles Settings Contract
  */
