@@ -71,6 +71,6 @@ contract ExternalERC1155 is ERC1155 {
 
         _mint(receiver, newTokenId, 1, "");
         _tokenCreator[newTokenId] = creator;
-        _tokenOwner[newTokenId] = creator;
+        _tokenOwner[newTokenId] = receiver;
     }
 }
