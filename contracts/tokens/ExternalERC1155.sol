@@ -27,31 +27,50 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 contract ExternalERC1155 is ERC1155 {
-  using Counters for Counters.Counter;
+    using Counters for Counters.Counter;
 
-  Counters.Counter internal _tokenCount;
-  mapping (uint256 => address) internal _tokenCreator;
-  mapping (uint256 => address) internal _tokenOwner;
+    Counters.Counter internal _tokenCount;
+    mapping(uint256 => address) internal _tokenCreator;
+    mapping(uint256 => address) internal _tokenOwner;
 
-  constructor() public ERC1155("https://charged.fi/erc1155/") {}
+    constructor() public ERC1155("https://charged.fi/erc1155/") {}
 
-  function creatorOf(uint256 tokenId) external view returns (address) {
-    return _tokenCreator[tokenId];
-  }
+    function creatorOf(uint256 tokenId) external view returns (address) {
+        return _tokenCreator[tokenId];
+    }
 
-  function ownerOf(uint256 tokenId) external view returns (address) {
-    return _tokenOwner[tokenId];
-  }
+    function ownerOf(uint256 tokenId) external view returns (address) {
+        return _tokenOwner[tokenId];
+    }
 
-  function mintNft(address receiver) external returns (uint256 newTokenId) {
-    return _mintNft(msg.sender, receiver);
-  }
+    function mintNft(address receiver) external returns (uint256 newTokenId) {
+        return _mintNft(msg.sender, receiver);
+    }
 
-  function _mintNft(address creator, address receiver) internal returns (uint256 newTokenId) {
-    _tokenCount.increment();
-    newTokenId = _tokenCount.current();
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    ) public virtual override {
+        require(
+            from == _msgSender() || isApprovedForAll(from, _msgSender()),
+            "ERC1155: caller is not owner nor approved"
+        );
+        super.safeTransferFrom(from, to, id, amount, data);
+        _tokenOwner[id] = to;
+    }
 
-    _mint(receiver, newTokenId, 1, "");
-    _tokenCreator[newTokenId] = creator;
-  }
+    function _mintNft(address creator, address receiver)
+        internal
+        returns (uint256 newTokenId)
+    {
+        _tokenCount.increment();
+        newTokenId = _tokenCount.current();
+
+        _mint(receiver, newTokenId, 1, "");
+        _tokenCreator[newTokenId] = creator;
+        _tokenOwner[newTokenId] = creator;
+    }
 }
