@@ -177,6 +177,7 @@ module.exports = {
         'ERC20',
         'ERC721',
         'ExternalNFT',
+        'ExternalERC1155',
         'YieldFarm',
         'Staking',
         'YieldFarm2',

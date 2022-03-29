@@ -76,30 +76,30 @@ async function run() {
     chargedParticlesAddress = '0xA85B3d84f54Fb238Ef257158da99FdfCe905C7aA';
   }
 
-  // Protocol
-  await verifyContract({name: 'Universe', networkName, addressOverride: universeAddress});
-  await verifyContract({name: 'ChargedParticles', networkName, addressOverride: chargedParticlesAddress});
-  await verifyContract({name: 'ChargedState', networkName, addressOverride: chargedStateAddress});
-  await verifyContract({name: 'ChargedSettings', networkName, addressOverride: chargedSettingsAddress});
-  await verifyContract({name: 'ChargedManagers', networkName, addressOverride: chargedManagersAddress});
-  await verifyContract({name: 'Ionx', networkName});
+  // // Protocol
+  // await verifyContract({name: 'Universe', networkName, addressOverride: universeAddress});
+  // await verifyContract({name: 'ChargedParticles', networkName, addressOverride: chargedParticlesAddress});
+  // await verifyContract({name: 'ChargedState', networkName, addressOverride: chargedStateAddress});
+  // await verifyContract({name: 'ChargedSettings', networkName, addressOverride: chargedSettingsAddress});
+  // await verifyContract({name: 'ChargedManagers', networkName, addressOverride: chargedManagersAddress});
+  // await verifyContract({name: 'Ionx', networkName});
 
-  // Wallet Managers
-  await verifyContract({name: 'GenericWalletManager', networkName});
-  await verifyContract({name: 'GenericWalletManagerB', networkName});
-  await verifyContract({name: 'GenericBasketManager', networkName});
-  await verifyContract({name: 'GenericBasketManagerB', networkName});
-  await verifyContract({name: 'AaveWalletManager', networkName});
-  await verifyContract({name: 'AaveWalletManagerB', networkName});
+  // // Wallet Managers
+  // await verifyContract({name: 'GenericWalletManager', networkName});
+  // await verifyContract({name: 'GenericWalletManagerB', networkName});
+  // await verifyContract({name: 'GenericBasketManager', networkName});
+  // await verifyContract({name: 'GenericBasketManagerB', networkName});
+  // await verifyContract({name: 'AaveWalletManager', networkName});
+  // await verifyContract({name: 'AaveWalletManagerB', networkName});
 
-  // NFTs
-  await verifyContract({name: 'Proton', networkName});
-  await verifyContract({name: 'ProtonB', networkName});
-  await verifyContract({name: 'Lepton', networkName});
-  await verifyContract({name: 'Lepton2', networkName});
-  await verifyContract({name: 'ExternalNFT', networkName});
-  await verifyContract({name: 'ParticleSplitter', networkName});
-  await verifyContract({name: 'TokenInfoProxy', networkName});
+  // // NFTs
+  // await verifyContract({name: 'Proton', networkName});
+  // await verifyContract({name: 'ProtonB', networkName});
+  // await verifyContract({name: 'Lepton', networkName});
+  // await verifyContract({name: 'Lepton2', networkName});
+  // await verifyContract({name: 'ExternalNFT', networkName});
+  // await verifyContract({name: 'ParticleSplitter', networkName});
+  // await verifyContract({name: 'TokenInfoProxy', networkName});
 
   // Incentives
   // await verifyContract({name: 'CommunityVault', networkName});
@@ -123,6 +123,9 @@ async function run() {
   // await verifyContract({name: 'VestingClaim2', networkName});
   // await verifyContract({name: 'VestingClaim3', networkName});
   // await verifyContract({name: 'VestingClaim4', networkName});
+  
+  // External ERC1555 (1 of 1)
+  await verifyContract({name: 'ExternalERC1155', networkName});
 
   success('Done!');
 };
