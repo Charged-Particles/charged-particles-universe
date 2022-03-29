@@ -103,7 +103,7 @@ module.exports = {
             // url: `https://rpc-mumbai.matic.today`,
             // url: `https://rpc-mumbai.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
             url: `https://matic-mumbai.chainstacklabs.com/`,
-            gasPrice: 10e9,
+            gasPrice: 5e9,
             accounts: {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
@@ -150,7 +150,7 @@ module.exports = {
     },
     abiExporter: {
       path: './abis',
-      runOnCompile: true, 
+      runOnCompile: true,
       // Mindful of https://github.com/ItsNickBarry/hardhat-abi-exporter/pull/29/files
       // and https://github.com/ItsNickBarry/hardhat-abi-exporter/pull/35 as they heavily change behavior around this package
       clear: true,

@@ -1,6 +1,7 @@
 const {
   saveMigrationData,
   getMigrationData,
+  getDeployData,
 } = require('../js-helpers/deploy');
 
 const {
@@ -19,12 +20,15 @@ const _ = require('lodash');
 
 
 module.exports = async (hre) => {
+  const { ethers } = hre;
   const network = await hre.network;
   const chainId = chainIdByName(network.name);
   const networkName = chainNameById(chainId).toLowerCase();
 
   if (chainId == 31337) { return; } // Hardhat Skip
 
+  const ddChargedState = getDeployData('ChargedState', chainId);
+  const ddChargedSettings = getDeployData('ChargedSettings', chainId);
 
   const _migrationSubgraphDump = {
     chargedSettings: require(`../migration_data/subgraph_dump/${networkName}/ChargedSettings`),
@@ -42,6 +46,14 @@ module.exports = async (hre) => {
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles Protocol - Contract Migrations');
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
+
+  log('  Loading ChargedState from: ', ddChargedState.address);
+  const ChargedState = await ethers.getContractFactory('ChargedState');
+  const chargedState = await ChargedState.attach(ddChargedState.address);
+
+  log('  Loading ChargedSettings from: ', ddChargedSettings.address);
+  const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
+  const chargedSettings = await ChargedSettings.attach(ddChargedSettings.address);
 
   let nftCreatorData, annuityRedirect;
   const nftCreatorSettings = _.get(_migrationSubgraphDump, 'chargedSettings.nftCreatorSettings', []);
