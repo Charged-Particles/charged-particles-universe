@@ -34,8 +34,8 @@ interface IBasketManager {
   event ExecutorSet(address indexed executor);
   event PausedStateSet(bool isPaused);
   event NewSmartBasket(address indexed contractAddress, uint256 indexed tokenId, address indexed smartBasket);
-  event BasketAdd(address indexed contractAddress, uint256 indexed tokenId, address basketTokenAddress, uint256 basketTokenId);
-  event BasketRemove(address indexed receiver, address indexed contractAddress, uint256 indexed tokenId, address basketTokenAddress, uint256 basketTokenId);
+  event BasketAdd(address indexed contractAddress, uint256 indexed tokenId, address basketTokenAddress, uint256 basketTokenId, uint256 basketTokenAmount);
+  event BasketRemove(address indexed receiver, address indexed contractAddress, uint256 indexed tokenId, address basketTokenAddress, uint256 basketTokenId, uint256 basketTokenAmount);
   event BasketRewarded(address indexed contractAddress, uint256 indexed tokenId, address indexed receiver, address rewardsToken, uint256 rewardsAmount);
 
   function isPaused() external view returns (bool);
@@ -43,6 +43,7 @@ interface IBasketManager {
   function getTokenTotalCount(address contractAddress, uint256 tokenId) external view returns (uint256);
   function getTokenCountByType(address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 basketTokenId) external returns (uint256);
 
+  function prepareTransferAmount(uint256 nftTokenAmount) external;
   function addToBasket(address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 basketTokenId) external returns (bool);
   function removeFromBasket(address receiver, address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 basketTokenId) external returns (bool);
   function withdrawRewards(address receiver, address contractAddress, uint256 tokenId, address rewardsToken, uint256 rewardsAmount) external returns (uint256 amount);

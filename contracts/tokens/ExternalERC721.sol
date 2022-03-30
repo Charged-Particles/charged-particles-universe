@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// ExternalNFT.sol -- Part of the Charged Particles Protocol
+// ExternalERC721.sol -- Part of the Charged Particles Protocol
 // Copyright (c) 2021 Firma Lux, Inc. <https://charged.fi>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,34 +24,31 @@
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract ExternalERC1155 is ERC1155 {
+contract ExternalERC721 is ERC721 {
   using Counters for Counters.Counter;
 
   Counters.Counter internal _tokenCount;
   mapping (uint256 => address) internal _tokenCreator;
-  mapping (uint256 => address) internal _tokenOwner;
 
-  constructor() public ERC1155("https://charged.fi/erc1155/") {}
+  constructor() public ERC721("Charged Particles - ExternalERC721", "ExNFT") {}
 
   function creatorOf(uint256 tokenId) external view returns (address) {
     return _tokenCreator[tokenId];
   }
 
-  function ownerOf(uint256 tokenId) external view returns (address) {
-    return _tokenOwner[tokenId];
+  function mintNft(address receiver, string memory tokenUri) external returns (uint256 newTokenId) {
+    return _mintNft(msg.sender, receiver, tokenUri);
   }
 
-  function mintNft(address receiver) external returns (uint256 newTokenId) {
-    return _mintNft(msg.sender, receiver);
-  }
-
-  function _mintNft(address creator, address receiver) internal returns (uint256 newTokenId) {
+  function _mintNft(address creator, address receiver, string memory tokenUri) internal returns (uint256 newTokenId) {
     _tokenCount.increment();
     newTokenId = _tokenCount.current();
 
-    _mint(receiver, newTokenId, 1, "");
+    _safeMint(receiver, newTokenId, "");
     _tokenCreator[newTokenId] = creator;
+
+    _setTokenURI(newTokenId, tokenUri);
   }
 }

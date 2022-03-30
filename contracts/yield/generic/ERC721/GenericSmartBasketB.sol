@@ -28,38 +28,34 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155Receiver.sol";
-import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../../../interfaces/ISmartBasketB.sol";
 import "../../../interfaces/ITokenInfoProxy.sol";
-import "../../../lib/BlackholePrevention.sol";
+import "../../../lib/TokenInfo.sol";
 import "../../../lib/NftTokenType.sol";
-
+import "../../../lib/BlackholePrevention.sol";
 
 /**
  * @notice Generic ERC721-Token Smart-Basket
  * @dev Non-upgradeable Contract
  */
 contract GenericSmartBasketB is ISmartBasketB, BlackholePrevention, IERC721Receiver, ERC1155Receiver {
-  using EnumerableSet for EnumerableSet.UintSet;
-  using EnumerableSet for EnumerableSet.AddressSet;
+  using TokenInfo for address;
   using NftTokenType for address;
-
-  ITokenInfoProxy internal _tokenInfoProxy;
 
   address internal _basketManager;
 
-  // NFT contract address => Token Type => Token ID     (ERC721 = Type 0, ERC1155 = Type is Bit Mask of Token ID)
-  mapping (address => mapping(uint256 => EnumerableSet.UintSet)) internal _nftContractTokens;
+  // NFT TokenUUID => ERC1155 Balance
+  mapping (uint256 => uint256) internal _nftContractTokenBalance;
+  uint256 internal _nestedNftCount;
 
 
   /***********************************|
   |          Initialization           |
   |__________________________________*/
 
-  function initialize(ITokenInfoProxy tokenInfoProxy) public {
+  function initialize(ITokenInfoProxy /* tokenInfoProxy */) public {
     require(_basketManager == address(0x0), "GSB:E-002");
     _basketManager = msg.sender;
-    _tokenInfoProxy = tokenInfoProxy;
   }
 
 
@@ -67,9 +63,12 @@ contract GenericSmartBasketB is ISmartBasketB, BlackholePrevention, IERC721Recei
   |              Public               |
   |__________________________________*/
 
+  function getNestedNftCount() external view override returns (uint256) {
+    return _nestedNftCount;
+  }
+
   function getTokenCountByType(address contractAddress, uint256 tokenId) external view override returns (uint256) {
-    uint256 nftType = contractAddress.getTokenType(tokenId);
-    return _nftContractTokens[contractAddress][nftType].length();
+    return _nftContractTokenBalance[contractAddress.getTokenUUID(tokenId)];
   }
 
   function onERC721Received(address, address, uint256, bytes calldata) external override returns (bytes4) {
@@ -85,42 +84,33 @@ contract GenericSmartBasketB is ISmartBasketB, BlackholePrevention, IERC721Recei
     return ""; // IERC1155ReceiverUpgradeable(0).onERC1155BatchReceived.selector;
   }
 
-  function addToBasket(address contractAddress, uint256 tokenId)
+  function addToBasket(address contractAddress, uint256 tokenId, uint256 nftTokenAmount)
     external
     override
     onlyBasketManager
     returns (bool)
   {
-    uint256 nftType = contractAddress.getTokenType(tokenId);
-    require(!_nftContractTokens[contractAddress][nftType].contains(tokenId), "GSB:E-425");
-
-    bool added = _nftContractTokens[contractAddress][nftType].add(tokenId);
-    if (added) {
-      // NFT should have been Transferred into here via Charged-Particles
-      address ownerOf = _tokenInfoProxy.getTokenOwner(contractAddress, tokenId);
-      added = (ownerOf == address(this));
-    }
-    return added;
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
+    _nftContractTokenBalance[uuid] += nftTokenAmount;
+    _nestedNftCount += nftTokenAmount;
+    return true;
   }
 
-  function removeFromBasket(address receiver, address contractAddress, uint256 tokenId)
+  function removeFromBasket(address receiver, address contractAddress, uint256 tokenId, uint256 nftTokenAmount)
     external
     override
     onlyBasketManager
     returns (bool)
   {
-    uint256 nftType = contractAddress.getTokenType(tokenId);
-    require(_nftContractTokens[contractAddress][nftType].contains(tokenId), "GSB:E-426");
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
+    _nftContractTokenBalance[uuid] -= nftTokenAmount;
+    _nestedNftCount -= nftTokenAmount;
 
-    bool removed = _nftContractTokens[contractAddress][nftType].remove(tokenId);
-    if (removed) {
-      if (contractAddress.isERC1155()) {
-        IERC1155(contractAddress).safeTransferFrom(address(this), receiver, tokenId, 1, "");
-      } else {
-        IERC721(contractAddress).safeTransferFrom(address(this), receiver, tokenId);
-      }
+    if (contractAddress.isERC1155()) {
+      IERC1155(contractAddress).safeTransferFrom(address(this), receiver, tokenId, nftTokenAmount, "");
+    } else {
+      IERC721(contractAddress).safeTransferFrom(address(this), receiver, tokenId);
     }
-    return removed;
   }
 
   function withdrawRewards(address receiver, address rewardsTokenAddress, uint256 rewardsAmount)

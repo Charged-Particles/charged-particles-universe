@@ -60,7 +60,8 @@ interface IChargedManagers {
     uint256 tokenId,
     string calldata basketManagerId,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   ) external;
   function validateDischarge(address sender, address contractAddress, uint256 tokenId) external;
   function validateRelease(address sender, address contractAddress, uint256 tokenId) external;

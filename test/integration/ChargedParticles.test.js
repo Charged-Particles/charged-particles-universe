@@ -34,6 +34,7 @@ const CryptoPunksMarket = require('../../build/contracts/contracts/test/CryptoPu
 const TokenInfoProxyMock = require('../../build/contracts/contracts/lib/TokenInfoProxy.sol/TokenInfoProxy.json');
 
 const TEST_NFT_TOKEN_URI = 'https://ipfs.io/ipfs/QmZrWBZo1y6bS2P6hCSPjkccYEex31bCRBbLaz4DqqwCzp';
+const TEST_NFT_AMOUNT = 1;
 
 const daiABI = require('../abis/dai');
 const erc20ABI = require('../abis/erc20');
@@ -484,7 +485,8 @@ describe("[INTEGRATION] Charged Particles", () => {
         tokenId1,
         'generic.B',
         protonB.address,
-        tokenId2
+        tokenId2,
+        TEST_NFT_AMOUNT
       ],
     });
     expect(await chargedParticles.currentParticleCovalentBonds(protonB.address, tokenId1, 'generic.B')).to.be.equal(1);
@@ -808,7 +810,8 @@ describe("[INTEGRATION] Charged Particles", () => {
       tokenId1,
       'generic',
       proton.address,
-      tokenId2
+      tokenId2,
+      TEST_NFT_AMOUNT
     );
 
     await chargedParticles.connect(signer2).breakCovalentBond(
@@ -817,7 +820,8 @@ describe("[INTEGRATION] Charged Particles", () => {
       tokenId1,
       'generic',
       proton.address,
-      tokenId2
+      tokenId2,
+      TEST_NFT_AMOUNT
     );
 
     expect(await proton.ownerOf(tokenId2)).to.be.equal(user1);
@@ -852,7 +856,8 @@ describe("[INTEGRATION] Charged Particles", () => {
       tokenId1,
       'generic',
       proton.address,
-      tokenId1
+      tokenId1,
+      TEST_NFT_AMOUNT
     )).to.be.revertedWith('CP:E-433');
   });
 
@@ -1059,7 +1064,8 @@ describe("[INTEGRATION] Charged Particles", () => {
   //     protonId2,
   //     'generic',
   //     lepton.address,
-  //     leptonId
+  //     leptonId,
+  //     TEST_NFT_AMOUNT
   //   );
 
   //   await chargedParticles.connect(signer2).releaseParticle(

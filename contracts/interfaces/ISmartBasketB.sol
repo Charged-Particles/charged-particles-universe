@@ -28,10 +28,11 @@ pragma solidity >=0.6.0;
  * @dev Manages holding and transferring NFTs within an NFT (if any),
  */
 interface ISmartBasketB {
+  function getNestedNftCount() external view returns (uint256);
   function getTokenCountByType(address contractAddress, uint256 tokenId) external view returns (uint256);
 
-  function addToBasket(address contractAddress, uint256 tokenId) external returns (bool);
-  function removeFromBasket(address receiver, address contractAddress, uint256 tokenId) external returns (bool);
+  function addToBasket(address contractAddress, uint256 tokenId, uint256 nftTokenAmount) external returns (bool);
+  function removeFromBasket(address receiver, address contractAddress, uint256 tokenId, uint256 nftTokenAmount) external returns (bool);
   function withdrawRewards(address receiver, address rewardsToken, uint256 rewardsAmount) external returns (uint256);
   function executeForAccount(address contractAddress, uint256 ethValue, bytes memory encodedParams) external returns (bytes memory);
 

@@ -122,15 +122,17 @@ contract ChargedManagers is
   /// @param basketManagerId      The Basket to Deposit the NFT into
   /// @param nftTokenAddress      The Address of the NFT Token being deposited
   /// @param nftTokenId           The ID of the NFT Token being deposited
+  /// @param nftTokenAmount       The amount of Tokens to Deposit (ERC1155-specific)
   function validateNftDeposit(
     address sender,
     address contractAddress,
     uint256 tokenId,
     string calldata basketManagerId,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   ) external virtual override {
-    _validateNftDeposit(sender, contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
+    _validateNftDeposit(sender, contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId, nftTokenAmount);
   }
 
   function validateDischarge(address sender, address contractAddress, uint256 tokenId) external virtual override {
@@ -323,13 +325,15 @@ contract ChargedManagers is
   /// @param basketManagerId      The Basket to Deposit the NFT into
   /// @param nftTokenAddress      The Address of the NFT Token being deposited
   /// @param nftTokenId           The ID of the NFT Token being deposited
+  /// @param nftTokenAmount       The amount of Tokens to Deposit (ERC1155-specific)
   function _validateNftDeposit(
     address sender,
     address contractAddress,
     uint256 tokenId,
     string calldata basketManagerId,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   )
     internal
     virtual
@@ -355,11 +359,8 @@ contract ChargedManagers is
     }
 
     if (maxNfts > 0) {
-      uint256 tokenCountByType = _nftBasketManager[basketManagerId].getTokenCountByType(contractAddress, tokenId, nftTokenAddress, nftTokenId);
-
-      if (maxNfts > 0) {
-        require(maxNfts > tokenCountByType, "CP:E-427");
-      }
+      uint256 tokenCount = _nftBasketManager[basketManagerId].getTokenTotalCount(contractAddress, tokenId);
+      require(maxNfts >= (tokenCount + nftTokenAmount), "CP:E-427");
     }
   }
 

@@ -97,7 +97,7 @@ async function run() {
   await verifyContract({name: 'ProtonB', networkName});
   await verifyContract({name: 'Lepton', networkName});
   await verifyContract({name: 'Lepton2', networkName});
-  await verifyContract({name: 'ExternalNFT', networkName});
+  await verifyContract({name: 'ExternalERC721', networkName});
   await verifyContract({name: 'ParticleSplitter', networkName});
   await verifyContract({name: 'TokenInfoProxy', networkName});
 

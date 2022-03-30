@@ -96,6 +96,10 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     return GenericSmartBasket(basket).getTokenCountByType(basketTokenAddress, basketTokenId);
   }
 
+  function prepareTransferAmount(uint256 /* nftTokenAmount */) external override onlyController {
+    // no-op
+  }
+
   function addToBasket(
     address contractAddress,
     uint256 tokenId,
@@ -116,7 +120,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     // Log Event
     if (added) {
       _totalTokens[uuid].increment();
-      emit BasketAdd(contractAddress, tokenId, basketTokenAddress, basketTokenId);
+      emit BasketAdd(contractAddress, tokenId, basketTokenAddress, basketTokenId, 1);
     }
   }
 
@@ -142,7 +146,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     // Log Event
     if (removed) {
       _totalTokens[uuid].decrement();
-      emit BasketRemove(receiver, contractAddress, tokenId, basketTokenAddress, basketTokenId);
+      emit BasketRemove(receiver, contractAddress, tokenId, basketTokenAddress, basketTokenId, 1);
     }
   }
 

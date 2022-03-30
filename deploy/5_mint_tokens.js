@@ -99,8 +99,8 @@ module.exports = async (hre) => {
     const ddProton = getDeployData('Proton', chainId);
     const ddProtonB = getDeployData('ProtonB', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
-    const ddExternalNFT = getDeployData('ExternalNFT', chainId);
-    let gasCosts;
+    const ddExternalERC721 = getDeployData('ExternalERC721', chainId);
+    let externalERC721, gasCosts;
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles: Mint Proton & Lepton Tokens ');
@@ -124,10 +124,11 @@ module.exports = async (hre) => {
     const Lepton = await ethers.getContractFactory('Lepton');
     const lepton = await Lepton.attach(ddLepton.address);
 
-    log('  Loading ExternalNFT from: ', ddExternalNFT.address);
-    const ExternalNFT = await ethers.getContractFactory('ExternalNFT');
-    const externalNFT = await ExternalNFT.attach(ddExternalNFT.address);
-
+    if (!isProd) {
+      log('  Loading ExternalERC721 from: ', ddExternalERC721.address);
+      const ExternalERC721 = await ethers.getContractFactory('ExternalERC721');
+      externalERC721 = await ExternalERC721.attach(ddExternalERC721.address);
+    }
 
 
     await executeTx('1-a', 'Minting Single Proton, Type "B"', async () =>
@@ -232,7 +233,7 @@ module.exports = async (hre) => {
     // log('  Minting External NFTs...');
     // for (let i = 0; i < _externalNftsForTesting.length; i++) {
     //   log(`    - Minting "${_externalNftsForTesting[i].tokenUri}" for "${_externalNftsForTesting[i].receiver}"`);
-    //   tx = await externalNFT.mintNft(_externalNftsForTesting[i].receiver, _externalNftsForTesting[i].tokenUri);
+    //   tx = await externalERC721.mintNft(_externalNftsForTesting[i].receiver, _externalNftsForTesting[i].tokenUri);
     //   await tx.wait();
     // }
 

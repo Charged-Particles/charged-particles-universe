@@ -529,12 +529,14 @@ contract ChargedParticles is
   /// @param basketManagerId      The Basket to Deposit the NFT into
   /// @param nftTokenAddress      The Address of the NFT Token being deposited
   /// @param nftTokenId           The ID of the NFT Token being deposited
+  /// @param nftTokenAmount       The amount of Tokens to Deposit (ERC1155-specific)
   function covalentBond(
     address contractAddress,
     uint256 tokenId,
     string calldata basketManagerId,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   )
     external
     virtual
@@ -543,17 +545,17 @@ contract ChargedParticles is
     nonReentrant
     returns (bool success)
   {
-    _validateNftDeposit(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
+    _validateNftDeposit(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId, nftTokenAmount);
 
     // Transfer ERC721 Token from Caller to Contract (reverts on fail)
-    _collectNftToken(_msgSender(), nftTokenAddress, nftTokenId);
+    _collectNftToken(_msgSender(), nftTokenAddress, nftTokenId, nftTokenAmount);
 
     // Deposit Asset Token directly into Smart Wallet (reverts on fail) and Update WalletManager
-    success = _depositIntoBasketManager(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
+    success = _depositIntoBasketManager(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId, nftTokenAmount);
 
     // Signal to Universe Controller
     if (address(_universe) != address(0)) {
-      _universe.onCovalentBond(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
+      _universe.onCovalentBond(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId, nftTokenAmount);
     }
   }
 
@@ -564,13 +566,15 @@ contract ChargedParticles is
   /// @param basketManagerId      The Basket to Deposit the NFT into
   /// @param nftTokenAddress      The Address of the NFT Token being deposited
   /// @param nftTokenId           The ID of the NFT Token being deposited
+  /// @param nftTokenAmount       The amount of Tokens to Withdraw (ERC1155-specific)
   function breakCovalentBond(
     address receiver,
     address contractAddress,
     uint256 tokenId,
     string calldata basketManagerId,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   )
     external
     virtual
@@ -581,8 +585,13 @@ contract ChargedParticles is
   {
     _validateBreakBond(contractAddress, tokenId);
 
+    IBasketManager basketMgr = _chargedManagers.getBasketManager(basketManagerId);
+    if (keccak256(abi.encodePacked(basketManagerId)) != keccak256(abi.encodePacked("generic"))) {
+      basketMgr.prepareTransferAmount(nftTokenAmount);
+    }
+
     // Release Particle to Receiver
-    success = _chargedManagers.getBasketManager(basketManagerId).removeFromBasket(
+    success = basketMgr.removeFromBasket(
       receiver,
       contractAddress,
       tokenId,
@@ -592,7 +601,7 @@ contract ChargedParticles is
 
     // Signal to Universe Controller
     if (address(_universe) != address(0)) {
-      _universe.onCovalentBreak(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
+      _universe.onCovalentBreak(contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId, nftTokenAmount);
     }
   }
 
@@ -692,17 +701,19 @@ contract ChargedParticles is
   /// @param basketManagerId      The Basket to Deposit the NFT into
   /// @param nftTokenAddress      The Address of the NFT Token being deposited
   /// @param nftTokenId           The ID of the NFT Token being deposited
+  /// @param nftTokenAmount       The amount of Tokens to Deposit (ERC1155-specific)
   function _validateNftDeposit(
     address contractAddress,
     uint256 tokenId,
     string calldata basketManagerId,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   )
     internal
     virtual
   {
-    _chargedManagers.validateNftDeposit(_msgSender(), contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId);
+    _chargedManagers.validateNftDeposit(_msgSender(), contractAddress, tokenId, basketManagerId, nftTokenAddress, nftTokenId, nftTokenAmount);
   }
 
   function _validateDischarge(address contractAddress, uint256 tokenId) internal virtual {
@@ -756,12 +767,14 @@ contract ChargedParticles is
   /// @param basketManagerId      The Wallet Manager of the Assets to Deposit
   /// @param nftTokenAddress      The Address of the Asset Token to Deposit
   /// @param nftTokenId           The specific amount of Asset Token to Deposit
+  /// @param nftTokenAmount       The amount of Tokens to Deposit (ERC1155-specific)
   function _depositIntoBasketManager(
     address contractAddress,
     uint256 tokenId,
     string calldata basketManagerId,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   )
     internal
     virtual
@@ -771,8 +784,13 @@ contract ChargedParticles is
     IBasketManager basketMgr = _chargedManagers.getBasketManager(basketManagerId);
     address wallet = basketMgr.getBasketAddressById(contractAddress, tokenId);
 
+    if (keccak256(abi.encodePacked(basketManagerId)) != keccak256(abi.encodePacked("generic"))) {
+      basketMgr.prepareTransferAmount(nftTokenAmount);
+    }
+
     if (_isERC1155(nftTokenAddress)) {
-      IERC1155Upgradeable(nftTokenAddress).safeTransferFrom(address(this), wallet, nftTokenId, 1, "");
+      if (nftTokenAmount == 0) { nftTokenAmount = 1; }
+      IERC1155Upgradeable(nftTokenAddress).safeTransferFrom(address(this), wallet, nftTokenId, nftTokenAmount, "");
     } else {
       IERC721Upgradeable(nftTokenAddress).transferFrom(address(this), wallet, nftTokenId);
     }
@@ -812,9 +830,10 @@ contract ChargedParticles is
   /// @param from             The owner address to collect the tokens from
   /// @param nftTokenAddress  The address of the NFT token to transfer
   /// @param nftTokenId       The ID of the NFT token to transfer
-  function _collectNftToken(address from, address nftTokenAddress, uint256 nftTokenId) internal virtual {
+  /// @param nftTokenAmount   The amount of Tokens to Transfer (ERC1155-specific)
+  function _collectNftToken(address from, address nftTokenAddress, uint256 nftTokenId, uint256 nftTokenAmount) internal virtual {
     if (_isERC1155(nftTokenAddress)) {
-      IERC1155Upgradeable(nftTokenAddress).safeTransferFrom(from, address(this), nftTokenId, 1, "");
+      IERC1155Upgradeable(nftTokenAddress).safeTransferFrom(from, address(this), nftTokenId, nftTokenAmount, "");
     } else {
       IERC721Upgradeable(nftTokenAddress).safeTransferFrom(from, address(this), nftTokenId);
     }

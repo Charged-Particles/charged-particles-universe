@@ -25,11 +25,13 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "../../../interfaces/IBasketManager.sol";
 import "../../../interfaces/ISmartBasket.sol";
 import "../../../interfaces/ITokenInfoProxy.sol";
 import "../../../lib/BlackholePrevention.sol";
 import "../../../lib/TokenInfo.sol";
+import "../../../lib/NftTokenType.sol";
 import "./GenericSmartBasketB.sol";
 
 /**
@@ -39,6 +41,7 @@ import "./GenericSmartBasketB.sol";
 contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   using Counters for Counters.Counter;
   using TokenInfo for address;
+  using NftTokenType for address;
 
   ITokenInfoProxy internal _tokenInfoProxy;
 
@@ -54,7 +57,8 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   //       TokenID => Token Smart-Basket Address
   mapping (uint256 => address) internal _baskets;
 
-  mapping (uint256 => Counters.Counter) internal _totalTokens;
+  // Prepared Amount
+  uint256 internal _preparedAmount;
 
   // State of Basket Manager
   bool internal _paused;
@@ -85,7 +89,9 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
     returns (uint256)
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
-    return _totalTokens[uuid].current();
+    address basket = _baskets[uuid];
+    if (basket == address(0)) { return 0; }
+    return GenericSmartBasketB(basket).getNestedNftCount();
   }
 
   function getTokenCountByType(
@@ -98,8 +104,14 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
     override
     returns (uint256)
   {
-    address basket = getBasketAddressById(contractAddress, tokenId);
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
+    address basket = _baskets[uuid];
+    if (basket == address(0)) { return 0; }
     return GenericSmartBasketB(basket).getTokenCountByType(basketTokenAddress, basketTokenId);
+  }
+
+  function prepareTransferAmount(uint256 nftTokenAmount) external override onlyController {
+    _preparedAmount = nftTokenAmount;
   }
 
   function addToBasket(
@@ -116,13 +128,17 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
+    require(basket != address(0x0), "GBM:E-403");
 
-    added = GenericSmartBasketB(basket).addToBasket(basketTokenAddress, basketTokenId);
+    uint256 nftTokenAmount = 1;
+    if (_preparedAmount > 0) {
+      nftTokenAmount = _preparedAmount;
+      _preparedAmount = 0;
+    }
 
-    // Log Event
+    added = GenericSmartBasketB(basket).addToBasket(basketTokenAddress, basketTokenId, nftTokenAmount);
     if (added) {
-      _totalTokens[uuid].increment();
-      emit BasketAdd(contractAddress, tokenId, basketTokenAddress, basketTokenId);
+      emit BasketAdd(contractAddress, tokenId, basketTokenAddress, basketTokenId, nftTokenAmount);
     }
   }
 
@@ -143,12 +159,15 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
     address basket = _baskets[uuid];
     require(basket != address(0x0), "GBM:E-403");
 
-    removed = GenericSmartBasketB(basket).removeFromBasket(receiver, basketTokenAddress, basketTokenId);
+    uint256 nftTokenAmount = 1;
+    if (_preparedAmount > 0) {
+      nftTokenAmount = _preparedAmount;
+      _preparedAmount = 0;
+    }
 
-    // Log Event
+    removed = GenericSmartBasketB(basket).removeFromBasket(receiver, basketTokenAddress, basketTokenId, nftTokenAmount);
     if (removed) {
-      _totalTokens[uuid].decrement();
-      emit BasketRemove(receiver, contractAddress, tokenId, basketTokenAddress, basketTokenId);
+      emit BasketRemove(receiver, contractAddress, tokenId, basketTokenAddress, basketTokenId, nftTokenAmount);
     }
   }
 
@@ -178,6 +197,7 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   {
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
+    require(basket != address(0x0), "GBM:E-403");
     return GenericSmartBasketB(basket).executeForAccount(externalAddress, ethValue, encodedParams);
   }
 
@@ -288,10 +308,6 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   /***********************************|
   |         Private Functions         |
   |__________________________________*/
-
-  function _getTokenUUID(address contractAddress, uint256 tokenId) internal pure returns (uint256) {
-    return uint256(keccak256(abi.encodePacked(contractAddress, tokenId)));
-  }
 
   function _createBasket()
     internal

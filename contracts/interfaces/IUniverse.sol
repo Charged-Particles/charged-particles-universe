@@ -82,7 +82,8 @@ interface IUniverse {
     uint256 tokenId,
     string calldata managerId,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   ) external;
 
   function onCovalentBreak(
@@ -90,7 +91,8 @@ interface IUniverse {
     uint256 tokenId,
     string calldata managerId,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   ) external;
 
   function onProtonSale(
