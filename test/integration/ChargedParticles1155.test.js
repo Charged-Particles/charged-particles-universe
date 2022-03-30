@@ -96,10 +96,171 @@ describe("[INTEGRATION] Charged Particles with ERC1155", () => {
 
     await proton.connect(signerD).setPausedState(false);
     await protonB.connect(signerD).setPausedState(false);
+
+    // Non-Fungible ERC1155 with an "ownerOf" function can be whitelisted for Energize
+    await chargedSettings.enableNftContracts([nonFungibleERC1155.address])
   });
 
 
   describe('Non-Fungible ERC1155s', () => {
+    it('can successfully energize and release an ERC1155 with Proton A', async () => {
+      const _nftAmount = 1;
+
+      await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+      await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+      await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
+      await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+      await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+      // Switch to protonA
+      await universe.setProtonToken(proton.address);
+
+      // Mint a Proton
+      const protonId = await callAndReturn({
+        contractInstance: proton,
+        contractMethod: 'createBasicProton',
+        contractCaller: signer1,
+        contractParams: [
+          user1,                      // creator
+          user1,                      // receiver
+          TEST_NFT_TOKEN_URI,
+        ],
+      });
+      await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, protonId.toString()).returns(user1);
+
+      // Mint a Non-Fungible ERC1155
+      const erc1155 = await callAndReturn({
+        contractInstance: nonFungibleERC1155,
+        contractMethod: 'mintNft',
+        contractCaller: signer1,
+        contractParams: [
+          user1,
+        ],
+      });
+      await tokenInfoProxyMock.mock.getTokenOwner.withArgs(nonFungibleERC1155.address, erc1155.toString()).returns(user1);
+
+      // Deposit ERC1155 into Proton
+      await proton.connect(signer1).setApprovalForAll(chargedParticles.address, true);
+      const bondResults = await callAndReturnWithLogs({
+        contractInstance: chargedParticles,
+        contractMethod: 'covalentBond',
+        contractCaller: signer1,
+        contractParams: [
+          nonFungibleERC1155.address,
+          erc1155,
+          'generic.B',
+          proton.address,
+          protonId,
+          _nftAmount
+        ],
+      });
+
+      // Get Basket Address from NewSmartBasket event
+      let smartBasketAddress = false;
+      const eventHash = ethers.utils.solidityKeccak256(['string'], ['NewSmartBasket(address,uint256,address)']);
+      _.forEach(bondResults.txResults.events, (e) => {
+        if (e.topics[0] === eventHash) {
+          smartBasketAddress = '0x' + e.topics[3].slice(26); // addresses are padded to fill 32 bytes (0x + 24 leading zeroes)
+        }
+      })
+      expect(smartBasketAddress).to.not.be.equal(false);
+      expect(_.toLower(await proton.ownerOf(protonId))).to.be.equal(smartBasketAddress);
+      expect(await chargedParticles.currentParticleCovalentBonds(nonFungibleERC1155.address, erc1155, 'generic.B')).to.be.equal(_nftAmount);
+
+      // Release Proton from ERC1155
+      await chargedParticles.connect(signer1).breakCovalentBond(
+        user1,
+        nonFungibleERC1155.address,
+        erc1155,
+        'generic.B',
+        proton.address,
+        protonId,
+        _nftAmount
+      );
+      expect(await proton.ownerOf(protonId)).to.be.equal(user1);
+      expect(await chargedParticles.currentParticleCovalentBonds(nonFungibleERC1155.address, erc1155, 'generic.B')).to.be.equal(0);
+    });
+
+    it('can successfully energize and release an ERC1155 with Proton B', async () => {
+      const _nftAmount = 1;
+
+      await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+      await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+      await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
+      await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+      await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+      // Switch to protonB
+      await universe.setProtonToken(protonB.address);
+
+      // Mint a Proton
+      const protonId = await callAndReturn({
+        contractInstance: protonB,
+        contractMethod: 'createBasicProton',
+        contractCaller: signer1,
+        contractParams: [
+          user1,                      // creator
+          user1,                      // receiver
+          TEST_NFT_TOKEN_URI,
+        ],
+      });
+      await tokenInfoProxyMock.mock.getTokenOwner.withArgs(protonB.address, protonId.toString()).returns(user1);
+
+      // Mint a Non-Fungible ERC1155
+      const erc1155 = await callAndReturn({
+        contractInstance: nonFungibleERC1155,
+        contractMethod: 'mintNft',
+        contractCaller: signer1,
+        contractParams: [
+          user1,
+        ],
+      });
+      await tokenInfoProxyMock.mock.getTokenOwner.withArgs(nonFungibleERC1155.address, erc1155.toString()).returns(user1);
+
+      // Deposit ERC1155 into Proton
+      await protonB.connect(signer1).setApprovalForAll(chargedParticles.address, true);
+      const bondResults = await callAndReturnWithLogs({
+        contractInstance: chargedParticles,
+        contractMethod: 'covalentBond',
+        contractCaller: signer1,
+        contractParams: [
+          nonFungibleERC1155.address,
+          erc1155,
+          'generic.B',
+          protonB.address,
+          protonId,
+          _nftAmount
+        ],
+      });
+
+      // Get Basket Address from NewSmartBasket event
+      let smartBasketAddress = false;
+      const eventHash = ethers.utils.solidityKeccak256(['string'], ['NewSmartBasket(address,uint256,address)']);
+      _.forEach(bondResults.txResults.events, (e) => {
+        if (e.topics[0] === eventHash) {
+          smartBasketAddress = '0x' + e.topics[3].slice(26); // addresses are padded to fill 32 bytes (0x + 24 leading zeroes)
+        }
+      })
+      expect(smartBasketAddress).to.not.be.equal(false);
+      expect(_.toLower(await protonB.ownerOf(protonId))).to.be.equal(smartBasketAddress);
+      expect(await chargedParticles.currentParticleCovalentBonds(nonFungibleERC1155.address, erc1155, 'generic.B')).to.be.equal(_nftAmount);
+
+      // Release Proton from ERC1155
+      await chargedParticles.connect(signer1).breakCovalentBond(
+        user1,
+        nonFungibleERC1155.address,
+        erc1155,
+        'generic.B',
+        protonB.address,
+        protonId,
+        _nftAmount
+      );
+      expect(await protonB.ownerOf(protonId)).to.be.equal(user1);
+      expect(await chargedParticles.currentParticleCovalentBonds(nonFungibleERC1155.address, erc1155, 'generic.B')).to.be.equal(0);
+    });
+
     it("can succesfully energize and release a single ERC1155 into Proton A", async () => {
       const _nftAmount = 1;
 
