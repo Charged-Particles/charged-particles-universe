@@ -131,76 +131,13 @@ module.exports = async (hre) => {
     }
 
 
-    await executeTx('1-a', 'Minting Single Proton, Type "B"', async () =>
-      await protonB.createProton(
-        initialMinter,
-        initialMinter,
-        SingularityCollection[0],
-      )
-    );
-
-
-    await executeTx('1-a', 'Batch Minting 1 Proton, Type "B"', async () =>
-      await protonB.createProtons(
-        initialMinter,
-        initialMinter,
-        SingularityCollection.slice(0, 1),
-      )
-    );
-
-
-    await executeTx('1-a', 'Batch Minting 3 Protons, Type "B"', async () =>
-      await protonB.createProtons(
-        initialMinter,
-        initialMinter,
-        SingularityCollection.slice(0, 3),
-      )
-    );
-
-
-    await executeTx('1-a', 'Batch Minting 5 Protons, Type "B"', async () =>
-      await protonB.createProtons(
-        initialMinter,
-        initialMinter,
-        SingularityCollection.slice(0, 5),
-      )
-    );
-
-
-    await executeTx('1-a', 'Batch Minting 15 Protons, Type "B"', async () =>
-      await protonB.createProtons(
-        initialMinter,
-        initialMinter,
-        SingularityCollection.slice(0, 15),
-      )
-    );
-
-
-    await executeTx('1-a', 'Batch Minting 20 Protons, Type "B"', async () =>
-      await protonB.createProtons(
-        initialMinter,
-        initialMinter,
-        SingularityCollection.slice(0, 20),
-      )
-    );
-
-
-    await executeTx('1-a', 'Batch Minting 25 Protons, Type "B"', async () =>
-      await protonB.createProtons(
-        initialMinter,
-        initialMinter,
-        SingularityCollection.slice(0, 25),
-      )
-    );
-
-
-    await executeTx('1-a', 'Batch Minting 50 Protons, Type "B"', async () =>
-      await protonB.createProtons(
-        initialMinter,
-        initialMinter,
-        [...SingularityCollection, ...SingularityCollection],
-      )
-    );
+    // await executeTx('1-a', 'Minting Single Proton, Type "B"', async () =>
+    //   await protonB.createProton(
+    //     initialMinter,
+    //     initialMinter,
+    //     SingularityCollection[0],
+    //   )
+    // );
 
 
     // Gas Usage Breakdown for Minting:

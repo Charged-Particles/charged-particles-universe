@@ -34,7 +34,19 @@ const resetAccumulatedGasCost = () => {
   __accumulatedGasCost = bn(0);
 };
 
+let __skipTo = '';
+const skipToTxId = (txId) => {
+  __skipTo = txId;
+}
 const executeTx = async (txId, txDesc, callback, delay = 0) => {
+  if (!_.isEmpty(__skipTo) && __skipTo !== txId) {
+    log(`  - Skipping ${txId}`);
+    return;
+  }
+  if (!_.isEmpty(__skipTo)) {
+    __skipTo = '';
+    log(`\n`);
+  }
   try {
     if (txId === '1-a') {
       log(`\n`);
@@ -54,6 +66,7 @@ const executeTx = async (txId, txDesc, callback, delay = 0) => {
 
 module.exports = {
   executeTx,
+  skipToTxId,
   accumulatedGasCost,
   getAccumulatedGasCost,
   resetAccumulatedGasCost,

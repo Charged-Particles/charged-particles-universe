@@ -45,6 +45,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - AaveWalletManager:  ', aaveWalletManager.address);
+    log('     - Block:           ', aaveWalletManager.deployTransaction.blockNumber);
     log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: aaveWalletManager.deployTransaction }));
 
     await log('\n  Deploying AaveWalletManagerB...')(alchemyTimeout);
@@ -58,6 +59,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - AaveWalletManagerB: ', aaveWalletManagerB.address);
+    log('     - Block:           ', aaveWalletManagerB.deployTransaction.blockNumber);
     log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: aaveWalletManagerB.deployTransaction }));
 
     await log('\n  Deploying AaveBridgeV2 with LP Provider: ', lendingPoolProviderV2)(alchemyTimeout);
@@ -72,6 +74,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - AaveBridgeV2:       ', aaveBridgeV2.address);
+    log('     - Block:           ', aaveBridgeV2.deployTransaction.blockNumber);
     log('     - Gas Cost:        ', getTxGasCost({deployTransaction: aaveBridgeV2.deployTransaction}));
 
 

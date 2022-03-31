@@ -29,6 +29,7 @@ const log = (...args) => {
 
 const chainIdByName = (chainName) => {
   switch (_.toLower(chainName)) {
+    case 'homestead': return 1;
     case 'mainnet': return 1;
     case 'ropsten': return 3;
     case 'rinkeby': return 4;

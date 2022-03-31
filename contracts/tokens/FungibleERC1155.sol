@@ -31,7 +31,7 @@ contract FungibleERC1155 is ERC1155 {
 
   Counters.Counter internal _tokenCount;
 
-  constructor() public ERC1155("https://charged.fi/erc1155/") {}
+  constructor() public ERC1155("https://staging.app.charged.fi/erc1155/metadata.json") {}
 
   function mintNft(address receiver, uint256 amount) external returns (uint256 newTokenId) {
     return _mintNft(receiver, amount);

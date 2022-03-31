@@ -49,6 +49,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - Universe:         ', universe.address);
+    log('     - Block:         ', universe.deployTransaction.blockNumber);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
 
     await log('  Deploying ChargedState...')(alchemyTimeout);
@@ -62,6 +63,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - ChargedState:     ', chargedState.address);
+    log('     - Block:         ', chargedState.deployTransaction.blockNumber);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedState.deployTransaction }));
 
     await log('  Deploying ChargedSettings...')(alchemyTimeout);
@@ -75,6 +77,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - ChargedSettings:  ', chargedSettings.address);
+    log('     - Block:         ', chargedSettings.deployTransaction.blockNumber);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedSettings.deployTransaction }));
 
     await log('  Deploying ChargedManagers...')(alchemyTimeout);
@@ -88,6 +91,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - ChargedManagers:  ', chargedManagers.address);
+    log('     - Block:         ', chargedManagers.deployTransaction.blockNumber);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedManagers.deployTransaction }));
 
 
@@ -102,6 +106,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - ChargedParticles: ', chargedParticles.address);
+    log('     - Block:         ', chargedParticles.deployTransaction.blockNumber);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedParticles.deployTransaction }));
 
     //
@@ -119,6 +124,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - TokenInfoProxy: ', tokenInfoProxy.address);
+    log('     - Block:         ', tokenInfoProxy.deployTransaction.blockNumber);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: tokenInfoProxy.deployTransaction }));
 
 
@@ -133,6 +139,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - ParticleSplitter: ', particleSplitter.address);
+    log('     - Block:         ', particleSplitter.deployTransaction.blockNumber);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: particleSplitter.deployTransaction }));
 
 

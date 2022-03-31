@@ -44,6 +44,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - GenericWalletManager:  ', genericWalletManager.address);
+    log('     - Block:              ', genericWalletManager.deployTransaction.blockNumber);
     log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
 
     await log('\n  Deploying GenericWalletManagerB...')(alchemyTimeout);
@@ -57,6 +58,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - GenericWalletManagerB:  ', genericWalletManagerB.address);
+    log('     - Block:              ', genericWalletManagerB.deployTransaction.blockNumber);
     log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManagerB.deployTransaction }));
 
     await log('  Deploying GenericBasketManager...')(alchemyTimeout);
@@ -70,6 +72,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - GenericBasketManager:  ', genericBasketManager.address);
+    log('     - Block:              ', genericBasketManager.deployTransaction.blockNumber);
     log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericBasketManager.deployTransaction }));
 
     await log('  Deploying GenericBasketManagerB...')(alchemyTimeout);
@@ -83,6 +86,7 @@ module.exports = async (hre) => {
     }
     saveDeploymentData(chainId, deployData);
     log('  - GenericBasketManagerB:  ', genericBasketManagerB.address);
+    log('     - Block:              ', genericBasketManagerB.deployTransaction.blockNumber);
     log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericBasketManagerB.deployTransaction }));
 
 

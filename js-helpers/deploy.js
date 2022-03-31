@@ -355,6 +355,19 @@ const getMigrationData = (dataTypeId, chainId = 31337) => {
   return migrationJson;
 }
 
+const getOZProjectData = (chainId = 31337) => {
+  let fileRef = '';
+  switch (chainId) {
+    case 1: fileRef = `mainnet`; break;
+    case 42: fileRef = `kovan`; break;
+    default: fileRef = `unknown-${chainId}`; break;
+  }
+  const projectPath = path.join(__dirname, '..', '.openzeppelin');
+  const filename = `${projectPath}/${fileRef}.json`;
+  const projectJson = (fs.existsSync(filename)) ? require(filename) : {};
+  return projectJson;
+}
+
 
 const getTxGasCost = ({deployTransaction}) => {
   const gasCost = toEth(deployTransaction.gasLimit.mul(deployTransaction.gasPrice));
@@ -413,6 +426,7 @@ module.exports = {
   getContractAbi,
   getDeployData,
   getMigrationData,
+  getOZProjectData,
   getTxGasCost,
   getActualTxGasCost,
   getIonxDistributionAmount,

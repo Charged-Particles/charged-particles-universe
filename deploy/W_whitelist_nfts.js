@@ -62,4 +62,4 @@ module.exports = async (hre) => {
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };
 
-module.exports.tags = ['external-nfts'];
+module.exports.tags = ['whitelist-nfts'];

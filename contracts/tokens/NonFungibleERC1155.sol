@@ -33,7 +33,7 @@ contract NonFungibleERC1155 is ERC1155 {
   mapping (uint256 => address) internal _tokenCreator;
   mapping (uint256 => address) internal _tokenOwner;
 
-  constructor() public ERC1155("https://charged.fi/erc1155/") {}
+  constructor() public ERC1155("https://staging.app.charged.fi/erc1155/metadata.json") {}
 
   function creatorOf(uint256 tokenId) external view returns (address) {
     return _tokenCreator[tokenId];
