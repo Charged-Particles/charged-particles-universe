@@ -87,38 +87,38 @@ module.exports = async (hre) => {
     deployTransaction: ionx.deployTransaction,
   }
 
-  // let externalERC721, nonFungibleERC1155, fungibleERC1155
-  // if (!isProd) {
-  //   await log('\n  Deploying ExternalERC721...')(alchemyTimeout);
-  //   const ExternalERC721 = await ethers.getContractFactory('ExternalERC721');
-  //   const ExternalERC721Instance = await ExternalERC721.deploy();
-  //   externalERC721 = await ExternalERC721Instance.deployed();
-  //   deployData['ExternalERC721'] = {
-  //     abi: getContractAbi('ExternalERC721'),
-  //     address: externalERC721.address,
-  //     deployTransaction: externalERC721.deployTransaction,
-  //   }
+  let externalERC721, nonFungibleERC1155, fungibleERC1155
+  if (!isProd) {
+    await log('\n  Deploying ExternalERC721...')(alchemyTimeout);
+    const ExternalERC721 = await ethers.getContractFactory('ExternalERC721');
+    const ExternalERC721Instance = await ExternalERC721.deploy();
+    externalERC721 = await ExternalERC721Instance.deployed();
+    deployData['ExternalERC721'] = {
+      abi: getContractAbi('ExternalERC721'),
+      address: externalERC721.address,
+      deployTransaction: externalERC721.deployTransaction,
+    }
 
-  //   await log('\n  Deploying NonFungibleERC1155...')(alchemyTimeout);
-  //   const NonFungibleERC1155 = await ethers.getContractFactory('NonFungibleERC1155');
-  //   const NonFungibleERC1155Instance = await NonFungibleERC1155.deploy();
-  //   nonFungibleERC1155 = await NonFungibleERC1155Instance.deployed();
-  //   deployData['NonFungibleERC1155'] = {
-  //     abi: getContractAbi('NonFungibleERC1155'),
-  //     address: nonFungibleERC1155.address,
-  //     deployTransaction: nonFungibleERC1155.deployTransaction,
-  //   }
+    await log('\n  Deploying NonFungibleERC1155...')(alchemyTimeout);
+    const NonFungibleERC1155 = await ethers.getContractFactory('NonFungibleERC1155');
+    const NonFungibleERC1155Instance = await NonFungibleERC1155.deploy();
+    nonFungibleERC1155 = await NonFungibleERC1155Instance.deployed();
+    deployData['NonFungibleERC1155'] = {
+      abi: getContractAbi('NonFungibleERC1155'),
+      address: nonFungibleERC1155.address,
+      deployTransaction: nonFungibleERC1155.deployTransaction,
+    }
 
-  //   await log('\n  Deploying FungibleERC1155...')(alchemyTimeout);
-  //   const FungibleERC1155 = await ethers.getContractFactory('FungibleERC1155');
-  //   const FungibleERC1155Instance = await FungibleERC1155.deploy();
-  //   fungibleERC1155 = await FungibleERC1155Instance.deployed();
-  //   deployData['FungibleERC1155'] = {
-  //     abi: getContractAbi('FungibleERC1155'),
-  //     address: fungibleERC1155.address,
-  //     deployTransaction: fungibleERC1155.deployTransaction,
-  //   }
-  // }
+    await log('\n  Deploying FungibleERC1155...')(alchemyTimeout);
+    const FungibleERC1155 = await ethers.getContractFactory('FungibleERC1155');
+    const FungibleERC1155Instance = await FungibleERC1155.deploy();
+    fungibleERC1155 = await FungibleERC1155Instance.deployed();
+    deployData['FungibleERC1155'] = {
+      abi: getContractAbi('FungibleERC1155'),
+      address: fungibleERC1155.address,
+      deployTransaction: fungibleERC1155.deployTransaction,
+    }
+  }
 
   // Display Contract Addresses
   await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);

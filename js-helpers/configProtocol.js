@@ -136,7 +136,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ionx = await Ionx.attach(ddIonx.address);
 
 
-    // skipToTxId('1-a');
+    // skipToTxId('6-a');
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Charged Particles & Universe
@@ -365,30 +365,30 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     //   await lepton.setMaxMintPerTx(leptonMaxMint)
     // );
 
-    !afterUpgradesV2 && await executeTx('5-c', 'ChargedParticles: Registering Lepton', async () =>
-      await chargedSettings.enableNftContracts([ddLepton.address])
-    );
+    // !afterUpgradesV2 && await executeTx('5-c', 'ChargedParticles: Registering Lepton', async () =>
+    //   await chargedSettings.enableNftContracts([ddLepton.address])
+    // );
 
-    !afterUpgradesV2 && await executeTx('5-d', 'Lepton: Unpausing', async () =>
-      await lepton.setPausedState(false)
-    );
+    // !afterUpgradesV2 && await executeTx('5-d', 'Lepton: Unpausing', async () =>
+    //   await lepton.setPausedState(false)
+    // );
 
-    if (isHardhat) {
-      let leptonType;
-      for (let i = 0; i < presets.Lepton.types.length; i++) {
-        leptonType = presets.Lepton.types[i];
+    // if (isHardhat) {
+    //   let leptonType;
+    //   for (let i = 0; i < presets.Lepton.types.length; i++) {
+    //     leptonType = presets.Lepton.types[i];
 
-        await executeTx(`5-e-${i}`, `Lepton: Adding Lepton Type: ${leptonType.name}`, async () =>
-          await lepton.addLeptonType(
-            leptonType.tokenUri,
-            leptonType.price[chainId],
-            leptonType.supply[chainId],
-            leptonType.multiplier,
-            leptonType.bonus,
-          )
-        );
-      }
-    }
+    //     await executeTx(`5-e-${i}`, `Lepton: Adding Lepton Type: ${leptonType.name}`, async () =>
+    //       await lepton.addLeptonType(
+    //         leptonType.tokenUri,
+    //         leptonType.price[chainId],
+    //         leptonType.supply[chainId],
+    //         leptonType.multiplier,
+    //         leptonType.bonus,
+    //       )
+    //     );
+    //   }
+    // }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Ionx
