@@ -69,7 +69,7 @@
   "dependencies": {
     "dateformat": "^4.5.1",
     "hardhat-watcher": "^2.1.1",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "sleep-promise": "^9.1.0"
   }
 }
