@@ -63,6 +63,37 @@ contract ProtonB is BaseProton, IProtonB {
   |              Public               |
   |__________________________________*/
 
+  function createProtonForSale(
+    address creator,
+    address receiver,
+    string memory tokenMetaUri,
+    uint256 annuityPercent,
+    uint256 royaltiesPercent,
+    uint256 salePrice
+  )
+    external
+    virtual
+    override
+    returns (uint256 newTokenId)
+  {
+    newTokenId = _createProton(
+      creator,
+      receiver,
+      tokenMetaUri,
+      royaltiesPercent,
+      salePrice
+    );
+
+    if (annuityPercent > 0) {
+      _chargedSettings.setCreatorAnnuities(
+        address(this),
+        newTokenId,
+        creator,
+        annuityPercent
+      );
+    }
+  }
+
   function createChargedParticle(
     address creator,
     address receiver,

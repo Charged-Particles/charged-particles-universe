@@ -50,6 +50,15 @@ interface IProtonB is IERC721 {
   |              Public               |
   |__________________________________*/
 
+  function createProtonForSale(
+    address creator,
+    address receiver,
+    string memory tokenMetaUri,
+    uint256 annuityPercent,
+    uint256 royaltiesPercent,
+    uint256 salePrice
+  ) external returns (uint256 newTokenId);
+
   function createChargedParticle(
     address creator,
     address receiver,
