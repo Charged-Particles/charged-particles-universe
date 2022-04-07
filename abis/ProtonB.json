@@ -618,6 +618,50 @@
       },
       {
         "internalType": "uint256",
+        "name": "annuityPercent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "royaltiesPercent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "salePrice",
+        "type": "uint256"
+      }
+    ],
+    "name": "createProtonForSale",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "newTokenId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "tokenMetaUri",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
         "name": "royaltiesPercent",
         "type": "uint256"
       },
