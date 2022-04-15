@@ -11,3 +11,9 @@
      
   - Mint particles and energize
 */
+
+/*
+  polygon testnet erc1155 contract > 0xe233ae2213d3592c479a9ff9c2ee067d330d1a0c
+  polygon testnet erc721 mintable contract > 0x443c56d58C4B7aBB29325526A2e0cE0BF78EAE7C
+*/
+
