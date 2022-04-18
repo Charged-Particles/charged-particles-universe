@@ -111,6 +111,7 @@ contract GenericSmartBasketB is ISmartBasketB, BlackholePrevention, IERC721Recei
     } else {
       IERC721(contractAddress).safeTransferFrom(address(this), receiver, tokenId);
     }
+    return true;
   }
 
   function withdrawRewards(address receiver, address rewardsTokenAddress, uint256 rewardsAmount)

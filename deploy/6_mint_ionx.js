@@ -38,8 +38,8 @@ module.exports = async (hre) => {
   const Ionx = await ethers.getContractFactory('Ionx');
   const ionx = await Ionx.attach(ddIonx.address).connect(daoSigner);
 
-  // await log(`  - Ionx: Minting to DAO`)(alchemyTimeout);
-  // await ionx.mint(protocolOwner, ionxMaxSupply);
+  await log(`  - Ionx: Minting to DAO`)(alchemyTimeout);
+  await ionx.mint(protocolOwner, ionxMaxSupply);
 
 
   log('\n  Contract Universe Ionx Minting Complete!');

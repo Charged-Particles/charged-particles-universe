@@ -37,7 +37,8 @@ import "../lib/TokenInfo.sol";
 import "../lib/BlackholePrevention.sol";
 import "../lib/RelayRecipient.sol";
 
-
+/// @title Base Proton Contract for Charged Particles compatible ERC721 NFTs
+/// @dev MUST NOT be Upgradeable, as Upgradeable NFTs are incompatible with Charged Particles.
 contract BaseProton is IBaseProton, ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePrevention {
   using SafeMath for uint256;
   using TokenInfo for address payable;
@@ -45,16 +46,20 @@ contract BaseProton is IBaseProton, ERC721, Ownable, RelayRecipient, ReentrancyG
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
 
+  /// @dev Sequential Token IDs storage
   Counters.Counter internal _tokenIds;
 
+  /// @dev NFT Token Creator settings
   mapping (uint256 => address) internal _tokenCreator;
   mapping (uint256 => uint256) internal _tokenCreatorRoyaltiesPct;
   mapping (uint256 => address) internal _tokenCreatorRoyaltiesRedirect;
   mapping (address => uint256) internal _tokenCreatorClaimableRoyalties;
 
+  /// @dev NFT Token Sale settings
   mapping (uint256 => uint256) internal _tokenSalePrice;
   mapping (uint256 => uint256) internal _tokenLastSellPrice;
 
+  /// @dev Whether of not the Contract is Paused
   bool internal _paused;
 
 
@@ -62,6 +67,7 @@ contract BaseProton is IBaseProton, ERC721, Ownable, RelayRecipient, ReentrancyG
   |          Initialization           |
   |__________________________________*/
 
+  /// @dev Inherit from ERC721 standard
   constructor(string memory _name, string memory _symbol) public ERC721(_name, _symbol) {}
 
 
@@ -69,30 +75,53 @@ contract BaseProton is IBaseProton, ERC721, Ownable, RelayRecipient, ReentrancyG
   |              Public               |
   |__________________________________*/
 
+  /// Returns the Creator address of an NFT by Token ID
+  /// @param tokenId The ID of the NFT Token to lookup
+  /// @return The address of the Creator account
   function creatorOf(uint256 tokenId) external view virtual override returns (address) {
     return _tokenCreator[tokenId];
   }
 
+  /// Returns the Sale Price of an NFT by Token ID
+  /// @param tokenId The ID of the NFT Token to lookup
+  /// @return The sale price of the NFT
   function getSalePrice(uint256 tokenId) external view virtual override returns (uint256) {
     return _tokenSalePrice[tokenId];
   }
 
+  /// Returns the Last Sale Price of an NFT by Token ID
+  /// @notice This is used to determine any increase in sale price used in royalties calculations
+  /// @param tokenId The ID of the NFT Token to lookup
+  /// @return The last sale price of the NFT
   function getLastSellPrice(uint256 tokenId) external view virtual override returns (uint256) {
     return _tokenLastSellPrice[tokenId];
   }
 
+  /// Returns the Claimable Royalties for the NFT Creator
+  /// @param account The address of the Creator account to lookup
+  /// @return The amount of earned royalties for the creator account
   function getCreatorRoyalties(address account) external view virtual override returns (uint256) {
     return _tokenCreatorClaimableRoyalties[account];
   }
 
+  /// Returns the Percentage of Royalties reserved for the NFT Creator
+  /// @param tokenId The ID of the NFT Token to lookup
+  /// @return The percentage of royalties reserved for the creator
   function getCreatorRoyaltiesPct(uint256 tokenId) external view virtual override returns (uint256) {
     return _tokenCreatorRoyaltiesPct[tokenId];
   }
 
+  /// Returns the Receiving address of the Creator Royalties (or Creator if not set)
+  /// @dev Returns the creator address if a receiving address has not been configured
+  /// @param tokenId The ID of the NFT Token to lookup
+  /// @return The Receiving address of the Creator Royalties
   function getCreatorRoyaltiesReceiver(uint256 tokenId) external view virtual override returns (address) {
     return _creatorRoyaltiesReceiver(tokenId);
   }
 
+  /// Allows an NFT Creator to Claim any Royalties that have been earned from NFT sales
+  /// @dev Must be called by the royalties receiver account (not neccessarily the creator)
+  /// @return The amout of creator royalties claimed
   function claimCreatorRoyalties()
     external
     virtual
@@ -109,6 +138,12 @@ contract BaseProton is IBaseProton, ERC721, Ownable, RelayRecipient, ReentrancyG
   |       Create Single Protons       |
   |__________________________________*/
 
+  /// Creates a Basic NFT with no Royalties and no initial Sale Price
+  /// @dev Royalties and Sale Price can be configured later
+  /// @param creator The address of the NFT Creator (can be different from the caller)
+  /// @param receiver The receiving address of the NFT (can be different from the caller)
+  /// @param tokenMetaUri The unique metadata URI for the NFT
+  /// @return newTokenId The newly minted NFT Token ID
   function createProton(
     address creator,
     address receiver,

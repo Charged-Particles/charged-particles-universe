@@ -814,11 +814,18 @@ describe("[INTEGRATION] Charged Particles", () => {
       TEST_NFT_AMOUNT
     );
 
-    await chargedParticles.connect(signer2).breakCovalentBond(
+    await expect(chargedParticles.connect(signer2).breakCovalentBond(
       user1,
       proton.address,
       tokenId1,
       'generic',
+      proton.address,
+      tokenId2,
+      TEST_NFT_AMOUNT
+    )).to.emit(genericBasketManager, 'BasketRemove').withArgs(
+      user1,
+      proton.address,
+      tokenId1,
       proton.address,
       tokenId2,
       TEST_NFT_AMOUNT
