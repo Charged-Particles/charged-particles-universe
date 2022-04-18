@@ -59,79 +59,79 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     log('  - Trusted Forwarder: ', trustedForwarder);
     log(' ');
 
-    log('  Loading Universe from:              ', ddUniverse.address);
+    log('  Loading Universe from:              ', ddUniverse.address, ` (${ddUniverse.deployTransaction.blockNumber})`);
     const Universe = await ethers.getContractFactory('Universe');
     const universe = await Universe.attach(ddUniverse.address);
 
-    log('  Loading ChargedParticles from:      ', ddChargedParticles.address);
+    log('  Loading ChargedParticles from:      ', ddChargedParticles.address, ` (${ddChargedParticles.deployTransaction.blockNumber})`);
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
     const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
-    log('  Loading ChargedState from:          ', ddChargedState.address);
+    log('  Loading ChargedState from:          ', ddChargedState.address, ` (${ddChargedState.deployTransaction.blockNumber})`);
     const ChargedState = await ethers.getContractFactory('ChargedState');
     const chargedState = await ChargedState.attach(ddChargedState.address);
 
-    log('  Loading ChargedSettings from:       ', ddChargedSettings.address);
+    log('  Loading ChargedSettings from:       ', ddChargedSettings.address, ` (${ddChargedSettings.deployTransaction.blockNumber})`);
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     const chargedSettings = await ChargedSettings.attach(ddChargedSettings.address);
 
-    log('  Loading ChargedManagers from:       ', ddChargedManagers.address);
+    log('  Loading ChargedManagers from:       ', ddChargedManagers.address, ` (${ddChargedManagers.deployTransaction.blockNumber})`);
     const ChargedManagers = await ethers.getContractFactory('ChargedManagers');
     const chargedManagers = await ChargedManagers.attach(ddChargedManagers.address);
 
-    log('  Loading ParticleSplitter from:      ', ddParticleSplitter.address);
+    log('  Loading ParticleSplitter from:      ', ddParticleSplitter.address, ` (${ddParticleSplitter.deployTransaction.blockNumber})`);
     const ParticleSplitter = await ethers.getContractFactory('ParticleSplitter');
     const particleSplitter = await ParticleSplitter.attach(ddParticleSplitter.address);
 
-    log('  Loading GenericWalletManager from:  ', ddGenericWalletManager.address);
+    log('  Loading GenericWalletManager from:  ', ddGenericWalletManager.address, ` (${ddGenericWalletManager.deployTransaction.blockNumber})`);
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const genericWalletManager = await GenericWalletManager.attach(ddGenericWalletManager.address);
 
-    log('  Loading GenericWalletManagerB from: ', ddGenericWalletManagerB.address);
+    log('  Loading GenericWalletManagerB from: ', ddGenericWalletManagerB.address, ` (${ddGenericWalletManagerB.deployTransaction.blockNumber})`);
     const GenericWalletManagerB = await ethers.getContractFactory('GenericWalletManagerB');
     const genericWalletManagerB = await GenericWalletManagerB.attach(ddGenericWalletManagerB.address);
 
-    log('  Loading GenericBasketManager from:  ', ddGenericBasketManager.address);
+    log('  Loading GenericBasketManager from:  ', ddGenericBasketManager.address, ` (${ddGenericBasketManager.deployTransaction.blockNumber})`);
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const genericBasketManager = await GenericBasketManager.attach(ddGenericBasketManager.address);
 
-    log('  Loading GenericBasketManagerB from: ', ddGenericBasketManagerB.address);
+    log('  Loading GenericBasketManagerB from: ', ddGenericBasketManagerB.address, ` (${ddGenericBasketManagerB.deployTransaction.blockNumber})`);
     const GenericBasketManagerB = await ethers.getContractFactory('GenericBasketManagerB');
     const genericBasketManagerB = await GenericBasketManagerB.attach(ddGenericBasketManagerB.address);
 
-    log('  Loading AaveWalletManager from:     ', ddAaveWalletManager.address);
+    log('  Loading AaveWalletManager from:     ', ddAaveWalletManager.address, ` (${ddAaveWalletManager.deployTransaction.blockNumber})`);
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
     const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
 
-    log('  Loading AaveWalletManagerB from:    ', ddAaveWalletManagerB.address);
+    log('  Loading AaveWalletManagerB from:    ', ddAaveWalletManagerB.address, ` (${ddAaveWalletManagerB.deployTransaction.blockNumber})`);
     const AaveWalletManagerB = await ethers.getContractFactory('AaveWalletManagerB');
     const aaveWalletManagerB = await AaveWalletManagerB.attach(ddAaveWalletManagerB.address);
 
-    log('  Loading TokenInfoProxy from:        ', ddTokenInfoProxy.address);
+    log('  Loading TokenInfoProxy from:        ', ddTokenInfoProxy.address, ` (${ddTokenInfoProxy.deployTransaction.blockNumber})`);
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
     const tokenInfoProxy = await TokenInfoProxy.attach(ddTokenInfoProxy.address);
 
-    log('  Loading Proton from:                ', ddProton.address);
+    log('  Loading Proton from:                ', ddProton.address, ` (${ddProton.deployTransaction.blockNumber})`);
     const Proton = await ethers.getContractFactory('Proton');
     const proton = await Proton.attach(ddProton.address);
 
-    log('  Loading ProtonB from:               ', ddProtonB.address);
+    log('  Loading ProtonB from:               ', ddProtonB.address, ` (${ddProtonB.deployTransaction.blockNumber})`);
     const ProtonB = await ethers.getContractFactory('ProtonB');
     const protonB = await ProtonB.attach(ddProtonB.address);
 
     let ddLepton, Lepton, lepton;
     if (isHardhat) {
       ddLepton = getDeployData('Lepton', chainId);
-      log('  Loading Lepton from:                ', ddLepton.address);
+      log('  Loading Lepton from:                ', ddLepton.address, ` (${ddLepton.deployTransaction.blockNumber})`);
       Lepton = await ethers.getContractFactory('Lepton');
       lepton = await Lepton.attach(ddLepton.address);
     }
 
-    log('  Loading Lepton2 from:               ', ddLepton2.address);
+    log('  Loading Lepton2 from:               ', ddLepton2.address, ` (${ddLepton2.deployTransaction.blockNumber})`);
     const Lepton2 = await ethers.getContractFactory('Lepton2');
     const lepton2 = await Lepton2.attach(ddLepton2.address);
 
-    log('  Loading Ionx from:                  ', ddIonx.address);
+    log('  Loading Ionx from:                  ', ddIonx.address, ` (${ddIonx.deployTransaction.blockNumber})`);
     const Ionx = await ethers.getContractFactory('Ionx');
     const ionx = await Ionx.attach(ddIonx.address);
 
@@ -142,7 +142,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // Setup Charged Particles & Universe
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('1-a', 'Universe: Registering ChargedParticles at: ' + ddChargedParticles.address, async () =>
+    await executeTx('1-a', 'Universe: Registering ChargedParticles', async () =>
       await universe.setChargedParticles(ddChargedParticles.address)
     );
 
