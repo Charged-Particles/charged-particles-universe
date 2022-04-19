@@ -19,70 +19,30 @@ const {
   resetAccumulatedGasCost,
 } = require('../js-helpers/executeTx');
 
+const testHelpers = require('../js-helpers/test');
+
 const _ = require('lodash');
 
-const SingularityCollection = [
-  'https://ipfs.io/ipfs/QmScSSJ8HdKr13qkPHHgM7UMbbsLMRjLt2TRY8nQ97qCrL',
-  'https://ipfs.io/ipfs/QmUYDhtnhjJXH5yPzYhEqg7SuQ4W7HwaHFMVUQxSq41dtq',
-  'https://ipfs.io/ipfs/QmWc1upvg4C4wSiSu1ry72Lw2smGsEptq73vV5hNk84MR9',
-  'https://ipfs.io/ipfs/QmPUoAULoodhy2uipiCZbT4YcMwCJX7jEK9wM8V2A7JXxu',
-  'https://ipfs.io/ipfs/QmVT2TvPjznpoNAgRhvzR5paH9rGqZ9kskM7iqK3oVDqAi',
 
-  'https://ipfs.io/ipfs/QmNkRS2kXSoquxBzMjAAzAim5MkBmdWapiqMDUx7Ycfev7',
-  'https://ipfs.io/ipfs/QmWzSAsvMQtrsGua7Bv9VrnjhYzPVQb2tQD82s3nBBL6c5',
-  'https://ipfs.io/ipfs/QmW9CyctFiLPS4jVYMsphCse39WSzBNMjBqS2nbiUpbQPh',
-  'https://ipfs.io/ipfs/QmYYz36gkueJjy7LxogPq7Uh2ZyoqByPv6cCypKktVWJ7H',
-  'https://ipfs.io/ipfs/QmafjdCLdTeXsMUX85fvWAkwcMcNbRdsd2HHysWZVP7TpC',
-
-  'https://ipfs.io/ipfs/QmaL5CjZABwLX9L6yXdvHFox7fYFdZGvyDFKuLZssw1Ypo',
-  'https://ipfs.io/ipfs/QmSeE4icQQte3DPgJsLuHstRocTJSD5vQHNbsrDX3U5wSC',
-  'https://ipfs.io/ipfs/QmcJX9VWqdeAMq8FJTzS2o2WdRXqGciYHjVk9hL4DC2q85',
-  'https://ipfs.io/ipfs/QmWAtrv5gvgRGc5u2nqFctgTUU7DgWxnHUXB8Az5HBbyvc',
-  'https://ipfs.io/ipfs/QmatHa7y7JzBUBYnozCAqXyPaoT5bvWZckHqEMfpdEBgy5',
-
-  'https://ipfs.io/ipfs/Qmexdm7Y7WkymGfJAVdF4Ex3TLXhsRGzb6cN8ug9mxKJ4K',
-  'https://ipfs.io/ipfs/QmcXaXc54txJU8V8u7a3h7dpwDGxbFy6px9FKvdsTqLBvP',
-  'https://ipfs.io/ipfs/QmUSw99dH3LikLHYBaWnQm9NGXzJkqkBqvfXK2hscPmb8p',
-  'https://ipfs.io/ipfs/Qme4EazsTrRiGY6HtUJpTCJyePkLgU8xcC3qwiiHB9wfLn',
-  'https://ipfs.io/ipfs/QmRchzHj74k4virx3WXgoNNJTTYSPhGqQ69LHk4dj1fnqV',
-
-  'https://ipfs.io/ipfs/Qmexdm7Y7WkymGfJAVdF4Ex3TLXhsRGzb6cN8ug9mxKJ4K',
-  'https://ipfs.io/ipfs/QmcXaXc54txJU8V8u7a3h7dpwDGxbFy6px9FKvdsTqLBvP',
-  'https://ipfs.io/ipfs/QmUSw99dH3LikLHYBaWnQm9NGXzJkqkBqvfXK2hscPmb8p',
-  'https://ipfs.io/ipfs/Qme4EazsTrRiGY6HtUJpTCJyePkLgU8xcC3qwiiHB9wfLn',
-  'https://ipfs.io/ipfs/QmRchzHj74k4virx3WXgoNNJTTYSPhGqQ69LHk4dj1fnqV',
-];
-const SingularityPrices = [
-  toWei('69'),
-  toWei('30'),
-  toWei('21'),
-  toWei('11'),
-  toWei('5.5'),
-
-  // toWei('5'),
-  // toWei('4'),
-  // toWei('3'),
-  // toWei('2'),
-  // toWei('1'),
-
-  // toWei('1'),
-  // toWei('2'),
-  // toWei('3'),
-  // toWei('2'),
-  // toWei('1'),
-
-  // toWei('0.9'),
-  // toWei('0.825'),
-  // toWei('0.75'),
-  // toWei('0.675'),
-  // toWei('0.5'),
+let _DEPLOY_ROBS_NFTS = true;
+const RobsTestCollection = [
+  "ipfs://QmcbUiZVJVGMXKGV453YFhKxVKpQZKQSSvz8HAcSZxUBmr",
+  "ipfs://QmUi3rmHLiQaEHziR4rKrCwA1a2ZuqNvaCDGoZDHHm85YG",
+  "ipfs://Qmdxhvd6KVhaFFtyY49ZNHtUGbyWJ55RPVPPQLUQeQQV8j",
+  "ipfs://QmRfQguqZqppZXuwV4HNKRocF5JPGbjGaKoSjAMdw5TksH",
+  "ipfs://QmSF4kDAsaVXCdvYGo5jkzMHRPTQXzWwyhuzpxyeR8dYan",
+  "ipfs://QmcReccrBqkQF1koydeiB8oezrcPxJspRqAkUEeBae29eE",
+  "ipfs://QmYpzRutFhp9Pdrt22wFD3DNePH6zrawnnpFgAag2z8nhd",
+  "ipfs://QmTdV1JzPSj5WFPP7EfUsBwm6QCLHzd5fhnhQcXXgYF3YF",
+  "ipfs://QmTgYYCfgb7xQcpkLkE3xo7wZnUBdTWZrW6ir7FPvqiaiu",
+  "ipfs://QmVw7cPRmyN9Z44JXh7jG1iAK9UZ9cUATe6sknSaS9Whz9",
 ];
 
 
 const _externalNftsForTesting = [
-  {receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76', tokenUri: 'https://ipfs.io/ipfs/QmWc1upvg4C4wSiSu1ry72Lw2smGsEptq73vV5hNk84MR9'},
-  {receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76', tokenUri: 'https://ipfs.io/ipfs/QmScSSJ8HdKr13qkPHHgM7UMbbsLMRjLt2TRY8nQ97qCrL'},
-  {receiver: '0xb14d1a16f30dB670097DA86D4008640c6CcC2B76', tokenUri: 'https://ipfs.io/ipfs/QmPUoAULoodhy2uipiCZbT4YcMwCJX7jEK9wM8V2A7JXxu'},
+  'https://ipfs.io/ipfs/QmWc1upvg4C4wSiSu1ry72Lw2smGsEptq73vV5hNk84MR9',
+  'https://ipfs.io/ipfs/QmScSSJ8HdKr13qkPHHgM7UMbbsLMRjLt2TRY8nQ97qCrL',
+  'https://ipfs.io/ipfs/QmPUoAULoodhy2uipiCZbT4YcMwCJX7jEK9wM8V2A7JXxu',
 ];
 
 
@@ -90,6 +50,7 @@ module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;
     const { deployer, initialMinter } = await getNamedAccounts();
     const network = await hre.network;
+    const { callAndReturn } = testHelpers(network);
 
     const chainId = chainIdByName(network.name);
     const {isProd, isHardhat} = chainTypeById(chainId);
@@ -100,7 +61,10 @@ module.exports = async (hre) => {
     const ddProtonB = getDeployData('ProtonB', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
     const ddExternalERC721 = getDeployData('ExternalERC721', chainId);
-    let externalERC721, gasCosts;
+    const ddFungibleERC1155 = getDeployData('FungibleERC1155', chainId);
+    const ddNonFungibleERC1155 = getDeployData('NonFungibleERC1155', chainId);
+
+    let externalERC721, fungibleERC1155, nonFungibleERC1155, gasCosts;
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles: Mint Proton & Lepton Tokens ');
@@ -128,6 +92,119 @@ module.exports = async (hre) => {
       log('  Loading ExternalERC721 from: ', ddExternalERC721.address);
       const ExternalERC721 = await ethers.getContractFactory('ExternalERC721');
       externalERC721 = await ExternalERC721.attach(ddExternalERC721.address);
+
+      log('  Loading FungibleERC1155 from: ', ddFungibleERC1155.address);
+      const FungibleERC1155 = await ethers.getContractFactory('FungibleERC1155');
+      fungibleERC1155 = await FungibleERC1155.attach(ddFungibleERC1155.address);
+
+      log('  Loading NonFungibleERC1155 from: ', ddNonFungibleERC1155.address);
+      const NonFungibleERC1155 = await ethers.getContractFactory('NonFungibleERC1155');
+      nonFungibleERC1155 = await NonFungibleERC1155.attach(ddNonFungibleERC1155.address);
+    }
+
+
+
+    const _mintProtonNft = async (index, type, tokenUri, minter) => {
+      log(`   - Minting Proton ${index+1}, Type "${type}" with URI: ${tokenUri}...`);
+      const contract = type === 'A' ? proton : protonB;
+      const signer = ethers.provider.getSigner(minter);
+      const tokenId = await callAndReturn({
+        contractInstance: contract,
+        contractMethod: 'createBasicProton',
+        contractCaller: signer,
+        contractParams: [
+          minter,    // creator
+          minter,    // receiver
+          tokenUri,
+        ],
+      });
+      return {contract, address: contract.address, tokenId: tokenId.toString()};
+    };
+
+    const _mintExternalNft = async (index, contract, type, tokenUri, minter) => {
+      log(`   - Minting NFT ${index+1}, Type "${type}" with URI: ${tokenUri}...`);
+      const signer = ethers.provider.getSigner(minter);
+      const tokenId = await callAndReturn({
+        contractInstance: contract,
+        contractMethod: 'mintNft',
+        contractCaller: signer,
+        contractParams: [
+          minter,    // receiver
+          tokenUri,
+        ],
+      });
+      return {contract, address: contract.address, tokenId: tokenId.toString()};
+    };
+
+    const _covalentBond = async (account, managerId, nftA, nftB, nftAmount = 1) => {
+      log(`   - Bonding NFT "${nftA.tokenId}" into "${nftB.tokenId}"...`);
+      const signer = ethers.provider.getSigner(account);
+
+      await nftA.contract.connect(signer).setApprovalForAll(chargedParticles.address, true);
+      const bondResults = await callAndReturnWithLogs({
+        contractInstance: chargedParticles,
+        contractMethod: 'covalentBond',
+        contractCaller: signer,
+        contractParams: [
+          nftA.address,
+          nftA.tokenId,
+          managerId,
+          nftB.address,
+          nftB.tokenId,
+          nftAmount
+        ],
+      });
+      console.log({bondResults});
+    };
+
+
+    // Leave empty to deploy new NFTs.  Add token IDs as strings to manipulate existing NFTs
+    const testingTokens = {
+      externalERC721: [],
+      fungibleERC1155: [],
+      nonFungibleERC1155: [],
+      protons: [],
+    };
+    let tokenIds;
+
+
+    if (!testingTokens.externalERC721.length) {
+      log(' ');
+      log('  Minting External NFTs...');
+      for (let i = 0; i < _externalNftsForTesting.length; i++) {
+        testingTokens.externalERC721.push(await _mintExternalNft(i, externalERC721, "ExternalERC721", _externalNftsForTesting[i], initialMinter));
+      }
+      if (testingTokens.externalERC721.length) {
+        tokenIds = _.reduce(testingTokens.externalERC721, (final, obj) => { final.push(obj.tokenId); return final; }, []);
+        log(`  Minted External Token IDs: ${tokenIds}`);
+      }
+    }
+
+
+
+    _DEPLOY_ROBS_NFTS = _DEPLOY_ROBS_NFTS && (!isProd);
+    if (_DEPLOY_ROBS_NFTS) {
+      if (!testingTokens.protons.length) {
+        log(' ');
+        log('  Minting NFTs from Rob\'s Collection');
+        for (let i = 0; i < RobsTestCollection.length; i++) {
+          testingTokens.protons.push(await _mintProtonNft(i, i>2?'B':'A', RobsTestCollection[i], initialMinter));
+        }
+      }
+
+      if (testingTokens.protons.length) {
+        tokenIds = _.reduce(testingTokens.externalERC721, (final, obj) => { final.push(obj.tokenId); return final; }, []);
+        log(' ');
+        log(`  Charging Particles with Token IDs: ${tokenIds}`);
+
+        await _covalentBond(
+          initialMinter,
+          'generic.B',
+          testingTokens.protons[0], // Proton A - #1
+          testingTokens.protons[3], // Proton B - #1
+        );
+
+      }
     }
 
 
@@ -166,13 +243,6 @@ module.exports = async (hre) => {
     // await lepton.mintLepton({value: toWei('1')}); // 1 Tau
     // await lepton.mintLepton({value: toWei('1')}); // 1 Tau
 
-    // let tx;
-    // log('  Minting External NFTs...');
-    // for (let i = 0; i < _externalNftsForTesting.length; i++) {
-    //   log(`    - Minting "${_externalNftsForTesting[i].tokenUri}" for "${_externalNftsForTesting[i].receiver}"`);
-    //   tx = await externalERC721.mintNft(_externalNftsForTesting[i].receiver, _externalNftsForTesting[i].tokenUri);
-    //   await tx.wait();
-    // }
 
 
     log('\n  Token Minting Complete!');
