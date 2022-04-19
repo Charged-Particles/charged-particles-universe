@@ -54,7 +54,7 @@ const _externalERC1155 = [
 
 module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;
-    const { deployer, initialMinter } = await getNamedAccounts();
+    const { deployer, initialMinter, user1, user2, user3 } = await getNamedAccounts();
     const network = await hre.network;
     const { callAndReturn } = testHelpers(network);
 
@@ -73,14 +73,15 @@ module.exports = async (hre) => {
 
     let externalERC721, fungibleERC1155, nonFungibleERC1155, gasCosts;
 
+    const nftReceiver = user1;
+
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles: Mint Proton & Lepton Tokens ');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 
     log('  Using Network: ', chainNameById(chainId));
     log('  Using Accounts:');
-    log('  - For Creator:     ', initialMinter);
-    log('  - With Timeout:    ', alchemyTimeout);
+    log('  - For Receiver:    ', nftReceiver);
     log(' ');
 
     log('  Loading ChargedParticles from: ', ddChargedParticles.address);
@@ -198,7 +199,7 @@ module.exports = async (hre) => {
       log(' ');
       log('  Minting External ERC721s...');
       for (let i = 0; i < _externalERC721.length; i++) {
-        data = await _mintExternalERC721(i, externalERC721, "ExternalERC721", _externalERC721[i], initialMinter);
+        data = await _mintExternalERC721(i, externalERC721, "ExternalERC721", _externalERC721[i], nftReceiver);
         testingTokens.externalERC721.push(data);
       }
       if (testingTokens.externalERC721.length) {
@@ -217,16 +218,16 @@ module.exports = async (hre) => {
       log('  Minting Fungible ERC1155s...');
 
       // 10 Fungible ERC1155s
-      const fungibleToken = await _mintExternalERC1155(0, fungibleERC1155, 'Fungible', initialMinter, [initialMinter, 10]);
+      const fungibleToken = await _mintExternalERC1155(0, fungibleERC1155, 'Fungible', nftReceiver, [nftReceiver, 10]);
       log(`   == Minted Fungible ERC1155 Token IDs: ${fungibleToken.tokenId}`);
 
       log(' ');
       log('  Minting Non-Fungible ERC1155s...');
       // 3 NonFungible ERC1155s
       const nonFungibleTokens = [
-        await _mintExternalERC1155(1, nonFungibleERC1155, 'Non-Fungible', initialMinter, [initialMinter]),
-        await _mintExternalERC1155(2, nonFungibleERC1155, 'Non-Fungible', initialMinter, [initialMinter]),
-        await _mintExternalERC1155(3, nonFungibleERC1155, 'Non-Fungible', initialMinter, [initialMinter]),
+        await _mintExternalERC1155(1, nonFungibleERC1155, 'Non-Fungible', nftReceiver, [nftReceiver]),
+        await _mintExternalERC1155(2, nonFungibleERC1155, 'Non-Fungible', nftReceiver, [nftReceiver]),
+        await _mintExternalERC1155(3, nonFungibleERC1155, 'Non-Fungible', nftReceiver, [nftReceiver]),
       ];
       tokenIds = _.reduce(nonFungibleTokens, (final, obj) => { final.push(obj.tokenId); return final; }, []);
       log(`   == Minted Non-Fungible ERC1155 Token IDs: ${tokenIds}`);
@@ -241,7 +242,7 @@ module.exports = async (hre) => {
       log(' ');
       log('  Minting NFTs from Rob\'s Collection');
       for (let i = 0; i < RobsTestCollection.length; i++) {
-        data = await _mintProtonNft(i, i>2?'B':'A', RobsTestCollection[i], initialMinter);
+        data = await _mintProtonNft(i, i>2?'B':'A', RobsTestCollection[i], nftReceiver);
         testingTokens.protons.push(data);
       }
       if (testingTokens.protons.length) {
@@ -261,7 +262,7 @@ module.exports = async (hre) => {
 
       // Proton B into Proton A
       await _covalentBond(
-        initialMinter,
+        nftReceiver,
         'generic.B',
         testingTokens.protons[0], // Proton A - #1
         testingTokens.protons[3], // Proton B - #1
@@ -269,7 +270,7 @@ module.exports = async (hre) => {
 
       // Proton A into Proton B
       await _covalentBond(
-        initialMinter,
+        nftReceiver,
         'generic.B',
         testingTokens.protons[4], // Proton B - #2
         testingTokens.protons[1], // Proton A - #2
@@ -277,7 +278,7 @@ module.exports = async (hre) => {
 
       // Deposit ERC1155s into Proton A - #3
       await _covalentBond(
-        initialMinter,
+        nftReceiver,
         'generic.B',
         testingTokens.protons[2], // Proton A - #3
         fungibleToken,            // Fungible Token
@@ -286,7 +287,7 @@ module.exports = async (hre) => {
 
       // Deposit ERC1155s into Proton B - #3
       await _covalentBond(
-        initialMinter,
+        nftReceiver,
         'generic.B',
         testingTokens.protons[5], // Proton B - #3
         nonFungibleTokens[0],     // Non-Fungible Token # 1
@@ -299,9 +300,9 @@ module.exports = async (hre) => {
       // todo..
 
       // Russian Doll of Proton Bs (#7 holds #8 which holds #9 which holds #10)
-      await _covalentBond(initialMinter, 'generic.B', testingTokens.protons[8], testingTokens.protons[9]);
-      await _covalentBond(initialMinter, 'generic.B', testingTokens.protons[7], testingTokens.protons[8]);
-      await _covalentBond(initialMinter, 'generic.B', testingTokens.protons[6], testingTokens.protons[7]);
+      await _covalentBond(nftReceiver, 'generic.B', testingTokens.protons[8], testingTokens.protons[9]);
+      await _covalentBond(nftReceiver, 'generic.B', testingTokens.protons[7], testingTokens.protons[8]);
+      await _covalentBond(nftReceiver, 'generic.B', testingTokens.protons[6], testingTokens.protons[7]);
     }
 
 
