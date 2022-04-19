@@ -31,10 +31,11 @@ const callAndReturn = async ({
         ...contractParams,
         { value: callValue }
     );
-    await contractInstance.connect(contractCaller)[contractMethod](
+    const tx = await contractInstance.connect(contractCaller)[contractMethod](
         ...contractParams,
         { value: callValue }
     );
+    await tx.wait();
     return returnValue;
 }
 
