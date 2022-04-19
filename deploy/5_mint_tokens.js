@@ -39,10 +39,16 @@ const RobsTestCollection = [
 ];
 
 
-const _externalNftsForTesting = [
+const _externalERC721 = [
   'https://ipfs.io/ipfs/QmWc1upvg4C4wSiSu1ry72Lw2smGsEptq73vV5hNk84MR9',
   'https://ipfs.io/ipfs/QmScSSJ8HdKr13qkPHHgM7UMbbsLMRjLt2TRY8nQ97qCrL',
   'https://ipfs.io/ipfs/QmPUoAULoodhy2uipiCZbT4YcMwCJX7jEK9wM8V2A7JXxu',
+];
+
+const _externalERC1155 = [
+  'https://arweave.net/LjyCZiR9D4v8M9mpMKymuyvnXUtTXHftHF2txi3QCGs',
+  'https://arweave.net/Tbnh-usk61-Y8lonVFd6SbebnPfUA6wFqMbCBPbyjVM',
+  'https://arweave.net/WjLspfljcMRspz_hTvnJbS_b89-6jkTWukSxH4lOmB4',
 ];
 
 
@@ -57,6 +63,7 @@ module.exports = async (hre) => {
     const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
     const leptonMaxMint = presets.Lepton.maxMintPerTx;
 
+    const ddChargedParticles = getDeployData('ChargedParticles', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddProtonB = getDeployData('ProtonB', chainId);
     const ddLepton = getDeployData('Lepton', chainId);
@@ -75,6 +82,10 @@ module.exports = async (hre) => {
     log('  - For Creator:     ', initialMinter);
     log('  - With Timeout:    ', alchemyTimeout);
     log(' ');
+
+    log('  Loading ChargedParticles from: ', ddChargedParticles.address);
+    const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
+    const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
     log('  Loading Proton from: ', ddProton.address);
     const Proton = await ethers.getContractFactory('Proton');
@@ -121,8 +132,8 @@ module.exports = async (hre) => {
       return {contract, address: contract.address, tokenId: tokenId.toString()};
     };
 
-    const _mintExternalNft = async (index, contract, type, tokenUri, minter) => {
-      log(`   - Minting NFT ${index+1}, Type "${type}" with URI: ${tokenUri}...`);
+    const _mintExternalERC721 = async (index, contract, type, tokenUri, minter) => {
+      log(`   - Minting 721 NFT ${index+1}, Type "${type}" with URI: ${tokenUri}...`);
       const signer = ethers.provider.getSigner(minter);
       const tokenId = await callAndReturn({
         contractInstance: contract,
@@ -136,12 +147,24 @@ module.exports = async (hre) => {
       return {contract, address: contract.address, tokenId: tokenId.toString()};
     };
 
+    const _mintExternalERC1155 = async (index, contract, type, minter, args = []) => {
+      log(`   - Minting 1155 NFT ${index+1}, Type "${type}"...`);
+      const signer = ethers.provider.getSigner(minter);
+      const tokenId = await callAndReturn({
+        contractInstance: contract,
+        contractMethod: 'mintNft',
+        contractCaller: signer,
+        contractParams: args,
+      });
+      return {contract, address: contract.address, tokenId: tokenId.toString()};
+    };
+
     const _covalentBond = async (account, managerId, nftA, nftB, nftAmount = 1) => {
-      log(`   - Bonding NFT "${nftA.tokenId}" into "${nftB.tokenId}"...`);
+      log(`   - Bonding NFT "${nftB.tokenId}" into "${nftA.tokenId}"...`);
       const signer = ethers.provider.getSigner(account);
 
-      await nftA.contract.connect(signer).setApprovalForAll(chargedParticles.address, true);
-      const bondResults = await callAndReturnWithLogs({
+      await nftB.contract.connect(signer).setApprovalForAll(chargedParticles.address, true);
+      return await callAndReturn({
         contractInstance: chargedParticles,
         contractMethod: 'covalentBond',
         contractCaller: signer,
@@ -154,58 +177,136 @@ module.exports = async (hre) => {
           nftAmount
         ],
       });
-      console.log({bondResults});
     };
 
 
-    // Leave empty to deploy new NFTs.  Add token IDs as strings to manipulate existing NFTs
     const testingTokens = {
       externalERC721: [],
       fungibleERC1155: [],
       nonFungibleERC1155: [],
       protons: [],
     };
-    let tokenIds;
+    let tokenIds, data;
 
 
-    if (!testingTokens.externalERC721.length) {
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ERC721
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    if (!isProd) {
       log(' ');
-      log('  Minting External NFTs...');
-      for (let i = 0; i < _externalNftsForTesting.length; i++) {
-        testingTokens.externalERC721.push(await _mintExternalNft(i, externalERC721, "ExternalERC721", _externalNftsForTesting[i], initialMinter));
+      log('  Minting External ERC721s...');
+      for (let i = 0; i < _externalERC721.length; i++) {
+        data = await _mintExternalERC721(i, externalERC721, "ExternalERC721", _externalERC721[i], initialMinter);
+        testingTokens.externalERC721.push(data);
       }
       if (testingTokens.externalERC721.length) {
         tokenIds = _.reduce(testingTokens.externalERC721, (final, obj) => { final.push(obj.tokenId); return final; }, []);
-        log(`  Minted External Token IDs: ${tokenIds}`);
+        log(`   == Minted External ERC721 Token IDs: ${tokenIds}`);
       }
     }
 
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ERC1155
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    _DEPLOY_ROBS_NFTS = _DEPLOY_ROBS_NFTS && (!isProd);
-    if (_DEPLOY_ROBS_NFTS) {
-      if (!testingTokens.protons.length) {
-        log(' ');
-        log('  Minting NFTs from Rob\'s Collection');
-        for (let i = 0; i < RobsTestCollection.length; i++) {
-          testingTokens.protons.push(await _mintProtonNft(i, i>2?'B':'A', RobsTestCollection[i], initialMinter));
-        }
+    if (!isProd) {
+      log(' ');
+      log('  Minting Fungible ERC1155s...');
+
+      // 10 Fungible ERC1155s
+      const fungibleToken = await _mintExternalERC1155(0, fungibleERC1155, 'Fungible', initialMinter, [initialMinter, 10]);
+      log(`   == Minted Fungible ERC1155 Token IDs: ${fungibleToken.tokenId}`);
+
+      log(' ');
+      log('  Minting Non-Fungible ERC1155s...');
+      // 3 NonFungible ERC1155s
+      const nonFungibleTokens = [
+        await _mintExternalERC1155(1, nonFungibleERC1155, 'Non-Fungible', initialMinter, [initialMinter]),
+        await _mintExternalERC1155(2, nonFungibleERC1155, 'Non-Fungible', initialMinter, [initialMinter]),
+        await _mintExternalERC1155(3, nonFungibleERC1155, 'Non-Fungible', initialMinter, [initialMinter]),
+      ];
+      tokenIds = _.reduce(nonFungibleTokens, (final, obj) => { final.push(obj.tokenId); return final; }, []);
+      log(`   == Minted Non-Fungible ERC1155 Token IDs: ${tokenIds}`);
+    }
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Protons
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    if (!isProd) {
+      log(' ');
+      log('  Minting NFTs from Rob\'s Collection');
+      for (let i = 0; i < RobsTestCollection.length; i++) {
+        data = await _mintProtonNft(i, i>2?'B':'A', RobsTestCollection[i], initialMinter);
+        testingTokens.protons.push(data);
       }
-
       if (testingTokens.protons.length) {
-        tokenIds = _.reduce(testingTokens.externalERC721, (final, obj) => { final.push(obj.tokenId); return final; }, []);
-        log(' ');
-        log(`  Charging Particles with Token IDs: ${tokenIds}`);
-
-        await _covalentBond(
-          initialMinter,
-          'generic.B',
-          testingTokens.protons[0], // Proton A - #1
-          testingTokens.protons[3], // Proton B - #1
-        );
-
+        tokenIds = _.reduce(testingTokens.protons, (final, obj) => { final.push(obj.tokenId); return final; }, []);
+        log(`   == Minted Protons with Token IDs: ${tokenIds}`);
       }
     }
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Charges
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    if (testingTokens.protons.length) {
+      log(' ');
+      log('  Charging up the Particles');
+
+      // Proton B into Proton A
+      await _covalentBond(
+        initialMinter,
+        'generic.B',
+        testingTokens.protons[0], // Proton A - #1
+        testingTokens.protons[3], // Proton B - #1
+      );
+
+      // Proton A into Proton B
+      await _covalentBond(
+        initialMinter,
+        'generic.B',
+        testingTokens.protons[4], // Proton B - #2
+        testingTokens.protons[1], // Proton A - #2
+      );
+
+      // Deposit ERC1155s into Proton A - #3
+      await _covalentBond(
+        initialMinter,
+        'generic.B',
+        testingTokens.protons[2], // Proton A - #3
+        fungibleToken,            // Fungible Token
+        3                         // Amount of Tokens to Deposit
+      );
+
+      // Deposit ERC1155s into Proton B - #3
+      await _covalentBond(
+        initialMinter,
+        'generic.B',
+        testingTokens.protons[5], // Proton B - #3
+        nonFungibleTokens[0],     // Non-Fungible Token # 1
+      );
+
+      // Deposit ERC20s into Proton B - #10
+      // todo..
+
+      // Deposit ERC20s into Proton B - #9
+      // todo..
+
+      // Russian Doll of Proton Bs (#7 holds #8 which holds #9 which holds #10)
+      await _covalentBond(initialMinter, 'generic.B', testingTokens.protons[8], testingTokens.protons[9]);
+      await _covalentBond(initialMinter, 'generic.B', testingTokens.protons[7], testingTokens.protons[8]);
+      await _covalentBond(initialMinter, 'generic.B', testingTokens.protons[6], testingTokens.protons[7]);
+    }
+
+
+
+
 
 
     // await executeTx('1-a', 'Minting Single Proton, Type "B"', async () =>
