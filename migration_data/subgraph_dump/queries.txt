@@ -25,14 +25,6 @@
           allowBreakBondFromAny
         }
       }
-    }
-  }
-}
-
-
-{
-  universes(first: 5) {
-    chargedParticles {
       chargedSettings {
         depositCaps {
           id
