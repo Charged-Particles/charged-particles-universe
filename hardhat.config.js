@@ -191,7 +191,11 @@ module.exports = {
         'TokenInfoProxy',
         'VestingClaim',
         'VestingClaim2',
-        'VestingClaim3'
+        'VestingClaim3',
+        'VestingClaim4',
+        'VestingClaim5',
+        'VestingClaim6',
+        'VestingClaim7',
       ],
     },
     namedAccounts: {

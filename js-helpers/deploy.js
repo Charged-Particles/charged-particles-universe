@@ -288,6 +288,21 @@ const presets = {
       totalIonx: tokensBN(bn(1_516_631)),
       expiryDate: dateToTimestamp(dateFormat(ONE_MONTH_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')),
     },
+    month5: {
+      merkleRoot: '0x857cbf75cef2bfa807523ac7fcda259ddc01a95e02afc262c0cb4207c3c70510',
+      totalIonx: tokensBN(bn(1_516_631)),
+      expiryDate: dateToTimestamp(dateFormat(ONE_MONTH_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')),
+    },
+    month6: {
+      merkleRoot: '0x857cbf75cef2bfa807523ac7fcda259ddc01a95e02afc262c0cb4207c3c70510',
+      totalIonx: tokensBN(bn(1_516_631)),
+      expiryDate: dateToTimestamp(dateFormat(ONE_MONTH_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')),
+    },
+    month7: {
+      merkleRoot: '0x857cbf75cef2bfa807523ac7fcda259ddc01a95e02afc262c0cb4207c3c70510',
+      totalIonx: tokensBN(bn(1_516_631)),
+      expiryDate: dateToTimestamp(dateFormat(ONE_MONTH_FROM_NOW, 'UTC:dd:mm:yyyy HH:MM')),
+    },
   },
 };
 
