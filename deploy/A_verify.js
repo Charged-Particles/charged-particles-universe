@@ -29,13 +29,14 @@ const _verifyProxyContract = async ({name, networkName}) => {
 
   let implementationAddress = '';
   const deployData = getDeployData(name, chainId);
-  const deployTx = _.get(deployData, 'deployTransaction', '');
+  const deployTx = _.get(deployData, 'upgradeTransaction', _.get(deployData, 'deployTransaction', ''));
   if (!_.isEmpty(deployTx)) {
     implementationAddress = _findImplementationAddress(projectData.impls, name);
-    if (_.isEmpty(implementationAddress)) {
-      log(`Failed to Verify Proxy: "${name}" - Implementation Address not found!`);
-      return;
-    }
+  }
+
+  if (_.isEmpty(implementationAddress)) {
+    log(`Failed to Verify Proxy: "${name}" - Implementation Address not found!`);
+    return;
   }
 
   // Verify Implementation
@@ -106,16 +107,16 @@ module.exports = async (hre) => {
 
   // Wallet Managers
   await _verifyContract({name: 'GenericWalletManager', networkName});
-  await _verifyContract({name: 'GenericWalletManagerB', networkName});
   await _verifyContract({name: 'GenericBasketManager', networkName});
-  await _verifyContract({name: 'GenericBasketManagerB', networkName});
   await _verifyContract({name: 'AaveWalletManager', networkName});
+  await _verifyContract({name: 'GenericWalletManagerB', networkName});
+  await _verifyContract({name: 'GenericBasketManagerB', networkName});
   await _verifyContract({name: 'AaveWalletManagerB', networkName});
 
   // NFTs
   await _verifyContract({name: 'Proton', networkName});
   await _verifyContract({name: 'ProtonB', networkName});
-  // await _verifyContract({name: 'Lepton', networkName});
+  await _verifyContract({name: 'Lepton', networkName});
   await _verifyContract({name: 'Lepton2', networkName});
   await _verifyContract({name: 'ExternalERC721', networkName});
   await _verifyContract({name: 'FungibleERC1155', networkName});

@@ -36,9 +36,11 @@ module.exports = async (hre) => {
   if (chainId === 31337) { return; } // Don't upgrade for Unit-Tests
 
   // V1 Contracts
+  const ddUniverse = getDeployData('Universe', chainId);
   const ddChargedParticles = getDeployData('ChargedParticles', chainId);
 
   // V2 Contracts
+  let universe;
   let chargedParticles;
   let chargedState;
   let chargedSettings;
@@ -64,6 +66,21 @@ module.exports = async (hre) => {
   //
   // Upgrade Contracts
   //
+
+  await log('  Upgrading Universe...')(alchemyTimeout);
+  const Universe = await ethers.getContractFactory('Universe');
+  const UniverseInstance = await upgrades.upgradeProxy(ddUniverse.address, Universe, [deployer], {initialize: 'initialize'});
+  universe = await UniverseInstance.deployed();
+  deployData['Universe'] = {
+    abi: getContractAbi('Universe'),
+    address: universe.address,
+    upgradeTransaction: universe.deployTransaction,
+  }
+  saveDeploymentData(chainId, deployData, true);
+  log('  - Universe: ', universe.address);
+  log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
+  accumulatedGasCost(universe.deployTransaction);
+
 
   await log('  Upgrading ChargedParticles...')(alchemyTimeout);
   const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
