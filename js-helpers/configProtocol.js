@@ -136,7 +136,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ionx = await Ionx.attach(ddIonx.address);
 
 
-    // skipToTxId('2-b');
+    // skipToTxId('4-d');
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Charged Particles & Universe
@@ -200,11 +200,11 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await particleSplitter.setChargedManagers(ddChargedManagers.address)
     );
 
-    await executeTx('1-n', 'ParticleSplitter: Registering TokenInfoProxy', async () =>
+    await executeTx('1-o', 'ParticleSplitter: Registering TokenInfoProxy', async () =>
       await particleSplitter.setTokenInfoProxy(ddTokenInfoProxy.address)
     );
 
-    await executeTx('1-o', 'ChargedParticles: Setting Temp-Lock Expiry Blocks', async () =>
+    await executeTx('1-p', 'ChargedParticles: Setting Temp-Lock Expiry Blocks', async () =>
       await chargedSettings.setTempLockExpiryBlocks(tempLockExpiryBlocks)
     );
 

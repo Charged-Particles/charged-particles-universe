@@ -199,6 +199,22 @@ module.exports = async (hre) => {
   log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: aaveWalletManagerB.deployTransaction }));
   accumulatedGasCost(aaveWalletManagerB.deployTransaction);
 
+  // await log('  Deploying ProtonB NFT...')(alchemyTimeout);
+  // const ProtonB = await ethers.getContractFactory('ProtonB');
+  // const ProtonBInstance = await ProtonB.deploy();
+  // protonB = await ProtonBInstance.deployed();
+  // deployData['ProtonB'] = {
+  //   abi: getContractAbi('ProtonB'),
+  //   address: protonB.address,
+  //   deployTransaction: protonB.deployTransaction,
+  // }
+  // saveDeploymentData(chainId, deployData, true);
+  // log('  - ProtonB:            ', protonB.address);
+  // log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: protonB.deployTransaction }));
+  // accumulatedGasCost(protonB.deployTransaction);
+
+
+
   log('\n  Contract Deployment Complete - data saved to "deployments" directory.');
   const gasCosts = getAccumulatedGasCost();
   log('     - Total Gas Cost');
