@@ -30,6 +30,9 @@ module.exports = async (hre) => {
   const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
   const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
   const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
+  const ddAaveWalletManagerB = getDeployData('AaveWalletManagerB', chainId);
+  const ddGenericWalletManagerB = getDeployData('GenericWalletManagerB', chainId);
+  const ddGenericBasketManagerB = getDeployData('GenericBasketManagerB', chainId);
   const ddProton = getDeployData('Proton', chainId);
   const ddLepton = getDeployData('Lepton', chainId);
   const ddLepton2 = getDeployData('Lepton2', chainId);
@@ -55,6 +58,18 @@ module.exports = async (hre) => {
   log('  Loading AaveWalletManager from: ', ddAaveWalletManager.address);
   const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
   const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
+
+  log('  Loading GenericWalletManagerB from: ', ddGenericWalletManagerB.address);
+  const GenericWalletManagerB = await ethers.getContractFactory('GenericWalletManagerB');
+  const genericWalletManagerB = await GenericWalletManagerB.attach(ddGenericWalletManagerB.address);
+
+  log('  Loading GenericBasketManagerB from: ', ddGenericBasketManagerB.address);
+  const GenericBasketManagerB = await ethers.getContractFactory('GenericBasketManagerB');
+  const genericBasketManagerB = await GenericBasketManagerB.attach(ddGenericBasketManagerB.address);
+
+  log('  Loading AaveWalletManagerB from: ', ddAaveWalletManagerB.address);
+  const AaveWalletManagerB = await ethers.getContractFactory('AaveWalletManagerB');
+  const aaveWalletManagerB = await AaveWalletManagerB.attach(ddAaveWalletManagerB.address);
 
   log('  Loading Proton from: ', ddProton.address);
   const Proton = await ethers.getContractFactory('Proton');

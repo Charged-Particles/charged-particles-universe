@@ -42,6 +42,9 @@ abstract contract WalletManagerBase is Ownable, BlackholePrevention, IWalletMana
   // The Controller Contract Address
   address internal _controller;
 
+  // The Executor Contract Address
+  address internal _executor;
+
   // Template Contract for creating Token Smart-Wallet Bridges
   address internal _walletTemplate;
 
@@ -78,6 +81,14 @@ abstract contract WalletManagerBase is Ownable, BlackholePrevention, IWalletMana
   function setController(address controller) external onlyOwner {
     _controller = controller;
     emit ControllerSet(controller);
+  }
+
+  /**
+    * @dev Connects to the ExecForAccount Controller
+    */
+  function setExecutor(address executor) external onlyOwner {
+    _executor = executor;
+    emit ExecutorSet(executor);
   }
 
   function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount)
@@ -148,6 +159,18 @@ abstract contract WalletManagerBase is Ownable, BlackholePrevention, IWalletMana
   /// @dev Throws if called by any account other than the Controller contract
   modifier onlyController() {
     require(_controller == msg.sender, "WMB:E-108");
+    _;
+  }
+
+  /// @dev Throws if called by any account other than the Executor contract
+  modifier onlyExecutor() {
+    require(_executor == msg.sender, "WMB:E-108");
+    _;
+  }
+
+  /// @dev Throws if called by any account other than the Controller or Executor contract
+  modifier onlyControllerOrExecutor() {
+    require(_executor == msg.sender || _controller == msg.sender, "WMB:E-108");
     _;
   }
 

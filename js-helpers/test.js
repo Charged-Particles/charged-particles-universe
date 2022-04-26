@@ -31,11 +31,31 @@ const callAndReturn = async ({
         ...contractParams,
         { value: callValue }
     );
-    await contractInstance.connect(contractCaller)[contractMethod](
+    const tx = await contractInstance.connect(contractCaller)[contractMethod](
         ...contractParams,
         { value: callValue }
     );
+    await tx.wait();
     return returnValue;
+}
+
+const callAndReturnWithLogs = async ({
+    contractInstance,
+    contractMethod,
+    contractCaller,
+    contractParams = [],
+    callValue = '0',
+  }) => {
+    const returnValue = await contractInstance.connect(contractCaller).callStatic[contractMethod](
+        ...contractParams,
+        { value: callValue }
+    );
+    const tx = await contractInstance.connect(contractCaller)[contractMethod](
+        ...contractParams,
+        { value: callValue }
+    );
+    const txResults = await tx.wait();
+    return {tx, txResults, logs: txResults.logs, returnValue};
 }
 
 const setNetworkAfterTimestamp = (network) => async (timestamp) => {
@@ -54,6 +74,7 @@ module.exports = (network) => {
         "getNetworkBlockNumber": getNetworkBlockNumber(network),
         "setNetworkAfterBlockNumber": setNetworkAfterBlockNumber(network),
         "setNetworkAfterTimestamp": setNetworkAfterTimestamp(network),
-        "callAndReturn": callAndReturn
+        "callAndReturn": callAndReturn,
+        "callAndReturnWithLogs": callAndReturnWithLogs
     }
 }

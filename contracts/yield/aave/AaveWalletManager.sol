@@ -313,6 +313,14 @@ contract AaveWalletManager is WalletManagerBase {
     return AaveSmartWallet(wallet).executeForAccount(externalAddress, ethValue, encodedParams);
   }
 
+  function refreshPrincipal(address contractAddress, uint256 tokenId, address assetToken)
+    external
+    override
+    onlyControllerOrExecutor
+  {
+    // no-op
+  }
+
   function getWalletAddressById(
     address contractAddress,
     uint256 tokenId,

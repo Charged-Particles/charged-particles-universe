@@ -35,30 +35,39 @@ interface IChargedSettings {
   |             Public API            |
   |__________________________________*/
 
-  function isContractOwner(address contractAddress, address account) external view returns (bool);
-  function getCreatorAnnuities(address contractAddress, uint256 tokenId) external view returns (address creator, uint256 annuityPct);
+  // function isContractOwner(address contractAddress, address account) external view returns (bool);
+  function getCreatorAnnuities(address contractAddress, uint256 tokenId) external returns (address creator, uint256 annuityPct);
   function getCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId) external view returns (address);
   function getTempLockExpiryBlocks() external view returns (uint256);
   function getTimelockApprovals(address operator) external view returns (bool timelockAny, bool timelockOwn);
-  function getAssetRequirements(address contractAddress, address assetToken) external view
-    returns (string memory requiredWalletManager, bool energizeEnabled, bool restrictedAssets, bool validAsset, uint256 depositCap, uint256 depositMin, uint256 depositMax);
-  function getNftAssetRequirements(address contractAddress, address nftTokenAddress) external view
-    returns (string memory requiredBasketManager, bool basketEnabled, uint256 maxNfts);
-
-  // ERC20
-  function isWalletManagerEnabled(string calldata walletManagerId) external view returns (bool);
-  function getWalletManager(string calldata walletManagerId) external view returns (IWalletManager);
-
-  // ERC721
-  function isNftBasketEnabled(string calldata basketId) external view returns (bool);
-  function getBasketManager(string calldata basketId) external view returns (IBasketManager);
+  function getAssetRequirements(
+    address contractAddress,
+    address assetToken
+  ) external view returns (
+    string memory requiredWalletManager,
+    bool energizeEnabled,
+    bool restrictedAssets,
+    bool validAsset,
+    uint256 depositCap,
+    uint256 depositMin,
+    uint256 depositMax,
+    bool invalidAsset
+  );
+  function getNftAssetRequirements(
+    address contractAddress,
+    address nftTokenAddress
+  ) external view returns (
+    string memory requiredBasketManager,
+    bool basketEnabled,
+    uint256 maxNfts
+  );
 
   /***********************************|
   |         Only NFT Creator          |
   |__________________________________*/
 
   function setCreatorAnnuities(address contractAddress, uint256 tokenId, address creator, uint256 annuityPercent) external;
-  function setCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId, address creator, address receiver) external;
+  function setCreatorAnnuitiesRedirect(address contractAddress, uint256 tokenId, address receiver) external;
 
 
   /***********************************|
@@ -76,6 +85,7 @@ interface IChargedSettings {
   |          Only Admin/DAO           |
   |__________________________________*/
 
+  function setAssetInvalidity(address assetToken, bool invalidity) external;
   function enableNftContracts(address[] calldata contracts) external;
   function setPermsForCharge(address contractAddress, bool state) external;
   function setPermsForBasket(address contractAddress, bool state) external;
@@ -86,11 +96,10 @@ interface IChargedSettings {
   |          Particle Events          |
   |__________________________________*/
 
+  event Initialized(address indexed initiator);
+  event ControllerSet(address indexed controllerAddress, string controllerId);
   event DepositCapSet(address assetToken, uint256 depositCap);
   event TempLockExpirySet(uint256 expiryBlocks);
-
-  event WalletManagerRegistered(string indexed walletManagerId, address indexed walletManager);
-  event BasketManagerRegistered(string indexed basketId, address indexed basketManager);
 
   event RequiredWalletManagerSet(address indexed contractAddress, string walletManager);
   event RequiredBasketManagerSet(address indexed contractAddress, string basketManager);
@@ -98,6 +107,7 @@ interface IChargedSettings {
   event AllowedAssetTokenSet(address indexed contractAddress, address assetToken, bool isAllowed);
   event AssetTokenLimitsSet(address indexed contractAddress, address assetToken, uint256 assetDepositMin, uint256 assetDepositMax);
   event MaxNftsSet(address indexed contractAddress, address indexed nftTokenAddress, uint256 maxNfts);
+  event AssetInvaliditySet(address indexed assetToken, bool invalidity);
 
   event TokenCreatorConfigsSet(address indexed contractAddress, uint256 indexed tokenId, address indexed creatorAddress, uint256 annuityPercent);
   event TokenCreatorAnnuitiesRedirected(address indexed contractAddress, uint256 indexed tokenId, address indexed redirectAddress);

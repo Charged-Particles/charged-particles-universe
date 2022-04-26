@@ -1,4 +1,4 @@
-## Charged Particles Universe - Solidity Contracts v1.0.0
+## Charged Particles Universe - Solidity Contracts v2.0.0
 
 [![Discord](https://badgen.net/badge/definft/Charged%20Particles?icon=discord&label=discord)](https://discord.gg/Syh3gjz)
 [![Twitter Follow](https://badgen.net/twitter/follow/DeFiNFT?icon=twitter)](https://twitter.com/intent/follow?screen_name=DeFiNFT)
@@ -115,7 +115,7 @@ Deployed contract details go in deployments/{networkName}/{contractName}.json
 ### Test:
 
   yarn test
-  
+
   Watching tests: `npx hardhat watch test`
 
 See package.json for more scripts

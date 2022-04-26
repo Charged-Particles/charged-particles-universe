@@ -132,10 +132,10 @@ describe("Universe", () => {
       await expect(universe.connect(signer1).onRelease(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, toWei('1'), toWei('1'), toWei('1')))
         .to.be.revertedWith('UNI:E-108');
 
-      await expect(universe.connect(signer1).onCovalentBond(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, '1'))
+      await expect(universe.connect(signer1).onCovalentBond(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, '1', 1))
         .to.be.revertedWith('UNI:E-108');
 
-      await expect(universe.connect(signer1).onCovalentBreak(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, '1'))
+      await expect(universe.connect(signer1).onCovalentBreak(TEST_ADDRESS, TEST_TOKEN_ID, 'generic', daiAddress, '1', 1))
         .to.be.revertedWith('UNI:E-108');
     });
 

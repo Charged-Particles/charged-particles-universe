@@ -31,16 +31,19 @@ library TokenInfo {
     return uint256(keccak256(abi.encodePacked(contractAddress, tokenId)));
   }
 
+  /// @dev DEPRECATED; Prefer TokenInfoProxy
   function getTokenOwner(address contractAddress, uint256 tokenId) internal view virtual returns (address) {
     IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     return tokenInterface.ownerOf(tokenId);
   }
 
+  /// @dev DEPRECATED; Prefer TokenInfoProxy
   function getTokenCreator(address contractAddress, uint256 tokenId) internal view virtual returns (address) {
     IERC721Chargeable tokenInterface = IERC721Chargeable(contractAddress);
     return tokenInterface.creatorOf(tokenId);
   }
 
+  /// @dev DEPRECATED; Prefer TokenInfoProxy
   /// @dev Checks if an account is the Owner of an External NFT contract
   /// @param contractAddress  The Address to the Contract of the NFT to check
   /// @param account          The Address of the Account to check
@@ -50,6 +53,7 @@ library TokenInfo {
     return contractOwner != address(0x0) && contractOwner == account;
   }
 
+  /// @dev DEPRECATED; Prefer TokenInfoProxy
   /// @dev Checks if an account is the Creator of a Proton-based NFT
   /// @param contractAddress  The Address to the Contract of the Proton-based NFT to check
   /// @param tokenId          The Token ID of the Proton-based NFT to check
@@ -61,6 +65,7 @@ library TokenInfo {
     return (sender == tokenCreator);
   }
 
+  /// @dev DEPRECATED; Prefer TokenInfoProxy
   /// @dev Checks if an account is the Creator of a Proton-based NFT or the Contract itself
   /// @param contractAddress  The Address to the Contract of the Proton-based NFT to check
   /// @param tokenId          The Token ID of the Proton-based NFT to check
@@ -73,6 +78,7 @@ library TokenInfo {
     return (sender == tokenCreator);
   }
 
+  /// @dev DEPRECATED; Prefer TokenInfoProxy
   /// @dev Checks if an account is the Owner or Operator of an External NFT
   /// @param contractAddress  The Address to the Contract of the External NFT to check
   /// @param tokenId          The Token ID of the External NFT to check
@@ -130,11 +136,13 @@ library TokenInfo {
     * {ReentrancyGuard} or the
     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
     */
-  function sendValue(address payable recipient, uint256 amount) internal {
+  function sendValue(address payable recipient, uint256 amount, uint256 gasLimit) internal {
     require(address(this).balance >= amount, "TokenInfo: insufficient balance");
 
     // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
-    (bool success, ) = recipient.call{ value: amount }("");
+    (bool success, ) = (gasLimit > 0)
+      ? recipient.call{ value: amount, gas: gasLimit }("")
+      : recipient.call{ value: amount }("");
     require(success, "TokenInfo: unable to send value, recipient may have reverted");
   }
 }

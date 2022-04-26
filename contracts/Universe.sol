@@ -174,7 +174,8 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     uint256 tokenId,
     string calldata /* managerId */,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   )
     external
     virtual
@@ -189,7 +190,8 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     uint256 tokenId,
     string calldata /* managerId */,
     address nftTokenAddress,
-    uint256 /* nftTokenId */
+    uint256 /* nftTokenId */,
+    uint256 /* nftTokenAmount */
   )
     external
     virtual
@@ -316,6 +318,10 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
 
   function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external virtual onlyOwner {
     _withdrawERC721(receiver, tokenAddress, tokenId);
+  }
+
+  function withdrawERC1155(address payable receiver, address tokenAddress, uint256 tokenId, uint256 amount) external virtual onlyOwner {
+    _withdrawERC1155(receiver, tokenAddress, tokenId, amount);
   }
 
 

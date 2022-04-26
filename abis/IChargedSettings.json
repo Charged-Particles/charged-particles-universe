@@ -30,6 +30,25 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "invalidity",
+        "type": "bool"
+      }
+    ],
+    "name": "AssetInvaliditySet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "contractAddress",
         "type": "address"
       },
@@ -79,18 +98,18 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "string",
-        "name": "basketId",
-        "type": "string"
+        "internalType": "address",
+        "name": "controllerAddress",
+        "type": "address"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "basketManager",
-        "type": "address"
+        "indexed": false,
+        "internalType": "string",
+        "name": "controllerId",
+        "type": "string"
       }
     ],
-    "name": "BasketManagerRegistered",
+    "name": "ControllerSet",
     "type": "event"
   },
   {
@@ -110,6 +129,19 @@
       }
     ],
     "name": "DepositCapSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "initiator",
+        "type": "address"
+      }
+    ],
+    "name": "Initialized",
     "type": "event"
   },
   {
@@ -321,25 +353,6 @@
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "string",
-        "name": "walletManagerId",
-        "type": "string"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "walletManager",
-        "type": "address"
-      }
-    ],
-    "name": "WalletManagerRegistered",
-    "type": "event"
-  },
-  {
     "inputs": [
       {
         "internalType": "address[]",
@@ -401,25 +414,11 @@
         "internalType": "uint256",
         "name": "depositMax",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
+      },
       {
-        "internalType": "string",
-        "name": "basketId",
-        "type": "string"
-      }
-    ],
-    "name": "getBasketManager",
-    "outputs": [
-      {
-        "internalType": "contract IBasketManager",
-        "name": "",
-        "type": "address"
+        "internalType": "bool",
+        "name": "invalidAsset",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -451,7 +450,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -552,87 +551,6 @@
   {
     "inputs": [
       {
-        "internalType": "string",
-        "name": "walletManagerId",
-        "type": "string"
-      }
-    ],
-    "name": "getWalletManager",
-    "outputs": [
-      {
-        "internalType": "contract IWalletManager",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "isContractOwner",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "basketId",
-        "type": "string"
-      }
-    ],
-    "name": "isNftBasketEnabled",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "walletManagerId",
-        "type": "string"
-      }
-    ],
-    "name": "isWalletManagerEnabled",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "contractAddress",
         "type": "address"
@@ -649,6 +567,24 @@
       }
     ],
     "name": "setAllowedAssetToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "invalidity",
+        "type": "bool"
+      }
+    ],
+    "name": "setAssetInvalidity",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -738,11 +674,6 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "creator",
-        "type": "address"
       },
       {
         "internalType": "address",

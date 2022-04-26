@@ -13,6 +13,7 @@ const {
 const {
   toWei,
   toBN,
+  toBytes,
 } = require('../js-helpers/utils');
 
 const { deployMockContract } = require('../js-helpers/deployMockContract');
@@ -50,6 +51,7 @@ describe("Charged Particles", () => {
   let universe;
   let chargedState;
   let chargedSettings;
+  let chargedManagers;
   let chargedParticles;
   let newGenericWalletManager;
   let newGenericBasketManager;
@@ -90,7 +92,7 @@ describe("Charged Particles", () => {
     signer3 = ethers.provider.getSigner(user3);
 
     // With Forked Mainnet
-    dai = new ethers.Contract(daiAddress, daiABI, daiSigner);
+    // dai = new ethers.Contract(daiAddress, daiABI, daiSigner);
 
     // Deploy Mocked Contracts
     erc20token = await deployMockContract(signerD, ERC20Mintable.abi, overrides);
@@ -108,6 +110,9 @@ describe("Charged Particles", () => {
 
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     chargedSettings = ChargedSettings.attach(getDeployData('ChargedSettings', chainId).address);
+
+    const ChargedManagers = await ethers.getContractFactory('ChargedManagers');
+    chargedManagers = ChargedManagers.attach(getDeployData('ChargedManagers', chainId).address);
 
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const GenericWalletManagerInstance = await GenericWalletManager.deploy();
@@ -129,21 +134,27 @@ describe("Charged Particles", () => {
 
   describe('Contract Configurations', async () => {
     it('should allow the contract owner to set the Universe contract', async () => {
-      expect(await chargedParticles.connect(signerD).setUniverse(universe.address))
-        .to.emit(chargedParticles, 'UniverseSet')
-        .withArgs(universe.address);
+      expect(await chargedParticles.connect(signerD).setController(universe.address, 'universe'))
+        .to.emit(chargedParticles, 'ControllerSet')
+        .withArgs(universe.address, 'universe');
     });
 
     it('should allow the contract owner to set the ChargedSettings contract', async () => {
-      expect(await chargedParticles.connect(signerD).setChargedSettings(chargedSettings.address))
-        .to.emit(chargedParticles, 'ChargedSettingsSet')
-        .withArgs(chargedSettings.address);
+      expect(await chargedParticles.connect(signerD).setController(chargedSettings.address, 'settings'))
+        .to.emit(chargedParticles, 'ControllerSet')
+        .withArgs(chargedSettings.address, 'settings');
     });
 
     it('should allow the contract owner to set the ChargedState contract', async () => {
-      expect(await chargedParticles.connect(signerD).setChargedState(chargedState.address))
-        .to.emit(chargedParticles, 'ChargedStateSet')
-        .withArgs(chargedState.address);
+      expect(await chargedParticles.connect(signerD).setController(chargedState.address, 'state'))
+        .to.emit(chargedParticles, 'ControllerSet')
+        .withArgs(chargedState.address, 'state');
+    });
+
+    it('should allow the contract owner to set the ChargedManagers contract', async () => {
+      expect(await chargedParticles.connect(signerD).setController(chargedManagers.address, 'managers'))
+        .to.emit(chargedParticles, 'ControllerSet')
+        .withArgs(chargedManagers.address, 'managers');
     });
   });
 

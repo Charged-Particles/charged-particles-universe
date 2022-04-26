@@ -38,19 +38,19 @@ interface IChargedState {
   function getReleaseTimelockExpiry(address contractAddress, uint256 tokenId) external view returns (uint256 lockExpiry);
   function getBreakBondTimelockExpiry(address contractAddress, uint256 tokenId) external view returns (uint256 lockExpiry);
 
-  function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
-  function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
-  function isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
-  function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external view returns (bool);
+  function isApprovedForDischarge(address contractAddress, uint256 tokenId, address operator) external returns (bool);
+  function isApprovedForRelease(address contractAddress, uint256 tokenId, address operator) external returns (bool);
+  function isApprovedForBreakBond(address contractAddress, uint256 tokenId, address operator) external returns (bool);
+  function isApprovedForTimelock(address contractAddress, uint256 tokenId, address operator) external returns (bool);
 
   function isEnergizeRestricted(address contractAddress, uint256 tokenId) external view returns (bool);
   function isCovalentBondRestricted(address contractAddress, uint256 tokenId) external view returns (bool);
 
-  function getDischargeState(address contractAddress, uint256 tokenId, address sender) external view
+  function getDischargeState(address contractAddress, uint256 tokenId, address sender) external
     returns (bool allowFromAll, bool isApproved, uint256 timelock, uint256 tempLockExpiry);
-  function getReleaseState(address contractAddress, uint256 tokenId, address sender) external view
+  function getReleaseState(address contractAddress, uint256 tokenId, address sender) external
     returns (bool allowFromAll, bool isApproved, uint256 timelock, uint256 tempLockExpiry);
-  function getBreakBondState(address contractAddress, uint256 tokenId, address sender) external view
+  function getBreakBondState(address contractAddress, uint256 tokenId, address sender) external
     returns (bool allowFromAll, bool isApproved, uint256 timelock, uint256 tempLockExpiry);
 
   /***********************************|
@@ -101,7 +101,8 @@ interface IChargedState {
   |          Particle Events          |
   |__________________________________*/
 
-  event ChargedSettingsSet(address indexed settingsController);
+  event Initialized(address indexed initiator);
+  event ControllerSet(address indexed controllerAddress, string controllerId);
 
   event DischargeApproval(address indexed contractAddress, uint256 indexed tokenId, address indexed owner, address operator);
   event ReleaseApproval(address indexed contractAddress, uint256 indexed tokenId, address indexed owner, address operator);

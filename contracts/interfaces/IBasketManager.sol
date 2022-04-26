@@ -31,22 +31,27 @@ pragma solidity >=0.6.0;
 interface IBasketManager {
 
   event ControllerSet(address indexed controller);
+  event ExecutorSet(address indexed executor);
   event PausedStateSet(bool isPaused);
   event NewSmartBasket(address indexed contractAddress, uint256 indexed tokenId, address indexed smartBasket);
-  event BasketAdd(address indexed contractAddress, uint256 indexed tokenId, address basketTokenAddress, uint256 basketTokenId);
-  event BasketRemove(address indexed receiver, address indexed contractAddress, uint256 indexed tokenId, address basketTokenAddress, uint256 basketTokenId);
+  event BasketAdd(address indexed contractAddress, uint256 indexed tokenId, address basketTokenAddress, uint256 basketTokenId, uint256 basketTokenAmount);
+  event BasketRemove(address indexed receiver, address indexed contractAddress, uint256 indexed tokenId, address basketTokenAddress, uint256 basketTokenId, uint256 basketTokenAmount);
+  event BasketRewarded(address indexed contractAddress, uint256 indexed tokenId, address indexed receiver, address rewardsToken, uint256 rewardsAmount);
 
   function isPaused() external view returns (bool);
 
   function getTokenTotalCount(address contractAddress, uint256 tokenId) external view returns (uint256);
   function getTokenCountByType(address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 basketTokenId) external returns (uint256);
 
+  function prepareTransferAmount(uint256 nftTokenAmount) external;
   function addToBasket(address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 basketTokenId) external returns (bool);
   function removeFromBasket(address receiver, address contractAddress, uint256 tokenId, address basketTokenAddress, uint256 basketTokenId) external returns (bool);
+  function withdrawRewards(address receiver, address contractAddress, uint256 tokenId, address rewardsToken, uint256 rewardsAmount) external returns (uint256 amount);
   function executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes memory encodedParams) external returns (bytes memory);
   function getBasketAddressById(address contractAddress, uint256 tokenId) external returns (address);
 
   function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount) external;
   function withdrawERC20(address contractAddress, uint256 tokenId, address payable receiver, address tokenAddress, uint256 amount) external;
   function withdrawERC721(address contractAddress, uint256 tokenId, address payable receiver, address nftTokenAddress, uint256 nftTokenId) external;
+  function withdrawERC1155(address contractAddress, uint256 tokenId, address payable receiver, address nftTokenAddress, uint256 nftTokenId, uint256 amount) external;
 }

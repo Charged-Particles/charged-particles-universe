@@ -31,6 +31,7 @@ pragma solidity >=0.6.0;
 interface IWalletManager {
 
   event ControllerSet(address indexed controller);
+  event ExecutorSet(address indexed executor);
   event PausedStateSet(bool isPaused);
   event NewSmartWallet(address indexed contractAddress, uint256 indexed tokenId, address indexed smartWallet, address creator, uint256 annuityPct);
   event WalletEnergized(address indexed contractAddress, uint256 indexed tokenId, address indexed assetToken, uint256 assetAmount, uint256 yieldTokensAmount);
@@ -57,6 +58,7 @@ interface IWalletManager {
   function releaseAmount(address receiver, address contractAddress, uint256 tokenId, address assetToken, uint256 assetAmount, address creatorRedirect) external returns (uint256 principalAmount, uint256 creatorAmount, uint256 receiverAmount);
   function withdrawRewards(address receiver, address contractAddress, uint256 tokenId, address rewardsToken, uint256 rewardsAmount) external returns (uint256 amount);
   function executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes memory encodedParams) external returns (bytes memory);
+  function refreshPrincipal(address contractAddress, uint256 tokenId, address assetToken) external;
   function getWalletAddressById(address contractAddress, uint256 tokenId, address creator, uint256 annuityPct) external returns (address);
 
   function withdrawEther(address contractAddress, uint256 tokenId, address payable receiver, uint256 amount) external;

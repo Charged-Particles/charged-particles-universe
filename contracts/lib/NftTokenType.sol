@@ -32,6 +32,14 @@ library NftTokenType {
   uint256 constant internal TYPE_MASK = uint256(uint128(~0)) << 128;
   uint256 constant internal TYPE_NFT_BIT = 1 << 255;
 
+  function isERC721(address contractAddress) internal view returns (bool) {
+    return IERC165(contractAddress).supportsInterface(INTERFACE_SIGNATURE_ERC721);
+  }
+
+  function isERC1155(address contractAddress) internal view returns (bool) {
+    return IERC165(contractAddress).supportsInterface(INTERFACE_SIGNATURE_ERC1155);
+  }
+
   function getTokenType(address contractAddress, uint256 tokenId) internal view returns (uint256) {
     IERC165 tokenInterface = IERC165(contractAddress);
     bool is1155 = tokenInterface.supportsInterface(INTERFACE_SIGNATURE_ERC1155);

@@ -1,4 +1,5 @@
 const {
+  getDeployData,
   saveDeploymentData,
   getContractAbi,
   getTxGasCost,
@@ -41,6 +42,24 @@ module.exports = async (hre) => {
       address: genericWalletManager.address,
       deployTransaction: genericWalletManager.deployTransaction,
     }
+    saveDeploymentData(chainId, deployData);
+    log('  - GenericWalletManager:  ', genericWalletManager.address);
+    log('     - Block:              ', genericWalletManager.deployTransaction.blockNumber);
+    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
+
+    await log('\n  Deploying GenericWalletManagerB...')(alchemyTimeout);
+    const GenericWalletManagerB = await hre.ethers.getContractFactory('GenericWalletManagerB');
+    const GenericWalletManagerBInstance = await GenericWalletManagerB.deploy();
+    const genericWalletManagerB = await GenericWalletManagerBInstance.deployed();
+    deployData['GenericWalletManagerB'] = {
+      abi: getContractAbi('GenericWalletManagerB'),
+      address: genericWalletManagerB.address,
+      deployTransaction: genericWalletManagerB.deployTransaction,
+    }
+    saveDeploymentData(chainId, deployData);
+    log('  - GenericWalletManagerB:  ', genericWalletManagerB.address);
+    log('     - Block:              ', genericWalletManagerB.deployTransaction.blockNumber);
+    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManagerB.deployTransaction }));
 
     await log('  Deploying GenericBasketManager...')(alchemyTimeout);
     const GenericBasketManager = await hre.ethers.getContractFactory('GenericBasketManager');
@@ -51,17 +70,27 @@ module.exports = async (hre) => {
       address: genericBasketManager.address,
       deployTransaction: genericBasketManager.deployTransaction,
     }
-
-    // Display Contract Addresses
-    await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
-    log('  - GenericWalletManager:  ', genericWalletManager.address);
-    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
+    saveDeploymentData(chainId, deployData);
     log('  - GenericBasketManager:  ', genericBasketManager.address);
+    log('     - Block:              ', genericBasketManager.deployTransaction.blockNumber);
     log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericBasketManager.deployTransaction }));
 
+    await log('  Deploying GenericBasketManagerB...')(alchemyTimeout);
+    const GenericBasketManagerB = await hre.ethers.getContractFactory('GenericBasketManagerB');
+    const GenericBasketManagerBInstance = await GenericBasketManagerB.deploy();
+    const genericBasketManagerB = await GenericBasketManagerBInstance.deployed();
+    deployData['GenericBasketManagerB'] = {
+      abi: getContractAbi('GenericBasketManagerB'),
+      address: genericBasketManagerB.address,
+      deployTransaction: genericBasketManagerB.deployTransaction,
+    }
     saveDeploymentData(chainId, deployData);
-    log('\n  Contract Deployment Data saved to "deployments" directory.');
+    log('  - GenericBasketManagerB:  ', genericBasketManagerB.address);
+    log('     - Block:              ', genericBasketManagerB.deployTransaction.blockNumber);
+    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericBasketManagerB.deployTransaction }));
 
+
+    log('\n  Contract Deployment Data saved to "deployments" directory.');
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };
 

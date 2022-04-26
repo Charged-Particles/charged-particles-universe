@@ -5,24 +5,17 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "chargedSettings",
+        "name": "controllerAddress",
         "type": "address"
-      }
-    ],
-    "name": "ChargedSettingsSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
+      },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "chargedState",
-        "type": "address"
+        "indexed": false,
+        "internalType": "string",
+        "name": "controllerId",
+        "type": "string"
       }
     ],
-    "name": "ChargedStateSet",
+    "name": "ControllerSet",
     "type": "event"
   },
   {
@@ -44,11 +37,11 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "leptonToken",
+        "name": "initiator",
         "type": "address"
       }
     ],
-    "name": "LeptonTokenSet",
+    "name": "Initialized",
     "type": "event"
   },
   {
@@ -101,11 +94,29 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "universeAddress",
+        "name": "receiver",
         "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "tokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
       }
     ],
-    "name": "UniverseSet",
+    "name": "WithdrawStuckERC1155",
     "type": "event"
   },
   {
@@ -242,6 +253,11 @@
         "internalType": "uint256",
         "name": "nftTokenId",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftTokenAmount",
+        "type": "uint256"
       }
     ],
     "name": "breakCovalentBond",
@@ -280,6 +296,11 @@
       {
         "internalType": "uint256",
         "name": "nftTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftTokenAmount",
         "type": "uint256"
       }
     ],
@@ -593,6 +614,19 @@
   },
   {
     "inputs": [],
+    "name": "getManagersAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "managersAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "getSettingsAddress",
     "outputs": [
       {
@@ -621,7 +655,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_trustedForwarder",
+        "name": "initiator",
         "type": "address"
       }
     ],
@@ -647,6 +681,84 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "name": "onERC1155BatchReceived",
+    "outputs": [
+      {
+        "internalType": "bytes4",
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "name": "onERC1155Received",
+    "outputs": [
+      {
+        "internalType": "bytes4",
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -800,24 +912,16 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "settingsController",
+        "name": "controller",
         "type": "address"
-      }
-    ],
-    "name": "setChargedSettings",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+      },
       {
-        "internalType": "address",
-        "name": "stateController",
-        "type": "address"
+        "internalType": "string",
+        "name": "controllerId",
+        "type": "string"
       }
     ],
-    "name": "setChargedState",
+    "name": "setController",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -838,40 +942,20 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
+        "internalType": "bytes4",
+        "name": "",
+        "type": "bytes4"
       }
     ],
-    "name": "setLeptonToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+    "name": "supportsInterface",
+    "outputs": [
       {
-        "internalType": "address",
-        "name": "_trustedForwarder",
-        "type": "address"
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
-    "name": "setTrustedForwarder",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "universe",
-        "type": "address"
-      }
-    ],
-    "name": "setUniverse",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -911,6 +995,34 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address payable",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawERC1155",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

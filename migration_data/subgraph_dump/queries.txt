@@ -1,0 +1,66 @@
+{
+  universes(first: 5) {
+    chargedParticles {
+      chargedState {
+        nftState {
+          id
+          contractAddress
+          tokenId
+          lastKnownOwner
+          dischargeApproval
+          releaseApproval
+          breakBondApproval
+          timelockApproval
+          dischargeTimelockExpiry
+          dischargeTimelockLockedBy
+          releaseTimelockExpiry
+          releaseTimelockLockedBy
+          breakBondTimelockExpiry
+          breakBondTimelockLockedBy
+          tempLockExpiry
+          restrictChargeFromAny
+          allowDischargeFromAny
+          allowReleaseFromAny
+          restrictBondFromAny
+          allowBreakBondFromAny
+        }
+      }
+      chargedSettings {
+        depositCaps {
+          id
+          assetToken
+          maxDeposit
+        }
+        tempLockExpiryBlocks
+        nftSettings {
+          id
+          contractAddress
+          requiredWalletManager
+          requiredBasketManager
+          allowedAssetTokens {
+            id
+          }
+          assetDepositMin
+          assetDepositMax
+          maxNfts {
+            id
+            maxNfts
+          }
+          allowCharge
+          allowBond
+          allowTimelockAnyNft
+          allowTimelockOwnNft
+          hasRestrictedAssets
+        }
+        nftCreatorSettings {
+          id
+          contractAddress
+          tokenId
+          creatorAddress
+          annuityPercent
+          annuityRedirect
+        }
+      }
+    }
+  }
+}

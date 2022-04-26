@@ -47,14 +47,27 @@ const optimizerDisabled = process.env.OPTIMIZER_DISABLED
 
 module.exports = {
     solidity: {
-        version: '0.6.12',
-        settings: {
-            optimizer: {
-                enabled: !optimizerDisabled,
+        compilers: [
+          {
+            version: '0.6.12',
+            settings: {
+                optimizer: {
+                    enabled: !optimizerDisabled,
+                    runs: 200
+                }
+            },
+            evmVersion: 'istanbul'
+          },
+          {
+            version: '0.4.11', // for testing cryptopunks (matches compiler version of etherscan verified contract)
+            settings: {
+              optimizer: {
+                enabled: true,
                 runs: 200
+              }
             }
-        },
-        evmVersion: 'istanbul'
+          }
+        ]
     },
     paths: {
         sources: "./contracts",
@@ -78,7 +91,7 @@ module.exports = {
         kovan: {
             // url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
             url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 10e9,
+            gasPrice: 3e9,
             blockGasLimit: 12400000,
             accounts: {
                 mnemonic: mnemonic.testnet,
@@ -88,8 +101,9 @@ module.exports = {
         },
         mumbai: {
             url: `https://rpc-mumbai.matic.today`,
-            // url: `https://rpc-mumbai.maticvigil.com`,
-            gasPrice: 1e9,
+            // url: `https://rpc-mumbai.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
+            // url: `https://matic-mumbai.chainstacklabs.com/`,
+            gasPrice: 3e9,
             accounts: {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
@@ -98,8 +112,9 @@ module.exports = {
             chainId: 80001
         },
         polygon: {
-            url: `https://rpc-mainnet.maticvigil.com`,
-            gasPrice: 15e9,
+            // url: `https://rpc-mainnet.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
+            url: `https://matic-mainnet.chainstacklabs.com/`,
+            gasPrice: 50e9,
             accounts: {
                 mnemonic: mnemonic.mainnet,
                 initialIndex: 0,
@@ -109,7 +124,7 @@ module.exports = {
         mainnet: {
             // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
             url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 100e9,
+            gasPrice: 55e9,
             blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.mainnet,
@@ -119,11 +134,16 @@ module.exports = {
         },
     },
     etherscan: {
-      apiKey: process.env.ETHERSCAN_APIKEY
+      apiKey: {
+        mainnet: process.env.ETHERSCAN_APIKEY,
+        kovan: process.env.ETHERSCAN_APIKEY,
+        polygon: process.env.POLYGONSCAN_APIKEY,
+        polygonMumbai: process.env.POLYGONSCAN_APIKEY,
+      }
     },
-    polygonscan: {
-      apiKey: process.env.POLYGONSCAN_APIKEY
-    },
+    // polygonscan: {
+    //   apiKey: process.env.POLYGONSCAN_APIKEY
+    // },
     gasReporter: {
         currency: 'USD',
         gasPrice: 1,
@@ -131,26 +151,35 @@ module.exports = {
     },
     abiExporter: {
       path: './abis',
+      runOnCompile: true,
+      // Mindful of https://github.com/ItsNickBarry/hardhat-abi-exporter/pull/29/files
+      // and https://github.com/ItsNickBarry/hardhat-abi-exporter/pull/35 as they heavily change behavior around this package
       clear: true,
       flat: true,
       only: [
         'Universe',
         'ChargedState',
         'ChargedSettings',
+        'ChargedManagers',
         'ChargedParticles',
+        'ParticleSplitter',
         'AaveWalletManager',
+        'AaveWalletManagerB',
         'AaveBridgeV2',
         'GenericWalletManager',
+        'GenericWalletManagerB',
         'GenericBasketManager',
+        'GenericBasketManagerB',
         'Ionx',
-        'IonxTimelock',
         'Proton',
-        'WBoson',
+        'ProtonB',
         'Lepton',
         'Lepton2',
         'ERC20',
         'ERC721',
-        'ExternalNFT',
+        'ExternalERC721',
+        'FungibleERC1155',
+        'NonFungibleERC1155',
         'YieldFarm',
         'Staking',
         'YieldFarm2',
@@ -159,6 +188,7 @@ module.exports = {
         'MerkleDistributor',
         'MerkleDistributor2',
         'MerkleDistributor3',
+        'TokenInfoProxy',
         'VestingClaim',
         'VestingClaim2',
         'VestingClaim3',

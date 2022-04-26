@@ -96,6 +96,10 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     return GenericSmartBasket(basket).getTokenCountByType(basketTokenAddress, basketTokenId);
   }
 
+  function prepareTransferAmount(uint256 /* nftTokenAmount */) external override onlyController {
+    // no-op
+  }
+
   function addToBasket(
     address contractAddress,
     uint256 tokenId,
@@ -116,7 +120,7 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     // Log Event
     if (added) {
       _totalTokens[uuid].increment();
-      emit BasketAdd(contractAddress, tokenId, basketTokenAddress, basketTokenId);
+      emit BasketAdd(contractAddress, tokenId, basketTokenAddress, basketTokenId, 1);
     }
   }
 
@@ -142,10 +146,18 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     // Log Event
     if (removed) {
       _totalTokens[uuid].decrement();
-      emit BasketRemove(receiver, contractAddress, tokenId, basketTokenAddress, basketTokenId);
+      emit BasketRemove(receiver, contractAddress, tokenId, basketTokenAddress, basketTokenId, 1);
     }
   }
 
+  function withdrawRewards(address receiver, address contractAddress, uint256 tokenId, address rewardsToken, uint256 rewardsAmount)
+    external
+    override
+    onlyController
+    returns (uint256 amount)
+  {
+    // no-op
+  }
 
   function executeForAccount(address contractAddress, uint256 tokenId, address externalAddress, uint256 ethValue, bytes memory encodedParams)
     public
@@ -232,6 +244,18 @@ contract GenericBasketManager is Ownable, BlackholePrevention, IBasketManager {
     address basket = _baskets[uuid];
     _withdrawERC721(receiver, nftTokenAddress, nftTokenId);
     return ISmartBasket(basket).withdrawERC721(receiver, nftTokenAddress, nftTokenId);
+  }
+
+  function withdrawERC1155(address contractAddress, uint256 tokenId, address payable receiver, address nftTokenAddress, uint256 nftTokenId, uint256 amount)
+    external
+    virtual
+    override
+    onlyOwner
+  {
+    uint256 uuid = contractAddress.getTokenUUID(tokenId);
+    address basket = _baskets[uuid];
+    _withdrawERC1155(receiver, nftTokenAddress, nftTokenId, amount);
+    return ISmartBasket(basket).withdrawERC1155(receiver, nftTokenAddress, nftTokenId, amount);
   }
 
 

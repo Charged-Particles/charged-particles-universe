@@ -118,6 +118,11 @@ const presets = {
         80001: '0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F', // polygon testnet
         31337: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // Hardhat - Forked Mainnet
       },
+      ampl: {
+        1: '0xD46bA6D942050d489DBd938a2C909A5d5039A161', // mainnet
+        42: '0x3E0437898a5667a4769B1Ca5A34aAB1ae7E81377', // kovan
+        31337: '0xD46bA6D942050d489DBd938a2C909A5d5039A161', // Hardhat - Forked Mainnet
+      },
       lendingPoolProvider: {
         1: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // mainnet
         42: '0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b', // kovan
@@ -175,16 +180,16 @@ const presets = {
       },
       staking: {
         epochDuration: 7 * 24 * 60 * 60,  // 1 week
-        epoch1Start: 1629754980, // dateToTimestamp(dateFormat('23/08/2021 5:30', 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
+        epoch1Start: 1637012580, // dateToTimestamp(dateFormat('23/08/2021 5:30', 'UTC:dd:mm:yyyy HH:MM')), // format: '24/05/2021 11:00'
       },
       ionxToken: {
         startAmount: bn(48000),
-        nrOfEpochs: bn(12),
+        nrOfEpochs: bn(24),
         deprecation: bn(0),
       },
       lpTokens: {
         startAmount: bn(48000),
-        nrOfEpochs: bn(12),
+        nrOfEpochs: bn(24),
         deprecation: bn(0),
       },
 
@@ -203,12 +208,12 @@ const presets = {
       },
       ionxToken: {
         startAmount: bn(48000),
-        nrOfEpochs: bn(12),
+        nrOfEpochs: bn(24),
         deprecation: bn(0),
       },
       lpTokens: {
         startAmount: bn(48000),
-        nrOfEpochs: bn(12),
+        nrOfEpochs: bn(24),
         deprecation: bn(0),
       },
 
@@ -304,7 +309,7 @@ const presets = {
 
 const txOverrides = (options = {}) => ({gasLimit: 15000000, ...options});
 
-const saveDeploymentData = (chainId, deployData) => {
+const saveDeploymentData = (chainId, deployData, overwrite = false) => {
   const network = chainNameById(chainId).toLowerCase();
   const deployPath = path.join(__dirname, '..', 'deployments', network);
 
@@ -312,7 +317,7 @@ const saveDeploymentData = (chainId, deployData) => {
     const filename = `${deployPath}/${contractName}.json`;
 
     let existingData = {};
-    if (fs.existsSync(filename)) {
+    if (!overwrite && fs.existsSync(filename)) {
       existingData = JSON.parse(fs.readFileSync(filename));
     }
 
@@ -333,9 +338,51 @@ const getDeployData = (contractName, chainId = 31337) => {
   const network = chainNameById(chainId).toLowerCase();
   const deployPath = path.join(__dirname, '..', 'deployments', network);
   const filename = `${deployPath}/${contractName}.json`;
+  delete require.cache[require.resolve(filename)]; // Prevent requiring cached deps
   const contractJson = require(filename);
   return contractJson;
 }
+
+
+const saveMigrationData = (chainId, migrationData) => {
+  const network = chainNameById(chainId).toLowerCase();
+  const deployPath = path.join(__dirname, '..', 'migration_data', network);
+
+  _.forEach(_.keys(migrationData), (dataTypeId) => {
+    const filename = `${deployPath}/${dataTypeId}.json`;
+
+    let existingData = {};
+    if (fs.existsSync(filename)) {
+      existingData = JSON.parse(fs.readFileSync(filename));
+    }
+
+    const newData = _.merge(existingData, migrationData[dataTypeId]);
+    ensureDirectoryExistence(filename);
+    fs.writeFileSync(filename, JSON.stringify(newData, null, "\t"));
+  });
+};
+
+const getMigrationData = (dataTypeId, chainId = 31337) => {
+  const network = chainNameById(chainId).toLowerCase();
+  const deployPath = path.join(__dirname, '..', 'migration_data', network);
+  const filename = `${deployPath}/${dataTypeId}.json`;
+  const migrationJson = (fs.existsSync(filename)) ? require(filename) : {};
+  return migrationJson;
+}
+
+const getOZProjectData = (chainId = 31337) => {
+  let fileRef = '';
+  switch (chainId) {
+    case 1: fileRef = `mainnet`; break;
+    case 42: fileRef = `kovan`; break;
+    default: fileRef = `unknown-${chainId}`; break;
+  }
+  const projectPath = path.join(__dirname, '..', '.openzeppelin');
+  const filename = `${projectPath}/${fileRef}.json`;
+  const projectJson = (fs.existsSync(filename)) ? require(filename) : {};
+  return projectJson;
+}
+
 
 const getTxGasCost = ({deployTransaction}) => {
   const gasCost = toEth(deployTransaction.gasLimit.mul(deployTransaction.gasPrice));
@@ -390,8 +437,11 @@ const distributeInitialFunds = async (tokenContract, contract, amount, signer) =
 module.exports = {
   txOverrides,
   saveDeploymentData,
+  saveMigrationData,
   getContractAbi,
   getDeployData,
+  getMigrationData,
+  getOZProjectData,
   getTxGasCost,
   getActualTxGasCost,
   getIonxDistributionAmount,

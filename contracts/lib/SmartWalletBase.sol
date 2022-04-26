@@ -92,6 +92,15 @@ abstract contract SmartWalletBase is ISmartWallet, BlackholePrevention {
     return result;
   }
 
+  function refreshPrincipal(address assetToken)
+    external
+    virtual
+    override
+    onlyWalletManager
+  {
+    // no-op
+  }
+
 
   /***********************************|
   |          Only Admin/DAO           |

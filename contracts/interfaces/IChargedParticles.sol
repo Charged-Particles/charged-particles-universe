@@ -34,6 +34,7 @@ interface IChargedParticles {
 
   function getStateAddress() external view returns (address stateAddress);
   function getSettingsAddress() external view returns (address settingsAddress);
+  function getManagersAddress() external view returns (address managersAddress);
 
   function getFeesForDeposit(uint256 assetAmount) external view returns (uint256 protocolFee);
   function baseParticleMass(address contractAddress, uint256 tokenId, string calldata walletManagerId, address assetToken) external returns (uint256);
@@ -102,7 +103,8 @@ interface IChargedParticles {
     uint256 tokenId,
     string calldata basketManagerId,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   ) external returns (bool success);
 
   function breakCovalentBond(
@@ -111,18 +113,16 @@ interface IChargedParticles {
     uint256 tokenId,
     string calldata basketManagerId,
     address nftTokenAddress,
-    uint256 nftTokenId
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   ) external returns (bool success);
 
   /***********************************|
   |          Particle Events          |
   |__________________________________*/
 
-  event UniverseSet(address indexed universeAddress);
-  event ChargedStateSet(address indexed chargedState);
-  event ChargedSettingsSet(address indexed chargedSettings);
-  event LeptonTokenSet(address indexed leptonToken);
-  // event DepositFeeSet(uint256 depositFeeLimit, uint256 depositFee);
+  event Initialized(address indexed initiator);
+  event ControllerSet(address indexed controllerAddress, string controllerId);
   event DepositFeeSet(uint256 depositFee);
   event ProtocolFeesCollected(address indexed assetToken, uint256 depositAmount, uint256 feesCollected);
 }
