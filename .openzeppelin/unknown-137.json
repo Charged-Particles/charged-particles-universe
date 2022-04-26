@@ -80,11 +80,6 @@
       "kind": "transparent"
     },
     {
-      "address": "0x660De54CEA09838d11Df0812E2754eD8D08CD2f7",
-      "txHash": "0x7a88c4b4033d9ac2ab2487d2e76c4ca657ef176ffb9a4e181337870dd730d86a",
-      "kind": "transparent"
-    },
-    {
       "address": "0x0288280Df6221E7e9f23c1BB398c820ae0Aa6c10",
       "txHash": "0xc5beeaab481f8c94132c5222d33189146dbb9b1b5531635d61ed4dcd1ab187e2",
       "kind": "transparent"
@@ -103,148 +98,14 @@
       "address": "0x0f42057be75AF6D977a0cE900E732eA4d490B580",
       "txHash": "0xc2f2c30622aa1b37c3700dcda30b38f71de37f0621bbcdee457a68b2ba2a7d92",
       "kind": "transparent"
+    },
+    {
+      "address": "0x1634C92cC06CB52B5DB8fa2a449542F0607c9Dd3",
+      "txHash": "0xa45d02283cd7be49e4de7cf84c51e605c54ae663428d9cb17234fea271699899",
+      "kind": "transparent"
     }
   ],
   "impls": {
-    "91a472ce4ec722fa34e00fe2676ad7296e9a170e0c7d519233245a6fdd9a0c7c": {
-      "address": "0x1E70aa1599a624880e91103738591C920cCbb925",
-      "txHash": "0x5a353b538c33fbdc63fe459f4f9c5fff74c7186b2625a762590bcebcefe96708",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
-          },
-          {
-            "contract": "ContextUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
-          },
-          {
-            "contract": "OwnableUpgradeable",
-            "label": "_owner",
-            "type": "t_address",
-            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
-          },
-          {
-            "contract": "OwnableUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)49_storage",
-            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
-          },
-          {
-            "contract": "Universe",
-            "label": "chargedParticles",
-            "type": "t_address",
-            "src": "contracts/Universe.sol:50"
-          },
-          {
-            "contract": "Universe",
-            "label": "proton",
-            "type": "t_address",
-            "src": "contracts/Universe.sol:51"
-          },
-          {
-            "contract": "Universe",
-            "label": "lepton",
-            "type": "t_address",
-            "src": "contracts/Universe.sol:52"
-          },
-          {
-            "contract": "Universe",
-            "label": "quark",
-            "type": "t_address",
-            "src": "contracts/Universe.sol:53"
-          },
-          {
-            "contract": "Universe",
-            "label": "boson",
-            "type": "t_address",
-            "src": "contracts/Universe.sol:54"
-          },
-          {
-            "contract": "Universe",
-            "label": "photonMaxSupply",
-            "type": "t_uint256",
-            "src": "contracts/Universe.sol:59"
-          },
-          {
-            "contract": "Universe",
-            "label": "totalPhotonDischarged",
-            "type": "t_uint256",
-            "src": "contracts/Universe.sol:60"
-          },
-          {
-            "contract": "Universe",
-            "label": "photonSource",
-            "type": "t_contract(IERC20Upgradeable)1347",
-            "src": "contracts/Universe.sol:63"
-          },
-          {
-            "contract": "Universe",
-            "label": "esaMultiplier",
-            "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/Universe.sol:66"
-          },
-          {
-            "contract": "Universe",
-            "label": "esaLevel",
-            "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/Universe.sol:69"
-          },
-          {
-            "contract": "Universe",
-            "label": "referralSource",
-            "type": "t_mapping(t_address,t_address)",
-            "src": "contracts/Universe.sol:72"
-          },
-          {
-            "contract": "Universe",
-            "label": "bondedLeptonMass",
-            "type": "t_mapping(t_uint256,t_uint256)",
-            "src": "contracts/Universe.sol:75"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address"
-          },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_contract(IERC20Upgradeable)1347": {
-            "label": "contract IERC20Upgradeable"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)"
-          },
-          "t_mapping(t_address,t_address)": {
-            "label": "mapping(address => address)"
-          },
-          "t_mapping(t_uint256,t_uint256)": {
-            "label": "mapping(uint256 => uint256)"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]"
-          },
-          "t_bool": {
-            "label": "bool"
-          }
-        }
-      }
-    },
     "45be1a4b0581e0aadd2b20664cd0c3fc33e126343984eb1d4d360c963a3369c0": {
       "address": "0xB29256073C63960daAa398f1227D0adBC574341C",
       "txHash": "0x4867c64aca66f6502030d4707782f0f657a7e59efe76b18ebebfb7859df5c486",
@@ -927,6 +788,145 @@
           },
           "t_uint256": {
             "label": "uint256"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "54d6cf0408e8e72d76bd06fa9fe5c75d06ade6919a9bc2ff47507f7dbfd4ba23": {
+      "address": "0x344f8Dc0C5994910ed102716166477d35dF671b2",
+      "txHash": "0x9bdd1446af28d0c93d97e8ab3d7a609e74c8e9b2894b00634887e5ba38cdb7db",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "Universe",
+            "label": "chargedParticles",
+            "type": "t_address",
+            "src": "contracts/Universe.sol:50"
+          },
+          {
+            "contract": "Universe",
+            "label": "proton",
+            "type": "t_address",
+            "src": "contracts/Universe.sol:51"
+          },
+          {
+            "contract": "Universe",
+            "label": "lepton",
+            "type": "t_address",
+            "src": "contracts/Universe.sol:52"
+          },
+          {
+            "contract": "Universe",
+            "label": "quark",
+            "type": "t_address",
+            "src": "contracts/Universe.sol:53"
+          },
+          {
+            "contract": "Universe",
+            "label": "boson",
+            "type": "t_address",
+            "src": "contracts/Universe.sol:54"
+          },
+          {
+            "contract": "Universe",
+            "label": "photonMaxSupply",
+            "type": "t_uint256",
+            "src": "contracts/Universe.sol:59"
+          },
+          {
+            "contract": "Universe",
+            "label": "totalPhotonDischarged",
+            "type": "t_uint256",
+            "src": "contracts/Universe.sol:60"
+          },
+          {
+            "contract": "Universe",
+            "label": "photonSource",
+            "type": "t_contract(IERC20Upgradeable)1510",
+            "src": "contracts/Universe.sol:63"
+          },
+          {
+            "contract": "Universe",
+            "label": "esaMultiplier",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/Universe.sol:66"
+          },
+          {
+            "contract": "Universe",
+            "label": "esaLevel",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/Universe.sol:69"
+          },
+          {
+            "contract": "Universe",
+            "label": "referralSource",
+            "type": "t_mapping(t_address,t_address)",
+            "src": "contracts/Universe.sol:72"
+          },
+          {
+            "contract": "Universe",
+            "label": "bondedLeptonMass",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/Universe.sol:75"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_contract(IERC20Upgradeable)1510": {
+            "label": "contract IERC20Upgradeable"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
           },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"
