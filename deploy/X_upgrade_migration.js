@@ -15,6 +15,8 @@ const {
   chainNameById,
 } = require('../js-helpers/utils');
 
+const hardhatConfig = require('../hardhat.config');
+
 const { AddressZero } = require('ethers').constants
 const _ = require('lodash');
 
@@ -24,11 +26,17 @@ module.exports = async (hre) => {
   const network = await hre.network;
   const chainId = chainIdByName(network.name);
   const networkName = chainNameById(chainId).toLowerCase();
+  const { deployer } = await hre.getNamedAccounts();
 
   if (chainId == 31337) { return; } // Hardhat Skip
 
   const ddChargedState = getDeployData('ChargedState', chainId);
   const ddChargedSettings = getDeployData('ChargedSettings', chainId);
+
+  let gasPrice = _.parseInt(_.get(hardhatConfig, `networks.${network.name}.gasPrice`, '0'), 10);
+  if (gasPrice > 0) {
+    gasPrice /= 1e9;
+  }
 
   const _migrationSubgraphDump = {
     chargedSettings: require(`../migration_data/subgraph_dump/${networkName}/ChargedSettings`),
@@ -46,6 +54,12 @@ module.exports = async (hre) => {
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles Protocol - Contract Migrations');
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
+
+  log(`  Using Network: ${chainNameById(chainId)} (${network.name}:${chainId})`);
+  log('  Using Gas Price: ', gasPrice, 'GWEI');
+  log('  Using Accounts:');
+  log('  - Deployer: ', deployer);
+  log(' ');
 
   log('  Loading ChargedState from: ', ddChargedState.address);
   const ChargedState = await ethers.getContractFactory('ChargedState');
@@ -81,34 +95,57 @@ module.exports = async (hre) => {
     saveMigrationData(chainId, migrationTracking);
   }
 
-  let nftEnabledData;
-  const nftSettings = _.get(_migrationSubgraphDump, 'chargedSettings.nftSettings', []);
-  log(`\n\n  Migrating ChargedSettings for ${nftSettings.length} Contracts...`);
+  // let nftEnabledData;
+  // const nftSettings = _.get(_migrationSubgraphDump, 'chargedSettings.nftSettings', []);
+  // log(`\n\n  Migrating ChargedSettings for ${nftSettings.length} Contracts...`);
 
-  for (let i = 0; i < nftSettings.length; i++) {
-    nftEnabledData = nftSettings[i];
+  // for (let i = 0; i < nftSettings.length; i++) {
+  //   nftEnabledData = nftSettings[i];
 
-    if (isMigrated('contracts', nftEnabledData.id)) {
-      log(`  - [TX-8-b-${i}] Skipping: ${nftEnabledData.id} (already migrated)`);
-      continue;
-    }
+  //   if (isMigrated('contracts', nftEnabledData.id)) {
+  //     log(`  - [TX-8-b-${i}] Skipping: ${nftEnabledData.id} (already migrated)`);
+  //     continue;
+  //   }
 
-    await executeTx(`8-b-${i}`, `Migrating ChargedSettings for: ${nftEnabledData.contractAddress}`, async () =>
-      await chargedSettings.enableNftContracts([nftEnabledData.contractAddress])
-    );
-    migrationTracking.contracts[nftEnabledData.id] = true;
-    saveMigrationData(chainId, migrationTracking);
-  }
+  //   await executeTx(`8-b-${i}`, `Migrating ChargedSettings for: ${nftEnabledData.contractAddress}`, async () =>
+  //     await chargedSettings.enableNftContracts([nftEnabledData.contractAddress])
+  //   );
+  //   migrationTracking.contracts[nftEnabledData.id] = true;
+  //   saveMigrationData(chainId, migrationTracking);
+  // }
 
   let nftStateData, releaseTimelockExpiry, releaseTimelockLockedBy, tempLockExpiry;
   const nftState = _.get(_migrationSubgraphDump, 'chargedState', []);
-  log(`\n\n  Migrating ChargedState for ${nftState.length} NFTs...`);
+  const filteredNftState = _.filter(nftState, (state) => {
+    const conditions = [
+      !_.isEmpty(state.dischargeApproval),
+      !_.isEmpty(state.releaseApproval),
+      !_.isEmpty(state.breakBondApproval),
+      !_.isEmpty(state.timelockApproval),
+      !_.isEmpty(state.dischargeTimelockExpiry),
+      !_.isEmpty(state.dischargeTimelockLockedBy),
+      !_.isEmpty(state.releaseTimelockExpiry),
+      !_.isEmpty(state.releaseTimelockLockedBy),
+      !_.isEmpty(state.breakBondTimelockExpiry),
+      !_.isEmpty(state.breakBondTimelockLockedBy),
+      !!state.restrictChargeFromAny,
+      !!state.allowDischargeFromAny,
+      !!state.allowReleaseFromAny,
+      !!state.restrictBondFromAny,
+      !!state.allowBreakBondFromAny,
+      _.parseInt(state.tempLockExpiry) > 0,
+    ];
+    return _.some(conditions, Boolean);
+  });
+  log(`\n\n  Migrating ChargedState for ${filteredNftState.length} NFTs (out of ${nftState.length})...`);
 
-  for (let i = 0; i < nftState.length; i++) {
-    nftStateData = nftState[i];
-    releaseTimelockExpiry = !_.isEmpty(nftCreatorData.releaseTimelockExpiry) ? nftCreatorData.releaseTimelockExpiry : "0";
-    releaseTimelockLockedBy = !_.isEmpty(nftCreatorData.releaseTimelockLockedBy) ? nftCreatorData.releaseTimelockLockedBy : AddressZero;
-    tempLockExpiry = !_.isEmpty(nftCreatorData.tempLockExpiry) ? nftCreatorData.tempLockExpiry : "0";
+  for (let i = filteredNftState.length - 1; i >= 0; i--) {
+    nftStateData = filteredNftState[i];
+    nftStateData.id = `${nftStateData.contractAddress}-${nftStateData.tokenId}`;
+
+    releaseTimelockExpiry = !_.isEmpty(nftStateData.releaseTimelockExpiry) ? nftStateData.releaseTimelockExpiry : "0";
+    releaseTimelockLockedBy = !_.isEmpty(nftStateData.releaseTimelockLockedBy) ? nftStateData.releaseTimelockLockedBy : AddressZero;
+    tempLockExpiry = !_.isEmpty(nftStateData.tempLockExpiry) ? nftStateData.tempLockExpiry : "0";
 
     if (isMigrated('nfts', nftStateData.id)) {
       log(`  - [TX-8-c-${i}] Skipping: ${nftStateData.id} (already migrated)`);
@@ -117,8 +154,8 @@ module.exports = async (hre) => {
 
     await executeTx(`8-c-${i}`, `Migrating ChargedState for: ${nftStateData.id}`, async () =>
       await chargedState.migrateToken(
-        nftCreatorData.contractAddress,
-        nftCreatorData.tokenId,
+        nftStateData.contractAddress,
+        nftStateData.tokenId,
         releaseTimelockExpiry,
         releaseTimelockLockedBy,
         tempLockExpiry,
