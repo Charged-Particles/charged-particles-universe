@@ -140,7 +140,7 @@ describe("[INTEGRATION] Charged Particles with ERC1155", () => {
       });
       await tokenInfoProxyMock.mock.getTokenOwner.withArgs(nonFungibleERC1155.address, erc1155.toString()).returns(user1);
 
-      // Deposit ERC1155 into Proton
+      // Deposit Proton into ERC1155
       await proton.connect(signer1).setApprovalForAll(chargedParticles.address, true);
       const bondResults = await callAndReturnWithLogs({
         contractInstance: chargedParticles,
@@ -219,7 +219,7 @@ describe("[INTEGRATION] Charged Particles with ERC1155", () => {
       });
       await tokenInfoProxyMock.mock.getTokenOwner.withArgs(nonFungibleERC1155.address, erc1155.toString()).returns(user1);
 
-      // Deposit ERC1155 into Proton
+      // Deposit Proton into ERC1155
       await protonB.connect(signer1).setApprovalForAll(chargedParticles.address, true);
       const bondResults = await callAndReturnWithLogs({
         contractInstance: chargedParticles,
