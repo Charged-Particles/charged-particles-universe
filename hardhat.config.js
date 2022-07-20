@@ -99,6 +99,16 @@ module.exports = {
                 count: 10,
             }
         },
+        goerli: {
+            url: `https://eth-goerli.g.alchemy.com/v2/mCtpp6DQI8VDJ9F4kIovVrGncmsUnM_n`,
+            gasPrice: 3e9,
+            // blockGasLimit: 12400000,
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            }
+        },
         mumbai: {
             // url: `https://rpc-mumbai.matic.today`,
             // url: `https://rpc-mumbai.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
@@ -124,7 +134,7 @@ module.exports = {
         mainnet: {
             url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
             // url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 60e9,
+            gasPrice: 34e9,
             blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.mainnet,

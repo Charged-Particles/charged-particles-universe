@@ -33,6 +33,7 @@ const chainIdByName = (chainName) => {
     case 'mainnet': return 1;
     case 'ropsten': return 3;
     case 'rinkeby': return 4;
+    case 'goerli': return 5;
     case 'kovan': return 42;
     case 'polygon': return 137;
     case 'mumbai': return 80001;
@@ -47,6 +48,7 @@ const chainNameById = (chainId) => {
     case 1: return 'Mainnet';
     case 3: return 'Ropsten';
     case 4: return 'Rinkeby';
+    case 5: return 'Goerli';
     case 42: return 'Kovan';
     case 137: return 'Polygon';
     case 80001: return 'Mumbai';

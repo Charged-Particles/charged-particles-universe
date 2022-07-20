@@ -54,7 +54,7 @@ const _externalERC1155 = [
 
 module.exports = async (hre) => {
     const { ethers, getNamedAccounts } = hre;
-    const { deployer, initialMinter, user1, user2, user3, user4, user5 } = await getNamedAccounts();
+    const { deployer, initialMinter, user1, user2, user3 } = await getNamedAccounts();
     const network = await hre.network;
     const { callAndReturn } = testHelpers(network);
 
@@ -73,7 +73,7 @@ module.exports = async (hre) => {
 
     let externalERC721, fungibleERC1155, nonFungibleERC1155, gasCosts;
 
-    const nftReceiver = user5;
+    const nftReceiver = user3;
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles: Mint Proton & Lepton Tokens ');

@@ -30,24 +30,18 @@ contract ExternalERC721 is ERC721 {
   using Counters for Counters.Counter;
 
   Counters.Counter internal _tokenCount;
-  mapping (uint256 => address) internal _tokenCreator;
 
   constructor() public ERC721("Charged Particles - ExternalERC721", "ExNFT") {}
 
-  function creatorOf(uint256 tokenId) external view returns (address) {
-    return _tokenCreator[tokenId];
-  }
-
   function mintNft(address receiver, string memory tokenUri) external returns (uint256 newTokenId) {
-    return _mintNft(msg.sender, receiver, tokenUri);
+    return _mintNft(receiver, tokenUri);
   }
 
-  function _mintNft(address creator, address receiver, string memory tokenUri) internal returns (uint256 newTokenId) {
+  function _mintNft(address receiver, string memory tokenUri) internal returns (uint256 newTokenId) {
     _tokenCount.increment();
     newTokenId = _tokenCount.current();
 
     _safeMint(receiver, newTokenId, "");
-    _tokenCreator[newTokenId] = creator;
 
     _setTokenURI(newTokenId, tokenUri);
   }

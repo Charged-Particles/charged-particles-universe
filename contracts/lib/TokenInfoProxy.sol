@@ -80,8 +80,14 @@ contract TokenInfoProxy is ITokenInfoProxy, Ownable {
     if (_remappedFnSigs[contractAddress].creatorOf != bytes4(0)) {
       fnSig = _remappedFnSigs[contractAddress].creatorOf;
     }
-    bytes memory returnData = contractAddress.functionCall(abi.encodeWithSelector(fnSig, tokenId), "TokenInfoProxy: low-level call failed on getTokenCreator");
-    return abi.decode(returnData, (address));
+
+    // solhint-disable-next-line
+    (bool success, bytes memory returnData) = contractAddress.call(abi.encodeWithSelector(fnSig, tokenId));
+    if (success) {
+      return abi.decode(returnData, (address));
+    } else {
+      return address(0x0);
+    }
   }
 
   function _getTokenOwner(address contractAddress, uint256 tokenId) internal returns (address) {
@@ -89,7 +95,13 @@ contract TokenInfoProxy is ITokenInfoProxy, Ownable {
     if (_remappedFnSigs[contractAddress].ownerOf != bytes4(0)) {
       fnSig = _remappedFnSigs[contractAddress].ownerOf;
     }
-    bytes memory returnData = contractAddress.functionCall(abi.encodeWithSelector(fnSig, tokenId), "TokenInfoProxy: low-level call failed on getTokenOwner");
-    return abi.decode(returnData, (address));
+
+    // solhint-disable-next-line
+    (bool success, bytes memory returnData) = contractAddress.call(abi.encodeWithSelector(fnSig, tokenId));
+    if (success) {
+      return abi.decode(returnData, (address));
+    } else {
+      return address(0x0);
+    }
   }
 }
