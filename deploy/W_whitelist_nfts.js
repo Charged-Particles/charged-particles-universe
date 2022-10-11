@@ -71,6 +71,8 @@ const _WHITELISTED_CONTRACTS = {
     // "0x8943c7bac1914c9a7aba750bf2b6b09fd21037e0", // Lazy Lions
     // "0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0", // SuperRare
     // "0xabb3738f04dc2ec20f4ae4462c3d069d02ae045b", // KnownOrigin
+    // "0x79986af15539de2db9a5086382daeda917a9cf0c", // Voxels Parcel
+    // "0x5d183d790d6b570eaec299be432f0a13a00058a9", // HMN
   ],
   '42': [
     "0xAEdEDf4A27d4Ea6f658b5F69F70a72d12BDeb937", // Proton
@@ -83,10 +85,13 @@ const _WHITELISTED_CONTRACTS = {
     "0xef815ad5401cee4b8b2e6bc2f8c481d84e5d0871", // External NFT Example Contract
   ],
   '137': [
-    "0x4ed360c8725d3a63f564f8484a582d0a7cecea7a", // Lepton 2
-    "0xe2a9b15e283456894246499fb912cce717f83319", // Proton
-    "0x1CeFb0E1EC36c7971bed1D64291fc16a145F35DC", // Proton B
-    "0x9d305a42a3975ee4c1c57555bed5919889dce63f", // Sandbox Land
+    // "0x4ed360c8725d3a63f564f8484a582d0a7cecea7a", // Lepton 2
+    // "0xe2a9b15e283456894246499fb912cce717f83319", // Proton
+    // "0x1CeFb0E1EC36c7971bed1D64291fc16a145F35DC", // Proton B
+    // "0x9d305a42a3975ee4c1c57555bed5919889dce63f", // Sandbox Land
+    // "0x28BFEFd2FDc109527D9d5e459417b12a8eF3AC0B", // Moda Dropcase NFT (DropCase)
+    // "0x96c89cc7c5d2fbfa41afa10da5917742ff35941b", // Elder ENTS
+    // "0x135dE69e2C8A6f14f00dcf9c9e8D8120FBebeF5a", // HMN
   ],
   '80001': [
     "0xd02cB38f5D68333219d32Ea2a08c3BCdC92753F2", // Proton
