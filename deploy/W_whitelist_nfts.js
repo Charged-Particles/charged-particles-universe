@@ -73,6 +73,7 @@ const _WHITELISTED_CONTRACTS = {
     // "0xabb3738f04dc2ec20f4ae4462c3d069d02ae045b", // KnownOrigin
     // "0x79986af15539de2db9a5086382daeda917a9cf0c", // Voxels Parcel
     // "0x5d183d790d6b570eaec299be432f0a13a00058a9", // HMN
+    // "0xe6A5e67F92CC6219E9c210f2734A6175Ee4eE6D1" // Moda Dropcase NFT (DropCase)
   ],
   '42': [
     "0xAEdEDf4A27d4Ea6f658b5F69F70a72d12BDeb937", // Proton
@@ -92,6 +93,7 @@ const _WHITELISTED_CONTRACTS = {
     // "0x28BFEFd2FDc109527D9d5e459417b12a8eF3AC0B", // Moda Dropcase NFT (DropCase)
     // "0x96c89cc7c5d2fbfa41afa10da5917742ff35941b", // Elder ENTS
     // "0x135dE69e2C8A6f14f00dcf9c9e8D8120FBebeF5a", // HMN
+    // "0x4bf5a99ea2f8de061f7d77ba9edd749503d945da", // .BASIN (FlexiPunkTLD)
   ],
   '80001': [
     "0xd02cB38f5D68333219d32Ea2a08c3BCdC92753F2", // Proton
@@ -112,7 +114,7 @@ module.exports = async (hre) => {
     const {isProd, isHardhat} = chainTypeById(chainId);
     const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
 
-    // if (chainId !== 42) { return; } // Kovan only
+    if (chainId !== 42) { return; } // Kovan only
 
     const ddChargedSettings = getDeployData('ChargedSettings', chainId);
     const ddProton = getDeployData('Proton', chainId);

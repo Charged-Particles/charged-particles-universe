@@ -30,7 +30,7 @@ module.exports = async (hre) => {
   const chainId = chainIdByName(network.name);
   const alchemyTimeout = 0;
 
-  // if (chainId !== 1) { return; } // Mainnet only
+  if (chainId !== 1) { return; } // Mainnet only
 
   const ddLepton = getDeployData('Lepton', chainId);
   const ddLepton2 = getDeployData('Lepton2', chainId);

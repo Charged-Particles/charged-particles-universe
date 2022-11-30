@@ -60,7 +60,7 @@ describe("[LIB] TokenInfoProxy", function() {
         expect(ownerOf).to.be.equal(this.account)
     })
 
-    it.only('should not fail on contracts with no creatorOf function', async () => {
+    it('should not fail on contracts with no creatorOf function', async () => {
       externalERC721.mintNft(this.account, "https://somewhere.com");
       const creatorOf = await callAndReturn({
           contractInstance: this.tokenInfoProxy,
