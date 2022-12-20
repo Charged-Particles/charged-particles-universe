@@ -41,7 +41,7 @@ import "../lib/BlackholePrevention.sol";
 import "../lib/RelayRecipient.sol";
 
 
-contract ProtonB is BaseProton, IProtonB {
+contract ProtonC is BaseProton, IProtonB {
   using SafeMath for uint256;
   using TokenInfo for address payable;
   using Counters for Counters.Counter;
@@ -56,7 +56,7 @@ contract ProtonB is BaseProton, IProtonB {
   |          Initialization           |
   |__________________________________*/
 
-  constructor() public BaseProton("Charged Particles - ProtonB", "PROTON.B") {}
+  constructor() public BaseProton("Charged Particles - ProtonC", "PROTON.C") {}
 
 
   /***********************************|

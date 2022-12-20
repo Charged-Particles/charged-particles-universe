@@ -51,6 +51,8 @@ contract BaseProton is
   using TokenInfo for address payable;
   using Counters for Counters.Counter;
 
+  event Received(address, uint);
+
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
 
   /// @dev Sequential Token IDs storage
@@ -81,6 +83,9 @@ contract BaseProton is
   /***********************************|
   |              Public               |
   |__________________________________*/
+  receive() external payable {
+    emit Received(msg.sender, msg.value);
+  }
 
   /// Returns the Creator address of an NFT by Token ID
   /// @param tokenId The ID of the NFT Token to lookup
