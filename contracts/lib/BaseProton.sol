@@ -187,6 +187,7 @@ contract BaseProton is
     virtual
     override
     whenNotPaused
+    payable
     returns (uint256 newTokenId)
   {
     newTokenId = _createProton(

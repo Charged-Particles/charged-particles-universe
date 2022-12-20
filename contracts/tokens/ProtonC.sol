@@ -33,7 +33,7 @@ import "../interfaces/IUniverse.sol";
 import "../interfaces/IChargedState.sol";
 import "../interfaces/IChargedSettings.sol";
 import "../interfaces/IChargedParticles.sol";
-import "../interfaces/IProtonB.sol";
+import "../interfaces/IProtonC.sol";
 
 import "../lib/BaseProton.sol";
 import "../lib/TokenInfo.sol";
@@ -41,7 +41,7 @@ import "../lib/BlackholePrevention.sol";
 import "../lib/RelayRecipient.sol";
 
 
-contract ProtonC is BaseProton, IProtonB {
+contract ProtonC is BaseProton, IProtonC {
   using SafeMath for uint256;
   using TokenInfo for address payable;
   using Counters for Counters.Counter;
@@ -196,7 +196,6 @@ contract ProtonC is BaseProton, IProtonB {
   )
     internal
     virtual
-    payable
     returns (uint256 newTokenId)
   {
     require(address(_chargedParticles) != address(0x0), "PRT:E-107");
@@ -257,7 +256,6 @@ contract ProtonC is BaseProton, IProtonB {
     internal
     virtual
     override
-    payable
     returns (
       address contractAddress,
       uint256 tokenId,
