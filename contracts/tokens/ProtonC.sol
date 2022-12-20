@@ -74,6 +74,7 @@ contract ProtonC is BaseProton, IProtonB {
     external
     virtual
     override
+    payable
     returns (uint256 newTokenId)
   {
     newTokenId = _createProton(
@@ -109,6 +110,7 @@ contract ProtonC is BaseProton, IProtonB {
     override
     nonReentrant
     whenNotPaused
+    payable
     returns (uint256 newTokenId)
   {
     newTokenId = _createChargedParticle(
@@ -132,6 +134,7 @@ contract ProtonC is BaseProton, IProtonB {
     external
     virtual
     whenNotPaused
+    payable
     returns (uint256 newTokenId)
   {
     newTokenId = _createProton(
@@ -193,6 +196,7 @@ contract ProtonC is BaseProton, IProtonB {
   )
     internal
     virtual
+    payable
     returns (uint256 newTokenId)
   {
     require(address(_chargedParticles) != address(0x0), "PRT:E-107");
@@ -253,6 +257,7 @@ contract ProtonC is BaseProton, IProtonB {
     internal
     virtual
     override
+    payable
     returns (
       address contractAddress,
       uint256 tokenId,
