@@ -39,7 +39,14 @@ import "../lib/RelayRecipient.sol";
 
 /// @title Base Proton Contract for Charged Particles compatible ERC721 NFTs
 /// @dev MUST NOT be Upgradeable, as Upgradeable NFTs are incompatible with Charged Particles.
-contract BaseProton is IBaseProton, ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePrevention {
+contract BaseProton is 
+  IBaseProton, 
+  ERC721, 
+  Ownable, 
+  RelayRecipient, 
+  ReentrancyGuard, 
+  BlackholePrevention 
+{
   using SafeMath for uint256;
   using TokenInfo for address payable;
   using Counters for Counters.Counter;
