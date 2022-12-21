@@ -67,6 +67,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   let genericBasketManager;
   let proton;
   let protonB;
+  let protonC;
   let lepton;
   let ionx;
   let timelocks;
@@ -138,6 +139,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const Proton = await ethers.getContractFactory('Proton');
     const ProtonB = await ethers.getContractFactory('ProtonB');
+    const ProtonC = await ethers.getContractFactory('ProtonC');
     const Lepton = await ethers.getContractFactory('Lepton2');
     const Ionx = await ethers.getContractFactory('Ionx');
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy')
@@ -153,12 +155,14 @@ describe("[INTEGRATION] Charged Particles", () => {
     genericBasketManager = GenericBasketManager.attach(getDeployData('GenericBasketManager', chainId).address);
     proton = Proton.attach(getDeployData('Proton', chainId).address);
     protonB = ProtonB.attach(getDeployData('ProtonB', chainId).address);
+    protonC = ProtonC.attach(getDeployData('ProtonC', chainId).address);
     lepton = Lepton.attach(getDeployData('Lepton2', chainId).address);
     ionx = Ionx.attach(getDeployData('Ionx', chainId).address);
     tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address);
 
     await proton.connect(signerD).setPausedState(false);
     await protonB.connect(signerD).setPausedState(false);
+    await protonC.connect(signerD).setPausedState(false);
     await lepton.connect(signerD).setPausedState(false);
   });
 
@@ -1287,4 +1291,33 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   // });
 
+  it.only ("Payable minting", async () => {
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+    // Switch to protonA
+    await universe.setProtonToken(proton.address);
+
+    const user1Address = await signer1.getAddress();
+    const user1BalanceBeforeMint = await ethers.provider.getBalance(user1Address);
+    const energizedParticleId = await callAndReturn({
+      contractInstance: protonC,
+      contractMethod: 'createBasicProton',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                      // creator
+        user1,                      // receiver
+        TEST_NFT_TOKEN_URI,
+      ],
+      value: ethers.utils.parseEther('0.1')
+    });
+    const user1BalanceAfterMint = await ethers.provider.getBalance(user1Address);
+    const balanceDifference = user1BalanceBeforeMint.sub(user1BalanceAfterMint);
+
+    console.log(ethers.utils.formatUnits(balanceDifference.toString()).toString());
+  });
 });
