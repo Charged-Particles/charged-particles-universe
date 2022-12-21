@@ -223,29 +223,27 @@ contract BaseProton is
     return true;
   }
 
-  // function createProtonsForSale(
-  //   address creator,
-  //   address receiver,
-  //   uint256 royaltiesPercent,
-  //   string[] calldata tokenMetaUris,
-  //   uint256[] calldata salePrices
-  // )
-  //   external
-  //   virtual
-  //   override
-  //   whenNotPaused
-  //   payable
-  //   returns (bool)
-  // {
-  //   _createProtonsForSale(
-  //     creator,
-  //     receiver,
-  //     royaltiesPercent,
-  //     tokenMetaUris,
-  //     salePrices
-  //   );
-  //   return true;
-  // }
+  function createProtonsForSale(
+    address creator,
+    address receiver,
+    uint256 royaltiesPercent,
+    string[] calldata tokenMetaUris,
+    uint256[] calldata salePrices
+  )
+    external
+    virtual
+    whenNotPaused
+    returns (bool)
+  {
+    _createProtonsForSale(
+      creator,
+      receiver,
+      royaltiesPercent,
+      tokenMetaUris,
+      salePrices
+    );
+    return true;
+  }
 
 
   /***********************************|

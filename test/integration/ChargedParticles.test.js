@@ -1344,5 +1344,7 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     expect(createProtonForSaleId).to.be.eq(ethers.BigNumber.from(2));
     expect(await ethers.provider.getBalance(protonC.address)).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('2')));
+
+    
   });
 });
