@@ -1,0 +1,358 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "chargedManagers",
+        "type": "address"
+      }
+    ],
+    "name": "ChargedManagersSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "basketManagerId",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "externalAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "encodedParams",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "ethValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "ExecuteForBasket",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "walletManagerId",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "externalAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "encodedParams",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "ethValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "ExecuteForWallet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "state",
+        "type": "bool"
+      }
+    ],
+    "name": "PermsSetForExternal",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "walletManagerId",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      }
+    ],
+    "name": "PrincipalRefreshed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "tokenInfoProxy",
+        "type": "address"
+      }
+    ],
+    "name": "TokenInfoProxySet",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "basketManagerId",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "externalAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "encodedParams",
+        "type": "bytes"
+      }
+    ],
+    "name": "executeForBasket",
+    "outputs": [
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "walletManagerId",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "externalAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "encodedParams",
+        "type": "bytes"
+      }
+    ],
+    "name": "executeForWallet",
+    "outputs": [
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "walletManagerId",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      }
+    ],
+    "name": "refreshWalletPrincipal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "basketManagerId",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "rewardsToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rewardsAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawBasketRewards",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountWithdrawn",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "walletManagerId",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "rewardsToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rewardsAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawWalletRewards",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountWithdrawn",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
