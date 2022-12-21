@@ -1379,13 +1379,21 @@ describe("[INTEGRATION] Charged Particles", () => {
     const protonBalanceAfterAllDeposits = await ethers.provider.getBalance(protonC.address);
     expect(protonBalanceAfterAllDeposits).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('3')));
 
+    // Get user 3 balacne
+    const user3BalanceBeforeWithdraw = await ethers.provider.getBalance(user3);
+
+    // Withdraw into user 3
     const withdrawEthFromContractTx = await protonC.connect(signerD)['withdrawEther'](
-      user1,
+      user3,
       protonBalanceAfterAllDeposits.toString()
     );
-
     await withdrawEthFromContractTx.wait();
-
+     
+    // ProtonC should have no eth
     expect(await ethers.provider.getBalance(protonC.address)).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('0')));
+
+    const user3BalanceAfterWithdraw = await ethers.provider.getBalance(user3);
+    
+    expect(user3BalanceBeforeWithdraw.add(protonBalanceAfterAllDeposits)).to.be.eq(user3BalanceAfterWithdraw);
   });
 });
