@@ -1326,6 +1326,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     
     const setChargedSettingsTx = await protonC.connect(signerD)['setChargedSettings'](chargedSettings.address);
     await setChargedSettingsTx.wait();
+    const setChargedParticlesTx = await protonC.connect(signerD)['setChargedParticles'](chargedParticles.address);
+    await setChargedParticlesTx.wait();
 
     const createProtonForSaleId = await callAndReturn({
       contractInstance: protonC,
@@ -1344,7 +1346,35 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     expect(createProtonForSaleId).to.be.eq(ethers.BigNumber.from(2));
     expect(await ethers.provider.getBalance(protonC.address)).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('2')));
-
     
+    // Allow list the contract into the protocol
+    await chargedSettings.connect(signerD).enableNftContracts([protonC.address]);
+    // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') });
+    
+    await dai.connect(daiSigner).transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](protonC.address, toWei('10'));
+    
+   const energizedParticleId = await callAndReturn({
+      contractInstance: protonC,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'aave.B',                     // walletManagerId
+        daiAddress,                   // assetToken
+        toWei('10'),                  // assetAmount
+        annuityPct,                   // annuityPercent
+      ],
+      callValue: ethers.utils.parseEther('1') 
+    });
+
+    // Token ID should be third
+    expect(energizedParticleId).to.be.eq(ethers.BigNumber.from(3));
+    // Contract should hold 3 eth, one per transaction.
+    expect(await ethers.provider.getBalance(protonC.address)).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('3')));
   });
 });
