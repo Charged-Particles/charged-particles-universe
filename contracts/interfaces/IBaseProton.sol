@@ -69,7 +69,7 @@ interface IBaseProton is IERC721 {
     string memory tokenMetaUri,
     uint256 royaltiesPercent,
     uint256 salePrice
-  ) external payable returns (uint256 newTokenId);
+  ) external returns (uint256 newTokenId);
 
   function createProtons(
     address creator,
