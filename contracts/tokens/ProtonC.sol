@@ -72,8 +72,8 @@ contract ProtonC is BaseProton, IProtonC {
     uint256 salePrice
   )
     external
-    virtual
-    override
+    // virtual
+    // override
     payable
     returns (uint256 newTokenId)
   {
@@ -107,7 +107,7 @@ contract ProtonC is BaseProton, IProtonC {
   )
     external
     virtual
-    override
+    // override
     nonReentrant
     whenNotPaused
     payable

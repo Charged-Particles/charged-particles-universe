@@ -1292,6 +1292,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   // });
 
   it.only ("Payable minting", async () => {
+    await universe.setProtonToken(protonC.address);
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
@@ -1299,12 +1300,9 @@ describe("[INTEGRATION] Charged Particles", () => {
     await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
     await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
 
-    // Switch to protonA
-    await universe.setProtonToken(proton.address);
-
     const user1Address = await signer1.getAddress();
     const user1BalanceBeforeMint = await ethers.provider.getBalance(user1Address);
-    const energizedParticleId = await callAndReturn({
+    const firstMintId = await callAndReturn({
       contractInstance: protonC,
       contractMethod: 'createBasicProton',
       contractCaller: signer1,
@@ -1313,13 +1311,38 @@ describe("[INTEGRATION] Charged Particles", () => {
         user1,                      // receiver
         TEST_NFT_TOKEN_URI,
       ],
-      callValue: ethers.utils.parseEther('2.0')
+      callValue: ethers.utils.parseEther('1')
     });
 
     const user1BalanceAfterMint = await ethers.provider.getBalance(user1Address);
     const balanceDifference = user1BalanceBeforeMint.sub(user1BalanceAfterMint);
 
-    // mint cost + gas 
-    expect(balanceDifference).to.be.equal(ethers.BigNumber.from('2000318946000000000'));
+    expect(firstMintId).to.be.eq(ethers.BigNumber.from(1));
+    // // mint cost + gas 
+    expect(balanceDifference).to.be.within(
+      ethers.BigNumber.from(ethers.utils.parseUnits('1')),
+      ethers.BigNumber.from(ethers.utils.parseUnits('1.1'))
+    );
+    
+    const setChargedSettingsTx = await protonC.connect(signerD)['setChargedSettings'](chargedSettings.address);
+    await setChargedSettingsTx.wait();
+
+    const createProtonForSaleId = await callAndReturn({
+      contractInstance: protonC,
+      contractMethod: 'createProtonForSale',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                      // creator
+        user2,                      // receiver
+        TEST_NFT_TOKEN_URI,
+        100,
+        100,
+        0
+      ],
+      callValue: ethers.utils.parseEther('1')
+    });
+
+    expect(createProtonForSaleId).to.be.eq(ethers.BigNumber.from(2));
+    expect(await ethers.provider.getBalance(protonC.address)).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('2')));
   });
 });

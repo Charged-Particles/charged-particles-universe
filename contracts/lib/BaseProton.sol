@@ -83,7 +83,7 @@ contract BaseProton is
   /***********************************|
   |              Public               |
   |__________________________________*/
-  receive() external payable {
+  receive() external payable virtual {
     emit Received(msg.sender, msg.value);
   }
 
@@ -176,27 +176,27 @@ contract BaseProton is
     );
   }
 
-  function createProtonForSale(
-    address creator,
-    address receiver,
-    string memory tokenMetaUri,
-    uint256 royaltiesPercent,
-    uint256 salePrice
-  )
-    external
-    virtual
-    override
-    whenNotPaused
-    returns (uint256 newTokenId)
-  {
-    newTokenId = _createProton(
-      creator,
-      receiver,
-      tokenMetaUri,
-      royaltiesPercent,
-      salePrice
-    );
-  }
+  // function createProtonForSale(
+  //   address creator,
+  //   address receiver,
+  //   string memory tokenMetaUri,
+  //   uint256 royaltiesPercent,
+  //   uint256 salePrice
+  // )
+  //   external
+  //   virtual
+  //   override
+  //   whenNotPaused
+  //   returns (uint256 newTokenId)
+  // {
+  //   newTokenId = _createProton(
+  //     creator,
+  //     receiver,
+  //     tokenMetaUri,
+  //     royaltiesPercent,
+  //     salePrice
+  //   );
+  // }
 
 
   /***********************************|
@@ -210,9 +210,8 @@ contract BaseProton is
   )
     external
     virtual
-    override
+    // override
     whenNotPaused
-    payable
     returns (bool)
   {
     _createProtons(
@@ -224,29 +223,29 @@ contract BaseProton is
     return true;
   }
 
-  function createProtonsForSale(
-    address creator,
-    address receiver,
-    uint256 royaltiesPercent,
-    string[] calldata tokenMetaUris,
-    uint256[] calldata salePrices
-  )
-    external
-    virtual
-    override
-    whenNotPaused
-    payable
-    returns (bool)
-  {
-    _createProtonsForSale(
-      creator,
-      receiver,
-      royaltiesPercent,
-      tokenMetaUris,
-      salePrices
-    );
-    return true;
-  }
+  // function createProtonsForSale(
+  //   address creator,
+  //   address receiver,
+  //   uint256 royaltiesPercent,
+  //   string[] calldata tokenMetaUris,
+  //   uint256[] calldata salePrices
+  // )
+  //   external
+  //   virtual
+  //   override
+  //   whenNotPaused
+  //   payable
+  //   returns (bool)
+  // {
+  //   _createProtonsForSale(
+  //     creator,
+  //     receiver,
+  //     royaltiesPercent,
+  //     tokenMetaUris,
+  //     salePrices
+  //   );
+  //   return true;
+  // }
 
 
   /***********************************|

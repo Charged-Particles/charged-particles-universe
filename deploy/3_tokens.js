@@ -58,6 +58,7 @@ module.exports = async (hre) => {
   const ProtonC = await ethers.getContractFactory('ProtonC');
   const ProtonCInstance = await ProtonC.deploy();
   const protonC = await ProtonCInstance.deployed();
+
   deployData['ProtonC'] = {
     abi: getContractAbi('ProtonC'),
     address: protonC.address,

@@ -63,27 +63,27 @@ interface IBaseProton is IERC721 {
     string memory tokenMetaUri
   ) external returns (uint256 newTokenId);
 
-  function createProtonForSale(
-    address creator,
-    address receiver,
-    string memory tokenMetaUri,
-    uint256 royaltiesPercent,
-    uint256 salePrice
-  ) external returns (uint256 newTokenId);
+  // function createProtonForSale(
+  //   address creator,
+  //   address receiver,
+  //   string memory tokenMetaUri,
+  //   uint256 royaltiesPercent,
+  //   uint256 salePrice
+  // ) external returns (uint256 newTokenId);
 
-  function createProtons(
-    address creator,
-    address receiver,
-    string[] calldata tokenMetaUris
-  ) external payable returns (bool);
+  // function createProtons(
+  //   address creator,
+  //   address receiver,
+  //   string[] calldata tokenMetaUris
+  // ) external returns (bool);
 
-  function createProtonsForSale(
-    address creator,
-    address receiver,
-    uint256 royaltiesPercent,
-    string[] calldata tokenMetaUris,
-    uint256[] calldata salePrices
-  ) external payable returns (bool);
+  // function createProtonsForSale(
+  //   address creator,
+  //   address receiver,
+  //   uint256 royaltiesPercent,
+  //   string[] calldata tokenMetaUris,
+  //   uint256[] calldata salePrices
+  // ) external returns (bool);
 
   /***********************************|
   |     Only Token Creator/Owner      |
