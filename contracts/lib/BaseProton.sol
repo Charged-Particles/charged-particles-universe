@@ -212,6 +212,7 @@ contract BaseProton is
     virtual
     override
     whenNotPaused
+    payable
     returns (bool)
   {
     _createProtons(
@@ -234,6 +235,7 @@ contract BaseProton is
     virtual
     override
     whenNotPaused
+    payable
     returns (bool)
   {
     _createProtonsForSale(
