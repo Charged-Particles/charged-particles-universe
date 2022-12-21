@@ -1291,7 +1291,7 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   // });
 
-  it.only ("Payable minting and withdraw", async () => {
+  it ("Payable minting and withdraw", async () => {
     await universe.setProtonToken(protonC.address);
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
