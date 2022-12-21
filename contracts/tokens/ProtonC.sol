@@ -33,7 +33,6 @@ import "../interfaces/IUniverse.sol";
 import "../interfaces/IChargedState.sol";
 import "../interfaces/IChargedSettings.sol";
 import "../interfaces/IChargedParticles.sol";
-import "../interfaces/IProtonC.sol";
 
 import "../lib/BaseProton.sol";
 import "../lib/TokenInfo.sol";
@@ -41,7 +40,7 @@ import "../lib/BlackholePrevention.sol";
 import "../lib/RelayRecipient.sol";
 
 
-contract ProtonC is BaseProton, IProtonC {
+contract ProtonC is BaseProton {
   using SafeMath for uint256;
   using TokenInfo for address payable;
   using Counters for Counters.Counter;
@@ -50,6 +49,11 @@ contract ProtonC is BaseProton, IProtonC {
   IChargedState internal _chargedState;
   IChargedSettings internal _chargedSettings;
   IChargedParticles internal _chargedParticles;
+
+  event UniverseSet(address indexed universe);
+  event ChargedStateSet(address indexed chargedState);
+  event ChargedSettingsSet(address indexed chargedSettings);
+  event ChargedParticlesSet(address indexed chargedParticles);
 
 
   /***********************************|

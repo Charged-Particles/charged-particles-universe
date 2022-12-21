@@ -176,28 +176,6 @@ contract BaseProton is
     );
   }
 
-  // function createProtonForSale(
-  //   address creator,
-  //   address receiver,
-  //   string memory tokenMetaUri,
-  //   uint256 royaltiesPercent,
-  //   uint256 salePrice
-  // )
-  //   external
-  //   virtual
-  //   whenNotPaused
-  //   payable
-  //   returns (uint256 newTokenId)
-  // {
-  //   newTokenId = _createProton(
-  //     creator,
-  //     receiver,
-  //     tokenMetaUri,
-  //     royaltiesPercent,
-  //     salePrice
-  //   );
-  // }
-
 
   /***********************************|
   |      Create Multiple Protons      |
@@ -210,7 +188,6 @@ contract BaseProton is
   )
     external
     virtual
-    // override
     whenNotPaused
     returns (bool)
   {
