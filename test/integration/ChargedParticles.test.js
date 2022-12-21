@@ -1313,11 +1313,13 @@ describe("[INTEGRATION] Charged Particles", () => {
         user1,                      // receiver
         TEST_NFT_TOKEN_URI,
       ],
-      value: ethers.utils.parseEther('0.1')
+      callValue: ethers.utils.parseEther('2.0')
     });
+
     const user1BalanceAfterMint = await ethers.provider.getBalance(user1Address);
     const balanceDifference = user1BalanceBeforeMint.sub(user1BalanceAfterMint);
 
-    console.log(ethers.utils.formatUnits(balanceDifference.toString()).toString());
+    // mint cost + gas 
+    expect(balanceDifference).to.be.equal(ethers.BigNumber.from('2000318946000000000'));
   });
 });
