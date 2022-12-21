@@ -1291,7 +1291,7 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   // });
 
-  it.only ("Payable minting", async () => {
+  it.only ("Payable minting and withdraw", async () => {
     await universe.setProtonToken(protonC.address);
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
@@ -1374,7 +1374,18 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     // Token ID should be third
     expect(energizedParticleId).to.be.eq(ethers.BigNumber.from(3));
+
     // Contract should hold 3 eth, one per transaction.
-    expect(await ethers.provider.getBalance(protonC.address)).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('3')));
+    const protonBalanceAfterAllDeposits = await ethers.provider.getBalance(protonC.address);
+    expect(protonBalanceAfterAllDeposits).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('3')));
+
+    const withdrawEthFromContractTx = await protonC.connect(signerD)['withdrawEther'](
+      user1,
+      protonBalanceAfterAllDeposits.toString()
+    );
+
+    await withdrawEthFromContractTx.wait();
+
+    expect(await ethers.provider.getBalance(protonC.address)).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('0')));
   });
 });
