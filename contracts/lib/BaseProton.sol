@@ -185,8 +185,8 @@ contract BaseProton is
   // )
   //   external
   //   virtual
-  //   override
   //   whenNotPaused
+  //   payable
   //   returns (uint256 newTokenId)
   // {
   //   newTokenId = _createProton(
