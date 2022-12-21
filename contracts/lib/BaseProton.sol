@@ -188,6 +188,7 @@ contract BaseProton is
   )
     external
     virtual
+    override
     whenNotPaused
     returns (bool)
   {
@@ -209,6 +210,7 @@ contract BaseProton is
   )
     external
     virtual
+    override
     whenNotPaused
     returns (bool)
   {
