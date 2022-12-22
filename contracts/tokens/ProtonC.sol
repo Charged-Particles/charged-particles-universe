@@ -67,6 +67,31 @@ contract ProtonC is BaseProton, Soul {
   |              Public               |
   |__________________________________*/
 
+  function createBondedToken(
+    address creator,
+    address receiver,
+    string memory tokenMetaUri,
+    uint256 annuityPercent,
+    uint256 royaltiesPercent
+  )
+    external
+    virtual
+    payable
+    returns (uint256 newTokenId)
+  {
+    uint256 tokenId = createProtonForSale(
+      creator,
+      receiver,
+      tokenMetaUri,
+      annuityPercent,
+      royaltiesPercent,
+      0
+    );
+    lockToken(tokenId);
+
+    return tokenId;
+  }
+
   function createProtonForSale(
     address creator,
     address receiver,
@@ -75,7 +100,7 @@ contract ProtonC is BaseProton, Soul {
     uint256 royaltiesPercent,
     uint256 salePrice
   )
-    external
+    public 
     virtual
     payable
     returns (uint256 newTokenId)
