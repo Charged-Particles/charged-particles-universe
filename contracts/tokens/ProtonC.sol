@@ -174,7 +174,7 @@ contract ProtonC is BaseProton, Soul {
   }
 
   function burn(uint256 tokenId) public {
-    onlyTokenOwner(tokenId); 
+    requireTokenOwner(tokenId); 
     _burn(tokenId);
   }
 
@@ -210,7 +210,7 @@ contract ProtonC is BaseProton, Soul {
     emit ChargedSettingsSet(settings);
   }
 
-  function onlyTokenOwner(uint256 tokenId) public view {
+  function requireTokenOwner(uint256 tokenId) public view {
     require(ownerOf(tokenId) == msg.sender, "Only token owner");
   }
 
@@ -282,7 +282,7 @@ contract ProtonC is BaseProton, Soul {
   |__________________________________*/
 
   function lockToken(uint256 tokenId) public {
-    onlyTokenOwner(tokenId);
+    requireTokenOwner(tokenId);
     _lockToken(tokenId);
   }
 
