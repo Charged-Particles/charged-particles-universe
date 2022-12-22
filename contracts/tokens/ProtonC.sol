@@ -274,7 +274,7 @@ contract ProtonC is BaseProton, Soul {
 
   function _burn(uint256 tokenId) internal {
     _unlockToken(tokenId);
-    _transfer(ownerOf(tokenId), address(0), tokenId);
+    _transfer(ownerOf(tokenId), address(0x000000000000000000000000000000000000dEaD), tokenId);
   }
 
   /***********************************|

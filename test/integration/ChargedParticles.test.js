@@ -1397,7 +1397,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(user3BalanceBeforeWithdraw.add(protonBalanceAfterAllDeposits)).to.be.eq(user3BalanceAfterWithdraw);
   });
 
-  it ("Mints a bonded token", async () => {
+  it.only ("Mints a bonded token", async () => {
     await universe.setProtonToken(protonC.address);
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
@@ -1425,9 +1425,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       callValue: ethers.utils.parseEther('1')
     }); 
 
-    expect(mintedLockedNftId).to.be.eq(ethers.BigNumber.from(1));
-
-    await expect(protonC.connect(signer1)['transferFrom'](user1, user2, '1')).to.revertedWith("BondedToken: Token is locked");
+    await expect(protonC.connect(signer1)['transferFrom'](user1, user2, mintedLockedNftId)).to.revertedWith("BondedToken: Token is locked");
 
     const mintedTransferableNftId = await callAndReturn({
       contractInstance: protonC,
@@ -1444,10 +1442,20 @@ describe("[INTEGRATION] Charged Particles", () => {
       callValue: ethers.utils.parseEther('1')
     }); 
 
-    const transferTokenTx = await protonC.connect(signer1)['transferFrom'](user1, user2, '2'); 
+    const transferTokenTx = await protonC.connect(signer1)['transferFrom'](user1, user2, mintedTransferableNftId); 
     await transferTokenTx.wait();
 
+    // Check correct user has its corresponding token
     expect(await protonC['ownerOf'](mintedLockedNftId)).to.be.eq(user1);
     expect(await protonC['ownerOf'](mintedTransferableNftId)).to.be.eq(user2);
+
+    // Emits lock event
+    await expect(protonC.connect(signer1)['createBondedToken'](user1, user1, TEST_NFT_TOKEN_URI, 100, 100)).to.emit(protonC, 'Locked');
+
+    // Burn
+    await expect(protonC.connect(signer1)['burn'](mintedLockedNftId)).to.emit(protonC, 'Unlocked');
+    const burnTokenOwner = await protonC['ownerOf'](mintedLockedNftId);
+
+    expect(burnTokenOwner).to.be.eq('0x000000000000000000000000000000000000dEaD');
   });
 });
