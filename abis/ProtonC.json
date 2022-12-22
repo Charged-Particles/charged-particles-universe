@@ -587,6 +587,45 @@
         "type": "address"
       },
       {
+        "internalType": "string",
+        "name": "tokenMetaUri",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "annuityPercent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "royaltiesPercent",
+        "type": "uint256"
+      }
+    ],
+    "name": "createBondedToken",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "newTokenId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
         "internalType": "address",
         "name": "referrer",
         "type": "address"

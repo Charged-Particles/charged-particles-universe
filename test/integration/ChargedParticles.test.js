@@ -1397,7 +1397,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(user3BalanceBeforeWithdraw.add(protonBalanceAfterAllDeposits)).to.be.eq(user3BalanceAfterWithdraw);
   });
 
-  it.only ("Mints a bonded token", async () => {
+  it ("Mints a bonded token", async () => {
     await universe.setProtonToken(protonC.address);
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
