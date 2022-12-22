@@ -220,7 +220,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
   });
 
-  it("can succesfully energize and release proton on 'aave.B'", async () => {
+  it ("can succesfully energize and release proton on 'aave.B'", async () => {
+    await universe.setProtonToken(proton.address);
 
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
