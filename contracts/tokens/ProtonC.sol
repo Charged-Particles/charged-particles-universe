@@ -38,9 +38,10 @@ import "../lib/BaseProton.sol";
 import "../lib/TokenInfo.sol";
 import "../lib/BlackholePrevention.sol";
 import "../lib/RelayRecipient.sol";
+import "../lib/Soul.sol";
 
 
-contract ProtonC is BaseProton {
+contract ProtonC is BaseProton, Soul {
   using SafeMath for uint256;
   using TokenInfo for address payable;
   using Counters for Counters.Counter;
@@ -54,7 +55,6 @@ contract ProtonC is BaseProton {
   event ChargedStateSet(address indexed chargedState);
   event ChargedSettingsSet(address indexed chargedSettings);
   event ChargedParticlesSet(address indexed chargedParticles);
-
 
   /***********************************|
   |          Initialization           |
@@ -148,6 +148,10 @@ contract ProtonC is BaseProton {
     );
   }
 
+  function burn(uint256 tokenId) public {
+    onlyTokenOwner(tokenId); 
+    _burn(tokenId);
+  }
 
   /***********************************|
   |          Only Admin/DAO           |
@@ -240,6 +244,18 @@ contract ProtonC is BaseProton {
     );
   }
 
+  function onlyTokenOwner(uint256 tokenId) private view {
+    require(ownerOf(tokenId) == msg.sender, "Only token owner");
+  }
+
+  /***********************************|
+  |        Soul bounded               |
+  |__________________________________*/
+
+  function lockToken(uint256 tokenId) public {
+    onlyTokenOwner(tokenId);
+    _lockToken(tokenId);
+  }
 
   /***********************************|
   |        Function Overrides         |
@@ -276,11 +292,24 @@ contract ProtonC is BaseProton {
     }
   }
 
-
   function _transfer(address from, address to, uint256 tokenId) internal virtual override {
     // Unlock NFT
     _chargedState.setTemporaryLock(address(this), tokenId, false);
 
     super._transfer(from, to, tokenId);
+  }
+
+  function _beforeTokenTransfer(address from, address to, uint256 tokenId) 
+    internal
+    virtual 
+    override(ERC721)
+  {
+    require(lockedTokens[tokenId] == false, "BondedToken: Token is locked");
+    super._beforeTokenTransfer(from, to, tokenId);
+  }
+
+  function _burn(uint256 tokenId) internal override(ERC721) {
+    _unlockToken(tokenId);
+    super._burn(tokenId);
   }
 }
