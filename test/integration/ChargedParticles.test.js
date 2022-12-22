@@ -1396,4 +1396,58 @@ describe("[INTEGRATION] Charged Particles", () => {
     
     expect(user3BalanceBeforeWithdraw.add(protonBalanceAfterAllDeposits)).to.be.eq(user3BalanceAfterWithdraw);
   });
+
+  it.only ("Mints a bonded token", async () => {
+    await universe.setProtonToken(protonC.address);
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+    const setChargedSettingsTx = await protonC.connect(signerD)['setChargedSettings'](chargedSettings.address);
+    await setChargedSettingsTx.wait();
+    const setChargedStateTx = await protonC.connect(signerD)['setChargedState'](chargedState.address);
+    await setChargedStateTx.wait();
+
+    const mintedLockedNftId = await callAndReturn({
+      contractInstance: protonC,
+      contractMethod: 'createBondedToken',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                      // creator
+        user1,                      // receiver
+        TEST_NFT_TOKEN_URI,
+        100,
+        100
+      ],
+      callValue: ethers.utils.parseEther('1')
+    }); 
+
+    expect(mintedLockedNftId).to.be.eq(ethers.BigNumber.from(1));
+
+    await expect(protonC.connect(signer1)['transferFrom'](user1, user2, '1')).to.revertedWith("BondedToken: Token is locked");
+
+    const mintedNftId = await callAndReturn({
+      contractInstance: protonC,
+      contractMethod: 'createProtonForSale',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                      // creator
+        user1,                      // receiver
+        TEST_NFT_TOKEN_URI,
+        100,
+        100,
+        0
+      ],
+      callValue: ethers.utils.parseEther('1')
+    }); 
+
+    const transferTokenTx = await protonC.connect(signer1)['transferFrom'](user1, user2, '2'); 
+    await transferTokenTx.wait();
+
+    expect(await protonC['ownerOf'](1)).to.be.eq(user1);
+    expect(await protonC['ownerOf'](2)).to.be.eq(user2);
+  });
 });
