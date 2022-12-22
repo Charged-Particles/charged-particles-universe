@@ -1397,7 +1397,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(user3BalanceBeforeWithdraw.add(protonBalanceAfterAllDeposits)).to.be.eq(user3BalanceAfterWithdraw);
   });
 
-  it.only ("Mints a bonded token", async () => {
+  it ("Mints a bonded token", async () => {
     await universe.setProtonToken(protonC.address);
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
@@ -1429,7 +1429,7 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     await expect(protonC.connect(signer1)['transferFrom'](user1, user2, '1')).to.revertedWith("BondedToken: Token is locked");
 
-    const mintedNftId = await callAndReturn({
+    const mintedTransferableNftId = await callAndReturn({
       contractInstance: protonC,
       contractMethod: 'createProtonForSale',
       contractCaller: signer1,
@@ -1447,7 +1447,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     const transferTokenTx = await protonC.connect(signer1)['transferFrom'](user1, user2, '2'); 
     await transferTokenTx.wait();
 
-    expect(await protonC['ownerOf'](1)).to.be.eq(user1);
-    expect(await protonC['ownerOf'](2)).to.be.eq(user2);
+    expect(await protonC['ownerOf'](mintedLockedNftId)).to.be.eq(user1);
+    expect(await protonC['ownerOf'](mintedTransferableNftId)).to.be.eq(user2);
   });
 });
