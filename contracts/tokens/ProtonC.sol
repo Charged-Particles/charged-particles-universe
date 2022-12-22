@@ -185,6 +185,9 @@ contract ProtonC is BaseProton, Soul {
     emit ChargedSettingsSet(settings);
   }
 
+  function onlyTokenOwner(uint256 tokenId) public view {
+    require(ownerOf(tokenId) == msg.sender, "Only token owner");
+  }
 
   /***********************************|
   |         Private Functions         |
@@ -244,8 +247,9 @@ contract ProtonC is BaseProton, Soul {
     );
   }
 
-  function onlyTokenOwner(uint256 tokenId) private view {
-    require(ownerOf(tokenId) == msg.sender, "Only token owner");
+  function _burn(uint256 tokenId) internal {
+    _unlockToken(tokenId);
+    _transfer(ownerOf(tokenId), address(0), tokenId);
   }
 
   /***********************************|
@@ -293,23 +297,12 @@ contract ProtonC is BaseProton, Soul {
   }
 
   function _transfer(address from, address to, uint256 tokenId) internal virtual override {
+    require(lockedTokens[tokenId] == false, "BondedToken: Token is locked");
+
     // Unlock NFT
     _chargedState.setTemporaryLock(address(this), tokenId, false);
 
     super._transfer(from, to, tokenId);
   }
 
-  function _beforeTokenTransfer(address from, address to, uint256 tokenId) 
-    internal
-    virtual 
-    override(ERC721)
-  {
-    require(lockedTokens[tokenId] == false, "BondedToken: Token is locked");
-    super._beforeTokenTransfer(from, to, tokenId);
-  }
-
-  function _burn(uint256 tokenId) internal override(ERC721) {
-    _unlockToken(tokenId);
-    super._burn(tokenId);
-  }
 }
