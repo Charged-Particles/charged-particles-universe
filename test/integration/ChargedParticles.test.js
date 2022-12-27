@@ -1459,4 +1459,45 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     expect(burnTokenOwner).to.be.eq('0x000000000000000000000000000000000000dEaD');
   });
+
+  it ("Locks a token after being minted", async() => {
+    await universe.setProtonToken(protonC.address);
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+    const setChargedSettingsTx = await protonC.connect(signerD)['setChargedSettings'](chargedSettings.address);
+    await setChargedSettingsTx.wait();
+    const setChargedStateTx = await protonC.connect(signerD)['setChargedState'](chargedState.address);
+    await setChargedStateTx.wait();
+
+    const createProtonForSaleId = await callAndReturn({
+      contractInstance: protonC,
+      contractMethod: 'createProtonForSale',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                      // creator
+        user1,                      // receiver
+        TEST_NFT_TOKEN_URI,
+        100,
+        100,
+        0
+      ],
+      callValue: ethers.utils.parseEther('1')
+    });
+
+    // Lock minted token 
+    await callAndReturnWithLogs({
+      contractInstance: protonC,
+      contractMethod: 'lockToken',
+      contractCaller: signer1,
+      contractParams: [
+        createProtonForSaleId.toString(),
+      ],
+    });
+    await expect(protonC.connect(signer1)['transferFrom'](user1, user2, createProtonForSaleId)).to.revertedWith("BondedToken: Token is locked");
+  });
 });
