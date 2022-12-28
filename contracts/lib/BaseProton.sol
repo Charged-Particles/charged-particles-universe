@@ -39,10 +39,19 @@ import "../lib/RelayRecipient.sol";
 
 /// @title Base Proton Contract for Charged Particles compatible ERC721 NFTs
 /// @dev MUST NOT be Upgradeable, as Upgradeable NFTs are incompatible with Charged Particles.
-contract BaseProton is IBaseProton, ERC721, Ownable, RelayRecipient, ReentrancyGuard, BlackholePrevention {
+contract BaseProton is 
+  IBaseProton, 
+  ERC721, 
+  Ownable, 
+  RelayRecipient, 
+  ReentrancyGuard, 
+  BlackholePrevention 
+{
   using SafeMath for uint256;
   using TokenInfo for address payable;
   using Counters for Counters.Counter;
+
+  event Received(address, uint);
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
 
@@ -74,6 +83,9 @@ contract BaseProton is IBaseProton, ERC721, Ownable, RelayRecipient, ReentrancyG
   /***********************************|
   |              Public               |
   |__________________________________*/
+  receive() external payable virtual {
+    emit Received(msg.sender, msg.value);
+  }
 
   /// Returns the Creator address of an NFT by Token ID
   /// @param tokenId The ID of the NFT Token to lookup
@@ -161,28 +173,6 @@ contract BaseProton is IBaseProton, ERC721, Ownable, RelayRecipient, ReentrancyG
       tokenMetaUri,
       0, // royaltiesPercent
       0  // salePrice
-    );
-  }
-
-  function createProtonForSale(
-    address creator,
-    address receiver,
-    string memory tokenMetaUri,
-    uint256 royaltiesPercent,
-    uint256 salePrice
-  )
-    external
-    virtual
-    override
-    whenNotPaused
-    returns (uint256 newTokenId)
-  {
-    newTokenId = _createProton(
-      creator,
-      receiver,
-      tokenMetaUri,
-      royaltiesPercent,
-      salePrice
     );
   }
 

@@ -67,6 +67,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   let genericBasketManager;
   let proton;
   let protonB;
+  let protonC;
   let lepton;
   let ionx;
   let timelocks;
@@ -138,6 +139,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
     const Proton = await ethers.getContractFactory('Proton');
     const ProtonB = await ethers.getContractFactory('ProtonB');
+    const ProtonC = await ethers.getContractFactory('ProtonC');
     const Lepton = await ethers.getContractFactory('Lepton2');
     const Ionx = await ethers.getContractFactory('Ionx');
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy')
@@ -153,12 +155,14 @@ describe("[INTEGRATION] Charged Particles", () => {
     genericBasketManager = GenericBasketManager.attach(getDeployData('GenericBasketManager', chainId).address);
     proton = Proton.attach(getDeployData('Proton', chainId).address);
     protonB = ProtonB.attach(getDeployData('ProtonB', chainId).address);
+    protonC = ProtonC.attach(getDeployData('ProtonC', chainId).address);
     lepton = Lepton.attach(getDeployData('Lepton2', chainId).address);
     ionx = Ionx.attach(getDeployData('Ionx', chainId).address);
     tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address);
 
     await proton.connect(signerD).setPausedState(false);
     await protonB.connect(signerD).setPausedState(false);
+    await protonC.connect(signerD).setPausedState(false);
     await lepton.connect(signerD).setPausedState(false);
   });
 
@@ -216,7 +220,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
   });
 
-  it("can succesfully energize and release proton on 'aave.B'", async () => {
+  it ("can succesfully energize and release proton on 'aave.B'", async () => {
+    await universe.setProtonToken(proton.address);
 
     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
@@ -1287,4 +1292,109 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   // });
 
+  it ("Payable minting and withdraw", async () => {
+    await universe.setProtonToken(protonC.address);
+    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
+    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+    const user1Address = await signer1.getAddress();
+    const user1BalanceBeforeMint = await ethers.provider.getBalance(user1Address);
+    const firstMintId = await callAndReturn({
+      contractInstance: protonC,
+      contractMethod: 'createBasicProton',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                      // creator
+        user1,                      // receiver
+        TEST_NFT_TOKEN_URI,
+      ],
+      callValue: ethers.utils.parseEther('1')
+    });
+
+    const user1BalanceAfterMint = await ethers.provider.getBalance(user1Address);
+    const balanceDifference = user1BalanceBeforeMint.sub(user1BalanceAfterMint);
+
+    expect(firstMintId).to.be.eq(ethers.BigNumber.from(1));
+    // // mint cost + gas 
+    expect(balanceDifference).to.be.within(
+      ethers.BigNumber.from(ethers.utils.parseUnits('1')),
+      ethers.BigNumber.from(ethers.utils.parseUnits('1.1'))
+    );
+    
+    const setChargedSettingsTx = await protonC.connect(signerD)['setChargedSettings'](chargedSettings.address);
+    await setChargedSettingsTx.wait();
+    const setChargedParticlesTx = await protonC.connect(signerD)['setChargedParticles'](chargedParticles.address);
+    await setChargedParticlesTx.wait();
+
+    const createProtonForSaleId = await callAndReturn({
+      contractInstance: protonC,
+      contractMethod: 'createProtonForSale',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                      // creator
+        user2,                      // receiver
+        TEST_NFT_TOKEN_URI,
+        100,
+        100,
+        0
+      ],
+      callValue: ethers.utils.parseEther('1')
+    });
+
+    expect(createProtonForSaleId).to.be.eq(ethers.BigNumber.from(2));
+    expect(await ethers.provider.getBalance(protonC.address)).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('2')));
+    
+    // Allow list the contract into the protocol
+    await chargedSettings.connect(signerD).enableNftContracts([protonC.address]);
+    // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') });
+    
+    await dai.connect(daiSigner).transfer(user1, toWei('10'));
+    await dai.connect(signer1)['approve(address,uint256)'](protonC.address, toWei('10'));
+    
+   const energizedParticleId = await callAndReturn({
+      contractInstance: protonC,
+      contractMethod: 'createChargedParticle',
+      contractCaller: signer1,
+      contractParams: [
+        user1,                        // creator
+        user2,                        // receiver
+        user3,                        // referrer
+        TEST_NFT_TOKEN_URI,           // tokenMetaUri
+        'aave.B',                     // walletManagerId
+        daiAddress,                   // assetToken
+        toWei('10'),                  // assetAmount
+        annuityPct,                   // annuityPercent
+      ],
+      callValue: ethers.utils.parseEther('1') 
+    });
+
+    // Token ID should be third
+    expect(energizedParticleId).to.be.eq(ethers.BigNumber.from(3));
+
+    // Contract should hold 3 eth, one per transaction.
+    const protonBalanceAfterAllDeposits = await ethers.provider.getBalance(protonC.address);
+    expect(protonBalanceAfterAllDeposits).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('3')));
+
+    // Get user 3 balacne
+    const user3BalanceBeforeWithdraw = await ethers.provider.getBalance(user3);
+
+    // Withdraw into user 3
+    const withdrawEthFromContractTx = await protonC.connect(signerD)['withdrawEther'](
+      user3,
+      protonBalanceAfterAllDeposits.toString()
+    );
+    await withdrawEthFromContractTx.wait();
+     
+    // ProtonC should have no eth
+    expect(await ethers.provider.getBalance(protonC.address)).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('0')));
+
+    const user3BalanceAfterWithdraw = await ethers.provider.getBalance(user3);
+    
+    expect(user3BalanceBeforeWithdraw.add(protonBalanceAfterAllDeposits)).to.be.eq(user3BalanceAfterWithdraw);
+  });
 });
