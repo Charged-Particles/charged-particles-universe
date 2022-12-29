@@ -92,7 +92,7 @@ contract ProtonC is BaseProton, Soul {
     return tokenId;
   }
 
-  function createProtonForSale(
+ function createProtonForSale(
     address creator,
     address receiver,
     string memory tokenMetaUri,
@@ -329,5 +329,4 @@ contract ProtonC is BaseProton, Soul {
 
     super._transfer(from, to, tokenId);
   }
-
 }
