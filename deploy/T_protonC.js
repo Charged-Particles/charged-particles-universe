@@ -35,7 +35,7 @@ module.exports = async (hre) => {
   const chargedParticlesData = await deployments.get('ChargedParticles');
   const chargedParticlesContract =  ChargedParticles.attach(chargedParticlesData.address);
 
-  const protonCContract = ProtonC.attach(protonCData.address);
+  const protonCContract = ProtonC.attach(protonCdata.address);
   
   const Universe = await ethers.getContractFactory('Universe');
   const universeData = await deployments.get('Universe');
