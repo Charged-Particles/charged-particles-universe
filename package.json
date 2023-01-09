@@ -34,6 +34,7 @@
     "mint-tokens": "hardhat deploy --tags mint-tokens --network",
     "pause-all": "hardhat deploy --tags pause-all --network",
     "whitelist": "hardhat deploy --tags whitelist-nfts --network",
+    "deploy-protonC": "hardhat deploy --tags protonC --network",
     "deploy-airdrop": "hardhat deploy --tags airdrop --network",
     "deploy-incentives": "hardhat deploy --tags incentives --network",
     "deploy-vesting": "hardhat deploy --tags vesting --network",
