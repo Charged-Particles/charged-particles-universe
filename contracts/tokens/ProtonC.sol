@@ -38,9 +38,10 @@ import "../lib/BaseProton.sol";
 import "../lib/TokenInfo.sol";
 import "../lib/BlackholePrevention.sol";
 import "../lib/RelayRecipient.sol";
+import "../lib/Soul.sol";
 
 
-contract ProtonC is BaseProton {
+contract ProtonC is BaseProton, Soul {
   using SafeMath for uint256;
   using TokenInfo for address payable;
   using Counters for Counters.Counter;
@@ -55,7 +56,6 @@ contract ProtonC is BaseProton {
   event ChargedSettingsSet(address indexed chargedSettings);
   event ChargedParticlesSet(address indexed chargedParticles);
 
-
   /***********************************|
   |          Initialization           |
   |__________________________________*/
@@ -67,7 +67,32 @@ contract ProtonC is BaseProton {
   |              Public               |
   |__________________________________*/
 
-  function createProtonForSale(
+  function createBondedToken(
+    address creator,
+    address receiver,
+    string memory tokenMetaUri,
+    uint256 annuityPercent,
+    uint256 royaltiesPercent
+  )
+    external
+    virtual
+    payable
+    returns (uint256 newTokenId)
+  {
+    uint256 tokenId = createProtonForSale(
+      creator,
+      receiver,
+      tokenMetaUri,
+      annuityPercent,
+      royaltiesPercent,
+      0
+    );
+    lockToken(tokenId);
+
+    return tokenId;
+  }
+
+ function createProtonForSale(
     address creator,
     address receiver,
     string memory tokenMetaUri,
@@ -75,7 +100,7 @@ contract ProtonC is BaseProton {
     uint256 royaltiesPercent,
     uint256 salePrice
   )
-    external
+    public 
     virtual
     payable
     returns (uint256 newTokenId)
@@ -148,6 +173,10 @@ contract ProtonC is BaseProton {
     );
   }
 
+  function burn(uint256 tokenId) public {
+    requireTokenOwner(tokenId); 
+    _burn(tokenId);
+  }
 
   /***********************************|
   |          Only Admin/DAO           |
@@ -181,6 +210,9 @@ contract ProtonC is BaseProton {
     emit ChargedSettingsSet(settings);
   }
 
+  function requireTokenOwner(uint256 tokenId) public view {
+    require(ownerOf(tokenId) == msg.sender, "Only token owner");
+  }
 
   /***********************************|
   |         Private Functions         |
@@ -240,6 +272,19 @@ contract ProtonC is BaseProton {
     );
   }
 
+  function _burn(uint256 tokenId) internal {
+    _unlockToken(tokenId);
+    _transfer(ownerOf(tokenId), address(0x000000000000000000000000000000000000dEaD), tokenId);
+  }
+
+  /***********************************|
+  |        Soul bounded               |
+  |__________________________________*/
+
+  function lockToken(uint256 tokenId) public {
+    requireTokenOwner(tokenId);
+    _lockToken(tokenId);
+  }
 
   /***********************************|
   |        Function Overrides         |
@@ -276,8 +321,9 @@ contract ProtonC is BaseProton {
     }
   }
 
-
   function _transfer(address from, address to, uint256 tokenId) internal virtual override {
+    require(lockedTokens[tokenId] == false, "BondedToken: Token is locked");
+
     // Unlock NFT
     _chargedState.setTemporaryLock(address(this), tokenId, false);
 
