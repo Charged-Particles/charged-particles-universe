@@ -29,29 +29,29 @@ module.exports = async (hre) => {
     address: protonC.address,
     deployTransaction: protonC.deployTransaction,
   }
-
+  console.log("ProtonC address: ", protonC);
   // Attach new proton contract into charged particles protocol.
-  const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
-  const chargedParticlesData = await deployments.get('ChargedParticles');
-  const chargedParticlesContract =  ChargedParticles.attach(chargedParticlesData.address);
+  // const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
+  // const chargedParticlesData = await deployments.get('ChargedParticles');
+  // const chargedParticlesContract =  ChargedParticles.attach(chargedParticlesData.address);
 
-  const protonCContract = ProtonC.attach(protonCdata.address);
+  // const protonCContract = ProtonC.attach(protonCdata.address);
   
-  const Universe = await ethers.getContractFactory('Universe');
-  const universeData = await deployments.get('Universe');
+  // const Universe = await ethers.getContractFactory('Universe');
+  // const universeData = await deployments.get('Universe');
 
-  const universeContract = await Universe.attach(universeData.address);
-  const setProtonCIntoUniverse = universeContract['setProtonToken'](protonC.address);
-  await setProtonCIntoUniverse.wait();
+  // const universeContract = await Universe.attach(universeData.address);
+  // const setProtonCIntoUniverse = universeContract['setProtonToken'](protonC.address);
+  // await setProtonCIntoUniverse.wait();
 
   // Set charged particles addresses into proton
-  const chargedStateAddress = await chargedParticlesContract['getStateAddress']();
-  const chargedSettingsAddress = await chargedParticlesContract['getSettingsAddress']();
+  // const chargedStateAddress = await chargedParticlesContract['getStateAddress']();
+  // const chargedSettingsAddress = await chargedParticlesContract['getSettingsAddress']();
 
-  const setChargedSettingsTx = await protonCContract['setChargedSettings'](chargedSettingsAddress);
-  await setChargedSettingsTx.wait();
-  const setChargedStateTx = await protonCContract['setChargedState'](chargedStateAddress);
-  await setChargedStateTx.wait();
+  // const setChargedSettingsTx = await protonCContract['setChargedSettings'](chargedSettingsAddress);
+  // await setChargedSettingsTx.wait();
+  // const setChargedStateTx = await protonCContract['setChargedState'](chargedStateAddress);
+  // await setChargedStateTx.wait();
 }
 
 module.exports.tags = ['protonC']

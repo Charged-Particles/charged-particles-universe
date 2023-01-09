@@ -49,6 +49,9 @@ module.exports = {
     solidity: {
         compilers: [
           {
+            version: '0.8.2',
+          },
+          {
             version: '0.6.12',
             settings: {
                 optimizer: {
@@ -123,7 +126,7 @@ module.exports = {
         },
         polygon: {
             // url: `https://rpc-mainnet.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
-            url: `https://matic-mainnet.chainstacklabs.com/`,
+            url: `https://polygon-mainnet.g.alchemy.com/v2/HFlv2m48GYEDLf9sHMTBuy2Z80xFwlVC`,
             gasPrice: 629e9,
             accounts: {
                 mnemonic: mnemonic.mainnet,
