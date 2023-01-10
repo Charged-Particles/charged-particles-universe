@@ -17,22 +17,23 @@ const _ = require('lodash');
 
 const _WHITELISTED_CONTRACTS = {
   '1': [
-    // "0x3cd2410eaa9c2dce50af6ccab72dc93879a09c1f", // Lepton 2
-    // "0x63174fa9680c674a5580f7d747832b2a2133ad8f", // Proton
+    // "0x63174fa9680c674a5580f7d747832b2a2133ad8f", // Proton A
     // "0x04d572734006788B646ce35b133Bdf7160f79995", // Proton B
+    // "", // Proton C (Soul)
+    // "0x3cd2410eaa9c2dce50af6ccab72dc93879a09c1f", // Lepton 2
+    // "0xcd2ba94e435e536dc48648eab2f4f1db257bc64c", // Particlon
+    // "0xB66a603f4cFe17e3D27B87a8BfCaD319856518B8", // Rarible ERC1155
+    // "0xd07dc4262bcdbf85190c01c996b4c06a461d2430", // Rarible Collection
+    // "0xd07dc4262bcdbf85190c01c996b4c06a461d2430", // Rarible RARI
+    // "0xdfe3ac769b2d8e382cb86143e0b0b497e1ed5447", // THE PLUTO ALLIANCE
     // "0x929167191ca41a4753eda357bb6e5ad6f15fb89b", // Trism Originals
     // "0xd86898728aa9921101515a38b7d15d16c682e8ce", // Trism Vaults
     // "0xc0cb81c1f89ab0873653f67eea42652f13cd8416", // Lobby Lobsters
-    // "0xcd2ba94e435e536dc48648eab2f4f1db257bc64c", // Particlon
-    // "0xd07dc4262bcdbf85190c01c996b4c06a461d2430", // Rarible RARI
-    // "0xB66a603f4cFe17e3D27B87a8BfCaD319856518B8", // Rarible ERC1155
-    // "0xd07dc4262bcdbf85190c01c996b4c06a461d2430", // Rarible ERC1155
-    // "0xdfe3ac769b2d8e382cb86143e0b0b497e1ed5447", // Pluto
     // "0x2D92C4f9F75308d0b9b098B142369032E4f901Ff", // Floor Gen 3
     // "0xCcc441ac31f02cD96C153DB6fd5Fe0a2F4e6A68d", // FLUF
+    // "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D", // Bored Apes
     // "0x60E4d786628Fea6478F785A6d7e704777c86a7c6", // Mutant Apes
     // "0x8a90CAb2b38dba80c64b7734e58Ee1dB38B8992e", // Doodle
-    // "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D", // Bored Apes
     // "0x23581767a106ae21c074b2276D25e5C3e136a68b", // MoonBirds
     // "0xD2A077Ec359D94E0A0b7E84435eaCB40A67a817c", // Admit One
     // "0x1cBB182322Aee8ce9F4F1f98d7460173ee30Af1F", // Polymorph
@@ -72,34 +73,51 @@ const _WHITELISTED_CONTRACTS = {
     // "0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0", // SuperRare
     // "0xabb3738f04dc2ec20f4ae4462c3d069d02ae045b", // KnownOrigin
     // "0x79986af15539de2db9a5086382daeda917a9cf0c", // Voxels Parcel
-    // "0x5d183d790d6b570eaec299be432f0a13a00058a9", // HMN
-    // "0xe6A5e67F92CC6219E9c210f2734A6175Ee4eE6D1" // Moda Dropcase NFT (DropCase)
+    // "0xe6A5e67F92CC6219E9c210f2734A6175Ee4eE6D1", // Moda Dropcase NFT (DropCase)
+    // "0x5d183d790d6b570eaec299be432f0a13a00058a9", // HMNZone
+    // "0x92939Fc66f67017832be6b279410a59cA6A42a20", // APE Domains .ape
+  ],
+  '5': [
+    // "0xAEdEDf4A27d4Ea6f658b5F69F70a72d12BDeb937", // Proton
+    // "0xEDa5dA03bB30f7137F00787edAee84ae4fD54905", // Proton
+    // "0xfb6075A3f960DBcd28Ae4Bb45092ce33D2909060", // Proton
+    // "0xd1bCe91a13089b1f3178487aB8d0d2Ae191C1963", // Proton B
+    // "0x1554b19E1eD9FE78F375AC7c8F63Fe9E85d15a16", // Proton B
+    // "0x517fEfB53b58Ec8764ca885731Db20Ca2dcac7b7", // Proton B
+    // "0xF0e4ed501ED7d960886e3f9E8d569e1a1253Eb53", // Proton B
+    // "0x6D05f07c30be99317D649302dA2054C667Cdd93D", // Proton C (Soul)
+    // "0xc191e3De6e8ab034Adc4B199749F7199DA9a98e6", // Lepton 2
+    // "0xef815ad5401cee4b8b2e6bc2f8c481d84e5d0871", // External NFT Example Contract
   ],
   '42': [
-    "0xAEdEDf4A27d4Ea6f658b5F69F70a72d12BDeb937", // Proton
-    "0xEDa5dA03bB30f7137F00787edAee84ae4fD54905", // Proton
-    "0xfb6075A3f960DBcd28Ae4Bb45092ce33D2909060", // Proton
-    "0xd1bCe91a13089b1f3178487aB8d0d2Ae191C1963", // Proton B
-    "0x1554b19E1eD9FE78F375AC7c8F63Fe9E85d15a16", // Proton B
-    "0x517fEfB53b58Ec8764ca885731Db20Ca2dcac7b7", // Proton B
-    "0xF0e4ed501ED7d960886e3f9E8d569e1a1253Eb53", // Proton B
-    "0xef815ad5401cee4b8b2e6bc2f8c481d84e5d0871", // External NFT Example Contract
+    // "0xAEdEDf4A27d4Ea6f658b5F69F70a72d12BDeb937", // Proton
+    // "0xEDa5dA03bB30f7137F00787edAee84ae4fD54905", // Proton
+    // "0xfb6075A3f960DBcd28Ae4Bb45092ce33D2909060", // Proton
+    // "0xd1bCe91a13089b1f3178487aB8d0d2Ae191C1963", // Proton B
+    // "0x1554b19E1eD9FE78F375AC7c8F63Fe9E85d15a16", // Proton B
+    // "0x517fEfB53b58Ec8764ca885731Db20Ca2dcac7b7", // Proton B
+    // "0xF0e4ed501ED7d960886e3f9E8d569e1a1253Eb53", // Proton B
+    // "0xf5891837cc808f8d20a76c6a5db5a0c5374b6a1b", // Proton C (Soul)
+    // "0xef815ad5401cee4b8b2e6bc2f8c481d84e5d0871", // External NFT Example Contract
   ],
   '137': [
-    // "0x4ed360c8725d3a63f564f8484a582d0a7cecea7a", // Lepton 2
     // "0xe2a9b15e283456894246499fb912cce717f83319", // Proton
     // "0x1CeFb0E1EC36c7971bed1D64291fc16a145F35DC", // Proton B
+    // "", // Proton C (Soul)
+    // "0x4ed360c8725d3a63f564f8484a582d0a7cecea7a", // Lepton 2
     // "0x9d305a42a3975ee4c1c57555bed5919889dce63f", // Sandbox Land
     // "0x28BFEFd2FDc109527D9d5e459417b12a8eF3AC0B", // Moda Dropcase NFT (DropCase)
     // "0x96c89cc7c5d2fbfa41afa10da5917742ff35941b", // Elder ENTS
-    // "0x135dE69e2C8A6f14f00dcf9c9e8D8120FBebeF5a", // HMN
+    // "0x135dE69e2C8A6f14f00dcf9c9e8D8120FBebeF5a", // HMNZone
     // "0x4bf5a99ea2f8de061f7d77ba9edd749503d945da", // .BASIN (FlexiPunkTLD)
   ],
   '80001': [
-    "0xd02cB38f5D68333219d32Ea2a08c3BCdC92753F2", // Proton
-    "0xd04f13d02ea469dfF7eEce1b1aE0Ca234837DB38", // Proton B
-    "0xbc7895fa82a2e5c575b8105f62d2e57d53b6e75c", // External NFT Example Contract
-    "0x865Bd661EEFE49C4Ebd096e87720528C12959Ab9", // Moda Dropcase NFT (DropCase)
+    // "0xd02cB38f5D68333219d32Ea2a08c3BCdC92753F2", // Proton
+    // "0xd04f13d02ea469dfF7eEce1b1aE0Ca234837DB38", // Proton B
+    // "", // Proton C (Soul)
+    // "0x3e3792288599A748B242F6626E276Cae43f0f688", // Lepton 2
+    // "0xbc7895fa82a2e5c575b8105f62d2e57d53b6e75c", // External NFT Example Contract
+    // "0x865Bd661EEFE49C4Ebd096e87720528C12959Ab9", // Moda Dropcase NFT (DropCase)
   ]
 };
 
@@ -114,7 +132,7 @@ module.exports = async (hre) => {
     const {isProd, isHardhat} = chainTypeById(chainId);
     const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
 
-    if (chainId !== 42) { return; } // Kovan only
+    // if (chainId !== 42) { return; } // Kovan only
 
     const ddChargedSettings = getDeployData('ChargedSettings', chainId);
     const ddProton = getDeployData('Proton', chainId);

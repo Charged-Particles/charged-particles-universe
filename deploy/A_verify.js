@@ -96,31 +96,32 @@ module.exports = async (hre) => {
   log(' ');
 
   // Protocol
-  await _verifyProxyContract({name: 'Universe', networkName});
-  await _verifyProxyContract({name: 'ChargedParticles', networkName});
-  await _verifyProxyContract({name: 'ChargedState', networkName});
-  await _verifyProxyContract({name: 'ChargedSettings', networkName});
-  await _verifyProxyContract({name: 'ChargedManagers', networkName});
-  await _verifyContract({name: 'Ionx', networkName});
-  await _verifyContract({name: 'ParticleSplitter', networkName});
-  await _verifyContract({name: 'TokenInfoProxy', networkName});
+  // await _verifyProxyContract({name: 'Universe', networkName});
+  // await _verifyProxyContract({name: 'ChargedParticles', networkName});
+  // await _verifyProxyContract({name: 'ChargedState', networkName});
+  // await _verifyProxyContract({name: 'ChargedSettings', networkName});
+  // await _verifyProxyContract({name: 'ChargedManagers', networkName});
+  // await _verifyContract({name: 'Ionx', networkName});
+  // await _verifyContract({name: 'ParticleSplitter', networkName});
+  // await _verifyContract({name: 'TokenInfoProxy', networkName});
 
   // Wallet Managers
-  await _verifyContract({name: 'GenericWalletManager', networkName});
-  await _verifyContract({name: 'GenericBasketManager', networkName});
-  await _verifyContract({name: 'AaveWalletManager', networkName});
-  await _verifyContract({name: 'GenericWalletManagerB', networkName});
-  await _verifyContract({name: 'GenericBasketManagerB', networkName});
-  await _verifyContract({name: 'AaveWalletManagerB', networkName});
+  // await _verifyContract({name: 'GenericWalletManager', networkName});
+  // await _verifyContract({name: 'GenericBasketManager', networkName});
+  // await _verifyContract({name: 'AaveWalletManager', networkName});
+  // await _verifyContract({name: 'GenericWalletManagerB', networkName});
+  // await _verifyContract({name: 'GenericBasketManagerB', networkName});
+  // await _verifyContract({name: 'AaveWalletManagerB', networkName});
 
   // NFTs
-  await _verifyContract({name: 'Proton', networkName});
-  await _verifyContract({name: 'ProtonB', networkName});
-  await _verifyContract({name: 'Lepton', networkName});
-  await _verifyContract({name: 'Lepton2', networkName});
-  await _verifyContract({name: 'ExternalERC721', networkName});
-  await _verifyContract({name: 'FungibleERC1155', networkName});
-  await _verifyContract({name: 'NonFungibleERC1155', networkName});
+  // await _verifyContract({name: 'Proton', networkName});
+  // await _verifyContract({name: 'ProtonB', networkName});
+  await _verifyContract({name: 'ProtonC', networkName});
+  // await _verifyContract({name: 'Lepton', networkName});
+  // await _verifyContract({name: 'Lepton2', networkName});
+  // await _verifyContract({name: 'ExternalERC721', networkName});
+  // await _verifyContract({name: 'FungibleERC1155', networkName});
+  // await _verifyContract({name: 'NonFungibleERC1155', networkName});
 
 
 

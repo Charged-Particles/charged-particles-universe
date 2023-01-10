@@ -53,12 +53,11 @@ module.exports = async (hre) => {
     address: protonB.address,
     deployTransaction: protonB.deployTransaction,
   }
-  
+
   await log('\n  Deploying ProtonC NFT...')(alchemyTimeout);
   const ProtonC = await ethers.getContractFactory('ProtonC');
   const ProtonCInstance = await ProtonC.deploy();
   const protonC = await ProtonCInstance.deployed();
-
   deployData['ProtonC'] = {
     abi: getContractAbi('ProtonC'),
     address: protonC.address,
