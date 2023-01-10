@@ -279,7 +279,6 @@ contract ChargedParticles is
     nonReentrant
     returns (uint256 yieldTokensAmount)
   {
-
     _validateDeposit(contractAddress, tokenId, walletManagerId, assetToken, assetAmount);
 
     // Transfer ERC20 Token from Caller to Contract (reverts on fail)

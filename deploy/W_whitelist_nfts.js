@@ -19,7 +19,7 @@ const _WHITELISTED_CONTRACTS = {
   '1': [
     // "0x63174fa9680c674a5580f7d747832b2a2133ad8f", // Proton A
     // "0x04d572734006788B646ce35b133Bdf7160f79995", // Proton B
-    // "", // Proton C (Soul)
+    // "0xBb4Ddbc0E26d4E4ae838B12a832379295D5fD917", // Proton C (Soul)
     // "0x3cd2410eaa9c2dce50af6ccab72dc93879a09c1f", // Lepton 2
     // "0xcd2ba94e435e536dc48648eab2f4f1db257bc64c", // Particlon
     // "0xB66a603f4cFe17e3D27B87a8BfCaD319856518B8", // Rarible ERC1155
@@ -103,7 +103,7 @@ const _WHITELISTED_CONTRACTS = {
   '137': [
     // "0xe2a9b15e283456894246499fb912cce717f83319", // Proton
     // "0x1CeFb0E1EC36c7971bed1D64291fc16a145F35DC", // Proton B
-    // "", // Proton C (Soul)
+    // "0x59dde2EBe605cD75365F387FFFE82E5203b8E4cd", // Proton C (Soul)
     // "0x4ed360c8725d3a63f564f8484a582d0a7cecea7a", // Lepton 2
     // "0x9d305a42a3975ee4c1c57555bed5919889dce63f", // Sandbox Land
     // "0x28BFEFd2FDc109527D9d5e459417b12a8eF3AC0B", // Moda Dropcase NFT (DropCase)
@@ -114,7 +114,7 @@ const _WHITELISTED_CONTRACTS = {
   '80001': [
     // "0xd02cB38f5D68333219d32Ea2a08c3BCdC92753F2", // Proton
     // "0xd04f13d02ea469dfF7eEce1b1aE0Ca234837DB38", // Proton B
-    // "", // Proton C (Soul)
+    // "0x56D0d2e232e73634E5E9aaAB5d1b2f2e68e062Bd", // Proton C (Soul)
     // "0x3e3792288599A748B242F6626E276Cae43f0f688", // Lepton 2
     // "0xbc7895fa82a2e5c575b8105f62d2e57d53b6e75c", // External NFT Example Contract
     // "0x865Bd661EEFE49C4Ebd096e87720528C12959Ab9", // Moda Dropcase NFT (DropCase)
