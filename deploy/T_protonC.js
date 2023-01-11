@@ -67,9 +67,10 @@ module.exports = async (hre) => {
   // Setup ProtonC
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  await executeTx('1-a', 'ProtonC: Registering Universe', async () =>
-    await protonC.setUniverse(ddUniverse.address)
-  );
+  // Not Set for Mainnet or Polygon
+  // await executeTx('1-a', 'ProtonC: Registering Universe', async () =>
+  //   await protonC.setUniverse(ddUniverse.address)
+  // );
 
   await executeTx('1-b', 'ProtonC: Registering ChargedState', async () =>
     await protonC.setChargedState(ddChargedState.address)
@@ -87,9 +88,10 @@ module.exports = async (hre) => {
     await chargedSettings.enableNftContracts([protonC.address])
   );
 
-  await executeTx('1-g', 'Universe: Registering ProtonC', async () =>
-    await universe.setProtonToken(protonC.address)
-  );
+  // Not Set for Mainnet or Polygon
+  // await executeTx('1-g', 'Universe: Registering ProtonC', async () =>
+  //   await universe.setProtonToken(protonC.address)
+  // );
 
 
   // Display Contract Addresses

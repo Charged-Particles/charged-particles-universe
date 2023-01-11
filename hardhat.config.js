@@ -127,7 +127,7 @@ module.exports = {
         polygon: {
             // url: `https://rpc-mainnet.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
             url: `https://polygon-mainnet.g.alchemy.com/v2/HFlv2m48GYEDLf9sHMTBuy2Z80xFwlVC`,
-            gasPrice: 629e9,
+            gasPrice: 50e9,
             accounts: {
                 mnemonic: mnemonic.mainnet,
                 initialIndex: 0,
@@ -137,7 +137,7 @@ module.exports = {
         mainnet: {
             // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
             url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 40e9,
+            gasPrice: 30e9,
             blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.mainnet,
