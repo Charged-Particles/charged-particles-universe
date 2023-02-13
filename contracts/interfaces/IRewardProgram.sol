@@ -67,4 +67,24 @@ interface IRewardProgram {
 
   /* user functions */
 
+  function stake(address vault, uint256 amount, bytes calldata permission)
+    external;
+
+  function unstakeAndClaim(
+    address vault,
+    uint256[] calldata indices,
+    uint256[] calldata amounts,
+    bytes calldata permission
+  )
+    external;
+
+  /* admin functions */
+  function fund(uint256 amount, uint256 duration) external;
+
+  function rescueTokensFromRewardPool(
+    address token,
+    address recipient,
+    uint256 amount
+  )
+    external;
 }
