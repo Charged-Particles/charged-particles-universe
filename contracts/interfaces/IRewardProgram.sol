@@ -60,14 +60,12 @@ interface IRewardProgram {
   function initialize(
     uint64 startTime,
     address ownerAddress,
-    address feeRecipient,
-    uint16 feeBps,
     bytes calldata
   ) external;
 
   /* user functions */
 
-  function stake(address vault, uint256 amount, bytes calldata permission)
+  function stake(address vault, uint256 amount)
     external;
 
   function unstakeAndClaim(
