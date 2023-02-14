@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity ^0.8.0;
-
-pragma abicoder v2;
+pragma solidity 0.6.12;
 
 interface IRewardProgram {
   /* admin events */
@@ -71,7 +69,7 @@ interface IRewardProgram {
 
   // /* admin functions */
 
-  function fund(uint256 amount, uint256 duration) external;
+  // function fund(uint256 amount, uint256 duration) external;
 
   // function rescueTokensFromRewardPool(
   //   address token,

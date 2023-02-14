@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
-pragma abicoder v2;
+pragma solidity 0.6.12;
 
 import "../interfaces/IRewardProgram.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -14,7 +12,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     address stakingToken,
     address rewardToken,
     uint256 duration
-  ) {
+  ) public {
     _programData.stakingToken = stakingToken;
     _programData.rewardToken = rewardToken;
     _programData.rewardDuration = duration;
