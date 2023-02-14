@@ -79,6 +79,7 @@ interface IRewardProgram {
     external;
 
   /* admin functions */
+
   function fund(uint256 amount, uint256 duration) external;
 
   function rescueTokensFromRewardPool(
