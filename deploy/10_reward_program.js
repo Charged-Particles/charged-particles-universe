@@ -1,6 +1,5 @@
 const {
-    getDeployData,
-    presets,
+    saveDeploymentData,
   } = require('../js-helpers/deploy');
   
   const {
@@ -12,7 +11,9 @@ const {
   const _ = require('lodash');
   
   module.exports = async (hre) => {
-    const { getNamedAccounts } = hre;
+    let deployData = {};
+    const { getNamedAccounts, deployments } = hre;
+    const { deploy } = deployments;
     const { deployer, protocolOwner } = await getNamedAccounts();
     const network = await hre.network;
   
@@ -21,12 +22,41 @@ const {
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Reward program deployment ');
     log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
+    const result = await deploy("RewardProgram", {
+      from: deployer,
+      args: [
+        '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A',
+        '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A',
+        '1'
+      ],
+      log: true,
+      contract: "contracts/incentives/RewardProgram.sol:RewardProgram",
+      deterministicDeployment: false,
+    });
 
-    // const result = await deploy("AludelV3", {
+    
+    // const RewardProgram = await hre.ethers.getContractFactory('RewardProgram');
+    // const RewardProgramManagerInstance = await RewardProgram.deploy(
+      // '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A',
+      // '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A',
+      // '1'
+    // );
+
+    // const rewardProgram = await RewardProgramManagerInstance.deployed();
+
+    deployData['RewardProgram'] = {
+      abi: result.abi,
+      address: result.address,
+      // deployTransaction: rewardProgram.deployTransaction,
+    }
+
+    saveDeploymentData(chainId, deployData);
+    
+    // const result = await deploy("RewardProgram", {
     //   from: deployer,
     //   args: [],
     //   log: true,
-    //   contract: "src/contracts/aludel/AludelV3.sol:AludelV3",
+    //   abi: getContractAbi('RewardProgram'),
     //   deterministicDeployment: false,
     // });
   
