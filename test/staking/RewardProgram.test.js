@@ -17,11 +17,13 @@ describe('Reward program', function () {
   beforeEach(async function () {
     const ddRewardProgram = getDeployData('RewardProgram');
     const RewardProgram = await ethers.getContractFactory('RewardProgram');
-    rewardProgram = await RewardProgram.attach(ddRewardProgram.address); 
+    rewardProgram = RewardProgram.attach(ddRewardProgram.address); 
   });
 
-  it('should be deployed', async function () {
-    console.log(rewardProgram.address);
+  it('should be deployed', async () =>{
     expect(rewardProgram.address).to.not.equal(0);
+
+    const rewardData = await rewardProgram.getProgramData();
+    expect(rewardData[0].totalStake).to.be(0);
   });
 });
