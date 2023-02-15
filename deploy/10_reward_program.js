@@ -34,32 +34,13 @@ const {
       deterministicDeployment: false,
     });
 
-    
-    // const RewardProgram = await hre.ethers.getContractFactory('RewardProgram');
-    // const RewardProgramManagerInstance = await RewardProgram.deploy(
-      // '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A',
-      // '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A',
-      // '1'
-    // );
-
-    // const rewardProgram = await RewardProgramManagerInstance.deployed();
-
     deployData['RewardProgram'] = {
       abi: result.abi,
       address: result.address,
-      // deployTransaction: rewardProgram.deployTransaction,
     }
 
     saveDeploymentData(chainId, deployData);
     
-    // const result = await deploy("RewardProgram", {
-    //   from: deployer,
-    //   args: [],
-    //   log: true,
-    //   abi: getContractAbi('RewardProgram'),
-    //   deterministicDeployment: false,
-    // });
-  
     log('  Using Network: ', chainNameById(chainId));
     log('  Using Accounts:');
     log('  - Deployer:    ', deployer);
