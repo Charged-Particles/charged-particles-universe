@@ -24,6 +24,6 @@ describe('Reward program', function () {
     expect(rewardProgram.address).to.not.equal(0);
 
     const rewardData = await rewardProgram.getProgramData();
-    expect(rewardData[0].totalStake).to.be(0);
+    expect(rewardData.totalStake).to.equal(0);
   });
 });
