@@ -47,14 +47,16 @@ describe('Reward program', function () {
       const protocolOwnerSigner = ethers.provider.getSigner(protocolOwnerAddress);
       const deployerSigner = ethers.provider.getSigner(deployerAddress);
 
+      // Fund owner of reward program contract aka deployer
       const approveIonxUsageTx = await ionx.connect(protocolOwnerSigner).transfer(deployerAddress, fundingAmount);
       await approveIonxUsageTx.wait();
 
-      const balance = await ionx.balanceOf(deployerAddress);
-      const approveReward = await ionx.connect(deployerSigner).approve(rewardProgram.address, fundingAmount).then((tx) => tx.wait());
+      // Approve reward program contract usage of deployer ionx tokens
+      await ionx.connect(deployerSigner).approve(rewardProgram.address, fundingAmount).then((tx) => tx.wait());
 
-      const fundTx = await rewardProgram.connect(deployerSigner).fund(fundingAmount);
-      const fundReceipt = await fundTx.wait();
+      // Fund reward program
+      await rewardProgram.connect(deployerSigner).fund(fundingAmount).then(tx => tx.wait());
+
       expect(await ionx.balanceOf(rewardProgram.address)).to.equal(fundingAmount);
     });
   });
