@@ -30,12 +30,13 @@ describe('Reward program', function () {
   describe('Funds reward pool', () => {
     it('Has balance', async() => {
       const chainId = await getChainId();
-      console.log(chainId);
       const ddIonx = getDeployData('Ionx', chainId);
-
       const Ionx = await ethers.getContractFactory('Ionx');
       const ionx = await Ionx.attach(ddIonx.address);
-      console.log(ionx);
+
+      const { protocolOwner} = await getNamedAccounts();
+      const balance = await ionx.balanceOf(protocolOwner);
+
     });
     
     it.skip('Deposits IONX into the reward pool', async () => {
