@@ -50,12 +50,13 @@ describe('Reward program', function () {
       await approveIonxUsageTx.wait();
 
       const balance = await ionx.balanceOf(deployerAddress);
-      console.log(balance.toString());
+      const approveReward = await ionx.connect(deployerSigner).approve(rewardProgram.address, 100).then((tx) => tx.wait());
 
-      const approveReward = await ionx.connect(deployerSigner).approve(rewardProgram.address, 100).then(tx => tx.wait);
-      // const fundTx = await rewardProgram.connect(deployerSigner).fund(1);
-      // const fundReceipt = await fundTx.wait();
+      const fundTx = await rewardProgram.connect(deployerSigner).fund(1);
+      const fundReceipt = await fundTx.wait();
       // console.log(fundReceipt);
+      const rewardProgramBalance = await ionx.balanceOf(rewardProgram.address);
+      console.log(rewardProgramBalance);
     });
   });
 });
