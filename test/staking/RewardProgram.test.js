@@ -43,20 +43,19 @@ describe('Reward program', function () {
     });
     
     it('Deposits IONX into the reward pool', async () => {
+      const fundingAmount = 100;
       const protocolOwnerSigner = ethers.provider.getSigner(protocolOwnerAddress);
       const deployerSigner = ethers.provider.getSigner(deployerAddress);
 
-      const approveIonxUsageTx = await ionx.connect(protocolOwnerSigner).transfer(deployerAddress, 1000);
+      const approveIonxUsageTx = await ionx.connect(protocolOwnerSigner).transfer(deployerAddress, fundingAmount);
       await approveIonxUsageTx.wait();
 
       const balance = await ionx.balanceOf(deployerAddress);
-      const approveReward = await ionx.connect(deployerSigner).approve(rewardProgram.address, 100).then((tx) => tx.wait());
+      const approveReward = await ionx.connect(deployerSigner).approve(rewardProgram.address, fundingAmount).then((tx) => tx.wait());
 
-      const fundTx = await rewardProgram.connect(deployerSigner).fund(1);
+      const fundTx = await rewardProgram.connect(deployerSigner).fund(fundingAmount);
       const fundReceipt = await fundTx.wait();
-      // console.log(fundReceipt);
-      const rewardProgramBalance = await ionx.balanceOf(rewardProgram.address);
-      console.log(rewardProgramBalance);
+      expect(await ionx.balanceOf(rewardProgram.address)).to.equal(fundingAmount);
     });
   });
 });
