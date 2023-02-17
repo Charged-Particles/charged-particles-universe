@@ -1,5 +1,6 @@
 const {
     saveDeploymentData,
+    getDeployData
   } = require('../js-helpers/deploy');
   
   const {
@@ -18,6 +19,8 @@ const {
     const network = await hre.network;
   
     const chainId = chainIdByName(network.name);
+
+    const ionx = getDeployData('Ionx', chainId);
   
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Reward program deployment ');
@@ -26,7 +29,7 @@ const {
       from: deployer,
       args: [
         '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A',
-        '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A',
+        ionx.address,
         '1'
       ],
       log: true,

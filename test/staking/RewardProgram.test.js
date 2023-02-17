@@ -18,6 +18,8 @@ describe('Reward program', function () {
     const ddRewardProgram = getDeployData('RewardProgram');
     const RewardProgram = await ethers.getContractFactory('RewardProgram');
     rewardProgram = RewardProgram.attach(ddRewardProgram.address); 
+
+    // instantiate ionx erc20s
   });
 
   it('should be deployed', async () =>{
@@ -25,5 +27,11 @@ describe('Reward program', function () {
 
     const rewardData = await rewardProgram.getProgramData();
     expect(rewardData.totalStake).to.equal(0);
+  });
+
+  describe('Funds reward pool', () => {
+    it.skip('Deposits IONX into the reward pool', async () => {
+
+    });
   });
 });
