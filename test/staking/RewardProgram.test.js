@@ -11,7 +11,7 @@ const {
 } = require('../../js-helpers/deploy');
 
 describe('Reward program', function () {
-  let rewardProgram, ionx, protocolOwnerAddress;
+  let rewardProgram, ionx, protocolOwnerAddress, deployerAddress;
 
   before(async () => {
     const chainId = await getChainId();
@@ -19,8 +19,9 @@ describe('Reward program', function () {
     const Ionx = await ethers.getContractFactory('Ionx');
     ionx = await Ionx.attach(ddIonx.address);
 
-    const { protocolOwner } = await getNamedAccounts();
+    const { deployer, protocolOwner } = await getNamedAccounts();
     protocolOwnerAddress = protocolOwner;
+    deployerAddress = deployer;
   });
 
   beforeEach(async function () {
@@ -43,8 +44,18 @@ describe('Reward program', function () {
     
     it('Deposits IONX into the reward pool', async () => {
       const protocolOwnerSigner = ethers.provider.getSigner(protocolOwnerAddress);
-      const approveIonxUsageTx = await ionx.connect(protocolOwnerSigner).approve(rewardProgram.address, 100000);
+      const deployerSigner = ethers.provider.getSigner(deployerAddress);
+
+      const approveIonxUsageTx = await ionx.connect(protocolOwnerSigner).transfer(deployerAddress, 1000);
       await approveIonxUsageTx.wait();
+
+      const balance = await ionx.balanceOf(deployerAddress);
+      console.log(balance.toString());
+
+      const approveReward = await ionx.connect(deployerSigner).approve(rewardProgram.address, 100).then(tx => tx.wait);
+      // const fundTx = await rewardProgram.connect(deployerSigner).fund(1);
+      // const fundReceipt = await fundTx.wait();
+      // console.log(fundReceipt);
     });
   });
 });
