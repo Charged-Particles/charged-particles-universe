@@ -11,7 +11,7 @@ const {
 } = require('../../js-helpers/deploy');
 
 describe('Reward program', function () {
-  let rewardProgram, ionx, protocolOwnerSigner;
+  let rewardProgram, ionx, protocolOwnerAddress;
 
   before(async () => {
     const chainId = await getChainId();
@@ -20,7 +20,7 @@ describe('Reward program', function () {
     ionx = await Ionx.attach(ddIonx.address);
 
     const { protocolOwner } = await getNamedAccounts();
-    protocolOwnerSigner = protocolOwner;
+    protocolOwnerAddress = protocolOwner;
   });
 
   beforeEach(async function () {
@@ -37,13 +37,14 @@ describe('Reward program', function () {
 
   describe('Funds reward pool', () => {
     it('Has balance', async() => {
-      const balance = await ionx.balanceOf(protocolOwnerSigner);
+      const balance = await ionx.balanceOf(protocolOwnerAddress);
       expect(balance).to.gt(0)
     });
     
-    it.skip('Deposits IONX into the reward pool', async () => {
-
-
+    it('Deposits IONX into the reward pool', async () => {
+      const protocolOwnerSigner = ethers.provider.getSigner(protocolOwnerAddress);
+      const approveIonxUsageTx = await ionx.connect(protocolOwnerSigner).approve(rewardProgram.address, 100000);
+      await approveIonxUsageTx.wait();
     });
   });
 });
