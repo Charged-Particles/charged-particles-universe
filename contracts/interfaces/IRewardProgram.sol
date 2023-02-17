@@ -5,7 +5,7 @@ interface IRewardProgram {
   /* admin events */
 
   event RewardProgramCreated(address rewardPool);
-  // event RewardProgramFunded(uint256 amount);
+  event RewardProgramFunded(uint256 amount);
 
   /* user events */
 
@@ -19,6 +19,7 @@ interface IRewardProgram {
     address stakingToken;
     address rewardToken;
     address rewardPool;
+    uint256 rewardPoolBalance;
     uint256 totalStake;
     uint256 totalStakeUnits;
     uint256 lastUpdate;

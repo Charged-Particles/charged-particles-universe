@@ -5,6 +5,7 @@ pragma experimental ABIEncoderV2;
 
 import "../interfaces/IRewardProgram.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../lib/BlackholePrevention.sol";
 
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
@@ -19,13 +20,25 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     _programData.rewardToken = rewardToken;
     _programData.rewardDuration = duration;
     _programData.lastUpdate = block.timestamp;
+    _programData.rewardPool = address(this);
     _programData.totalStakeUnits = 0;
+    _programData.rewardPoolBalance = 0;
 
     emit RewardProgramCreated(address(this));
   }
 
-  function fund(uint256 amount) external override onlyOwner {
+  function fund(uint256 amount)
+    external
+    override
+    onlyOwner
+  {
+    IERC20 token = IERC20(_programData.rewardToken);
 
+    token.transferFrom(msg.sender, address(this), amount);
+
+    _programData.rewardPoolBalance = amount + _programData.rewardPoolBalance;
+
+    emit RewardProgramFunded(amount);
   }
 
   function getProgramData()
