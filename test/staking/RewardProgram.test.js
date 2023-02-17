@@ -2,14 +2,12 @@ const { expect } = require('chai');
 
 const {
   ethers,
-  network,
   getNamedAccounts,
   getChainId,
 } = require('hardhat');
 
 const {
   getDeployData,
-  presets
 } = require('../../js-helpers/deploy');
 
 describe('Reward program', function () {
@@ -30,7 +28,18 @@ describe('Reward program', function () {
   });
 
   describe('Funds reward pool', () => {
+    it('Has balance', async() => {
+      const chainId = await getChainId();
+      console.log(chainId);
+      const ddIonx = getDeployData('Ionx', chainId);
+
+      const Ionx = await ethers.getContractFactory('Ionx');
+      const ionx = await Ionx.attach(ddIonx.address);
+      console.log(ionx);
+    });
+    
     it.skip('Deposits IONX into the reward pool', async () => {
+
 
     });
   });
