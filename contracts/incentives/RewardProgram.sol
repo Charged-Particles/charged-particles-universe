@@ -19,8 +19,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     _programData.stakingToken = stakingToken;
     _programData.rewardToken = rewardToken;
     _programData.rewardDuration = duration;
-    _programData.lastUpdate = block.timestamp;
     _programData.rewardPool = address(this);
+    _programData.lastUpdate = block.timestamp;
     _programData.totalStakeUnits = 0;
     _programData.rewardPoolBalance = 0;
 

@@ -24,14 +24,16 @@ interface IRewardProgram {
     uint256 totalStakeUnits;
     uint256 lastUpdate;
     uint256 rewardDuration;
-    RewardSchedule[] rewardSchedules;
   }
+
 
   struct RewardSchedule {
     uint256 duration;
     uint256 start;
     uint256 shares;
   }
+  
+  
 
   // struct RewardScaling {
   //   uint256 multiplier;
