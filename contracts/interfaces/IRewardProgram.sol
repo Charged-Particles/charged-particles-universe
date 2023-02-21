@@ -27,13 +27,13 @@ interface IRewardProgram {
   }
 
 
-  struct RewardSchedule {
-    uint256 duration;
+  struct Stake {
     uint256 start;
-    uint256 shares;
+    uint256 amount;
   }
-  
-  
+
+  // TODO: allow for multiple stakes
+  mapping(address => Stake) public walletStake;
 
   // struct RewardScaling {
   //   uint256 multiplier;
