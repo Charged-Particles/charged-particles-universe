@@ -1,26 +1,17 @@
 const {
     saveDeploymentData,
-    getContractAbi,
     getTxGasCost,
-    getDeployData,
-    presets,
   } = require('../js-helpers/deploy');
   
   const {
     accumulatedGasCost,
-    getAccumulatedGasCost,
   } = require('../js-helpers/executeTx');
   
   const {
     log,
     chainTypeById,
-    chainNameById,
     chainIdByName,
   } = require('../js-helpers/utils');
-  
-  const configProtocol = require('../js-helpers/configProtocol');
-  const { AddressZero } = require('ethers').constants
-  const _ = require('lodash');
   
   
   module.exports = async (hre) => {
@@ -33,8 +24,6 @@ const {
     const { isProd, isHardhat } = chainTypeById(chainId);
     const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 5);
   
-    // if (chainId === 31337) { return; } // Don't upgrade for Unit-Tests
-
     await log('  Deploying RewardWalletManager...')(alchemyTimeout);
     const RewardWalletManager = await hre.ethers.getContractFactory('RewardWalletManager');
 

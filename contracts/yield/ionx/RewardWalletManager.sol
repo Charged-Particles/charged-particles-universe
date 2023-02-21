@@ -144,6 +144,10 @@ contract RewardWalletManager is WalletManagerBase {
     // Deposit into Smart-Wallet
     yieldTokensAmount = AaveSmartWalletB(wallet).deposit(assetToken, assetAmount, _referralCode);
 
+    // check if reward program is set
+    // if asset is USDc, register into reward program.
+    RewardProgram(_rewardProgram).fund(assetAmount);
+
     // Log Event
     emit WalletEnergized(contractAddress, tokenId, assetToken, assetAmount, yieldTokensAmount);
   }
@@ -379,7 +383,7 @@ contract RewardWalletManager is WalletManagerBase {
   |          Only Admin/DAO           |
   |__________________________________*/
 
-  function setReardProgram(address rewardProgam) external onlyOwner {
+  function setRewardProgram(address rewardProgam) external onlyOwner {
     require(rewardProgam != address(0x0), "AWM:E-403");
     _rewardProgram = rewardProgam;
     emit RewardProgramSet(rewardProgam);
