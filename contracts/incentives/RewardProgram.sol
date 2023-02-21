@@ -48,4 +48,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   {
     return _programData;
   }
+
+  function stake(address wallet, uin256 amount) external {
+    
+  }
 }

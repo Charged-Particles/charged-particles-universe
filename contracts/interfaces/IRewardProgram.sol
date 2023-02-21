@@ -59,8 +59,8 @@ interface IRewardProgram {
 
   /* user functions */
 
-  // function stake(address vault, uint256 amount)
-  //   external;
+  function stake(address wallet, uint256 amount)
+    external;
 
   // function unstakeAndClaim(
   //   address vault,

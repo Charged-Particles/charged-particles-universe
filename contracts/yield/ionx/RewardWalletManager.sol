@@ -146,7 +146,7 @@ contract RewardWalletManager is WalletManagerBase {
 
     // check if reward program is set
     // if asset is USDc, register into reward program.
-    RewardProgram(_rewardProgram).fund(assetAmount);
+    RewardProgram(_rewardProgram).stake(wallet, assetAmount);
 
     // Log Event
     emit WalletEnergized(contractAddress, tokenId, assetToken, assetAmount, yieldTokensAmount);
