@@ -9,7 +9,7 @@ interface IRewardProgram {
 
   /* user events */
 
-  // event Staked(address vault, uint256 amount);
+  event Staked(address wallet, uint256 amount);
   // event Unstaked(address vault, uint256 amount);
   // event RewardClaimed(address vault, address token, uint256 amount);
 
