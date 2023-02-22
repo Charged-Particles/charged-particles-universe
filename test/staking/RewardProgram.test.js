@@ -11,25 +11,27 @@ const {
 } = require('../../js-helpers/deploy');
 
 describe('Reward program', function () {
-  let rewardProgram, ionx, protocolOwnerAddress, deployerAddress, protocolOwnerSigner, deployerSigner;
+  let rewardProgram,
+    ionx,
+    protocolOwnerAddress,
+    deployerAddress,
+    protocolOwnerSigner,
+    deployerSigner;
 
-  // Allowlist reward wallet manager 
   before(async () => {
-
-
-  });
-
-  before(async () => {
-    const chainId = await getChainId();
-    const ddIonx = getDeployData('Ionx', chainId);
-    const Ionx = await ethers.getContractFactory('Ionx');
-    ionx = await Ionx.attach(ddIonx.address);
-
     const { deployer, protocolOwner } = await getNamedAccounts();
     protocolOwnerAddress = protocolOwner;
     deployerAddress = deployer;
     protocolOwnerSigner = ethers.provider.getSigner(protocolOwnerAddress);
     deployerSigner = ethers.provider.getSigner(deployerAddress);
+  });
+
+  before(async () => {
+    const chainId = await getChainId();
+
+    const ddIonx = getDeployData('Ionx', chainId);
+    const Ionx = await ethers.getContractFactory('Ionx');
+    ionx = await Ionx.attach(ddIonx.address);
   });
 
   beforeEach(async function () {
