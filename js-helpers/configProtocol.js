@@ -534,6 +534,10 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await aaveWalletManagerB.setExecutor(ddParticleSplitter.address)
     );
 
+    await executeTx('10-a', 'Reward Wallet Manager: Registering Executor', async () =>
+      await rewardWalletManager.setExecutor(deployer)
+    );
+
 
 
     log(`\n  Contract Initialization Complete!`);

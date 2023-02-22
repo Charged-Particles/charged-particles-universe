@@ -63,6 +63,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   let chargedParticles;
   let particleSplitter;
   let rewardProgram;
+  let rewardWalletManager; 
   let aaveWalletManager;
   let genericWalletManager;
   let genericBasketManager;
@@ -138,6 +139,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
+    const RewardWalletManager = await ethers.getContractFactory('RewardWalletManager');
     const Proton = await ethers.getContractFactory('Proton');
     const ProtonB = await ethers.getContractFactory('ProtonB');
     const ProtonC = await ethers.getContractFactory('ProtonC');
@@ -162,6 +164,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     ionx = Ionx.attach(getDeployData('Ionx', chainId).address);
     tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address);
     rewardProgram = RewardProgram.attach(getDeployData('RewardProgram', chainId).address);
+    rewardWalletManager = RewardWalletManager.attach(getDeployData('RewardWalletManager', chainId).address);
 
     await proton.connect(signerD).setPausedState(false);
     await protonB.connect(signerD).setPausedState(false);
@@ -1536,6 +1539,17 @@ describe("[INTEGRATION] Charged Particles", () => {
     });
 
     await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
+
+    const wallet = await rewardWalletManager.callStatic.getWalletAddressById(
+      proton.address, 
+      energizedParticleId,
+      proton.address, 
+      100
+    );
+
+    const stake = await rewardProgram.walletStake(wallet);
+    console.log(stake);
+    
 
     // await chargedParticles.connect(signer2).releaseParticle(
     //   user2,
