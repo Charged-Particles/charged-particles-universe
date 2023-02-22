@@ -47,6 +47,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ddGenericWalletManagerB = getDeployData('GenericWalletManagerB', chainId);
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddGenericBasketManagerB = getDeployData('GenericBasketManagerB', chainId);
+    const ddRewardWalletManager = getDeployData('RewardWalletManager', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddProtonB = getDeployData('ProtonB', chainId);
     const ddLepton2 = getDeployData('Lepton2', chainId);
@@ -106,6 +107,10 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     log('  Loading AaveWalletManagerB from:    ', ddAaveWalletManagerB.address, ` (${_.get(ddAaveWalletManagerB, 'deployTransaction.blockNumber', '0')})`);
     const AaveWalletManagerB = await ethers.getContractFactory('AaveWalletManagerB');
     const aaveWalletManagerB = await AaveWalletManagerB.attach(ddAaveWalletManagerB.address);
+
+    log('  Loading RewardWalletManager from:    ', ddRewardWalletManager.address, ` (${_.get(ddRewardWalletManager, 'deployTransaction.blockNumber', '0')})`);
+    const RewardWalletManager = await ethers.getContractFactory('RewardWalletManager');
+    const rewardWalletManager = await RewardWalletManager.attach(ddRewardWalletManager.address);
 
     log('  Loading TokenInfoProxy from:        ', ddTokenInfoProxy.address, ` (${_.get(ddTokenInfoProxy, 'deployTransaction.blockNumber', '0')})`);
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
@@ -293,6 +298,31 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // //     await aaveWalletManagerB.setReferralCode(referralCode)
     // //   );
     // // }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Setup Aave Wallet Manager
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    await executeTx('3-a', 'RewardWalletManager: Setting Charged Particles as Controller', async () =>
+      await rewardWalletManager.setController(ddChargedParticles.address)
+    );
+
+    await executeTx('3-b', 'RewardWalletManager: Setting Aave Bridge to V2', async () =>
+      await rewardWalletManager.setAaveBridge(ddAaveBridgeV2.address)
+    );
+
+    // await executeTx('3-c', 'RewardWalletManager: Registering Aave as LP with ChargedParticles', async () =>
+    //   await chargedManagers.registerWalletManager('ionxReward', ddRewardWalletManager.address)
+    // );
+
+    await executeTx('3-h', 'RewardWalletManager: Registering ChargedSettings', async () =>
+      await rewardWalletManager.setChargedSettings(ddChargedSettings.address)
+    );
+    await executeTx('3-g', 'RewardWalletManager: Registering Aave as LP with ChargedParticles', async () =>
+      await chargedManagers.registerWalletManager('reward', ddRewardWalletManager.address)
+    );
+
+    // TODO: setRewardProgram.
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Proton

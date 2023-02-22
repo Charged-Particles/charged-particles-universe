@@ -37,7 +37,7 @@ const {
     }
     saveDeploymentData(chainId, deployData, true);
 
-    log('  - AaveWalletManagerB: ', rewardWalletManager.address);
+    log('  - RewardWalletManager: ', rewardWalletManager.address);
     log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: rewardWalletManager.deployTransaction }));
     accumulatedGasCost(rewardWalletManager.deployTransaction);
   };

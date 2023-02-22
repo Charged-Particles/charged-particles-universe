@@ -16,6 +16,7 @@ describe('Reward program', function () {
   // Allowlist reward wallet manager 
   before(async () => {
 
+
   });
 
   before(async () => {
