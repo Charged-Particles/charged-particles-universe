@@ -62,6 +62,7 @@ describe("[INTEGRATION] Charged Particles", () => {
   let chargedManagers;
   let chargedParticles;
   let particleSplitter;
+  let rewardProgram;
   let aaveWalletManager;
   let genericWalletManager;
   let genericBasketManager;
@@ -142,7 +143,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     const ProtonC = await ethers.getContractFactory('ProtonC');
     const Lepton = await ethers.getContractFactory('Lepton2');
     const Ionx = await ethers.getContractFactory('Ionx');
-    const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy')
+    const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
+    const RewardProgram = await ethers.getContractFactory('RewardProgram');
 
     universe = Universe.attach(getDeployData('Universe', chainId).address);
     chargedState = ChargedState.attach(getDeployData('ChargedState', chainId).address);
@@ -159,6 +161,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     lepton = Lepton.attach(getDeployData('Lepton2', chainId).address);
     ionx = Ionx.attach(getDeployData('Ionx', chainId).address);
     tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address);
+    rewardProgram = RewardProgram.attach(getDeployData('RewardProgram', chainId).address);
 
     await proton.connect(signerD).setPausedState(false);
     await protonB.connect(signerD).setPausedState(false);
@@ -1541,7 +1544,6 @@ describe("[INTEGRATION] Charged Particles", () => {
     //   'aave.B',
     //   daiAddress
     // );
-
     // expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
   });
 
