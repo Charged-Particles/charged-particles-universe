@@ -11,6 +11,9 @@ import "../lib/BlackholePrevention.sol";
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   ProgramRewardData public _programData;
 
+  // TODO: allow for multiple stakes
+  mapping(address => Stake) public walletStake;
+
   constructor(
     address stakingToken,
     address rewardToken,
@@ -49,8 +52,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     return _programData;
   }
 
-  function stake(address wallet, uin256 amount) external {
-    walletStake[wallet] = amount;
+  function stake(address wallet, uint256 amount) override external {
+    walletStake[wallet] = Stake(block.timestamp, amount);
     emit Staked(wallet, amount);
   }
 }

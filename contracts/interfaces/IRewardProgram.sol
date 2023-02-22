@@ -32,9 +32,6 @@ interface IRewardProgram {
     uint256 amount;
   }
 
-  // TODO: allow for multiple stakes
-  mapping(address => Stake) public walletStake;
-
   // struct RewardScaling {
   //   uint256 multiplier;
   //   uint256 time;

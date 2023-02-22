@@ -13,6 +13,11 @@ const {
 describe('Reward program', function () {
   let rewardProgram, ionx, protocolOwnerAddress, deployerAddress, protocolOwnerSigner, deployerSigner;
 
+  // Allowlist reward wallet manager 
+  before(async () => {
+
+  });
+
   before(async () => {
     const chainId = await getChainId();
     const ddIonx = getDeployData('Ionx', chainId);
