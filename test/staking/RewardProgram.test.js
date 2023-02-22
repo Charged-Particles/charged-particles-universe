@@ -10,6 +10,8 @@ const {
   getDeployData,
 } = require('../../js-helpers/deploy');
 
+const { getChargedContracts } = require('../helpers.js')
+
 describe('Reward program', function () {
   let rewardProgram,
     ionx,
@@ -32,6 +34,10 @@ describe('Reward program', function () {
     const ddIonx = getDeployData('Ionx', chainId);
     const Ionx = await ethers.getContractFactory('Ionx');
     ionx = await Ionx.attach(ddIonx.address);
+
+    const { protonC } = await getChargedContracts();
+
+    console.log(protonC);
   });
 
   beforeEach(async function () {
