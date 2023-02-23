@@ -85,6 +85,8 @@ describe("[INTEGRATION] Charged Particles", () => {
   let daiSigner;
   let amplSigner;
   let deployer;
+  let protocolOwner
+  let protocolOwnerSigner
   let user1;
   let user2;
   let user3;
@@ -116,6 +118,9 @@ describe("[INTEGRATION] Charged Particles", () => {
     user1 = namedAccts.user1;
     user2 = namedAccts.user2;
     user3 = namedAccts.user3;
+    protocolOwner = namedAccts.protocolOwner;
+
+    protocolOwnerSigner = ethers.provider.getSigner(protocolOwner);
     signerD = ethers.provider.getSigner(deployer);
     signer1 = ethers.provider.getSigner(user1);
     signer2 = ethers.provider.getSigner(user2);
@@ -1549,13 +1554,13 @@ describe("[INTEGRATION] Charged Particles", () => {
     const initiatedStakeOnEnergized = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
     expect(initiatedStakeOnEnergized).to.have.property('start');
 
-    await chargedParticles.connect(signer2).callStatic.currentParticleCharge(
-      proton.address,
-      energizedParticleId,
-      'reward',
-      daiAddress
-    );
-    
+    // fund reward program.
+    const fundingAmount = ethers.utils.parseUnits('100');
+    await ionx.connect(protocolOwnerSigner).transfer(deployer, fundingAmount).then(tx => tx.wait());
+    await ionx.connect(signerD).approve(rewardProgram.address, fundingAmount).then(tx => tx.wait());
+    await rewardProgram.connect(signerD).fund(fundingAmount).then(tx => tx.wait());
+    expect(await ionx.balanceOf(rewardProgram.address)).to.equal(fundingAmount);
+
     await chargedParticles.connect(signer2).releaseParticle(
       user2,
       proton.address,
@@ -1566,5 +1571,9 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
     const stakeOnRelease = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
     expect(stakeOnRelease['generetedChage']).gt(0);
+
+    const user2BalanceIonx = await ionx.balanceOf(user2);
+    console.log(user2BalanceIonx);
+    // expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
   });
 });
