@@ -30,7 +30,7 @@ interface IRewardProgram {
   struct Stake {
     uint256 start;
     uint256 initialAmount;
-    uint256 generetedChage;
+    uint256 generatedCharge;
   }
 
   // struct RewardScaling {

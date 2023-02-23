@@ -1570,10 +1570,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     );
     expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
     const stakeOnRelease = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
-    expect(stakeOnRelease['generetedChage']).gt(0);
+    expect(stakeOnRelease['generatedCharge']).gt(0);
 
-    const user2BalanceIonx = await ionx.balanceOf(user2);
-    console.log(user2BalanceIonx);
-    // expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
+    expect(await ionx.balanceOf(user2)).to.be.eq(stakeOnRelease['generatedCharge']);
   });
 });
