@@ -59,14 +59,17 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   }
 
   function unstake(
-    address wallet
+    address wallet,
     uint256 creatorAmount,
     uint256 receiverAmount
   ) 
     override
     external
   {
-    Stake storage stake = walletStake(wallet);
-    stake.generetedChage = creatorAmount + receiverAmount; // TODO: safe math
+    uint256 interestGenerated = creatorAmount + receiverAmount; // TODO: safe math
+    Stake storage stake = walletStake[wallet];
+    stake.generetedChage = interestGenerated;
+
+    // transfer reward token to user.
   };
 }
