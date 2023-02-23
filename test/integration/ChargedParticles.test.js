@@ -1549,7 +1549,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     const initiatedStakeOnEnergized = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
     expect(initiatedStakeOnEnergized).to.have.property('start');
 
-    const charge = await chargedParticles.connect(signer2).callStatic.currentParticleCharge(
+    await chargedParticles.connect(signer2).callStatic.currentParticleCharge(
       proton.address,
       energizedParticleId,
       'reward',
