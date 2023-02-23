@@ -1540,15 +1540,14 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
 
-    const wallet = await rewardWalletManager.callStatic.getWalletAddressById(
+    const energizedNftWalletManagerAddress = await rewardWalletManager.callStatic.getWalletAddressById(
       proton.address, 
       energizedParticleId,
       proton.address, 
       100
     );
-
-    const stake = await rewardProgram.walletStake(wallet);
-    console.log(stake);
+    const initiatedStakeOnEnergized = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
+    expect(initiatedStakeOnEnergized).to.have.property('start');
     
 
     // await chargedParticles.connect(signer2).releaseParticle(
