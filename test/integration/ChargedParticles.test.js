@@ -1561,6 +1561,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     await rewardProgram.connect(signerD).fund(fundingAmount).then(tx => tx.wait());
     expect(await ionx.balanceOf(rewardProgram.address)).to.equal(fundingAmount);
 
+    expect(await ionx.balanceOf(user2)).to.be.eq(0);
     await chargedParticles.connect(signer2).releaseParticle(
       user2,
       proton.address,
