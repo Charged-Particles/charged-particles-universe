@@ -70,8 +70,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 interestGenerated = creatorAmount + receiverAmount; // TODO: safe math
     Stake storage stake = walletStake[wallet];
     stake.generetedChage = interestGenerated;
-    // transfer ionx to user
 
-    IERC20(_programData.rewardToken).transfer(receiver, interestGenerated);
+    // transfer ionx to user
+    // IERC20(_programData.rewardToken).transfer(receiver, interestGenerated);
   }
 }
