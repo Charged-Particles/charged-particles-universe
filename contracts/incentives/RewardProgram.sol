@@ -54,7 +54,19 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
   // TODO: only wallet manager.
   function stake(address wallet, uint256 amount) override external {
-    walletStake[wallet] = Stake(block.timestamp, amount);
+    walletStake[wallet] = Stake(block.timestamp, amount,0);
     emit Staked(wallet, amount);
   }
+
+  function unstake(
+    address wallet
+    uint256 creatorAmount,
+    uint256 receiverAmount
+  ) 
+    override
+    external
+  {
+    Stake storage stake = walletStake(wallet);
+    stake.generetedChage = creatorAmount + receiverAmount; // TODO: safe math
+  };
 }

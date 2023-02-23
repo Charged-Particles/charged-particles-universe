@@ -1549,7 +1549,6 @@ describe("[INTEGRATION] Charged Particles", () => {
     const initiatedStakeOnEnergized = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
     expect(initiatedStakeOnEnergized).to.have.property('start');
     
-
     // await chargedParticles.connect(signer2).releaseParticle(
     //   user2,
     //   proton.address,
@@ -1559,5 +1558,4 @@ describe("[INTEGRATION] Charged Particles", () => {
     // );
     // expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
   });
-
 });

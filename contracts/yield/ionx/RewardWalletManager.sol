@@ -179,6 +179,8 @@ contract RewardWalletManager is WalletManagerBase {
     // Discharge the full amount of interest
     (creatorAmount, receiverAmount) = AaveSmartWalletB(wallet).withdrawAmount(receiver, creator, annuityPct, assetToken, ownerInterest);
 
+    RewardProgram(_rewardProgram).unstake(wallet);
+
     // Log Event
     emit WalletDischarged(contractAddress, tokenId, assetToken, creatorAmount, receiverAmount);
   }

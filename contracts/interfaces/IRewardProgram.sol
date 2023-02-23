@@ -29,7 +29,8 @@ interface IRewardProgram {
 
   struct Stake {
     uint256 start;
-    uint256 amount;
+    uint256 initialAmount;
+    uint256 generetedChage;
   }
 
   // struct RewardScaling {
@@ -59,13 +60,12 @@ interface IRewardProgram {
   function stake(address wallet, uint256 amount)
     external;
 
-  // function unstakeAndClaim(
-  //   address vault,
-  //   uint256[] calldata indices,
-  //   uint256[] calldata amounts,
-  //   bytes calldata permission
-  // )
-  //   external;
+  function unstake(
+    address smartWallet,
+    uint256 creatorAmount,
+    uint256 receiverAmount
+  )
+    external;
 
   // /* admin functions */
 
