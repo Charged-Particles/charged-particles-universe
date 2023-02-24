@@ -15,8 +15,6 @@ const {
   
   
   module.exports = async (hre) => {
-    const { ethers, upgrades, getNamedAccounts } = hre;
-    const { deployer, protocolOwner, trustedForwarder } = await getNamedAccounts();
     const network = await hre.network;
     const deployData = {};
   

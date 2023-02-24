@@ -1514,6 +1514,8 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   // RewardWallet 
   describe.only('Ionx reward program', function() {
+    const fundingAmount = ethers.utils.parseUnits('100');
+
     it ("can succesfully stake into reward program.", async () => {
     
       await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
@@ -1527,7 +1529,13 @@ describe("[INTEGRATION] Charged Particles", () => {
     
       await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
       await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
-    
+      
+      // Reverts not wallet manager
+      await rewardProgram.connect(signerD).stake(
+        tokenInfoProxyMock.address,
+        fundingAmount
+      ).then(tx => tx.wait());
+
       const energizedParticleId = await callAndReturn({
         contractInstance: proton,
         contractMethod: 'createChargedParticle',
@@ -1556,7 +1564,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       expect(initiatedStakeOnEnergized).to.have.property('start');
     
       // fund reward program.
-      const fundingAmount = ethers.utils.parseUnits('100');
+      
       await ionx.connect(protocolOwnerSigner).transfer(deployer, fundingAmount).then(tx => tx.wait());
       await ionx.connect(signerD).approve(rewardProgram.address, fundingAmount).then(tx => tx.wait());
       await rewardProgram.connect(signerD).fund(fundingAmount).then(tx => tx.wait());
@@ -1575,13 +1583,13 @@ describe("[INTEGRATION] Charged Particles", () => {
       expect(stakeOnRelease['generatedCharge']).gt(0);
     
       expect(await ionx.balanceOf(user2)).to.be.eq(stakeOnRelease['generatedCharge']);
-    
     });
 
     it ('Deployed wallet manager set in reward program', async function() {
       const rewardWalletManager = getDeployData('RewardWalletManager', chainId);
       expect(await rewardProgram.rewardWalletManager()).to.be.eq(rewardWalletManager.address);
     });
+
     
   });
 });
