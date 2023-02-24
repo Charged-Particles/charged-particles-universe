@@ -1537,9 +1537,6 @@ describe("[INTEGRATION] Charged Particles", () => {
           fundingAmount)
       ).to.be.revertedWith("Not wallet");
 
-      // await expect(token.checkRole('ADMIN'))
-      // .to.be.revertedWith(/AccessControl: account .* is missing role .*/);
-
       const energizedParticleId = await callAndReturn({
         contractInstance: proton,
         contractMethod: 'createChargedParticle',
@@ -1568,12 +1565,20 @@ describe("[INTEGRATION] Charged Particles", () => {
       expect(initiatedStakeOnEnergized).to.have.property('start');
     
       // fund reward program.
-      
       await ionx.connect(protocolOwnerSigner).transfer(deployer, fundingAmount).then(tx => tx.wait());
       await ionx.connect(signerD).approve(rewardProgram.address, fundingAmount).then(tx => tx.wait());
       await rewardProgram.connect(signerD).fund(fundingAmount).then(tx => tx.wait());
       expect(await ionx.balanceOf(rewardProgram.address)).to.equal(fundingAmount);
     
+      // Reverts not wallet manager
+      await expect(
+        rewardProgram.connect(signerD).unstake(
+          user2,
+          proton.address,
+          1,
+          1
+      )).to.be.revertedWith("Not wallet");
+
       expect(await ionx.balanceOf(user2)).to.be.eq(0);
       await chargedParticles.connect(signer2).releaseParticle(
         user2,
