@@ -58,7 +58,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   }
 
   // TODO: only wallet manager.
-  function stake(address wallet, uint256 amount) override external {
+  function stake(address wallet, uint256 amount) override external onlyWalletManager {
     walletStake[wallet] = Stake(block.timestamp, amount,0);
     emit Staked(wallet, amount);
   }
@@ -71,6 +71,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   ) 
     override
     external
+    onlyWalletManager
   {
     uint256 interestGenerated = creatorAmount + receiverAmount; // TODO: safe math
     Stake storage stake = walletStake[wallet];
@@ -79,5 +80,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     // transfer ionx to user
     // todo: check decimals
     IERC20(_programData.rewardToken).transfer(receiver, interestGenerated);
+  }
+
+  modifier onlyWalletManager() {
+    require(msg.sender == rewardWalletManager, "Not wallet manager");
+    _;
   }
 }
