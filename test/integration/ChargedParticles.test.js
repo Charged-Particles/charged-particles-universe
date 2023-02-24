@@ -1574,5 +1574,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     expect(stakeOnRelease['generatedCharge']).gt(0);
 
     expect(await ionx.balanceOf(user2)).to.be.eq(stakeOnRelease['generatedCharge']);
+
+    const walletManagerAddress = await rewardProgram.rewardWalletManager();
+    console.log('>>>>>>>>> ', walletManagerAddress);
   });
 });

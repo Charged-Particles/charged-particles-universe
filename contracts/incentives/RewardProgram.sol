@@ -11,21 +11,26 @@ import "../lib/BlackholePrevention.sol";
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   ProgramRewardData public _programData;
 
+  address public rewardWalletManager;
+
   // TODO: allow for multiple stakes
   mapping(address => Stake) public walletStake;
 
   constructor(
-    address stakingToken,
-    address rewardToken,
-    uint256 duration
+    address _stakingToken,
+    address _rewardToken,
+    address _rewardWalletManager,
+    uint256 _duration
   ) public {
-    _programData.stakingToken = stakingToken;
-    _programData.rewardToken = rewardToken;
-    _programData.rewardDuration = duration;
+    _programData.stakingToken = _stakingToken;
+    _programData.rewardToken = _rewardToken;
+    _programData.rewardDuration = _duration;
     _programData.rewardPool = address(this);
     _programData.lastUpdate = block.timestamp;
     _programData.totalStakeUnits = 0;
     _programData.rewardPoolBalance = 0;
+
+    rewardWalletManager = _rewardWalletManager;
 
     emit RewardProgramCreated(address(this));
   }

@@ -21,6 +21,7 @@ const {
     const chainId = chainIdByName(network.name);
 
     const ionx = getDeployData('Ionx', chainId);
+    const rewardWalletManager = getDeployData('RewardWalletManager', chainId);
   
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Reward program deployment ');
@@ -30,6 +31,7 @@ const {
       args: [
         '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A',
         ionx.address,
+        rewardWalletManager.address,
         '1'
       ],
       log: true,
