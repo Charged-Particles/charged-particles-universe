@@ -22,6 +22,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     address _rewardWalletManager,
     uint256 _duration
   ) public {
+    //TODO: define stake data params
     _programData.stakingToken = _stakingToken;
     _programData.rewardToken = _rewardToken;
     _programData.rewardDuration = _duration;
@@ -57,8 +58,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     return _programData;
   }
 
-  // TODO: only wallet manager.
   function stake(address wallet, uint256 amount) override external onlyWalletManager {
+    // TODO: if deposit agains only update balance instead of creating new stake.
     walletStake[wallet] = Stake(block.timestamp, amount,0);
     emit Staked(wallet, amount);
   }
