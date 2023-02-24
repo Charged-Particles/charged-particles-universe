@@ -1531,10 +1531,14 @@ describe("[INTEGRATION] Charged Particles", () => {
       await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
       
       // Reverts not wallet manager
-      await rewardProgram.connect(signerD).stake(
-        tokenInfoProxyMock.address,
-        fundingAmount
-      ).then(tx => tx.wait());
+      await expect(
+        rewardProgram.connect(signerD).stake(
+          tokenInfoProxyMock.address,
+          fundingAmount)
+      ).to.be.revertedWith("Not wallet");
+
+      // await expect(token.checkRole('ADMIN'))
+      // .to.be.revertedWith(/AccessControl: account .* is missing role .*/);
 
       const energizedParticleId = await callAndReturn({
         contractInstance: proton,
