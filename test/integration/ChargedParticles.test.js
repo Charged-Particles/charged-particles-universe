@@ -1513,69 +1513,75 @@ describe("[INTEGRATION] Charged Particles", () => {
   });
 
   // RewardWallet 
-  it.only("can succesfully stake into reward program.", async () => {
-
-    await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
-    await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
-    await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
-
-    await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
-
-    await dai.connect(daiSigner).transfer(user1, toWei('10'));
-    await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
-
-    await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
-    await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
-
-    const energizedParticleId = await callAndReturn({
-      contractInstance: proton,
-      contractMethod: 'createChargedParticle',
-      contractCaller: signer1,
-      contractParams: [
-        user1,                        // creator
-        user2,                        // receiver
-        user1,                        // referrer
-        TEST_NFT_TOKEN_URI,           // tokenMetaUri
-        'reward',                     // walletManagerId
-        daiAddress,                   // assetToken
-        toWei('10'),                  // assetAmount
-        annuityPct,                   // annuityPercent
-      ],
+  describe.only('Ionx reward program', function() {
+    it ("can succesfully stake into reward program.", async () => {
+    
+      await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+      await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+      await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+    
+      await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+    
+      await dai.connect(daiSigner).transfer(user1, toWei('10'));
+      await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+    
+      await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+      await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+    
+      const energizedParticleId = await callAndReturn({
+        contractInstance: proton,
+        contractMethod: 'createChargedParticle',
+        contractCaller: signer1,
+        contractParams: [
+          user1,                        // creator
+          user2,                        // receiver
+          user1,                        // referrer
+          TEST_NFT_TOKEN_URI,           // tokenMetaUri
+          'reward',                     // walletManagerId
+          daiAddress,                   // assetToken
+          toWei('10'),                  // assetAmount
+          annuityPct,                   // annuityPercent
+        ],
+      });
+    
+      await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
+    
+      const energizedNftWalletManagerAddress = await rewardWalletManager.callStatic.getWalletAddressById(
+        proton.address, 
+        energizedParticleId,
+        proton.address, 
+        100
+      );
+      const initiatedStakeOnEnergized = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
+      expect(initiatedStakeOnEnergized).to.have.property('start');
+    
+      // fund reward program.
+      const fundingAmount = ethers.utils.parseUnits('100');
+      await ionx.connect(protocolOwnerSigner).transfer(deployer, fundingAmount).then(tx => tx.wait());
+      await ionx.connect(signerD).approve(rewardProgram.address, fundingAmount).then(tx => tx.wait());
+      await rewardProgram.connect(signerD).fund(fundingAmount).then(tx => tx.wait());
+      expect(await ionx.balanceOf(rewardProgram.address)).to.equal(fundingAmount);
+    
+      expect(await ionx.balanceOf(user2)).to.be.eq(0);
+      await chargedParticles.connect(signer2).releaseParticle(
+        user2,
+        proton.address,
+        energizedParticleId,
+        'reward',
+        daiAddress
+      );
+      expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
+      const stakeOnRelease = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
+      expect(stakeOnRelease['generatedCharge']).gt(0);
+    
+      expect(await ionx.balanceOf(user2)).to.be.eq(stakeOnRelease['generatedCharge']);
+    
     });
 
-    await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
-
-    const energizedNftWalletManagerAddress = await rewardWalletManager.callStatic.getWalletAddressById(
-      proton.address, 
-      energizedParticleId,
-      proton.address, 
-      100
-    );
-    const initiatedStakeOnEnergized = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
-    expect(initiatedStakeOnEnergized).to.have.property('start');
-
-    // fund reward program.
-    const fundingAmount = ethers.utils.parseUnits('100');
-    await ionx.connect(protocolOwnerSigner).transfer(deployer, fundingAmount).then(tx => tx.wait());
-    await ionx.connect(signerD).approve(rewardProgram.address, fundingAmount).then(tx => tx.wait());
-    await rewardProgram.connect(signerD).fund(fundingAmount).then(tx => tx.wait());
-    expect(await ionx.balanceOf(rewardProgram.address)).to.equal(fundingAmount);
-
-    expect(await ionx.balanceOf(user2)).to.be.eq(0);
-    await chargedParticles.connect(signer2).releaseParticle(
-      user2,
-      proton.address,
-      energizedParticleId,
-      'reward',
-      daiAddress
-    );
-    expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
-    const stakeOnRelease = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
-    expect(stakeOnRelease['generatedCharge']).gt(0);
-
-    expect(await ionx.balanceOf(user2)).to.be.eq(stakeOnRelease['generatedCharge']);
-
-    const walletManagerAddress = await rewardProgram.rewardWalletManager();
-    console.log('>>>>>>>>> ', walletManagerAddress);
+    it ('Deployed wallet manager set in reward program', async function() {
+      const rewardWalletManager = getDeployData('RewardWalletManager', chainId);
+      expect(await rewardProgram.rewardWalletManager()).to.be.eq(rewardWalletManager.address);
+    });
+    
   });
 });
