@@ -28,8 +28,9 @@ interface IRewardProgram {
 
 
   struct Stake {
+    bool started;
     uint256 start;
-    uint256 initialAmount;
+    uint256 principal;
     uint256 generatedCharge;
   }
 

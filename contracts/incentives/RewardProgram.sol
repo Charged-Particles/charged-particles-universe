@@ -59,8 +59,13 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   }
 
   function stake(address wallet, uint256 amount) override external onlyWalletManager {
-    // TODO: if deposit agains only update balance instead of creating new stake.
-    walletStake[wallet] = Stake(block.timestamp, amount,0);
+    if (walletStake[wallet].started) {
+      walletStake[wallet] = Stake(true, block.timestamp, amount,0);
+    } else {
+      Stake storage onGoingStake = walletStake[wallet];
+      onGoingStake.principal += amount;
+    }
+
     emit Staked(wallet, amount);
   }
 

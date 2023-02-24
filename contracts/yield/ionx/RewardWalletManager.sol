@@ -43,8 +43,13 @@ contract RewardWalletManager is WalletManagerBase {
 
   IChargedSettings internal _chargedSettings;
 
-  address internal _aaveBridge;
+  // This should be dynamically set on functions calls.
+  // it should be calculated based on the deposited asset or the nft address
+  // if non reward program is found, panic.
   address internal _rewardProgram;
+  // mapping (address => address) internal rewardBy
+
+  address internal _aaveBridge;
   uint256 internal _referralCode;
 
   mapping (address => bool) public _rewardsTokenWhitelist;
