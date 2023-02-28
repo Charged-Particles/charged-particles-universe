@@ -98,12 +98,12 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     view
     returns(
-      uint256 reward,
+      uint256 baseReward,
       uint256 interestGenerated
     )
   {
     interestGenerated = creatorAmount + receiverAmount; // TODO: safe math
-    reward = interestGenerated * baseMultiplier;
+    baseReward = interestGenerated * baseMultiplier;
   }
 
   function setBaseMultiplier(uint256 newMultiplier)

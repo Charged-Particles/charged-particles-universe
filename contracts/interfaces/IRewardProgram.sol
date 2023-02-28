@@ -33,11 +33,13 @@ interface IRewardProgram {
     uint256 principal;
     uint256 generatedCharge;
     uint256 reward;
+    // LeptonsMultiplier[] leptonsData;
   }
 
-  // struct RewardScaling {
+  // struct LeptonsMultiplier {
   //   uint256 multiplier;
-  //   uint256 time;
+  //   uint256 deposit;
+  //   uint256 timeDeposited;
   // }
 
   // struct VaultData {
