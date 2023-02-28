@@ -32,6 +32,7 @@ interface IRewardProgram {
     uint256 start;
     uint256 principal;
     uint256 generatedCharge;
+    uint256 reward;
   }
 
   // struct RewardScaling {

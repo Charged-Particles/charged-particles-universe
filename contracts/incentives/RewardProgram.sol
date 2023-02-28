@@ -12,8 +12,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   ProgramRewardData public _programData;
 
   address public rewardWalletManager;
+  uint256 public baseMultiplier = 1;
 
-  // TODO: allow for multiple stakes
   mapping(address => Stake) public walletStake;
 
   constructor(
@@ -79,13 +79,25 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyWalletManager
   {
-    uint256 interestGenerated = creatorAmount + receiverAmount; // TODO: safe math
+    uint256 reward = calculateReward(creatorAmount, receiverAmount);
     Stake storage stake = walletStake[wallet];
-    stake.generatedCharge = interestGenerated;
+    stake.generatedCharge = reward;
 
     // transfer ionx to user
     // todo: check decimals
     IERC20(_programData.rewardToken).transfer(receiver, interestGenerated);
+  }
+
+  function calculateReward(
+    uint256 creatorAmount,
+    uint256 receiverAmount
+  )
+    external
+    view
+    returns(uint256 reward)
+  {
+    uint256 interestGenerated = creatorAmount + receiverAmount; // TODO: safe math
+    reward = interestGenerated * baseMultiplier;
   }
 
   modifier onlyWalletManager() {
