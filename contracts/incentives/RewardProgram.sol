@@ -12,7 +12,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   ProgramRewardData public _programData;
 
   address public rewardWalletManager;
-  uint256 public baseMultiplier = 1;
+  uint256 public baseMultiplier;
 
   mapping(address => Stake) public walletStake;
 
@@ -20,7 +20,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     address _stakingToken,
     address _rewardToken,
     address _rewardWalletManager,
-    uint256 _duration
+    uint256 _duration,
+    uint256 _baseMultiplier
   ) public {
     //TODO: define stake data params
     _programData.stakingToken = _stakingToken;
@@ -32,6 +33,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     _programData.rewardPoolBalance = 0;
 
     rewardWalletManager = _rewardWalletManager;
+    baseMultiplier = _baseMultiplier;
 
     emit RewardProgramCreated(address(this));
   }
@@ -83,7 +85,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     Stake storage stake = walletStake[wallet];
     stake.generatedCharge = interestGenerated;
     stake.reward = reward;
-
 
     // transfer ionx to user
     // todo: check decimals

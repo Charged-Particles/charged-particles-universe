@@ -32,7 +32,8 @@ const {
         '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A',
         ionx.address,
         rewardWalletManager.address,
-        '1'
+        '1',
+        1
       ],
       log: true,
       contract: "contracts/incentives/RewardProgram.sol:RewardProgram",
