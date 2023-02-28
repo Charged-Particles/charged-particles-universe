@@ -79,9 +79,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyWalletManager
   {
-    uint256 reward = this.calculateReward(creatorAmount, receiverAmount);
+    (uint256 reward, uint256 interestGenerated) = this.calculateReward(creatorAmount, receiverAmount);
     Stake storage stake = walletStake[wallet];
-    stake.generatedCharge = reward;
+    stake.generatedCharge = interestGenerated;
+    stake.reward = reward;
 
 
     // transfer ionx to user
@@ -95,9 +96,12 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   )
     external
     view
-    returns(uint256 reward)
+    returns(
+      uint256 reward,
+      uint256 interestGenerated
+    )
   {
-    uint256 interestGenerated = creatorAmount + receiverAmount; // TODO: safe math
+    interestGenerated = creatorAmount + receiverAmount; // TODO: safe math
     reward = interestGenerated * baseMultiplier;
   }
 
