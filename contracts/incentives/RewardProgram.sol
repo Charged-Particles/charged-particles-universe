@@ -60,7 +60,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
   function stake(address wallet, uint256 amount) override external onlyWalletManager {
     if (walletStake[wallet].started) {
-      walletStake[wallet] = Stake(true, block.timestamp, amount,0);
+      walletStake[wallet] = Stake(true, block.timestamp, amount,0,0);
     } else {
       Stake storage onGoingStake = walletStake[wallet];
       onGoingStake.principal += amount;
@@ -79,13 +79,14 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyWalletManager
   {
-    uint256 reward = calculateReward(creatorAmount, receiverAmount);
+    uint256 reward = this.calculateReward(creatorAmount, receiverAmount);
     Stake storage stake = walletStake[wallet];
     stake.generatedCharge = reward;
 
+
     // transfer ionx to user
     // todo: check decimals
-    IERC20(_programData.rewardToken).transfer(receiver, interestGenerated);
+    IERC20(_programData.rewardToken).transfer(receiver, reward);
   }
 
   function calculateReward(
