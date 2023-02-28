@@ -1599,6 +1599,5 @@ describe("[INTEGRATION] Charged Particles", () => {
       expect(await rewardProgram.rewardWalletManager()).to.be.eq(rewardWalletManager.address);
     });
 
-    
   });
 });
