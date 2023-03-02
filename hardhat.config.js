@@ -145,6 +145,16 @@ module.exports = {
                 count: 3,
             }
         },
+        zkenvTest: {
+            // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
+            url: 'https://rpc.public.zkevm-test.net',
+            accounts: {
+                mnemonic: mnemonic.mainnet,
+                initialIndex: 0,
+                count: 3,
+            },
+            chainId: 1442
+        },
     },
     etherscan: {
       apiKey: {
