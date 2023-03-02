@@ -153,6 +153,7 @@ module.exports = {
                 initialIndex: 0,
                 count: 3,
             },
+            timeout: 400000,
             chainId: 1442
         },
     },
