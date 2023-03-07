@@ -39,6 +39,7 @@ const chainIdByName = (chainName) => {
     case 'mumbai': return 80001;
     case 'hardhat': return 31337;
     case 'coverage': return 31337;
+    // TODO: update for zk-Polygon 
     default: return 0;
   }
 };
@@ -70,6 +71,7 @@ const chainTypeById = (chainId) => {
     case 31337:
     default:
       return {isProd: false, isTestnet: false, isHardhat: true};
+    // TODO: update for zk-Polygon 
   }
 };
 
