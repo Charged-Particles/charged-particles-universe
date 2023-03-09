@@ -43,10 +43,8 @@ contract RewardWalletManager is WalletManagerBase {
 
   IChargedSettings internal _chargedSettings;
 
-  // This should be dynamically set on functions calls.
-  // it should be calculated based on the deposited asset or the nft address
-  // if non reward program is found, panic.
-  address internal _rewardProgram;
+  mapping (address => address) internal _rewardPrograms;
+
   // mapping (address => address) internal rewardBy
 
   address internal _aaveBridge;
@@ -149,9 +147,7 @@ contract RewardWalletManager is WalletManagerBase {
     // Deposit into Smart-Wallet
     yieldTokensAmount = AaveSmartWalletB(wallet).deposit(assetToken, assetAmount, _referralCode);
 
-    // TODO: check if reward program is set
-    // if asset is USDc, register into reward program.
-    RewardProgram(_rewardProgram).stake(wallet, assetAmount);
+    RewardProgram(_rewardPrograms[assetToken]).stake(wallet, assetAmount);
 
     // Log Event
     emit WalletEnergized(contractAddress, tokenId, assetToken, assetAmount, yieldTokensAmount);
@@ -184,7 +180,7 @@ contract RewardWalletManager is WalletManagerBase {
     // Discharge the full amount of interest
     (creatorAmount, receiverAmount) = AaveSmartWalletB(wallet).withdrawAmount(receiver, creator, annuityPct, assetToken, ownerInterest);
     
-    RewardProgram(_rewardProgram).unstake(
+    RewardProgram(_rewardPrograms[assetToken]).unstake(
       wallet,
       receiver,
       ownerInterest
@@ -207,6 +203,7 @@ contract RewardWalletManager is WalletManagerBase {
     onlyController
     returns (uint256 creatorAmount, uint256 receiverAmount)
   {
+    // TODO: disabloe or manage.
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address wallet = _wallets[uuid];
     require(wallet != address(0x0), "AWM:E-403");
@@ -280,7 +277,7 @@ contract RewardWalletManager is WalletManagerBase {
     principalAmount = AaveSmartWalletB(wallet).getPrincipal(assetToken);
     (creatorAmount, receiverAmount) = AaveSmartWalletB(wallet).withdraw(receiver, creator, annuityPct, assetToken);
 
-    RewardProgram(_rewardProgram).unstake(
+    RewardProgram(_rewardPrograms[assetToken]).unstake(
       wallet,
       receiver,
       ownerInterest
@@ -401,9 +398,15 @@ contract RewardWalletManager is WalletManagerBase {
   |          Only Admin/DAO           |
   |__________________________________*/
 
-  function setRewardProgram(address rewardProgam) external onlyOwner {
+  function setRewardProgram(
+    address rewardProgam,
+    address energizableToken
+  )
+  external
+  onlyOwner
+  {
     require(rewardProgam != address(0x0), "AWM:E-403");
-    _rewardProgram = rewardProgam;
+    _rewardPrograms[energizableToken] = rewardProgam;
     emit RewardProgramSet(rewardProgam);
   }
 

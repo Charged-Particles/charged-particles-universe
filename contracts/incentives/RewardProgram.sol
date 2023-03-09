@@ -85,6 +85,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     onlyWalletManager
   {
     uint256 reward = this.calculateReward(amount);
+
     Stake storage stake = walletStake[wallet];
     stake.generatedCharge = amount;
     stake.reward = reward;
@@ -115,12 +116,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       uint256 rewardAjustedDecimals
     )
   {
-    // todo: check decimals.. ionx decimal - usdc decimals = 12
-    // 18 - 6 = 12 
-    // in order to conver usdc into ionx decimals multiply the reward 1e12
-    // test  and generic, call the decimals functions!
-    // valueB * (10**(18-6))
-
+    // todo: convert into generic.
     rewardAjustedDecimals = reward.mul(10**(12));
   }
 
