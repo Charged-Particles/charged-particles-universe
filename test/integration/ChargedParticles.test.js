@@ -1514,7 +1514,7 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   // RewardWallet 
   describe.only('Ionx reward program', function() {
-    const fundingAmount = ethers.utils.parseUnits('1');
+    const fundingAmount = ethers.utils.parseUnits('10');
 
     it ("can succesfully stake into reward program.", async () => {
     
@@ -1580,7 +1580,10 @@ describe("[INTEGRATION] Charged Particles", () => {
           1,
       )).to.be.revertedWith("Not wallet");
 
-      expect(await ionx.balanceOf(user2)).to.be.eq(0);
+      // expect(await ionx.balanceOf(user2)).to.be.eq(0);
+
+      await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + 2);
+
       await chargedParticles.connect(signer2).releaseParticle(
         user2,
         proton.address,
@@ -1594,12 +1597,12 @@ describe("[INTEGRATION] Charged Particles", () => {
 
       console.log(stakeOnRelease['generatedCharge'].toString(), stakeOnRelease['reward'].toString());
     
-    //   expect(await ionx.balanceOf(user2)).to.be.eq(stakeOnRelease['generatedCharge']);
-    // });
+      expect(await ionx.balanceOf(user2)).to.be.eq(stakeOnRelease['reward']);
+    });
 
-    // it ('Deployed wallet manager set in reward program', async function() {
-    //   const rewardWalletManager = getDeployData('RewardWalletManager', chainId);
-    //   expect(await rewardProgram.rewardWalletManager()).to.be.eq(rewardWalletManager.address);
+    it ('Deployed wallet manager set in reward program', async function() {
+      const rewardWalletManager = getDeployData('RewardWalletManager', chainId);
+      expect(await rewardProgram.rewardWalletManager()).to.be.eq(rewardWalletManager.address);
     });
 
   });

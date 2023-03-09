@@ -99,11 +99,11 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     view
     returns(
-      uint256 ajustedReward
+      uint256 baseReward
     )
   {
-    uint256 baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
-    ajustedReward = this.convertDecimals(baseReward);
+    baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
+    // ajustedReward = this.convertDecimals(baseReward);
   }
 
   function convertDecimals(

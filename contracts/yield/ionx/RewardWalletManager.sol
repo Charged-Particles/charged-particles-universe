@@ -277,17 +277,18 @@ contract RewardWalletManager is WalletManagerBase {
       creator = creatorRedirect;
     }
 
-    // Release Principal + Interest
+    (, uint256 ownerInterest) = AaveSmartWalletB(wallet).getInterest(assetToken,0);
+
     principalAmount = AaveSmartWalletB(wallet).getPrincipal(assetToken);
+
     (creatorAmount, receiverAmount) = AaveSmartWalletB(wallet).withdraw(receiver, creator, annuityPct, assetToken);
 
-    (, uint256 interestGathered) = AaveSmartWalletB(wallet).getInterest(assetToken,0);
     // uint256 interestGathered =  AaveSmartWalletB(wallet).getInterest(assetToken,0);
 
     RewardProgram(_rewardProgram).unstake(
       wallet,
       receiver,
-      interestGathered
+      ownerInterest
     );
 
     // Log Event
