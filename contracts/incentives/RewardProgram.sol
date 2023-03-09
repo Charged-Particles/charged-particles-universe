@@ -38,7 +38,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     rewardWalletManager = _rewardWalletManager;
     baseMultiplier = _baseMultiplier;
-    // TODO: Basis porint as in traditional finance. 100000 = 100%, 100 = 1%
 
     emit RewardProgramCreated(address(this));
   }
@@ -91,7 +90,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     stake.reward = reward;
 
     // transfer ionx to user
-    IERC20(_programData.rewardToken).transfer(receiver, reward);
+    // IERC20(_programData.rewardToken).transfer(receiver, reward);
   }
 
   function calculateReward(
@@ -100,11 +99,11 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     view
     returns(
-      uint256 baseReward
+      uint256 ajustedReward
     )
   {
-    uint256 ajustedReward = this.convertDecimals(amount);
-    baseReward = ajustedReward.mul(baseMultiplier).div(PERCENTAGE_SCALE);
+    uint256 baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
+    ajustedReward = this.convertDecimals(baseReward);
   }
 
   function convertDecimals(
