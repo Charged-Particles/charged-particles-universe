@@ -121,7 +121,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     // test  and generic, call the decimals functions!
     // valueB * (10**(18-6))
 
-    rewardAjustedDecimals = reward.mul(10**(18-6));
+    rewardAjustedDecimals = reward.mul(10**(12));
   }
 
   function setBaseMultiplier(uint256 newMultiplier)

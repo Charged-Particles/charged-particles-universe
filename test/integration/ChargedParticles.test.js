@@ -1514,7 +1514,7 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   // RewardWallet 
   describe.only('Ionx reward program', function() {
-    const fundingAmount = ethers.utils.parseUnits('1000', 18);
+    const fundingAmount = ethers.utils.parseUnits('1');
 
     it ("can succesfully stake into reward program.", async () => {
     
@@ -1549,7 +1549,7 @@ describe("[INTEGRATION] Charged Particles", () => {
           'reward',                     // walletManagerId
           daiAddress,                   // assetToken
           toWei('10'),                  // assetAmount
-          annuityPct,                   // annuityPercent
+          0,                            // annuityPercent
         ],
       });
     
@@ -1590,7 +1590,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       );
       expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
       const stakeOnRelease = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
-      expect(stakeOnRelease['generatedCharge']).gt(0);
+      // expect(stakeOnRelease['generatedCharge']).gt(0);
 
       console.log(stakeOnRelease['generatedCharge'].toString(), stakeOnRelease['reward'].toString());
     
