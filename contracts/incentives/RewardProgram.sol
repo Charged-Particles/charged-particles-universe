@@ -75,16 +75,15 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   function unstake(
     address wallet,
     address receiver,
-    uint256 creatorAmount,
-    uint256 receiverAmount
+    uint256 amount
   ) 
     override
     external
     onlyWalletManager
   {
-    (uint256 reward, uint256 interestGenerated) = this.calculateReward(creatorAmount, receiverAmount);
+    uint256 reward = this.calculateReward(amount);
     Stake storage stake = walletStake[wallet];
-    stake.generatedCharge = interestGenerated;
+    stake.generatedCharge = amount;
     stake.reward = reward;
 
     // transfer ionx to user
@@ -96,18 +95,15 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   }
 
   function calculateReward(
-    uint256 creatorAmount,
-    uint256 receiverAmount
+    uint256 amount
   )
     external
     view
     returns(
-      uint256 baseReward,
-      uint256 interestGenerated
+      uint256 baseReward
     )
   {
-    interestGenerated = creatorAmount + receiverAmount; // TODO: safe math
-    baseReward = interestGenerated * baseMultiplier;
+    baseReward = amount * baseMultiplier;
   }
 
   function setBaseMultiplier(uint256 newMultiplier)

@@ -67,8 +67,7 @@ interface IRewardProgram {
   function unstake(
     address smartWallet,
     address receiver,
-    uint256 creatorAmount,
-    uint256 receiverAmount
+    uint256 amount
   )
     external;
 

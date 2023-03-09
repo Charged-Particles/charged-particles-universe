@@ -183,12 +183,12 @@ contract RewardWalletManager is WalletManagerBase {
 
     // Discharge the full amount of interest
     (creatorAmount, receiverAmount) = AaveSmartWalletB(wallet).withdrawAmount(receiver, creator, annuityPct, assetToken, ownerInterest);
-
+    
+    uint256 interestGenerated = creatorAmount.add(receiverAmount) ;
     RewardProgram(_rewardProgram).unstake(
       wallet,
       receiver,
-      creatorAmount,
-      receiverAmount
+      interestGenerated
     );
 
     // Log Event
@@ -280,12 +280,11 @@ contract RewardWalletManager is WalletManagerBase {
     principalAmount = AaveSmartWalletB(wallet).getPrincipal(assetToken);
     (creatorAmount, receiverAmount) = AaveSmartWalletB(wallet).withdraw(receiver, creator, annuityPct, assetToken);
 
-    // TODO: SUM BOTH AMOUNTS HERE !
+    uint256 interestGenerated = creatorAmount.add(receiverAmount);
     RewardProgram(_rewardProgram).unstake(
       wallet,
       receiver,
-      creatorAmount,
-      receiverAmount
+      interestGenerated
     );
 
     // Log Event
