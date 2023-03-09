@@ -4,11 +4,14 @@ pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
 import "../interfaces/IRewardProgram.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../lib/BlackholePrevention.sol";
 
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
+  using SafeMath for uint256;
+
   ProgramRewardData public _programData;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
@@ -105,7 +108,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       uint256 baseReward
     )
   {
-    baseReward = amount * baseMultiplier;
+    baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
   }
 
   function setBaseMultiplier(uint256 newMultiplier)
