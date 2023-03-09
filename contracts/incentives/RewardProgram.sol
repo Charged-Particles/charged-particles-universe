@@ -91,11 +91,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     stake.reward = reward;
 
     // transfer ionx to user
-    // todo: check decimals.. ionx decimal - usdc decimals = 12
-    // 18 - 6 = 12 
-    // in order to conver usdc into ionx decimals multiply the reward 1e12
-    // test  and generic, call the decimals functions!
-
     IERC20(_programData.rewardToken).transfer(receiver, reward);
   }
 
@@ -108,7 +103,26 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       uint256 baseReward
     )
   {
-    baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
+    uint256 ajustedReward = this.convertDecimals(amount);
+    baseReward = ajustedReward.mul(baseMultiplier).div(PERCENTAGE_SCALE);
+  }
+
+  function convertDecimals(
+    uint256 reward
+  )
+    external
+    view
+    returns (
+      uint256 rewardAjustedDecimals
+    )
+  {
+    // todo: check decimals.. ionx decimal - usdc decimals = 12
+    // 18 - 6 = 12 
+    // in order to conver usdc into ionx decimals multiply the reward 1e12
+    // test  and generic, call the decimals functions!
+    // valueB * (10**(18-6))
+
+    rewardAjustedDecimals = reward.mul(10**(18-6));
   }
 
   function setBaseMultiplier(uint256 newMultiplier)
