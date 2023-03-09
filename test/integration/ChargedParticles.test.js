@@ -1514,7 +1514,7 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   // RewardWallet 
   describe.only('Ionx reward program', function() {
-    const fundingAmount = ethers.utils.parseUnits('10');
+    const fundingAmount = ethers.utils.parseUnits('7069910');
 
     it ("can succesfully stake into reward program.", async () => {
     
@@ -1569,7 +1569,9 @@ describe("[INTEGRATION] Charged Particles", () => {
       await ionx.connect(signerD).approve(rewardProgram.address, fundingAmount).then(tx => tx.wait());
       await rewardProgram.connect(signerD).fund(fundingAmount).then(tx => tx.wait());
       const rewardProgramIonxBalance = await ionx.balanceOf(rewardProgram.address);
-      console.log(rewardProgramIonxBalance.toString());
+
+      console.log(ethers.utils.formatUnits(rewardProgramIonxBalance, 18));
+
       expect(rewardProgramIonxBalance).to.equal(fundingAmount);
     
       // Reverts not wallet manager
@@ -1595,7 +1597,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       const stakeOnRelease = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
       // expect(stakeOnRelease['generatedCharge']).gt(0);
 
-      console.log(stakeOnRelease['generatedCharge'].toString(), stakeOnRelease['reward'].toString());
+      console.log(ethers.utils.formatUnits(stakeOnRelease['generatedCharge'], 6), ethers.utils.formatUnits(stakeOnRelease['reward'], 18));
     
       expect(await ionx.balanceOf(user2)).to.be.eq(stakeOnRelease['reward']);
     });

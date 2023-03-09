@@ -90,7 +90,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     stake.reward = reward;
 
     // transfer ionx to user
-    // IERC20(_programData.rewardToken).transfer(receiver, reward);
+    IERC20(_programData.rewardToken).transfer(receiver, reward);
   }
 
   function calculateReward(
@@ -99,11 +99,11 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     view
     returns(
-      uint256 baseReward
+      uint256 ajustedReward
     )
   {
-    baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
-    // ajustedReward = this.convertDecimals(baseReward);
+    uint256 baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
+    ajustedReward = this.convertDecimals(baseReward);
   }
 
   function convertDecimals(
