@@ -149,7 +149,7 @@ contract RewardWalletManager is WalletManagerBase {
     // Deposit into Smart-Wallet
     yieldTokensAmount = AaveSmartWalletB(wallet).deposit(assetToken, assetAmount, _referralCode);
 
-    // check if reward program is set
+    // TODO: check if reward program is set
     // if asset is USDc, register into reward program.
     RewardProgram(_rewardProgram).stake(wallet, assetAmount);
 

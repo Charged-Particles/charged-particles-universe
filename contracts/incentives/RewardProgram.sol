@@ -11,6 +11,7 @@ import "../lib/BlackholePrevention.sol";
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   ProgramRewardData public _programData;
 
+  uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
   address public rewardWalletManager;
   uint256 public baseMultiplier;
 
@@ -91,6 +92,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     // 18 - 6 = 12 
     // in order to conver usdc into ionx decimals multiply the reward 1e12
     // test  and generic, call the decimals functions!
+
     IERC20(_programData.rewardToken).transfer(receiver, reward);
   }
 
