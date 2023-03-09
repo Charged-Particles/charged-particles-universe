@@ -1576,7 +1576,6 @@ describe("[INTEGRATION] Charged Particles", () => {
           user2,
           proton.address,
           1,
-          1
       )).to.be.revertedWith("Not wallet");
 
       expect(await ionx.balanceOf(user2)).to.be.eq(0);
