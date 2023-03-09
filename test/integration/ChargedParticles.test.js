@@ -1582,7 +1582,7 @@ describe("[INTEGRATION] Charged Particles", () => {
           1,
       )).to.be.revertedWith("Not wallet");
 
-      // expect(await ionx.balanceOf(user2)).to.be.eq(0);
+      expect(await ionx.balanceOf(user2)).to.be.eq(0);
 
       await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + 2);
 
@@ -1595,7 +1595,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       );
       expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
       const stakeOnRelease = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
-      // expect(stakeOnRelease['generatedCharge']).gt(0);
+      expect(stakeOnRelease['generatedCharge']).gt(0);
 
       console.log(ethers.utils.formatUnits(stakeOnRelease['generatedCharge'], 6), ethers.utils.formatUnits(stakeOnRelease['reward'], 18));
     

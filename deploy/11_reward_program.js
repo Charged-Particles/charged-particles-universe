@@ -33,7 +33,7 @@ const {
         ionx.address,
         rewardWalletManager.address,
         '1',
-        10000
+        5000
       ],
       log: true,
       contract: "contracts/incentives/RewardProgram.sol:RewardProgram",
