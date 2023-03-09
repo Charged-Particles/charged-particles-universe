@@ -280,6 +280,7 @@ contract RewardWalletManager is WalletManagerBase {
     principalAmount = AaveSmartWalletB(wallet).getPrincipal(assetToken);
     (creatorAmount, receiverAmount) = AaveSmartWalletB(wallet).withdraw(receiver, creator, annuityPct, assetToken);
 
+    // TODO: SUM BOTH AMOUNTS HERE !
     RewardProgram(_rewardProgram).unstake(
       wallet,
       receiver,
