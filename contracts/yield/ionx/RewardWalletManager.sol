@@ -147,7 +147,7 @@ contract RewardWalletManager is WalletManagerBase {
     // Deposit into Smart-Wallet
     yieldTokensAmount = AaveSmartWalletB(wallet).deposit(assetToken, assetAmount, _referralCode);
 
-    RewardProgram(_rewardPrograms[assetToken]).stake(wallet, assetAmount);
+    RewardProgram(this.getRewardProgram(assetToken)).stake(wallet, assetAmount);
 
     // Log Event
     emit WalletEnergized(contractAddress, tokenId, assetToken, assetAmount, yieldTokensAmount);
@@ -180,7 +180,7 @@ contract RewardWalletManager is WalletManagerBase {
     // Discharge the full amount of interest
     (creatorAmount, receiverAmount) = AaveSmartWalletB(wallet).withdrawAmount(receiver, creator, annuityPct, assetToken, ownerInterest);
     
-    RewardProgram(_rewardPrograms[assetToken]).unstake(
+    RewardProgram(this.getRewardProgram(assetToken)).unstake(
       wallet,
       receiver,
       ownerInterest
@@ -277,7 +277,7 @@ contract RewardWalletManager is WalletManagerBase {
     principalAmount = AaveSmartWalletB(wallet).getPrincipal(assetToken);
     (creatorAmount, receiverAmount) = AaveSmartWalletB(wallet).withdraw(receiver, creator, annuityPct, assetToken);
 
-    RewardProgram(_rewardPrograms[assetToken]).unstake(
+    RewardProgram(this.getRewardProgram(assetToken)).unstake(
       wallet,
       receiver,
       ownerInterest
@@ -319,6 +319,7 @@ contract RewardWalletManager is WalletManagerBase {
     emit WalletReleased(contractAddress, tokenId, receiver, assetToken, principalAmount, creatorAmount, receiverAmount);
   }
 
+  // TODO: this might need to be removed, its confusing.
   function withdrawRewards(
     address receiver,
     address contractAddress,
@@ -394,6 +395,18 @@ contract RewardWalletManager is WalletManagerBase {
     return wallet;
   }
 
+    function getRewardProgram(
+    address assetToken
+  )
+    external
+    returns (address)
+  {
+    address rewardProgram = _rewardPrograms[assetToken];
+    require (rewardProgram != address(0), "Non  existing reward program.");
+
+    return rewardProgram;
+  }
+
   /***********************************|
   |          Only Admin/DAO           |
   |__________________________________*/
@@ -445,4 +458,5 @@ contract RewardWalletManager is WalletManagerBase {
     AaveSmartWalletB(newWallet).initialize(_aaveBridge);
     return newWallet;
   }
+
 }

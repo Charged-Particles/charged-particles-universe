@@ -1607,5 +1607,24 @@ describe("[INTEGRATION] Charged Particles", () => {
       expect(await rewardProgram.rewardWalletManager()).to.be.eq(rewardWalletManager.address);
     });
 
+    it ('It records a second nft into the reward program', async function() {
+      const energizedParticleId = await callAndReturn({
+        contractInstance: proton,
+        contractMethod: 'createChargedParticle',
+        contractCaller: signer1,
+        contractParams: [
+          user1,                        // creator
+          user2,                        // receiver
+          user1,                        // referrer
+          TEST_NFT_TOKEN_URI,           // tokenMetaUri
+          'reward',                     // walletManagerId
+          daiAddress,                   // assetToken
+          toWei('10'),                  // assetAmount
+          0,                            // annuityPercent
+        ],
+      });
+      console.log('>>>>>>>>>>>>> ', energizedParticleId);
+    });
+
   });
 });
