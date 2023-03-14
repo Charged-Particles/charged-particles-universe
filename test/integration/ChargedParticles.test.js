@@ -1522,10 +1522,10 @@ describe("[INTEGRATION] Charged Particles", () => {
       await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
       await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
     
-      await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+      await signerD.sendTransaction({ to: daiHodler, value: toWei('20') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
     
-      await dai.connect(daiSigner).transfer(user1, toWei('10'));
-      await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+      await dai.connect(daiSigner).transfer(user1, toWei('20'));
+      await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('20'));
     
       await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
       await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
@@ -1542,14 +1542,14 @@ describe("[INTEGRATION] Charged Particles", () => {
         contractMethod: 'createChargedParticle',
         contractCaller: signer1,
         contractParams: [
-          user1,                        // creator
-          user2,                        // receiver
-          user1,                        // referrer
-          TEST_NFT_TOKEN_URI,           // tokenMetaUri
-          'reward',                     // walletManagerId
-          daiAddress,                   // assetToken
+          user1,                       // creator
+          user2,                       // receiver
+          user1,                       // referrer
+          TEST_NFT_TOKEN_URI,          // tokenMetaUri
+          'reward',                    // walletManagerId
+          daiAddress,                  // assetToken
           toWei('10'),                  // assetAmount
-          0,                            // annuityPercent
+          0,                           // annuityPercent
         ],
       });
     
@@ -1614,7 +1614,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         contractCaller: signer1,
         contractParams: [
           user1,                        // creator
-          user2,                        // receiver
+          user1,                        // receiver
           user1,                        // referrer
           TEST_NFT_TOKEN_URI,           // tokenMetaUri
           'reward',                     // walletManagerId
@@ -1623,8 +1623,6 @@ describe("[INTEGRATION] Charged Particles", () => {
           0,                            // annuityPercent
         ],
       });
-      console.log('>>>>>>>>>>>>> ', energizedParticleId);
     });
-
   });
 });
