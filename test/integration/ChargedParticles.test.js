@@ -1648,5 +1648,11 @@ describe("[INTEGRATION] Charged Particles", () => {
       const tenConvertedValue = await rewardProgram.convertDecimals(10);
       expect(tenConvertedValue.toString().split('').filter(v => v === '0').length).to.be.eq(13);
     });
+
+    it ('Calculates reward', async () => {
+      const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
+      const reward = await rewardProgram.calculateReward(chargedGeneratedInUsdc);
+      expect(ethers.utils.formatEther(reward.toString(), 18)).to.be.eq('1.0');
+    })
   });
 });
