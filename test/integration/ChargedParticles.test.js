@@ -1522,10 +1522,10 @@ describe("[INTEGRATION] Charged Particles", () => {
       await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
       await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
     
-      await signerD.sendTransaction({ to: daiHodler, value: toWei('20') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+      await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
     
-      await dai.connect(daiSigner).transfer(user1, toWei('20'));
-      await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('20'));
+      await dai.connect(daiSigner).transfer(user1, toWei('10'));
+      await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
     
       await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
       await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
@@ -1608,6 +1608,11 @@ describe("[INTEGRATION] Charged Particles", () => {
     });
 
     it ('It records a second nft into the reward program', async function() {
+      await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+    
+      await dai.connect(daiSigner).transfer(user1, toWei('10'));
+      await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
       const energizedParticleId = await callAndReturn({
         contractInstance: proton,
         contractMethod: 'createChargedParticle',
@@ -1623,6 +1628,8 @@ describe("[INTEGRATION] Charged Particles", () => {
           0,                            // annuityPercent
         ],
       });
+
+      console.log(energizedParticleId);
     });
   });
 });
