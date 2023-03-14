@@ -1623,7 +1623,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       expect(await rewardProgram.rewardWalletManager()).to.be.eq(rewardWalletManager.address);
     });
 
-    it('It records a second nft into the reward program', async function() {
+    it('Reverts when subscribing to the wrong reward program.', async function() {
       await signerD.sendTransaction({ to: usdcHodler, value: toWei('10') });
       await usdc.connect(usdcSigner).transfer(user1, '100000000000');
       await usdc.connect(signer1)['approve(address,uint256)'](proton.address, '100000000000');
@@ -1640,8 +1640,13 @@ describe("[INTEGRATION] Charged Particles", () => {
           0,                            // annuityPercent
        )
       ).to.be.revertedWith("Non  existing reward program.");
-
     });
-    
+
+    it('Converts decimals', async () => {
+      const oneConvertedValue = await rewardProgram.convertDecimals(1);
+      expect(oneConvertedValue.toString().split('').filter(v => v === '0').length).to.be.eq(12);
+      const tenConvertedValue = await rewardProgram.convertDecimals(10);
+      expect(tenConvertedValue.toString().split('').filter(v => v === '0').length).to.be.eq(13);
+    });
   });
 });
