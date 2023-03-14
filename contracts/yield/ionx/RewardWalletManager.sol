@@ -45,8 +45,6 @@ contract RewardWalletManager is WalletManagerBase {
 
   mapping (address => address) internal _rewardPrograms;
 
-  // mapping (address => address) internal rewardBy
-
   address internal _aaveBridge;
   uint256 internal _referralCode;
 
@@ -402,6 +400,7 @@ contract RewardWalletManager is WalletManagerBase {
     returns (address)
   {
     address rewardProgram = _rewardPrograms[assetToken];
+
     require (rewardProgram != address(0), "Non  existing reward program.");
 
     return rewardProgram;

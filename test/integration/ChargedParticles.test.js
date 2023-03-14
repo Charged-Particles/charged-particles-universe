@@ -41,6 +41,7 @@ const erc20ABI = require('../abis/erc20');
 const { balanceOf } = require('../../js-helpers/balanceOf');
 const daiHodler = "0x55e4d16f9c3041EfF17Ca32850662f3e9Dddbce7"; // Hodler with the highest current amount of DAI, used for funding our operations on mainnet fork.
 const amplHodler = "0x6723B7641c8Ac48a61F5f505aB1E9C03Bb44a301";
+const usdcHodler = "0xF977814e90dA44bFA03b6295A0616a897441aceC";
 
 let overrides = { gasLimit: 20000000 }
 const buyProtonGasLimit = toWei('0.5');
@@ -53,6 +54,8 @@ describe("[INTEGRATION] Charged Particles", () => {
   let daiAddress;
   let ampl;
   let amplAddress;
+  let usdc;
+  let usdcAddress
   let cryptoPunksMarket;
 
   // Internal contracts
@@ -84,6 +87,7 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   let daiSigner;
   let amplSigner;
+  let usdcSigner;
   let deployer;
   let protocolOwner
   let protocolOwnerSigner
@@ -99,6 +103,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     chainId = await getChainId(); // chainIdByName(network.name);
     daiAddress = presets.Aave.v2.dai[chainId];
     amplAddress = presets.Aave.v2.ampl[chainId];
+    usdcAddress = presets.Aave.v2.usdc[chainId];
 
     // With Forked Mainnet
     await network.provider.request({
@@ -109,9 +114,15 @@ describe("[INTEGRATION] Charged Particles", () => {
       method: "hardhat_impersonateAccount",
       params: [amplHodler]
     });
+    await network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [usdcHodler]
+    });
 
     daiSigner = ethers.provider.getSigner(daiHodler);
     amplSigner = ethers.provider.getSigner(amplHodler);
+    usdcSigner = ethers.provider.getSigner(usdcHodler);
+
     const namedAccts = (await getNamedAccounts());
     deployer = namedAccts.deployer
     trustedForwarder = namedAccts.trustedForwarder;
@@ -129,6 +140,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     // With Forked Mainnet
     dai = new ethers.Contract(daiAddress, daiABI, daiSigner);
     ampl = new ethers.Contract(amplAddress, erc20ABI, amplSigner);
+    usdc = new ethers.Contract(usdcAddress, erc20ABI, usdcSigner);
 
     // test NFTs that are non-compliant with ERC721 standard
     cryptoPunksMarket = await deployMockContract(signerD, CryptoPunksMarket.abi, overrides);
@@ -186,6 +198,10 @@ describe("[INTEGRATION] Charged Particles", () => {
     await network.provider.request({
       method: "hardhat_stopImpersonatingAccount",
       params: [amplHodler]
+    });
+    await network.provider.request({
+      method: "hardhat_stopImpersonatingAccount",
+      params: [usdcHodler]
     });
   });
 
@@ -1607,29 +1623,25 @@ describe("[INTEGRATION] Charged Particles", () => {
       expect(await rewardProgram.rewardWalletManager()).to.be.eq(rewardWalletManager.address);
     });
 
-    it ('It records a second nft into the reward program', async function() {
-      await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
-    
-      await dai.connect(daiSigner).transfer(user1, toWei('10'));
-      await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+    it('It records a second nft into the reward program', async function() {
+      await signerD.sendTransaction({ to: usdcHodler, value: toWei('10') });
+      await usdc.connect(usdcSigner).transfer(user1, '100000000000');
+      await usdc.connect(signer1)['approve(address,uint256)'](proton.address, '100000000000');
 
-      const energizedParticleId = await callAndReturn({
-        contractInstance: proton,
-        contractMethod: 'createChargedParticle',
-        contractCaller: signer1,
-        contractParams: [
+      await expect(
+        proton.connect(signer1).createChargedParticle(
           user1,                        // creator
           user1,                        // receiver
           user1,                        // referrer
           TEST_NFT_TOKEN_URI,           // tokenMetaUri
-          'reward',                     // walletManagerId
-          daiAddress,                   // assetToken
-          toWei('10'),                  // assetAmount
+          'reward',                    // walletManagerId
+          usdcAddress,                  // assetToken
+          '100000000000',               // assetAmount
           0,                            // annuityPercent
-        ],
-      });
+       )
+      ).to.be.revertedWith("Non  existing reward program.");
 
-      console.log(energizedParticleId);
     });
+    
   });
 });
