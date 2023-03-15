@@ -1661,6 +1661,9 @@ describe("[INTEGRATION] Charged Particles", () => {
       const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
       const reward = await rewardProgram.calculateReward(chargedGeneratedInUsdc);
       expect(ethers.utils.formatEther(reward.toString(), 18)).to.be.eq('0.5');
+
+      await rewardProgram.connect(signerD).setBaseMultiplier(15000);
+      expect(ethers.utils.formatEther(await rewardProgram.calculateReward(chargedGeneratedInUsdc), 18)).to.be.eq('1.5');
     })
   });
 });
