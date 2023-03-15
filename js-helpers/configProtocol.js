@@ -32,7 +32,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const depositCaps = presets.ChargedParticles.maxDeposits;
     const rewardsForAssetTokens = presets.Ionx.rewardsForAssetTokens;
     const tempLockExpiryBlocks = presets.ChargedParticles.tempLockExpiryBlocks;
-    const daiAddress = presets.Aave.v2.dai[chainId];
+    const usdcAddress = presets.Aave.v2.usdc[chainId];
 
     const ddUniverse = getDeployData('Universe', chainId);
     const ddChargedState = getDeployData('ChargedState', chainId);
@@ -326,7 +326,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     );
 
     await executeTx('11-d', 'RewardWalletManager: register reward program into wallet manager', async () =>
-      await rewardWalletManager.setRewardProgram(ddRewardProgram.address, daiAddress)
+      await rewardWalletManager.setRewardProgram(ddRewardProgram.address, usdcAddress)
     );
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

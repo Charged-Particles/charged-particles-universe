@@ -1530,18 +1530,17 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   // RewardWallet 
   describe.only('Ionx reward program', function() {
-    const fundingAmount = ethers.utils.parseUnits('7069910');
+    const fundingAmount = ethers.utils.parseUnits('70');
 
     it ("can succesfully stake into reward program.", async () => {
-    
       await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
       await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
       await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
     
-      await signerD.sendTransaction({ to: daiHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+      await signerD.sendTransaction({ to: usdcHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
     
-      await dai.connect(daiSigner).transfer(user1, toWei('10'));
-      await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+      await usdc.connect(usdcSigner).transfer(user1, '100000000000');
+      await usdc.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
     
       await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
       await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
@@ -1550,7 +1549,8 @@ describe("[INTEGRATION] Charged Particles", () => {
       await expect(
         rewardProgram.connect(signerD).stake(
           tokenInfoProxyMock.address,
-          fundingAmount)
+          fundingAmount
+        )
       ).to.be.revertedWith("Not wallet");
 
       const energizedParticleId = await callAndReturn({
@@ -1563,7 +1563,7 @@ describe("[INTEGRATION] Charged Particles", () => {
           user1,                       // referrer
           TEST_NFT_TOKEN_URI,          // tokenMetaUri
           'reward',                    // walletManagerId
-          daiAddress,                  // assetToken
+          usdcAddress,                  // assetToken
           toWei('10'),                  // assetAmount
           0,                           // annuityPercent
         ],
@@ -1586,8 +1586,6 @@ describe("[INTEGRATION] Charged Particles", () => {
       await rewardProgram.connect(signerD).fund(fundingAmount).then(tx => tx.wait());
       const rewardProgramIonxBalance = await ionx.balanceOf(rewardProgram.address);
 
-      console.log(ethers.utils.formatUnits(rewardProgramIonxBalance, 18));
-
       expect(rewardProgramIonxBalance).to.equal(fundingAmount);
     
       // Reverts not wallet manager
@@ -1607,14 +1605,12 @@ describe("[INTEGRATION] Charged Particles", () => {
         proton.address,
         energizedParticleId,
         'reward',
-        daiAddress
+        usdcAddress 
       );
-      expect(await dai.balanceOf(user2)).to.be.above(toWei('9.9'));
+      expect(await usdc.balanceOf(user2)).to.be.above(toWei('9.9'));
       const stakeOnRelease = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
       expect(stakeOnRelease['generatedCharge']).gt(0);
 
-      console.log(ethers.utils.formatUnits(stakeOnRelease['generatedCharge'], 6), ethers.utils.formatUnits(stakeOnRelease['reward'], 18));
-    
       expect(await ionx.balanceOf(user2)).to.be.eq(stakeOnRelease['reward']);
     });
 
@@ -1624,9 +1620,9 @@ describe("[INTEGRATION] Charged Particles", () => {
     });
 
     it('Reverts when subscribing to the wrong reward program.', async function() {
-      await signerD.sendTransaction({ to: usdcHodler, value: toWei('10') });
-      await usdc.connect(usdcSigner).transfer(user1, '100000000000');
-      await usdc.connect(signer1)['approve(address,uint256)'](proton.address, '100000000000');
+      await signerD.sendTransaction({ to: daiHodler, value: toWei('10') });
+      await dai.connect(daiSigner).transfer(user1, toWei('10'));
+      await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
 
       await expect(
         proton.connect(signer1).createChargedParticle(
@@ -1635,8 +1631,8 @@ describe("[INTEGRATION] Charged Particles", () => {
           user1,                        // referrer
           TEST_NFT_TOKEN_URI,           // tokenMetaUri
           'reward',                    // walletManagerId
-          usdcAddress,                  // assetToken
-          '100000000000',               // assetAmount
+          daiAddress,                  // assetToken
+          toWei('10'),                   // assetAmount
           0,                            // annuityPercent
        )
       ).to.be.revertedWith("Non  existing reward program.");
@@ -1664,6 +1660,7 @@ describe("[INTEGRATION] Charged Particles", () => {
 
       await rewardProgram.connect(signerD).setBaseMultiplier(15000);
       expect(ethers.utils.formatEther(await rewardProgram.calculateReward(chargedGeneratedInUsdc), 18)).to.be.eq('1.5');
-    })
+      await rewardProgram.connect(signerD).setBaseMultiplier(1000);
+    });
   });
 });
