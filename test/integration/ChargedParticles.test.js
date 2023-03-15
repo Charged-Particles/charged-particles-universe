@@ -1607,7 +1607,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         'reward',
         usdcAddress 
       );
-      expect(await usdc.balanceOf(user2)).to.be.above(toWei('9.9'));
+      expect(await usdc.balanceOf(user2)).to.be.above('90000000000');
       const stakeOnRelease = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
       expect(stakeOnRelease['generatedCharge']).gt(0);
 
