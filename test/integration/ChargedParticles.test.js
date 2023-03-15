@@ -1564,7 +1564,7 @@ describe("[INTEGRATION] Charged Particles", () => {
           TEST_NFT_TOKEN_URI,          // tokenMetaUri
           'reward',                    // walletManagerId
           usdcAddress,                  // assetToken
-          toWei('10'),                  // assetAmount
+          '100000000000',                  // assetAmount
           0,                           // annuityPercent
         ],
       });
