@@ -103,6 +103,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       uint256 ajustedReward
     )
   {
+    // TODO: should be check > 0 ?
     uint256 baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
     ajustedReward = this.convertDecimals(baseReward);
   }
