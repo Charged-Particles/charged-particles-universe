@@ -1644,23 +1644,5 @@ describe("[INTEGRATION] Charged Particles", () => {
       const tenConvertedValue = await rewardProgram.convertDecimals(10);
       expect(tenConvertedValue.toString().split('').filter(v => v === '0').length).to.be.eq(13);
     });
-
-    it ('Calculates reward with multiplier as 100%', async () => {
-      const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
-      const reward = await rewardProgram.calculateReward(chargedGeneratedInUsdc);
-      expect(ethers.utils.formatEther(reward.toString(), 18)).to.be.eq('1.0');
-    });
-
-    it ('Reward with .5 multiplier', async () => {
-      await rewardProgram.connect(signerD).setBaseMultiplier(5000);
-
-      const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
-      const reward = await rewardProgram.calculateReward(chargedGeneratedInUsdc);
-      expect(ethers.utils.formatEther(reward.toString(), 18)).to.be.eq('0.5');
-
-      await rewardProgram.connect(signerD).setBaseMultiplier(15000);
-      expect(ethers.utils.formatEther(await rewardProgram.calculateReward(chargedGeneratedInUsdc), 18)).to.be.eq('1.5');
-      await rewardProgram.connect(signerD).setBaseMultiplier(1000);
-    });
   });
 });

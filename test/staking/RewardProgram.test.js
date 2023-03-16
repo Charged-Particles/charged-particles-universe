@@ -35,9 +35,8 @@ describe('Reward program', function () {
     const Ionx = await ethers.getContractFactory('Ionx');
     ionx = await Ionx.attach(ddIonx.address);
 
-    const { protonC } = await getChargedContracts();
-
-    console.log(protonC);
+    // const { protonC } = await getChargedContracts();
+    // console.log(protonC);
   });
 
   beforeEach(async function () {
@@ -72,6 +71,24 @@ describe('Reward program', function () {
       await rewardProgram.connect(deployerSigner).fund(fundingAmount).then(tx => tx.wait());
 
       expect(await ionx.balanceOf(rewardProgram.address)).to.equal(fundingAmount);
+    });
+
+    it ('Calculates reward with multiplier as 100%', async () => {
+      const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
+      const reward = await rewardProgram.calculateReward(chargedGeneratedInUsdc);
+      expect(ethers.utils.formatEther(reward.toString(), 18)).to.be.eq('1.0');
+    });
+
+    it ('Reward with .5 multiplier', async () => {
+      await rewardProgram.connect(deployerSigner).setBaseMultiplier(5000);
+
+      const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
+      const reward = await rewardProgram.calculateReward(chargedGeneratedInUsdc);
+      expect(ethers.utils.formatEther(reward.toString(), 18)).to.be.eq('0.5');
+
+      await rewardProgram.connect(deployerSigner).setBaseMultiplier(15000);
+      expect(ethers.utils.formatEther(await rewardProgram.calculateReward(chargedGeneratedInUsdc), 18)).to.be.eq('1.5');
+      await rewardProgram.connect(deployerSigner).setBaseMultiplier(1000);
     });
   });
 });
