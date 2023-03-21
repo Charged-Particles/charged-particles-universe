@@ -78,7 +78,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
 
   function unstake(
-    address wallet,
+    uint256 uuid,
     address receiver,
     uint256 amount
   ) 
@@ -88,12 +88,14 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   {
     uint256 reward = this.calculateReward(amount);
 
-    Stake storage stake = walletStake[wallet];
+    Stake storage stake = walletStake[uuid];
     stake.generatedCharge = amount;
     stake.reward = reward;
 
     // transfer ionx to user
     IERC20(_programData.rewardToken).transfer(receiver, reward);
+
+    emit Unstaked(uuid, amount);
   }
 
   function leptonDeposit(uint256 tokenId) external onlyBasketManager {

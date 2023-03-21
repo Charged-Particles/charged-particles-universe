@@ -10,7 +10,7 @@ interface IRewardProgram {
   /* user events */
 
   event Staked(uint256 uuid, uint256 amount);
-  // event Unstaked(address vault, uint256 amount);
+  event Unstaked(uint256 uuid, uint256 amount);
   // event RewardClaimed(address vault, address token, uint256 amount);
 
   /* data types */
@@ -65,7 +65,7 @@ interface IRewardProgram {
     external;
 
   function unstake(
-    address smartWallet,
+    uint256 uuid,
     address receiver,
     uint256 amount
   )
