@@ -1571,13 +1571,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     
       await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
     
-      const energizedNftWalletManagerAddress = await rewardWalletManager.callStatic.getWalletAddressById(
-        proton.address, 
-        energizedParticleId,
-        proton.address, 
-        100
-      );
-      const initiatedStakeOnEnergized = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
+      const uuid = await tokenInfoProxy.getTokenUUID(proton.address, energizedParticleId);
+      const initiatedStakeOnEnergized = await rewardProgram.walletStake(uuid);
       expect(initiatedStakeOnEnergized).to.have.property('start');
     
       // fund reward program.
@@ -1608,7 +1603,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         usdcAddress 
       );
       expect(await usdc.balanceOf(user2)).to.be.above('90000000000');
-      const stakeOnRelease = await rewardProgram.walletStake(energizedNftWalletManagerAddress);
+      const stakeOnRelease = await rewardProgram.walletStake(uuid);
       expect(stakeOnRelease['generatedCharge']).gt(0);
 
       expect(await ionx.balanceOf(user2)).to.be.eq(stakeOnRelease['reward']);
