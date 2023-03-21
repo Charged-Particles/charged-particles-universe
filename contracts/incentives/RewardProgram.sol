@@ -16,9 +16,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
   address public rewardWalletManager;
+  address public rewardBasketManager;
   uint256 public baseMultiplier;
 
-  mapping(address => Stake) public walletStake;
+  mapping(uint256 => Stake) public walletStake;
 
   constructor(
     address _stakingToken,
@@ -64,16 +65,17 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     return _programData;
   }
 
-  function stake(address wallet, uint256 amount) override external onlyWalletManager {
-    if (walletStake[wallet].started) {
-      walletStake[wallet] = Stake(true, block.timestamp, amount,0,0);
+  function stake(uint256 uuid, uint256 amount) override external onlyWalletManager {
+    if (walletStake[uuid].started) {
+      walletStake[uuid] = Stake(true, block.timestamp, amount,0,0);
     } else {
-      Stake storage onGoingStake = walletStake[wallet];
+      Stake storage onGoingStake = walletStake[uuid];
       onGoingStake.principal += amount;
     }
 
-    emit Staked(wallet, amount);
+    emit Staked(uuid, amount);
   }
+
 
   function unstake(
     address wallet,
@@ -94,6 +96,11 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     IERC20(_programData.rewardToken).transfer(receiver, reward);
   }
 
+  function leptonDeposit(uint256 tokenId) external onlyBasketManager {
+
+  }
+
+  // Reward calculation
   function calculateReward(
     uint256 amount
   )
@@ -121,6 +128,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     rewardAjustedDecimals = reward.mul(10**(12));
   }
 
+  // Admin
   function setBaseMultiplier(uint256 newMultiplier)
     external
     onlyOwner
@@ -135,8 +143,21 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     rewardWalletManager = newRewardWalletManager;
   }
 
+  function setRewardBasketManager(address newRewardBasketManager)
+    external
+    onlyOwner
+  {
+    rewardBasketManager = newRewardBasketManager;
+  }
+
+
   modifier onlyWalletManager() {
     require(msg.sender == rewardWalletManager, "Not wallet manager");
+    _;
+  }
+
+  modifier onlyBasketManager() {
+    require(msg.sender == rewardBasketManager, "Not basket manager");
     _;
   }
 }

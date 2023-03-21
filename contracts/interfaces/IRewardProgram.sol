@@ -9,7 +9,7 @@ interface IRewardProgram {
 
   /* user events */
 
-  event Staked(address wallet, uint256 amount);
+  event Staked(uint256 uuid, uint256 amount);
   // event Unstaked(address vault, uint256 amount);
   // event RewardClaimed(address vault, address token, uint256 amount);
 
@@ -36,11 +36,11 @@ interface IRewardProgram {
     // LeptonsMultiplier[] leptonsData;
   }
 
-  // struct LeptonsMultiplier {
-  //   uint256 multiplier;
-  //   uint256 deposit;
-  //   uint256 timeDeposited;
-  // }
+  struct LeptonsMultiplier {
+    uint256 multiplier;
+    uint256 deposit;
+    // uint256 timeDeposited;
+  }
 
   // struct VaultData {
   //   uint256 totalStake;
@@ -61,7 +61,7 @@ interface IRewardProgram {
 
   /* user functions */
 
-  function stake(address wallet, uint256 amount)
+  function stake(uint256 uuid, uint256 amount)
     external;
 
   function unstake(

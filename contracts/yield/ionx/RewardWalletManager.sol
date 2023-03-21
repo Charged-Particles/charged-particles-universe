@@ -145,7 +145,7 @@ contract RewardWalletManager is WalletManagerBase {
     // Deposit into Smart-Wallet
     yieldTokensAmount = AaveSmartWalletB(wallet).deposit(assetToken, assetAmount, _referralCode);
 
-    RewardProgram(this.getRewardProgram(assetToken)).stake(wallet, assetAmount);
+    RewardProgram(this.getRewardProgram(assetToken)).stake(uuid, assetAmount);
 
     // Log Event
     emit WalletEnergized(contractAddress, tokenId, assetToken, assetAmount, yieldTokensAmount);
