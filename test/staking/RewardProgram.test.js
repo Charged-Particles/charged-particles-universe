@@ -10,15 +10,14 @@ const {
   getDeployData,
 } = require('../../js-helpers/deploy');
 
-const { getChargedContracts } = require('../helpers.js')
-
 describe('Reward program', function () {
   let rewardProgram,
     ionx,
     protocolOwnerAddress,
     deployerAddress,
     protocolOwnerSigner,
-    deployerSigner;
+    deployerSigner,
+    rewardProgramDeployerSigner;
 
   before(async () => {
     const { deployer, protocolOwner } = await getNamedAccounts();
@@ -43,6 +42,8 @@ describe('Reward program', function () {
     const ddRewardProgram = getDeployData('RewardProgram');
     const RewardProgram = await ethers.getContractFactory('RewardProgram');
     rewardProgram = RewardProgram.attach(ddRewardProgram.address); 
+
+    rewardProgramDeployerSigner = rewardProgram.connect(deployerSigner);
   });
 
   it('should be deployed', async () =>{
@@ -90,5 +91,36 @@ describe('Reward program', function () {
       expect(ethers.utils.formatEther(await rewardProgram.calculateReward(chargedGeneratedInUsdc), 18)).to.be.eq('1.5');
       await rewardProgram.connect(deployerSigner).setBaseMultiplier(1000);
     });
+  });
+
+  describe.only('Leptons staking', async () => {
+    it ('Changes wallet manager address', async () => {
+      await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
+        tx => tx.wait()
+      );
+
+      expect(await rewardProgram.rewardWalletManager()).to.be.eq(deployerAddress);
+      console.log(deployerAddress);
+    });
+
+    it('Registers lepton deposit in reward program', async () => {
+      // get/have lepton, it does not care if it has a lepton ...
+      
+      // set program wallet manager as test address to be able to do unit tests.
+
+
+      // start reward program with usdc
+        // 
+
+      // deposit lepton in nft 
+        // check that the nft is a lepton
+      
+
+      // check reward program for lepton deposit multiplier
+
+
+
+    });
+    
   });
 });

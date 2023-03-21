@@ -128,6 +128,13 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     baseMultiplier = newMultiplier;
   }
 
+  function setRewardWalletManager(address newRewardWalletManager)
+    external
+    onlyOwner
+  {
+    rewardWalletManager = newRewardWalletManager;
+  }
+
   modifier onlyWalletManager() {
     require(msg.sender == rewardWalletManager, "Not wallet manager");
     _;
