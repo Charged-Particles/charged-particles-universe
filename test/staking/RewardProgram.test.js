@@ -102,6 +102,8 @@ describe('Reward program', function () {
     });
 
     it('Registers lepton deposit in reward program', async () => {
+      await expect(rewardProgramDeployerSigner.leptonDeposit(1)).to.be.revertedWith('Not basket manager');
+
       // set program wallet manager as test address to be able to do unit tests.
       await rewardProgramDeployerSigner.setRewardBasketManager(deployerAddress).then(
         tx => tx.wait()

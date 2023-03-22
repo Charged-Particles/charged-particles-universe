@@ -98,7 +98,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     emit Unstaked(uuid, amount);
   }
 
-  function leptonDeposit(uint256 tokenId) external onlyBasketManager {
+  function leptonDeposit(uint256 tokenId)
+    external
+    onlyBasketManager
+  {
 
   }
 
@@ -151,7 +154,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   {
     rewardBasketManager = newRewardBasketManager;
   }
-
 
   modifier onlyWalletManager() {
     require(msg.sender == rewardWalletManager, "Not wallet manager");
