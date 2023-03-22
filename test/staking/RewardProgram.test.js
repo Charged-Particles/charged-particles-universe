@@ -94,11 +94,15 @@ describe('Reward program', function () {
   });
 
   describe('Leptons staking', async () => {
-    it ('Changes wallet manager address', async () => {
+    it ('Changes wallet and basket manager address', async () => {
       await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
         tx => tx.wait()
       );
+      await rewardProgramDeployerSigner.setRewardBasketManager(deployerAddress).then(
+        tx => tx.wait()
+      );
       expect(await rewardProgram.rewardWalletManager()).to.be.eq(deployerAddress);
+      expect(await rewardProgram.rewardBasketManager()).to.be.eq(deployerAddress);
     });
 
     it('Registers lepton deposit in reward program', async () => {
@@ -108,7 +112,10 @@ describe('Reward program', function () {
       await rewardProgramDeployerSigner.setRewardBasketManager(deployerAddress).then(
         tx => tx.wait()
       );
-      expect(await rewardProgram.rewardBasketManager()).to.be.eq(deployerAddress);
+
+      const uuid = 1;
+      // no staking before deposit
+      await expect(rewardProgramDeployerSigner.leptonDeposit(uuid)).to.be.revertedWith('Stake not started');
 
       // only allow deposit if usdc is deposited, reward started.
       // start reward program with usdc
