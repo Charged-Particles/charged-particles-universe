@@ -95,6 +95,8 @@ describe('Reward program', function () {
 
   describe('Leptons staking', async () => {
     it ('Changes wallet and basket manager address', async () => {
+      await expect(rewardProgramDeployerSigner.leptonDeposit(1)).to.be.revertedWith('Not basket manager');
+
       await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
         tx => tx.wait()
       );
@@ -106,20 +108,21 @@ describe('Reward program', function () {
     });
 
     it('Registers lepton deposit in reward program', async () => {
-      await expect(rewardProgramDeployerSigner.leptonDeposit(1)).to.be.revertedWith('Not basket manager');
-
-      // set program wallet manager as test address to be able to do unit tests.
-      await rewardProgramDeployerSigner.setRewardBasketManager(deployerAddress).then(
-        tx => tx.wait()
-      );
-
       const uuid = 1;
-      // no staking before deposit
-      await expect(rewardProgramDeployerSigner.leptonDeposit(uuid)).to.be.revertedWith('Stake not started');
 
       // only allow deposit if usdc is deposited, reward started.
+      await expect(rewardProgramDeployerSigner.leptonDeposit(uuid)).to.be.revertedWith('Stake not started');
+
       // start reward program with usdc
-        //  
+      await rewardProgramDeployerSigner.stake(uuid, 100).then(tx => tx.wait());
+
+      await rewardProgramDeployerSigner.leptonDeposit(uuid).then(tx => tx.wait());
+
+      const leptonsData = await rewardProgramDeployerSigner.leptonsStake(uuid);
+      console.log(leptonsData);
+
+      // expect(leptonsData.length).to.be.eq(1);
+      // expect(leptonsData.start).to.be.lessThan(Date.now());
 
       // deposit lepton in nft 
         // check that the nft is a lepton

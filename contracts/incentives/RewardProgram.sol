@@ -20,6 +20,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   uint256 public baseMultiplier;
 
   mapping(uint256 => Stake) public walletStake;
+  mapping(uint256 => LeptonsMultiplier[]) public leptonsStake;
 
   constructor(
     address _stakingToken,
@@ -28,14 +29,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 _duration,
     uint256 _baseMultiplier
   ) public {
-    //TODO: define stake data params
     _programData.stakingToken = _stakingToken;
     _programData.rewardToken = _rewardToken;
     _programData.rewardDuration = _duration;
     _programData.rewardPool = address(this);
-    _programData.lastUpdate = block.timestamp;
-    _programData.totalStakeUnits = 0;
-    _programData.rewardPoolBalance = 0;
 
     rewardWalletManager = _rewardWalletManager;
     baseMultiplier = _baseMultiplier;
@@ -66,7 +63,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   }
 
   function stake(uint256 uuid, uint256 amount) override external onlyWalletManager {
-    if (walletStake[uuid].started) {
+    if (!walletStake[uuid].started) {
       walletStake[uuid] = Stake(true, block.timestamp, amount,0,0);
     } else {
       Stake storage onGoingStake = walletStake[uuid];
@@ -102,9 +99,11 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyBasketManager
   {
-    Stake storage stake = walletStake[uuid];
+    require(walletStake[uuid].started, "Stake not started");
 
-    require(stake.started, "Stake not started");
+    if (true) {
+      leptonsStake[uuid] = LeptonsMultiplier(0, block.timestamp, 0);
+    }
 
 
   }

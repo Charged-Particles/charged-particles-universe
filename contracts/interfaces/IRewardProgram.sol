@@ -19,13 +19,9 @@ interface IRewardProgram {
     address stakingToken;
     address rewardToken;
     address rewardPool;
-    uint256 rewardPoolBalance;
-    uint256 totalStake;
-    uint256 totalStakeUnits;
-    uint256 lastUpdate;
     uint256 rewardDuration;
+    uint256 rewardPoolBalance;
   }
-
 
   struct Stake {
     bool started;
@@ -33,13 +29,12 @@ interface IRewardProgram {
     uint256 principal;
     uint256 generatedCharge;
     uint256 reward;
-    // LeptonsMultiplier[] leptonsData;
   }
 
   struct LeptonsMultiplier {
     uint256 multiplier;
     uint256 deposit;
-    // uint256 timeDeposited;
+    uint256 released;
   }
 
   // struct VaultData {
