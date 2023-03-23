@@ -108,36 +108,34 @@ describe('Reward program', function () {
 
     it('Registers lepton deposit in reward program', async () => {
       const uuid = 1;
+      const leptonId = 1;
+      const leptonMultiplier = 20000; // x2
 
       // mock lepton
       const leptonData = getDeployData('Lepton', chainId);
       const leptonMock = await deployMockContract(deployerSigner, leptonData.abi);
       rewardProgramDeployerSigner.setLepton(leptonMock.address).then(tx => tx.wait());
 
-      await leptonMock.mock.getMultiplier.returns(100);
+      await leptonMock.mock.getMultiplier.returns(leptonMultiplier);
+
+      const blockBeforeDeposit = await ethers.provider.getBlock("latest")
 
       // only allow deposit if usdc is deposited, reward started.
-      await expect(rewardProgramDeployerSigner.leptonDeposit(uuid, 1)).to.be.revertedWith('Stake not started');
+      await expect(rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId)).to.be.revertedWith('Stake not started');
 
       // start reward program with usdc
       await rewardProgramDeployerSigner.stake(uuid, 100).then(tx => tx.wait());
 
-      await rewardProgramDeployerSigner.leptonDeposit(uuid, 1).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
       const leptonsData = await rewardProgramDeployerSigner.leptonsStake(uuid);
-      console.log(leptonsData);
 
-      // expect(leptonsData.length).to.be.eq(1);
-      // expect(leptonsData.start).to.be.lessThan(Date.now());
+      expect(leptonsData.multiplier).to.be.eq(leptonMultiplier);
+      expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.deposit.toNumber());
 
       // deposit lepton in nft 
         // check that the nft is a lepton
-      
-
       // check reward program for lepton deposit multiplier
-
-
-
     });
     
   });
