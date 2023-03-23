@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const { deployMockContract } = require('ethereum-waffle');
 
 const {
   ethers,
@@ -17,6 +18,7 @@ describe('Reward program', function () {
     deployerAddress,
     protocolOwnerSigner,
     deployerSigner,
+    chainId,
     rewardProgramDeployerSigner;
 
   before(async () => {
@@ -28,14 +30,11 @@ describe('Reward program', function () {
   });
 
   before(async () => {
-    const chainId = await getChainId();
+    chainId = await getChainId();
 
     const ddIonx = getDeployData('Ionx', chainId);
     const Ionx = await ethers.getContractFactory('Ionx');
     ionx = await Ionx.attach(ddIonx.address);
-
-    // const { protonC } = await getChargedContracts();
-    // console.log(protonC);
   });
 
   beforeEach(async function () {
@@ -46,7 +45,7 @@ describe('Reward program', function () {
     rewardProgramDeployerSigner = rewardProgram.connect(deployerSigner);
   });
 
-  it.only('should be deployed', async () =>{
+  it('should be deployed', async () =>{
     expect(rewardProgramDeployerSigner.address).to.not.equal(0);
     const rewardData = await rewardProgramDeployerSigner.getProgramData();
     expect(rewardData.rewardPool).to.equal(rewardProgramDeployerSigner.address);
@@ -109,6 +108,11 @@ describe('Reward program', function () {
 
     it('Registers lepton deposit in reward program', async () => {
       const uuid = 1;
+
+      // mock lepton
+      const leptonData = getDeployData('Lepton', chainId);
+      const leptonMock = await deployMockContract(deployerSigner, leptonData.abi);
+      console.log(leptonMock.address);
 
       // only allow deposit if usdc is deposited, reward started.
       await expect(rewardProgramDeployerSigner.leptonDeposit(uuid, 1)).to.be.revertedWith('Stake not started');
