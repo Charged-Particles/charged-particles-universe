@@ -20,7 +20,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
   address public rewardWalletManager;
   address public rewardBasketManager;
-  address public lepton;
+  address public lepton = 0xc5a5C42992dECbae36851359345FE25997F5C42d;
 
   mapping(uint256 => Stake) public walletStake;
   mapping(uint256 => LeptonsMultiplier) public leptonsStake;
@@ -67,7 +67,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
   function stake(uint256 uuid, uint256 amount) override external onlyWalletManager {
     if (!walletStake[uuid].started) {
-      walletStake[uuid] = Stake(true, block.timestamp, amount,0,0);
+      walletStake[uuid] = Stake(true, block.number, amount,0,0);
     } else {
       Stake storage onGoingStake = walletStake[uuid];
       onGoingStake.principal += amount;
@@ -75,7 +75,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     emit Staked(uuid, amount);
   }
-
 
   function unstake(
     uint256 uuid,
@@ -86,7 +85,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyWalletManager
   {
-    uint256 reward = this.calculateReward(amount);
+    uint256 baseReward = this.calculateReward(amount);
+    uint256 reward = this.calculateLeptonReward(uuid, amount);
 
     Stake storage stake = walletStake[uuid];
     stake.generatedCharge = amount;
@@ -98,7 +98,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     emit Unstaked(uuid, amount);
   }
 
-  // function leptonDeposit(uint256 uuid)
   function leptonDeposit(uint256 uuid, uint256 tokenId)
     external
     onlyBasketManager
@@ -122,6 +121,26 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     // TODO: should be check > 0 ?
     uint256 baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
     ajustedReward = this.convertDecimals(baseReward);
+  }
+
+  function calculateLeptonReward(
+    uint256 uuid,
+    uint256 amount
+  )
+    external
+    view
+    returns(
+      uint256
+    )
+  {
+    LeptonsMultiplier memory leptonStake = leptonsStake[uuid];
+    uint256 multiplier = leptonStake.multiplier;
+
+    if (multiplier == 0 || amount == 0) {
+      return amount;
+    }
+
+    return amount.mul(multiplier).div(PERCENTAGE_SCALE);
   }
 
   function convertDecimals(
