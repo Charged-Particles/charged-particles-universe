@@ -12,6 +12,7 @@ const {
 } = require('../../js-helpers/deploy');
 
 describe('Reward program', function () {
+
   let rewardProgram,
     ionx,
     protocolOwnerAddress,
@@ -19,6 +20,7 @@ describe('Reward program', function () {
     protocolOwnerSigner,
     deployerSigner,
     chainId,
+    leptonMock,
     rewardProgramDeployerSigner;
 
   before(async () => {
@@ -35,6 +37,7 @@ describe('Reward program', function () {
     const ddIonx = getDeployData('Ionx', chainId);
     const Ionx = await ethers.getContractFactory('Ionx');
     ionx = await Ionx.attach(ddIonx.address);
+
   });
 
   beforeEach(async function () {
@@ -43,6 +46,11 @@ describe('Reward program', function () {
     rewardProgram = RewardProgram.attach(ddRewardProgram.address); 
 
     rewardProgramDeployerSigner = rewardProgram.connect(deployerSigner);
+
+    // mock lepton
+    const leptonData = getDeployData('Lepton', chainId);
+    leptonMock = await deployMockContract(deployerSigner, leptonData.abi);
+    rewardProgramDeployerSigner.setLepton(leptonMock.address).then(tx => tx.wait());
   });
 
   it('should be deployed', async () =>{
@@ -111,13 +119,7 @@ describe('Reward program', function () {
       const leptonId = 1;
       const leptonMultiplier = 20000; // x2
 
-      // mock lepton
-      const leptonData = getDeployData('Lepton', chainId);
-      const leptonMock = await deployMockContract(deployerSigner, leptonData.abi);
-      rewardProgramDeployerSigner.setLepton(leptonMock.address).then(tx => tx.wait());
-
       await leptonMock.mock.getMultiplier.returns(leptonMultiplier);
-
       const blockBeforeDeposit = await ethers.provider.getBlock("latest")
 
       // only allow deposit if usdc is deposited, reward started.
@@ -132,10 +134,10 @@ describe('Reward program', function () {
 
       expect(leptonsData.multiplier).to.be.eq(leptonMultiplier);
       expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.deposit.toNumber());
+    });
 
-      // deposit lepton in nft 
-        // check that the nft is a lepton
-      // check reward program for lepton deposit multiplier
+    it('Multiplies reward with lepton multiplier', async () => {
+
     });
     
   });
