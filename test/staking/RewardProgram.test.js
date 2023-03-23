@@ -37,7 +37,6 @@ describe('Reward program', function () {
     const ddIonx = getDeployData('Ionx', chainId);
     const Ionx = await ethers.getContractFactory('Ionx');
     ionx = await Ionx.attach(ddIonx.address);
-
   });
 
   beforeEach(async function () {
@@ -134,10 +133,17 @@ describe('Reward program', function () {
 
       expect(leptonsData.multiplier).to.be.eq(leptonMultiplier);
       expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.deposit.toNumber());
+
+      const principalForEmptyMultiplier = 100;
+      const emptyMultiplierReward = await rewardProgramDeployerSigner.callStatic.calculateLeptonReward(2, principalForEmptyMultiplier);
+      expect(emptyMultiplierReward).to.be.eq(principalForEmptyMultiplier);
+
+      const emptyRewardMultiplier = await rewardProgramDeployerSigner.callStatic.calculateLeptonReward(2, 0);
+      expect(emptyRewardMultiplier).to.be.eq(0);
     });
 
     it('Multiplies reward with lepton multiplier', async () => {
-
+      
     });
     
   });
