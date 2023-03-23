@@ -140,7 +140,19 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       return amount;
     }
 
-    return amount.mul(multiplier).div(PERCENTAGE_SCALE);
+    // calculate block in reward
+    Stake memory stake = walletStake[uuid];
+    uint256 blockInReward = block.number.sub(stake.start);
+
+    // calculate leptom block time
+    uint256 blockInLeptonDeposit = block.number.sub(leptonStake.deposit);
+
+    // percentage in reward
+    uint256 leptonPercentageInReward = blockInReward.div(blockInLeptonDeposit);
+
+    uint256 multipliedReard = amount.mul(leptonPercentageInReward).mul(multiplier).div(PERCENTAGE_SCALE);
+
+    return amount.add(multipliedReard);
   }
 
   function convertDecimals(
