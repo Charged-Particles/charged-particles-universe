@@ -112,7 +112,9 @@ describe('Reward program', function () {
       // mock lepton
       const leptonData = getDeployData('Lepton', chainId);
       const leptonMock = await deployMockContract(deployerSigner, leptonData.abi);
-      console.log(leptonMock.address);
+      rewardProgramDeployerSigner.setLepton(leptonMock.address).then(tx => tx.wait());
+
+      await leptonMock.mock.getMultiplier.returns(100);
 
       // only allow deposit if usdc is deposited, reward started.
       await expect(rewardProgramDeployerSigner.leptonDeposit(uuid, 1)).to.be.revertedWith('Stake not started');

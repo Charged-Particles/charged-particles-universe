@@ -20,7 +20,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
   address public rewardWalletManager;
   address public rewardBasketManager;
-  address public lepton2 = 0xc5a5C42992dECbae36851359345FE25997F5C42d;
+  address public lepton;
 
   mapping(uint256 => Stake) public walletStake;
   mapping(uint256 => LeptonsMultiplier) public leptonsStake;
@@ -105,7 +105,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   {
     require(walletStake[uuid].started, "Stake not started");
 
-    uint256 multiplier = ILepton(lepton2).getMultiplier(tokenId);
+    uint256 multiplier = ILepton(lepton).getMultiplier(tokenId);
     leptonsStake[uuid] = LeptonsMultiplier(multiplier, block.number, 0);
   }
 
@@ -157,6 +157,13 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     onlyOwner
   {
     rewardBasketManager = newRewardBasketManager;
+  }
+
+  function setLepton(address leptonAddress)
+    external
+    onlyOwner
+  {
+    lepton = leptonAddress;
   }
 
   modifier onlyWalletManager() {
