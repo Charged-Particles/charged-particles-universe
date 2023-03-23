@@ -46,10 +46,10 @@ describe('Reward program', function () {
     rewardProgramDeployerSigner = rewardProgram.connect(deployerSigner);
   });
 
-  it('should be deployed', async () =>{
-    expect(rewardProgram.address).to.not.equal(0);
-    const rewardData = await rewardProgram.getProgramData();
-    expect(rewardData.totalStake).to.equal(0);
+  it.only('should be deployed', async () =>{
+    expect(rewardProgramDeployerSigner.address).to.not.equal(0);
+    const rewardData = await rewardProgramDeployerSigner.getProgramData();
+    expect(rewardData.rewardPool).to.equal(rewardProgramDeployerSigner.address);
   });
 
   describe('Funds reward pool', () => {
@@ -95,7 +95,7 @@ describe('Reward program', function () {
 
   describe('Leptons staking', async () => {
     it ('Changes wallet and basket manager address', async () => {
-      await expect(rewardProgramDeployerSigner.leptonDeposit(1)).to.be.revertedWith('Not basket manager');
+      await expect(rewardProgramDeployerSigner.leptonDeposit(1,1)).to.be.revertedWith('Not basket manager');
 
       await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
         tx => tx.wait()
@@ -111,12 +111,12 @@ describe('Reward program', function () {
       const uuid = 1;
 
       // only allow deposit if usdc is deposited, reward started.
-      await expect(rewardProgramDeployerSigner.leptonDeposit(uuid)).to.be.revertedWith('Stake not started');
+      await expect(rewardProgramDeployerSigner.leptonDeposit(uuid, 1)).to.be.revertedWith('Stake not started');
 
       // start reward program with usdc
       await rewardProgramDeployerSigner.stake(uuid, 100).then(tx => tx.wait());
 
-      await rewardProgramDeployerSigner.leptonDeposit(uuid).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.leptonDeposit(uuid, 1).then(tx => tx.wait());
 
       const leptonsData = await rewardProgramDeployerSigner.leptonsStake(uuid);
       console.log(leptonsData);

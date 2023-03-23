@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../lib/BlackholePrevention.sol";
+import "../interfaces/ILepton.sol";
 
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using SafeMath for uint256;
@@ -15,12 +16,14 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   ProgramRewardData public _programData;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
-  address public rewardWalletManager;
-  address public rewardBasketManager;
   uint256 public baseMultiplier;
 
+  address public rewardWalletManager;
+  address public rewardBasketManager;
+  address public lepton2 = 0xc5a5C42992dECbae36851359345FE25997F5C42d;
+
   mapping(uint256 => Stake) public walletStake;
-  mapping(uint256 => LeptonsMultiplier[]) public leptonsStake;
+  mapping(uint256 => LeptonsMultiplier) public leptonsStake;
 
   constructor(
     address _stakingToken,
@@ -95,17 +98,15 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     emit Unstaked(uuid, amount);
   }
 
-  function leptonDeposit(uint256 uuid)
+  // function leptonDeposit(uint256 uuid)
+  function leptonDeposit(uint256 uuid, uint256 tokenId)
     external
     onlyBasketManager
   {
     require(walletStake[uuid].started, "Stake not started");
 
-    if (true) {
-      leptonsStake[uuid] = LeptonsMultiplier(0, block.timestamp, 0);
-    }
-
-
+    uint256 multiplier = ILepton(lepton2).getMultiplier(tokenId);
+    leptonsStake[uuid] = LeptonsMultiplier(multiplier, block.number, 0);
   }
 
   // Reward calculation
