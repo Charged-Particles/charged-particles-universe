@@ -214,12 +214,30 @@ describe('Reward program', function () {
         }
       ];
       
-      stakeInfoCases.map(stakeInfo => {
-        // calculate reward
-        const expectedReward = calculateExpectedReward(stakeInfo);
-        console.log('expectedReward', expectedReward);
+      await leptonMock.mock.getMultiplier.returns(stakeInfoCases[0].leptonStakeMultiplier * 10000);
 
-      });
+      await rewardProgramDeployerSigner.stake(1, stakeInfoCases[0].amount).then(tx => tx.wait());
+
+      await rewardProgramDeployerSigner.leptonDeposit(1, 1).then(tx => tx.wait());
+
+      const blockBeforeDeposit = await ethers.provider.getBlock("latest")
+      console.log(blockBeforeDeposit);
+
+      // await ethers.provider.send("hardhat_mine", ["0x100"]);
+      // await ethers.provider.send("evm_mine") // this one will have 02:00 PM as its timestamp 
+
+      const blockAfterDeposit = await ethers.provider.getBlock("latest")
+      console.log(blockAfterDeposit.number - blockBeforeDeposit.number);
+
+      // const reward = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[0].amount);
+      // console.log(reward.toString());
+
+      // stakeInfoCases.map(stakeInfo => {
+      //   // calculate reward
+      //   const expectedReward = calculateExpectedReward(stakeInfo);
+      //   console.log('expectedReward', expectedReward);
+
+      // });
       
     });
     
