@@ -100,7 +100,7 @@ describe('Reward program', function () {
   });
 
   describe('Leptons staking', async () => {
-    it ('Changes wallet and basket manager address', async () => {
+    it('Changes wallet and basket manager address', async () => {
       await expect(rewardProgramDeployerSigner.leptonDeposit(1,1)).to.be.revertedWith('Not basket manager');
 
       await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
@@ -142,8 +142,22 @@ describe('Reward program', function () {
       expect(emptyRewardMultiplier).to.be.eq(0);
     });
 
-    it('Multiplies reward with lepton multiplier', async () => {
-      
+    it('Verifies lepton reward calculation', async () => {
+      const principal = 100;
+      const uuid = 1;
+      const leptonId = 1;
+      const leptonMultiplier = 20000; // x2
+
+      await leptonMock.mock.getMultiplier.returns(leptonMultiplier);
+      // stake 
+      await rewardProgramDeployerSigner.stake(uuid, principal).then(tx => tx.wait());
+
+      // deposit lepton
+      await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
+
+      // calculate reward
+     const reward = await rewardProgramDeployerSigner.calculateLeptonReward(uuid, 100);
+     console.log(reward.toString());
     });
     
   });

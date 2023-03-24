@@ -10,6 +10,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../lib/BlackholePrevention.sol";
 import "../interfaces/ILepton.sol";
 
+import "hardhat/console.sol";
+
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using SafeMath for uint256;
 
@@ -86,7 +88,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     onlyWalletManager
   {
     uint256 baseReward = this.calculateReward(amount);
-    uint256 reward = this.calculateLeptonReward(uuid, amount);
+    uint256 reward = this.calculateLeptonReward(uuid, baseReward);
 
     Stake storage stake = walletStake[uuid];
     stake.generatedCharge = amount;
@@ -118,7 +120,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       uint256 ajustedReward
     )
   {
-    // TODO: should be check > 0 ?
+    // todo here should be the lepton calculation
     uint256 baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
     ajustedReward = this.convertDecimals(baseReward);
   }
@@ -144,13 +146,18 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     Stake memory stake = walletStake[uuid];
     uint256 blockInReward = block.number.sub(stake.start);
 
-    // calculate leptom block time
+    // calculate lepton block time
+    // TODO: check if lepton has been released 
+    if (block.number == leptonStake.deposit) {
+      return amount;
+    }
+
     uint256 blockInLeptonDeposit = block.number.sub(leptonStake.deposit);
 
     // percentage in reward
     uint256 leptonPercentageInReward = blockInReward.div(blockInLeptonDeposit);
 
-    uint256 multipliedReard = amount.mul(leptonPercentageInReward).mul(multiplier).div(PERCENTAGE_SCALE);
+    uint256 multipliedReard = amount.mul(leptonPercentageInReward).mul(multiplier);
 
     return amount.add(multipliedReard);
   }
