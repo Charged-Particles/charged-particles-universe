@@ -10,8 +10,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../lib/BlackholePrevention.sol";
 import "../interfaces/ILepton.sol";
 
-import "hardhat/console.sol";
-
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using SafeMath for uint256;
 
