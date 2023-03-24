@@ -31,7 +31,7 @@ interface IRewardProgram {
     uint256 reward;
   }
 
-  struct LeptonsMultiplier {
+  struct LeptonsStake {
     uint256 multiplier;
     uint256 depositBlockNumber;
     uint256 released;
