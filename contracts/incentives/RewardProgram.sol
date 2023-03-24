@@ -143,8 +143,12 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       return amount;
     }
 
+    if (leptonDepositLength > rewardBlockLength) {
+      leptonDepositLength = rewardBlockLength;
+    }
+    
     // percentage in reward
-    uint256 leptonPercentageInReward = rewardBlockLength.div(leptonDepositLength);
+    uint256 leptonPercentageInReward = leptonDepositLength.div(rewardBlockLength);
 
     uint256 multipliedReard = amount.mul(leptonPercentageInReward).mul(multiplier);
 

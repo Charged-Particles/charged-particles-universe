@@ -142,7 +142,7 @@ describe('Reward program', function () {
       expect(emptyRewardMultiplier).to.be.eq(0);
     });
 
-    it('Verifies lepton reward calculation', async () => {
+    it('Verifies simple lepton reward calculation', async () => {
       const principal = 100;
       const uuid = 1;
       const leptonId = 1;
@@ -162,7 +162,66 @@ describe('Reward program', function () {
      expect(reward).to.be.eq(100);
     });
 
-    // it('')
+    it('Checks lepton reward calculation with time spent', async () => {
+      const calculateExpectedReward = ({
+        amount,
+        rewardBlockLength,
+        leptonStakeDepositBlockNumber,
+        leptonStakeEndBlockNumber,
+        leptonStakeMultiplier
+      }) => {
+        const leptonDepositLength = leptonStakeEndBlockNumber - leptonStakeDepositBlockNumber;
+        const leptonPercentageInReward = rewardBlockLength / leptonDepositLength;
+        const expectedReward = amount + (amount * leptonPercentageInReward * leptonStakeMultiplier);
+        return expectedReward;
+      };
+
+      const stakeInfoCases = [
+        {
+          amount: 1000,
+          rewardBlockLength: 150,
+          leptonStakeDepositBlockNumber: 100,
+          leptonStakeEndBlockNumber: 200,
+          leptonStakeMultiplier: 2,
+        },
+        {
+          amount: 5000,
+          rewardBlockLength: 300,
+          leptonStakeDepositBlockNumber: 200,
+          leptonStakeEndBlockNumber: 400,
+          leptonStakeMultiplier: 1,
+        },
+        {
+          amount: 2000,
+          rewardBlockLength: 400,
+          leptonStakeDepositBlockNumber: 250,
+          leptonStakeEndBlockNumber: 300,
+          leptonStakeMultiplier: 0,
+        },
+        {
+          amount: 3000,
+          rewardBlockLength: 200,
+          leptonStakeDepositBlockNumber: 150,
+          leptonStakeEndBlockNumber: 250,
+          leptonStakeMultiplier: 5,
+        },
+        {
+          amount: 500,
+          rewardBlockLength: 100,
+          leptonStakeDepositBlockNumber: 50,
+          leptonStakeEndBlockNumber: 150,
+          leptonStakeMultiplier: 3,
+        }
+      ];
+      
+      stakeInfoCases.map(stakeInfo => {
+        // calculate reward
+        const expectedReward = calculateExpectedReward(stakeInfo);
+        console.log('expectedReward', expectedReward);
+
+      });
+      
+    });
     
   });
 });
