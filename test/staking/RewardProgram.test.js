@@ -156,9 +156,13 @@ describe('Reward program', function () {
       await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
       // calculate reward
-     const reward = await rewardProgramDeployerSigner.calculateLeptonReward(uuid, 100);
-     console.log(reward.toString());
+     const reward = await rewardProgramDeployerSigner.calculateLeptonReward(uuid, principal);
+
+     // Has multiplier but time spent is 0 so reward is multiplied by 1.
+     expect(reward).to.be.eq(100);
     });
+
+    // it('')
     
   });
 });
