@@ -132,7 +132,7 @@ describe('Reward program', function () {
       const leptonsData = await rewardProgramDeployerSigner.leptonsStake(uuid);
 
       expect(leptonsData.multiplier).to.be.eq(leptonMultiplier);
-      expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.deposit.toNumber());
+      expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.depositBlockNumber.toNumber());
 
       const principalForEmptyMultiplier = 100;
       const emptyMultiplierReward = await rewardProgramDeployerSigner.callStatic.calculateLeptonReward(2, principalForEmptyMultiplier);

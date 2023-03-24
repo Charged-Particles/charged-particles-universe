@@ -138,23 +138,12 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     LeptonsMultiplier memory leptonStake = leptonsStake[uuid];
     uint256 multiplier = leptonStake.multiplier;
 
-    if (multiplier == 0 || amount == 0) {
-      return amount;
-    }
-
-    // calculate lepton block time
-    // TODO: check if lepton has been released 
-    if (block.number == leptonStake.deposit) {
-      return amount;
-    }
-
     uint256 rewardBlockLength = block.number.sub(walletStake[uuid].start);
+    uint256 leptonDepositLength = block.number.sub(leptonStake.depositBlockNumber);
 
-    if (rewardBlockLength == 0) {
+    if (multiplier == 0 || leptonDepositLength == 0 || rewardBlockLength == 0) {
       return amount;
     }
-
-    uint256 leptonDepositLength = block.number.sub(leptonStake.deposit);
 
     // percentage in reward
     uint256 leptonPercentageInReward = rewardBlockLength.div(leptonDepositLength);
