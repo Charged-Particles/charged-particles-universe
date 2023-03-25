@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const { deployMockContract } = require('ethereum-waffle');
+// const { mine } = require("@nomicfoundation/hardhat-network-helpers");
 
 const {
   ethers,
@@ -214,6 +215,7 @@ describe('Reward program', function () {
         }
       ];
       
+      
       await leptonMock.mock.getMultiplier.returns(stakeInfoCases[0].leptonStakeMultiplier * 10000);
 
       await rewardProgramDeployerSigner.stake(1, stakeInfoCases[0].amount).then(tx => tx.wait());
@@ -223,8 +225,9 @@ describe('Reward program', function () {
       const blockBeforeDeposit = await ethers.provider.getBlock("latest")
       console.log(blockBeforeDeposit);
 
-      // await ethers.provider.send("hardhat_mine", ["0x100"]);
-      // await ethers.provider.send("evm_mine") // this one will have 02:00 PM as its timestamp 
+      await ethers.provider.send("hardhat_mine", ["0x100"]);
+      await ethers.provider.send("evm_mine") // this one will have 02:00 PM as its timestamp 
+      // await mine(1000);
 
       const blockAfterDeposit = await ethers.provider.getBlock("latest")
       console.log(blockAfterDeposit.number - blockBeforeDeposit.number);
