@@ -171,10 +171,14 @@ describe('Reward program', function () {
         leptonStakeEndBlockNumber,
         leptonStakeMultiplier
       }) => {
+        const percentageScale = 10000;
         const leptonDepositLength = leptonStakeEndBlockNumber - leptonStakeDepositBlockNumber;
-        const leptonPercentageInReward = leptonDepositLength / rewardBlockLength;
-        const expectedReward = amount + (amount * leptonPercentageInReward * leptonStakeMultiplier);
-        return expectedReward;
+
+        const leptonPercentageInReward = Math.floor(leptonDepositLength * percentageScale / rewardBlockLength);
+
+        const expectedReward = amount * leptonPercentageInReward * leptonStakeMultiplier;
+
+        return Math.floor(expectedReward/percentageScale + amount);
       };
 
       const stakeInfoCases = [
@@ -182,7 +186,7 @@ describe('Reward program', function () {
           amount: 1000,
           rewardBlockLength: 150,
           leptonStakeDepositBlockNumber: 0,
-          leptonStakeEndBlockNumber: 150,
+          leptonStakeEndBlockNumber: 149,
           leptonStakeMultiplier: 2,
         },
         {
