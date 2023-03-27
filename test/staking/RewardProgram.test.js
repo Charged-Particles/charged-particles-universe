@@ -245,9 +245,8 @@ describe('Reward program', function () {
         if (stakeInfoCases[i].leptonStakeDepositBlockNumber > 0 ) {
           await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(stakeInfoCases[i].leptonStakeDepositBlockNumber) ]);
           await ethers.provider.send("evm_mine");
+          await rewardProgramDeployerSigner.leptonDeposit(i, i).then(tx => tx.wait());
         };
-  
-        await rewardProgramDeployerSigner.leptonDeposit(i, i).then(tx => tx.wait());
   
         const blocksAfterBlockDeposit = stakeInfoCases[i].rewardBlockLength - stakeInfoCases[i].leptonStakeDepositBlockNumber;
         await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(blocksAfterBlockDeposit) ]);
