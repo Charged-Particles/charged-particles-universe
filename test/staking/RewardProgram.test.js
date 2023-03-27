@@ -194,6 +194,20 @@ describe('Reward program', function () {
           leptonStakeMultiplier: 2,
         },
         {
+          amount: 2,
+          rewardBlockLength: 20,
+          leptonStakeDepositBlockNumber: 10,
+          leptonStakeEndBlockNumber: 20,
+          leptonStakeMultiplier: 2,
+        },
+        {
+          amount: 1000,
+          rewardBlockLength: 100,
+          leptonStakeDepositBlockNumber: 10,
+          leptonStakeEndBlockNumber: 20,
+          leptonStakeMultiplier: 2,
+        },
+        {
           amount: 5000,
           rewardBlockLength: 300,
           leptonStakeDepositBlockNumber: 200,
@@ -227,9 +241,11 @@ describe('Reward program', function () {
         await leptonMock.mock.getMultiplier.returns(stakeInfoCases[i].leptonStakeMultiplier);
   
         await rewardProgramDeployerSigner.stake(i, stakeInfoCases[i].amount).then(tx => tx.wait());
-  
-        await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(stakeInfoCases[i].leptonStakeDepositBlockNumber) ]);
-        await ethers.provider.send("evm_mine");
+        
+        if (stakeInfoCases[i].leptonStakeDepositBlockNumber > 0 ) {
+          await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(stakeInfoCases[i].leptonStakeDepositBlockNumber) ]);
+          await ethers.provider.send("evm_mine");
+        };
   
         await rewardProgramDeployerSigner.leptonDeposit(i, i).then(tx => tx.wait());
   
