@@ -172,7 +172,7 @@ describe('Reward program', function () {
         leptonStakeMultiplier
       }) => {
         const leptonDepositLength = leptonStakeEndBlockNumber - leptonStakeDepositBlockNumber;
-        const leptonPercentageInReward = rewardBlockLength / leptonDepositLength;
+        const leptonPercentageInReward = leptonDepositLength / rewardBlockLength;
         const expectedReward = amount + (amount * leptonPercentageInReward * leptonStakeMultiplier);
         return expectedReward;
       };
@@ -234,7 +234,9 @@ describe('Reward program', function () {
       // console.log(blockAfterDeposit.number - blockBeforeDeposit.number);
 
       const reward = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[0].amount);
-      console.log(reward.toString());
+      const estimatedReward = calculateExpectedReward(stakeInfoCases[0]);
+      console.log(reward.toString(), estimatedReward);
+
 
       // stakeInfoCases.map(stakeInfo => {
       //   // calculate reward
