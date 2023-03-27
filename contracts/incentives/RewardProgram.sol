@@ -114,6 +114,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     onlyBasketManager
   {
     require(walletStake[uuid].started, "Stake not started");
+    require(leptonsStake[uuid].depositBlockNumber > 0, "No lepton deposit");
 
     LeptonsStake storage leptonStake = leptonsStake[uuid];
     leptonStake.released = block.number;
