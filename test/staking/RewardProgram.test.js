@@ -176,9 +176,13 @@ describe('Reward program', function () {
 
         const leptonPercentageInReward = Math.floor(leptonDepositLength * percentageScale / rewardBlockLength);
 
+        if (leptonDepositLength > rewardBlockLength) {
+          leptonDepositLength = rewardBlockLength;
+        }
+
         const expectedReward = amount * leptonPercentageInReward * leptonStakeMultiplier;
 
-        return Math.floor(expectedReward/percentageScale + amount);
+        return Math.floor((expectedReward/percentageScale) + amount);
       };
 
       const stakeInfoCases = [
@@ -219,7 +223,7 @@ describe('Reward program', function () {
         }
       ];
       
-      for(let i = 1; i < stakeInfoCases.length; i++) {
+      for(let i = 0; i < stakeInfoCases.length; i++) {
         await leptonMock.mock.getMultiplier.returns(stakeInfoCases[i].leptonStakeMultiplier);
   
         await rewardProgramDeployerSigner.stake(i, stakeInfoCases[i].amount).then(tx => tx.wait());
@@ -233,7 +237,7 @@ describe('Reward program', function () {
         await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(blocksAfterBlockDeposit) ]);
         await ethers.provider.send("evm_mine");
   
-        const reward = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[i].amount);
+        const reward = await rewardProgramDeployerSigner.calculateLeptonReward(i, stakeInfoCases[i].amount);
         const estimatedReward = calculateExpectedReward(stakeInfoCases[i]);
         console.log(reward.toString(), estimatedReward);
       }
