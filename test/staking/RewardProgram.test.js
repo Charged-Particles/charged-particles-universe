@@ -223,17 +223,18 @@ describe('Reward program', function () {
       await rewardProgramDeployerSigner.leptonDeposit(1, 1).then(tx => tx.wait());
 
       const blockBeforeDeposit = await ethers.provider.getBlock("latest")
-      console.log(blockBeforeDeposit);
 
-      await ethers.provider.send("hardhat_mine", ["0x100"]);
+      const rewardA = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[0].amount);
+
+      await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(100000) ]);
       await ethers.provider.send("evm_mine") // this one will have 02:00 PM as its timestamp 
       // await mine(1000);
 
       const blockAfterDeposit = await ethers.provider.getBlock("latest")
       console.log(blockAfterDeposit.number - blockBeforeDeposit.number);
 
-      // const reward = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[0].amount);
-      // console.log(reward.toString());
+      const reward = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[0].amount);
+      console.log(reward.toString(), rewardA.toString());
 
       // stakeInfoCases.map(stakeInfo => {
       //   // calculate reward
