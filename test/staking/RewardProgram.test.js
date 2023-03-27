@@ -181,8 +181,8 @@ describe('Reward program', function () {
         {
           amount: 1000,
           rewardBlockLength: 150,
-          leptonStakeDepositBlockNumber: 100,
-          leptonStakeEndBlockNumber: 200,
+          leptonStakeDepositBlockNumber: 0,
+          leptonStakeEndBlockNumber: 150,
           leptonStakeMultiplier: 2,
         },
         {
@@ -226,12 +226,12 @@ describe('Reward program', function () {
 
       // const rewardA = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[0].amount);
 
-      await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(100000) ]);
-      await ethers.provider.send("evm_mine") // this one will have 02:00 PM as its timestamp 
+      await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(stakeInfoCases[0].rewardBlockLength) ]);
+      await ethers.provider.send("evm_mine");
       // await mine(1000);
 
       const blockAfterDeposit = await ethers.provider.getBlock("latest")
-      // console.log(blockAfterDeposit.number - blockBeforeDeposit.number);
+      console.log(blockAfterDeposit.number - blockBeforeDeposit.number);
 
       const reward = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[0].amount);
       const estimatedReward = calculateExpectedReward(stakeInfoCases[0]);
