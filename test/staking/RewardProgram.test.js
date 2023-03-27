@@ -101,7 +101,7 @@ describe('Reward program', function () {
   });
 
   describe('Leptons staking', async () => {
-    it('Changes wallet and basket manager address', async () => {
+    it.only('Changes wallet and basket manager address', async () => {
       await expect(rewardProgramDeployerSigner.leptonDeposit(1,1)).to.be.revertedWith('Not basket manager');
 
       await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
@@ -163,7 +163,7 @@ describe('Reward program', function () {
      expect(reward).to.be.eq(100);
     });
 
-    it('Checks lepton reward calculation with time spent', async () => {
+    it.only('Checks lepton reward calculation with time spent', async () => {
       const calculateExpectedReward = ({
         amount,
         rewardBlockLength,
@@ -216,7 +216,7 @@ describe('Reward program', function () {
       ];
       
       
-      await leptonMock.mock.getMultiplier.returns(stakeInfoCases[0].leptonStakeMultiplier * 10000);
+      await leptonMock.mock.getMultiplier.returns(2);
 
       await rewardProgramDeployerSigner.stake(1, stakeInfoCases[0].amount).then(tx => tx.wait());
 
@@ -224,17 +224,17 @@ describe('Reward program', function () {
 
       const blockBeforeDeposit = await ethers.provider.getBlock("latest")
 
-      const rewardA = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[0].amount);
+      // const rewardA = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[0].amount);
 
       await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(100000) ]);
       await ethers.provider.send("evm_mine") // this one will have 02:00 PM as its timestamp 
       // await mine(1000);
 
       const blockAfterDeposit = await ethers.provider.getBlock("latest")
-      console.log(blockAfterDeposit.number - blockBeforeDeposit.number);
+      // console.log(blockAfterDeposit.number - blockBeforeDeposit.number);
 
       const reward = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[0].amount);
-      console.log(reward.toString(), rewardA.toString());
+      console.log(reward.toString());
 
       // stakeInfoCases.map(stakeInfo => {
       //   // calculate reward

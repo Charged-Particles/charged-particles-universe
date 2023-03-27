@@ -10,6 +10,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../lib/BlackholePrevention.sol";
 import "../interfaces/ILepton.sol";
 
+import "hardhat/console.sol";
+
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using SafeMath for uint256;
 
@@ -105,6 +107,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     require(walletStake[uuid].started, "Stake not started");
 
     uint256 multiplier = ILepton(lepton).getMultiplier(tokenId);
+
     leptonsStake[uuid] = LeptonsStake(multiplier, block.number, 0);
   }
 
@@ -139,6 +142,9 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 rewardBlockLength = block.number.sub(walletStake[uuid].start);
     uint256 leptonDepositLength = block.number.sub(leptonStake.depositBlockNumber);
 
+    // console.log("0 >>>> ", block.number, leptonStake.depositBlockNumber);
+    // console.log("1 >>>>> ", multiplier, leptonDepositLength, rewardBlockLength);
+
     if (multiplier == 0 || leptonDepositLength == 0 || rewardBlockLength == 0) {
       return amount;
     }
@@ -148,9 +154,13 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     }
     
     // percentage in reward
-    uint256 leptonPercentageInReward = leptonDepositLength.div(rewardBlockLength);
+    uint256 leptonPercentageInReward = leptonDepositLength.mul(PERCENTAGE_SCALE).div(rewardBlockLength);
+    // console.log("2 >>>>> ", leptonPercentageInReward, leptonDepositLength, rewardBlockLength);
 
-    uint256 multipliedReard = amount.mul(leptonPercentageInReward).mul(multiplier);
+    uint256 multipliedReard = amount.mul(leptonPercentageInReward).mul(multiplier).div(PERCENTAGE_SCALE);
+
+    console.log("3 >>>>> ", amount, multipliedReard);
+
 
     return amount.add(multipliedReard);
   }
