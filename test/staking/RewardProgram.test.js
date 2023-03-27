@@ -219,38 +219,25 @@ describe('Reward program', function () {
         }
       ];
       
-      
-      await leptonMock.mock.getMultiplier.returns(2);
+      for(let i = 1; i < stakeInfoCases.length; i++) {
+        await leptonMock.mock.getMultiplier.returns(stakeInfoCases[i].leptonStakeMultiplier);
+  
+        await rewardProgramDeployerSigner.stake(i, stakeInfoCases[i].amount).then(tx => tx.wait());
+  
+        await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(stakeInfoCases[i].leptonStakeDepositBlockNumber) ]);
+        await ethers.provider.send("evm_mine");
+  
+        await rewardProgramDeployerSigner.leptonDeposit(i, i).then(tx => tx.wait());
+  
+        const blocksAfterBlockDeposit = stakeInfoCases[i].rewardBlockLength - stakeInfoCases[i].leptonStakeDepositBlockNumber;
+        await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(blocksAfterBlockDeposit) ]);
+        await ethers.provider.send("evm_mine");
+  
+        const reward = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[i].amount);
+        const estimatedReward = calculateExpectedReward(stakeInfoCases[i]);
+        console.log(reward.toString(), estimatedReward);
+      }
 
-      await rewardProgramDeployerSigner.stake(1, stakeInfoCases[0].amount).then(tx => tx.wait());
-
-      const blockBeforeDeposit = await ethers.provider.getBlock("latest")
-
-      await rewardProgramDeployerSigner.leptonDeposit(1, 1).then(tx => tx.wait());
-      const blocksBeforeLeptonDeposit = stakeInfoCases[0].rewardBlockLength - stakeInfoCases[0].leptonStakeDepositBlockNumber;
-      await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(blocksBeforeLeptonDeposit) ]);
-      await ethers.provider.send("evm_mine");
-      
-      const blocksAfterBlockDeposit = stakeInfoCases[0].rewardBlockLength - blocksBeforeLeptonDeposit;
-      console.log('>>>>>> blocksAfterBlockDeposit', blocksAfterBlockDeposit);
-      // await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(blocksAfterBlockDeposit) ]);
-      // await ethers.provider.send("evm_mine");
-
-      const blockAfterDeposit = await ethers.provider.getBlock("latest")
-      console.log(blockAfterDeposit.number - blockBeforeDeposit.number);
-
-      const reward = await rewardProgramDeployerSigner.calculateLeptonReward(1, stakeInfoCases[0].amount);
-      const estimatedReward = calculateExpectedReward(stakeInfoCases[0]);
-      console.log(reward.toString(), estimatedReward);
-
-
-      // stakeInfoCases.map(stakeInfo => {
-      //   // calculate reward
-      //   const expectedReward = calculateExpectedReward(stakeInfo);
-      //   console.log('expectedReward', expectedReward);
-
-      // });
-      
     });
     
   });
