@@ -205,16 +205,13 @@ describe('Reward program', function () {
   
         await rewardProgramDeployerSigner.stake(i, stakeInfoCases[i].amount).then(tx => tx.wait());
         
-        await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(stakeInfoCases[i].blocksUntilLeptonDeposit) ]);
-        await ethers.provider.send("evm_mine");
+        await mineBlocks(stakeInfoCases[i].blocksUntilLeptonDeposit);
         await rewardProgramDeployerSigner.leptonDeposit(i, i).then(tx => tx.wait());
 
-        await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(stakeInfoCases[i].blocksUntilLeptonRelease) ]);
-        await ethers.provider.send("evm_mine");
+        await mineBlocks(stakeInfoCases[i].blocksUntilLeptonRelease);
         await rewardProgramDeployerSigner.leptonRelease(i).then(tx => tx.wait());
 
-        await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(stakeInfoCases[i].blocksUntilCalculation) ]);
-        await ethers.provider.send("evm_mine");
+        await mineBlocks(stakeInfoCases[i].blocksUntilCalculation);
   
         const reward = await rewardProgramDeployerSigner.calculateLeptonReward(i, stakeInfoCases[i].amount);
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
@@ -232,12 +229,16 @@ describe('Reward program', function () {
       await rewardProgramDeployerSigner.stake(uuid, amount).then(tx => tx.wait());
       await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
         
-      await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(100) ]);
-      await ethers.provider.send("evm_mine");
+      await mineBlocks(100)
 
       const reward = await rewardProgramDeployerSigner.calculateLeptonReward(uuid, amount); 
-      expect(reward).to.be.eq((amount * multiplier)- 1);
+      expect(reward).to.be.eq((amount * multiplier) - 1);
     });
     
   });
 });
+
+const mineBlocks = async (numberOfBlocks) => {
+  await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(numberOfBlocks) ]);
+  await ethers.provider.send("evm_mine");
+};
