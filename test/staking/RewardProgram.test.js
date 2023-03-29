@@ -101,7 +101,7 @@ describe('Reward program', function () {
   });
 
   describe('Leptons staking', async () => {
-    it.only('Changes wallet and basket manager address', async () => {
+    it ('Changes wallet and basket manager address', async () => {
       await expect(rewardProgramDeployerSigner.leptonDeposit(1,1)).to.be.revertedWith('Not basket manager');
 
       await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
@@ -115,7 +115,7 @@ describe('Reward program', function () {
     });
 
     it('Registers lepton deposit in reward program', async () => {
-      const uuid = 1;
+      const uuid = 20;
       const leptonId = 1;
       const leptonMultiplier = 20000; // x2
 
@@ -145,7 +145,7 @@ describe('Reward program', function () {
 
     it('Verifies simple lepton reward calculation', async () => {
       const principal = 100;
-      const uuid = 1;
+      const uuid = 21;
       const leptonId = 1;
       const leptonMultiplier = 20000; // x2
 
@@ -163,7 +163,7 @@ describe('Reward program', function () {
      expect(reward).to.be.eq(100);
     });
 
-    it.only('Checks lepton reward calculation with time spent', async () => {
+    it('Checks lepton reward calculation with time spent', async () => {
 
       const stakeInfoCases = [
         {
@@ -190,6 +190,14 @@ describe('Reward program', function () {
           leptonStakeMultiplier: 2,
           expectedReward: 133,
         },
+        {
+          amount: 100,
+          blocksUntilLeptonDeposit: 500,
+          blocksUntilLeptonRelease: 500,
+          blocksUntilCalculation: 500,
+          leptonStakeMultiplier: 0,
+          expectedReward: 100,
+        },
       ];
       
       for(let i = 0; i < stakeInfoCases.length; i++) {
@@ -211,7 +219,24 @@ describe('Reward program', function () {
         const reward = await rewardProgramDeployerSigner.calculateLeptonReward(i, stakeInfoCases[i].amount);
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
       }
+    });
 
+    it('Calculates reward without removing lepton', async () => {
+      const uuid = 100;
+      const amount = 100;
+      const leptonId = 35;
+      const multiplier = 2;
+
+      await leptonMock.mock.getMultiplier.returns(multiplier);
+
+      await rewardProgramDeployerSigner.stake(uuid, amount).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
+        
+      await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(100) ]);
+      await ethers.provider.send("evm_mine");
+
+      const reward = await rewardProgramDeployerSigner.calculateLeptonReward(uuid, amount); 
+      expect(reward).to.be.eq((amount * multiplier)- 1);
     });
     
   });
