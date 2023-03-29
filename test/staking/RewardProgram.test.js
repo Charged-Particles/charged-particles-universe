@@ -164,77 +164,32 @@ describe('Reward program', function () {
     });
 
     it.only('Checks lepton reward calculation with time spent', async () => {
-      const calculateExpectedReward = ({
-        amount,
-        rewardBlockLength,
-        leptonStakeDepositBlockNumber,
-        leptonStakeEndBlockNumber,
-        leptonStakeMultiplier
-      }) => {
-        const percentageScale = 10000;
-        const leptonDepositLength = leptonStakeEndBlockNumber - leptonStakeDepositBlockNumber;
-
-        const leptonPercentageInReward = Math.floor(leptonDepositLength * percentageScale / rewardBlockLength);
-
-        if (leptonDepositLength > rewardBlockLength) {
-          leptonDepositLength = rewardBlockLength;
-        }
-
-        const expectedReward = amount * leptonPercentageInReward * leptonStakeMultiplier;
-
-        return Math.floor((expectedReward/percentageScale) + amount);
-      };
 
       const stakeInfoCases = [
         {
-          amount: 1000,
-          rewardBlockLength: 150,
-          leptonStakeDepositBlockNumber: 1,
-          leptonStakeEndBlockNumber: 150,
+          amount: 100,
+          blocksUntilLeptonDeposit: 0,
+          blocksUntilLeptonRelease: 500,
+          blocksUntilCalculation: 495,
           leptonStakeMultiplier: 2,
+          expectedReward: 150,
         },
         {
-          amount: 2,
-          rewardBlockLength: 20,
-          leptonStakeDepositBlockNumber: 10,
-          leptonStakeEndBlockNumber: 20,
+          amount: 100,
+          blocksUntilLeptonDeposit: 0,
+          blocksUntilLeptonRelease: 1000,
+          blocksUntilCalculation: 0,
+          leptonStakeMultiplier: 4,
+          expectedReward: 399,
+        },
+        {
+          amount: 100,
+          blocksUntilLeptonDeposit: 500,
+          blocksUntilLeptonRelease: 500,
+          blocksUntilCalculation: 500,
           leptonStakeMultiplier: 2,
+          expectedReward: 133,
         },
-        {
-          amount: 1000,
-          rewardBlockLength: 100,
-          leptonStakeDepositBlockNumber: 10,
-          leptonStakeEndBlockNumber: 20,
-          leptonStakeMultiplier: 2,
-        },
-        {
-          amount: 5000,
-          rewardBlockLength: 300,
-          leptonStakeDepositBlockNumber: 200,
-          leptonStakeEndBlockNumber: 400,
-          leptonStakeMultiplier: 1,
-        },
-        {
-          amount: 2000,
-          rewardBlockLength: 400,
-          leptonStakeDepositBlockNumber: 250,
-          leptonStakeEndBlockNumber: 300,
-          leptonStakeMultiplier: 0,
-        },
-        {
-          amount: 3000,
-          rewardBlockLength: 200,
-          leptonStakeDepositBlockNumber: 150,
-          leptonStakeEndBlockNumber: 250,
-          leptonStakeMultiplier: 5,
-        },
-        {
-          amount: 500,
-          rewardBlockLength: 100,
-          leptonStakeDepositBlockNumber: 50,
-          leptonStakeEndBlockNumber: 150,
-          leptonStakeMultiplier: 3,
-        }
       ];
       
       for(let i = 0; i < stakeInfoCases.length; i++) {
@@ -242,19 +197,19 @@ describe('Reward program', function () {
   
         await rewardProgramDeployerSigner.stake(i, stakeInfoCases[i].amount).then(tx => tx.wait());
         
-        if (stakeInfoCases[i].leptonStakeDepositBlockNumber > 0 ) {
-          await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(stakeInfoCases[i].leptonStakeDepositBlockNumber) ]);
-          await ethers.provider.send("evm_mine");
-          await rewardProgramDeployerSigner.leptonDeposit(i, i).then(tx => tx.wait());
-        };
-  
-        const blocksAfterBlockDeposit = stakeInfoCases[i].rewardBlockLength - stakeInfoCases[i].leptonStakeDepositBlockNumber;
-        await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(blocksAfterBlockDeposit) ]);
+        await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(stakeInfoCases[i].blocksUntilLeptonDeposit) ]);
+        await ethers.provider.send("evm_mine");
+        await rewardProgramDeployerSigner.leptonDeposit(i, i).then(tx => tx.wait());
+
+        await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(stakeInfoCases[i].blocksUntilLeptonRelease) ]);
+        await ethers.provider.send("evm_mine");
+        await rewardProgramDeployerSigner.leptonRelease(i).then(tx => tx.wait());
+
+        await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(stakeInfoCases[i].blocksUntilCalculation) ]);
         await ethers.provider.send("evm_mine");
   
         const reward = await rewardProgramDeployerSigner.calculateLeptonReward(i, stakeInfoCases[i].amount);
-        const estimatedReward = calculateExpectedReward(stakeInfoCases[i]);
-        console.log(reward.toString(), estimatedReward);
+        expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
       }
 
     });
