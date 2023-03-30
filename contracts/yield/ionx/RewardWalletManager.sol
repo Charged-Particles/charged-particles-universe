@@ -399,6 +399,15 @@ contract RewardWalletManager is WalletManagerBase {
     public 
     returns (address)
   {
+    return _getRewardProgram(assetToken);
+  }
+
+  function _getRewardProgram(
+    address assetToken
+  )
+    internal 
+    returns (address)
+  {
     address rewardProgram = _rewardPrograms[assetToken];
 
     require (rewardProgram != address(0), "Non existing reward program.");

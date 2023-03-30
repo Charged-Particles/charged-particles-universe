@@ -141,7 +141,7 @@ contract RewardBasketManager is Ownable, BlackholePrevention, IBasketManager {
 
     added = GenericSmartBasketB(basket).addToBasket(basketTokenAddress, basketTokenId, nftTokenAmount);
     if (added) {
-      RewardProgram(getRewardProgram(basketTokenAddress)).leptonDeposit(uuid, basketTokenId);
+      RewardProgram(_getRewardProgram(basketTokenAddress)).leptonDeposit(uuid, basketTokenId);
       emit BasketAdd(contractAddress, tokenId, basketTokenAddress, basketTokenId, nftTokenAmount);
     }
   }
@@ -171,7 +171,7 @@ contract RewardBasketManager is Ownable, BlackholePrevention, IBasketManager {
 
     removed = GenericSmartBasketB(basket).removeFromBasket(receiver, basketTokenAddress, basketTokenId, nftTokenAmount);
     if (removed) {
-      RewardProgram(getRewardProgram(basketTokenAddress)).leptonRelease(uuid);
+      RewardProgram(_getRewardProgram(basketTokenAddress)).leptonRelease(uuid);
       emit BasketRemove(receiver, contractAddress, tokenId, basketTokenAddress, basketTokenId, nftTokenAmount);
     }
   }
@@ -229,7 +229,7 @@ contract RewardBasketManager is Ownable, BlackholePrevention, IBasketManager {
   function getRewardProgram(
     address assetToken
   )
-    public
+    external 
     returns (address)
   {
     address rewardProgram = _rewardPrograms[assetToken];
