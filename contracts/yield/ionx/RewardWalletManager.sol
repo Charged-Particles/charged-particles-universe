@@ -393,7 +393,7 @@ contract RewardWalletManager is WalletManagerBase {
     return wallet;
   }
 
-    function getRewardProgram(
+  function getRewardProgram(
     address assetToken
   )
     external
@@ -401,7 +401,7 @@ contract RewardWalletManager is WalletManagerBase {
   {
     address rewardProgram = _rewardPrograms[assetToken];
 
-    require (rewardProgram != address(0), "Non  existing reward program.");
+    require (rewardProgram != address(0), "Non existing reward program.");
 
     return rewardProgram;
   }
