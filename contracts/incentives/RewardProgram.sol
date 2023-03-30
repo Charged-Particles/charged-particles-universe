@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../lib/BlackholePrevention.sol";
+import "../interfaces/ILepton.sol";
+import "hardhat/console.sol";
 
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using SafeMath for uint256;
@@ -15,10 +17,14 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   ProgramRewardData public _programData;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
-  address public rewardWalletManager;
   uint256 public baseMultiplier;
 
-  mapping(address => Stake) public walletStake;
+  address public rewardWalletManager;
+  address public rewardBasketManager;
+  address public lepton = 0xc5a5C42992dECbae36851359345FE25997F5C42d;
+
+  mapping(uint256 => Stake) public walletStake;
+  mapping(uint256 => LeptonsStake) public leptonsStake;
 
   constructor(
     address _stakingToken,
@@ -27,14 +33,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 _duration,
     uint256 _baseMultiplier
   ) public {
-    //TODO: define stake data params
     _programData.stakingToken = _stakingToken;
     _programData.rewardToken = _rewardToken;
     _programData.rewardDuration = _duration;
     _programData.rewardPool = address(this);
-    _programData.lastUpdate = block.timestamp;
-    _programData.totalStakeUnits = 0;
-    _programData.rewardPoolBalance = 0;
 
     rewardWalletManager = _rewardWalletManager;
     baseMultiplier = _baseMultiplier;
@@ -64,19 +66,19 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     return _programData;
   }
 
-  function stake(address wallet, uint256 amount) override external onlyWalletManager {
-    if (walletStake[wallet].started) {
-      walletStake[wallet] = Stake(true, block.timestamp, amount,0,0);
+  function stake(uint256 uuid, uint256 amount) override external onlyWalletManager {
+    if (!walletStake[uuid].started) {
+      walletStake[uuid] = Stake(true, block.number, amount,0,0);
     } else {
-      Stake storage onGoingStake = walletStake[wallet];
+      Stake storage onGoingStake = walletStake[uuid];
       onGoingStake.principal += amount;
     }
 
-    emit Staked(wallet, amount);
+    emit Staked(uuid, amount);
   }
 
   function unstake(
-    address wallet,
+    uint256 uuid,
     address receiver,
     uint256 amount
   ) 
@@ -84,28 +86,97 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyWalletManager
   {
-    uint256 reward = this.calculateReward(amount);
+    uint256 baseReward = calculateReward(amount);
+    uint256 reward = calculateLeptonReward(uuid, baseReward);
 
-    Stake storage stake = walletStake[wallet];
-    stake.generatedCharge = amount;
-    stake.reward = reward;
+    Stake storage stake = walletStake[uuid];
+    stake.generatedCharge = stake.generatedCharge + amount;
+    stake.reward = stake.reward + reward;
 
     // transfer ionx to user
     IERC20(_programData.rewardToken).transfer(receiver, reward);
+
+    emit Unstaked(uuid, reward);
   }
 
+  function leptonDeposit(uint256 uuid, uint256 tokenId)
+    external
+    onlyBasketManager
+  {
+    require(walletStake[uuid].started, "Stake not started");
+
+    uint256 multiplier = ILepton(lepton).getMultiplier(tokenId);
+
+    leptonsStake[uuid] = LeptonsStake(multiplier, block.number, 0);
+  }
+
+  function leptonRelease(uint256 uuid)
+    external
+    onlyBasketManager
+  {
+    require(walletStake[uuid].started, "Stake not started");
+    require(leptonsStake[uuid].depositBlockNumber > 0, "No lepton deposit");
+
+    LeptonsStake storage leptonStake = leptonsStake[uuid];
+    leptonStake.released = block.number;
+  }
+
+  // Reward calculation
   function calculateReward(
     uint256 amount
   )
-    external
+    public
     view
     returns(
       uint256 ajustedReward
     )
   {
-    // TODO: should be check > 0 ?
+    // todo here should be the lepton calculation
     uint256 baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
     ajustedReward = this.convertDecimals(baseReward);
+  }
+
+  function calculateLeptonReward(
+    uint256 uuid,
+    uint256 amount
+  )
+    public
+    view
+    returns(
+      uint256
+    )
+  {
+    LeptonsStake memory leptonStake = leptonsStake[uuid];
+    uint256 multiplier = leptonStake.multiplier;
+
+    uint256 rewardBlockLength = block.number.sub(walletStake[uuid].start);
+    uint leptonDepositLength;
+
+    if (leptonStake.released > 0 ) {
+      leptonDepositLength = leptonStake.released.sub(leptonStake.depositBlockNumber);
+    } else {
+      leptonDepositLength = block.number.sub(leptonStake.depositBlockNumber);
+    }
+
+    if (multiplier == 0 || leptonDepositLength == 0 || rewardBlockLength == 0) {
+      return amount;
+    }
+
+    if (leptonDepositLength > rewardBlockLength) {
+      leptonDepositLength = rewardBlockLength;
+    }
+    
+    // Percentage of the total program that the lepton was deposited for
+    uint256 percentageOfLeptonInReward = leptonDepositLength.mul(PERCENTAGE_SCALE).div(rewardBlockLength);
+
+    // Amount of reward that the lepton is responsible for 
+    uint256 amountGenerateDurningLeptonDeposit = amount.mul(percentageOfLeptonInReward);
+
+    uint256 multipliedReward = amountGenerateDurningLeptonDeposit.mul(multiplier).div(PERCENTAGE_SCALE);
+
+    uint256 amountGeneratedWithoutLeptonDeposit = amount.sub(amountGenerateDurningLeptonDeposit.div(PERCENTAGE_SCALE));
+
+    return amountGeneratedWithoutLeptonDeposit.add(multipliedReward);
   }
 
   function convertDecimals(
@@ -121,6 +192,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     rewardAjustedDecimals = reward.mul(10**(12));
   }
 
+  // Admin
   function setBaseMultiplier(uint256 newMultiplier)
     external
     onlyOwner
@@ -128,8 +200,34 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     baseMultiplier = newMultiplier;
   }
 
+  function setRewardWalletManager(address newRewardWalletManager)
+    external
+    onlyOwner
+  {
+    rewardWalletManager = newRewardWalletManager;
+  }
+
+  function setRewardBasketManager(address newRewardBasketManager)
+    external
+    onlyOwner
+  {
+    rewardBasketManager = newRewardBasketManager;
+  }
+
+  function setLepton(address leptonAddress)
+    external
+    onlyOwner
+  {
+    lepton = leptonAddress;
+  }
+
   modifier onlyWalletManager() {
     require(msg.sender == rewardWalletManager, "Not wallet manager");
+    _;
+  }
+
+  modifier onlyBasketManager() {
+    require(msg.sender == rewardBasketManager, "Not basket manager");
     _;
   }
 }

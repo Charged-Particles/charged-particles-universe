@@ -9,8 +9,8 @@ interface IRewardProgram {
 
   /* user events */
 
-  event Staked(address wallet, uint256 amount);
-  // event Unstaked(address vault, uint256 amount);
+  event Staked(uint256 uuid, uint256 amount);
+  event Unstaked(uint256 uuid, uint256 amount);
   // event RewardClaimed(address vault, address token, uint256 amount);
 
   /* data types */
@@ -19,13 +19,9 @@ interface IRewardProgram {
     address stakingToken;
     address rewardToken;
     address rewardPool;
-    uint256 rewardPoolBalance;
-    uint256 totalStake;
-    uint256 totalStakeUnits;
-    uint256 lastUpdate;
     uint256 rewardDuration;
+    uint256 rewardPoolBalance;
   }
-
 
   struct Stake {
     bool started;
@@ -33,14 +29,13 @@ interface IRewardProgram {
     uint256 principal;
     uint256 generatedCharge;
     uint256 reward;
-    // LeptonsMultiplier[] leptonsData;
   }
 
-  // struct LeptonsMultiplier {
-  //   uint256 multiplier;
-  //   uint256 deposit;
-  //   uint256 timeDeposited;
-  // }
+  struct LeptonsStake {
+    uint256 multiplier;
+    uint256 depositBlockNumber;
+    uint256 released;
+  }
 
   // struct VaultData {
   //   uint256 totalStake;
@@ -61,11 +56,11 @@ interface IRewardProgram {
 
   /* user functions */
 
-  function stake(address wallet, uint256 amount)
+  function stake(uint256 uuid, uint256 amount)
     external;
 
   function unstake(
-    address smartWallet,
+    uint256 uuid,
     address receiver,
     uint256 amount
   )

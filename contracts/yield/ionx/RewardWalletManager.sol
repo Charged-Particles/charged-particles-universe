@@ -145,7 +145,7 @@ contract RewardWalletManager is WalletManagerBase {
     // Deposit into Smart-Wallet
     yieldTokensAmount = AaveSmartWalletB(wallet).deposit(assetToken, assetAmount, _referralCode);
 
-    RewardProgram(this.getRewardProgram(assetToken)).stake(wallet, assetAmount);
+    RewardProgram(this.getRewardProgram(assetToken)).stake(uuid, assetAmount);
 
     // Log Event
     emit WalletEnergized(contractAddress, tokenId, assetToken, assetAmount, yieldTokensAmount);
@@ -179,7 +179,7 @@ contract RewardWalletManager is WalletManagerBase {
     (creatorAmount, receiverAmount) = AaveSmartWalletB(wallet).withdrawAmount(receiver, creator, annuityPct, assetToken, ownerInterest);
     
     RewardProgram(this.getRewardProgram(assetToken)).unstake(
-      wallet,
+      uuid,
       receiver,
       ownerInterest
     );
@@ -276,7 +276,7 @@ contract RewardWalletManager is WalletManagerBase {
     (creatorAmount, receiverAmount) = AaveSmartWalletB(wallet).withdraw(receiver, creator, annuityPct, assetToken);
 
     RewardProgram(this.getRewardProgram(assetToken)).unstake(
-      wallet,
+      uuid,
       receiver,
       ownerInterest
     );
@@ -393,7 +393,7 @@ contract RewardWalletManager is WalletManagerBase {
     return wallet;
   }
 
-    function getRewardProgram(
+  function getRewardProgram(
     address assetToken
   )
     external
@@ -401,7 +401,7 @@ contract RewardWalletManager is WalletManagerBase {
   {
     address rewardProgram = _rewardPrograms[assetToken];
 
-    require (rewardProgram != address(0), "Non  existing reward program.");
+    require (rewardProgram != address(0), "Non existing reward program.");
 
     return rewardProgram;
   }
