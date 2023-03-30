@@ -235,10 +235,30 @@ describe('Reward program', function () {
       expect(reward).to.be.eq((amount * multiplier) - 1);
     });
     
+    it ('Calculates reward with lepton re-staking, resets lepton staking.', async () => {
+      const uuid = 101;
+      const amount = 100;
+      const leptonId = 36;
+      const multiplier = 2;
+
+      await leptonMock.mock.getMultiplier.returns(multiplier);
+
+      await rewardProgramDeployerSigner.stake(uuid, amount).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
+
+      await rewardProgramDeployerSigner.leptonRelease(uuid).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
+
+      await mineBlocks(1000);
+
+      const reward = await rewardProgramDeployerSigner.calculateLeptonReward(uuid, amount); 
+      expect(reward).to.be.eq(200);
+    });
   });
+
 });
 
 const mineBlocks = async (numberOfBlocks) => {
   await ethers.provider.send("hardhat_mine", [ ethers.utils.hexValue(numberOfBlocks) ]);
   await ethers.provider.send("evm_mine");
-};
+}

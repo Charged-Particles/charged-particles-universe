@@ -86,17 +86,17 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyWalletManager
   {
-    uint256 baseReward = this.calculateReward(amount);
-    uint256 reward = this.calculateLeptonReward(uuid, baseReward);
+    uint256 baseReward = calculateReward(amount);
+    uint256 reward = calculateLeptonReward(uuid, baseReward);
 
     Stake storage stake = walletStake[uuid];
-    stake.generatedCharge = amount;
-    stake.reward = reward;
+    stake.generatedCharge = stake.generatedCharge + amount;
+    stake.reward = stake.reward + reward;
 
     // transfer ionx to user
     IERC20(_programData.rewardToken).transfer(receiver, reward);
 
-    emit Unstaked(uuid, amount);
+    emit Unstaked(uuid, reward);
   }
 
   function leptonDeposit(uint256 uuid, uint256 tokenId)
@@ -125,7 +125,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   function calculateReward(
     uint256 amount
   )
-    external
+    public
     view
     returns(
       uint256 ajustedReward
@@ -140,7 +140,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 uuid,
     uint256 amount
   )
-    external
+    public
     view
     returns(
       uint256
