@@ -240,6 +240,17 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   /***********************************|
   |          Only Admin/DAO           |
   |__________________________________*/
+  function setRewardProgram(
+    address rewardProgam,
+    address energizableToken
+  )
+  external
+  onlyOwner
+  {
+    require(rewardProgam != address(0x0), "AWM:E-403");
+    _rewardPrograms[energizableToken] = rewardProgam;
+    emit RewardProgramSet(rewardProgam);
+  } 
 
   /**
     * @dev Sets the Paused-state of the Basket Manager
