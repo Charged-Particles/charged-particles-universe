@@ -418,6 +418,25 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      }
+    ],
+    "name": "getRewardProgram",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "contractAddress",
         "type": "address"
       },
@@ -592,6 +611,24 @@
       }
     ],
     "name": "setPausedState",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "rewardProgam",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "energizableToken",
+        "type": "address"
+      }
+    ],
+    "name": "setRewardProgram",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

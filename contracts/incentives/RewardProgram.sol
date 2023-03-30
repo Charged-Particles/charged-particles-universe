@@ -89,9 +89,9 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 baseReward = calculateReward(amount);
     uint256 reward = calculateLeptonReward(uuid, baseReward);
 
-    Stake storage stake = walletStake[uuid];
-    stake.generatedCharge = stake.generatedCharge + amount;
-    stake.reward = stake.reward + reward;
+    // Stake storage stake = walletStake[uuid];
+    // stake.generatedCharge = stake.generatedCharge + amount;
+    // stake.reward = stake.reward + reward;
 
     // transfer ionx to user
     IERC20(_programData.rewardToken).transfer(receiver, reward);

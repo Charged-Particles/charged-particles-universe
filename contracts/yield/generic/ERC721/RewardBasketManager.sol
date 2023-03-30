@@ -33,12 +33,13 @@ import "../../../lib/BlackholePrevention.sol";
 import "../../../lib/TokenInfo.sol";
 import "../../../lib/NftTokenType.sol";
 import "./GenericSmartBasketB.sol";
+import "../../../incentives/RewardProgram.sol";
 
 /**
  * @notice Generic ERC721 Basket Manager
  * @dev Non-upgradeable Contract
  */
-contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
+contract RewardBasketManager is Ownable, BlackholePrevention, IBasketManager {
   using Counters for Counters.Counter;
   using TokenInfo for address;
   using NftTokenType for address;
@@ -140,6 +141,7 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
 
     added = GenericSmartBasketB(basket).addToBasket(basketTokenAddress, basketTokenId, nftTokenAmount);
     if (added) {
+      RewardProgram(getRewardProgram(basketTokenAddress)).leptonDeposit(uuid, basketTokenId);
       emit BasketAdd(contractAddress, tokenId, basketTokenAddress, basketTokenId, nftTokenAmount);
     }
   }
@@ -169,6 +171,7 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
 
     removed = GenericSmartBasketB(basket).removeFromBasket(receiver, basketTokenAddress, basketTokenId, nftTokenAmount);
     if (removed) {
+      RewardProgram(getRewardProgram(basketTokenAddress)).leptonRelease(uuid);
       emit BasketRemove(receiver, contractAddress, tokenId, basketTokenAddress, basketTokenId, nftTokenAmount);
     }
   }
@@ -226,7 +229,7 @@ contract GenericBasketManagerB is Ownable, BlackholePrevention, IBasketManager {
   function getRewardProgram(
     address assetToken
   )
-    external
+    public
     returns (address)
   {
     address rewardProgram = _rewardPrograms[assetToken];
