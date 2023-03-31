@@ -114,8 +114,8 @@ module.exports = async (hre) => {
   // await _verifyContract({name: 'AaveWalletManagerB', networkName});
 
   // NFTs
-  // await _verifyContract({name: 'Proton', networkName});
-  // await _verifyContract({name: 'ProtonB', networkName});
+  await _verifyContract({name: 'Proton', networkName});
+  await _verifyContract({name: 'ProtonB', networkName});
   await _verifyContract({name: 'ProtonC', networkName});
   // await _verifyContract({name: 'Lepton', networkName});
   // await _verifyContract({name: 'Lepton2', networkName});

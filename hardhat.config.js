@@ -14,8 +14,7 @@ require('hardhat-abi-exporter');
 require('solidity-coverage');
 require('hardhat-deploy-ethers');
 require('hardhat-deploy');
-require("hardhat-watcher");
-
+require('hardhat-watcher');
 
 // This must occur after hardhat-deploy!
 task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
@@ -100,7 +99,7 @@ module.exports = {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
                 count: 10,
-            }
+            },
         },
         goerli: {
             url: `https://eth-goerli.g.alchemy.com/v2/mCtpp6DQI8VDJ9F4kIovVrGncmsUnM_n`,
@@ -110,7 +109,7 @@ module.exports = {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
                 count: 10,
-            }
+            },
         },
         mumbai: {
             // url: `https://rpc-mumbai.matic.today`,
@@ -122,7 +121,7 @@ module.exports = {
                 initialIndex: 0,
                 count: 10,
             },
-            chainId: 80001
+            chainId: 80001,
         },
         polygon: {
             // url: `https://rpc-mainnet.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
@@ -132,7 +131,7 @@ module.exports = {
                 mnemonic: mnemonic.mainnet,
                 initialIndex: 0,
                 count: 3,
-            }
+            },
         },
         mainnet: {
             // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
@@ -143,18 +142,18 @@ module.exports = {
                 mnemonic: mnemonic.mainnet,
                 initialIndex: 0,
                 count: 3,
-            }
+            },
         },
-        zkenvTest: {
-            // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
+        zkEVMtest: {
             url: 'https://rpc.public.zkevm-test.net',
+            gasPrice: 'auto',
             accounts: {
-                mnemonic: mnemonic.mainnet,
+                mnemonic: mnemonic.testnet,
                 initialIndex: 0,
-                count: 3,
+                count: 10,
             },
             timeout: 400000,
-            chainId: 1442
+            chainId: 1442,
         },
     },
     etherscan: {
@@ -164,7 +163,18 @@ module.exports = {
         kovan: process.env.ETHERSCAN_APIKEY,
         polygon: process.env.POLYGONSCAN_APIKEY,
         polygonMumbai: process.env.POLYGONSCAN_APIKEY,
-      }
+        zkEVMtest: process.env.ETHERSCAN_APIKEY,
+      },
+      customChains: [
+        {
+          network: 'zkEVMtest',
+          chainId: 1442,
+          urls: {
+            apiURL: 'https://rpc.public.zkevm-test.net',
+            browserURL: 'https://explorer.public.zkevm-test.net',
+          },
+        },
+      ],
     },
     // polygonscan: {
     //   apiKey: process.env.POLYGONSCAN_APIKEY

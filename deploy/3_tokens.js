@@ -77,25 +77,25 @@ module.exports = async (hre) => {
     }
   }
 
-  await log('\n  Deploying Lepton2 NFT...')(alchemyTimeout);
-  const Lepton2 = await ethers.getContractFactory('Lepton2');
-  const Lepton2Instance = await Lepton2.deploy();
-  const lepton2 = await Lepton2Instance.deployed();
-  deployData['Lepton2'] = {
-    abi: getContractAbi('Lepton2'),
-    address: lepton2.address,
-    deployTransaction: lepton2.deployTransaction,
-  }
+  // await log('\n  Deploying Lepton2 NFT...')(alchemyTimeout);
+  // const Lepton2 = await ethers.getContractFactory('Lepton2');
+  // const Lepton2Instance = await Lepton2.deploy();
+  // const lepton2 = await Lepton2Instance.deployed();
+  // deployData['Lepton2'] = {
+  //   abi: getContractAbi('Lepton2'),
+  //   address: lepton2.address,
+  //   deployTransaction: lepton2.deployTransaction,
+  // }
 
-  await log('\n  Deploying Ionx FT...')(alchemyTimeout);
-  const Ionx = await ethers.getContractFactory('Ionx');
-  const IonxInstance = await Ionx.deploy();
-  const ionx = await IonxInstance.deployed();
-  deployData['Ionx'] = {
-    abi: getContractAbi('Ionx'),
-    address: ionx.address,
-    deployTransaction: ionx.deployTransaction,
-  }
+  // await log('\n  Deploying Ionx FT...')(alchemyTimeout);
+  // const Ionx = await ethers.getContractFactory('Ionx');
+  // const IonxInstance = await Ionx.deploy();
+  // const ionx = await IonxInstance.deployed();
+  // deployData['Ionx'] = {
+  //   abi: getContractAbi('Ionx'),
+  //   address: ionx.address,
+  //   deployTransaction: ionx.deployTransaction,
+  // }
 
   let externalERC721, nonFungibleERC1155, fungibleERC1155
   if (!isProd) {
@@ -146,12 +146,12 @@ module.exports = async (hre) => {
     log('     - Block:    ', lepton.deployTransaction.blockNumber);
     log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
   }
-  log('  - Lepton2:     ', lepton2.address);
-  log('     - Block:    ', lepton2.deployTransaction.blockNumber);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
-  log('  - Ionx:        ', ionx.address);
-  log('     - Block:    ', ionx.deployTransaction.blockNumber);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionx.deployTransaction }));
+  // log('  - Lepton2:     ', lepton2.address);
+  // log('     - Block:    ', lepton2.deployTransaction.blockNumber);
+  // log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
+  // log('  - Ionx:        ', ionx.address);
+  // log('     - Block:    ', ionx.deployTransaction.blockNumber);
+  // log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionx.deployTransaction }));
   if (!isProd) {
     log('  - ExternalERC721:     ', externalERC721.address);
     log('     - Block:           ', externalERC721.deployTransaction.blockNumber);

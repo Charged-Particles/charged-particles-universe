@@ -37,6 +37,7 @@ const chainIdByName = (chainName) => {
     case 'kovan': return 42;
     case 'polygon': return 137;
     case 'mumbai': return 80001;
+    case 'zkevmtest': return 1442;
     case 'hardhat': return 31337;
     case 'coverage': return 31337;
     default: return 0;
@@ -51,6 +52,7 @@ const chainNameById = (chainId) => {
     case 5: return 'Goerli';
     case 42: return 'Kovan';
     case 137: return 'Polygon';
+    case 1442: return 'zkEVM-Testnet';
     case 80001: return 'Mumbai';
     case 31337: return 'Hardhat';
     default: return 'Unknown';
@@ -65,6 +67,7 @@ const chainTypeById = (chainId) => {
     case 3:
     case 4:
     case 42:
+    case 1442:
     case 80001:
       return {isProd: false, isTestnet: true, isHardhat: false};
     case 31337:
