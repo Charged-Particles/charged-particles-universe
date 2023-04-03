@@ -103,7 +103,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyBasketManager
   {
-    require(walletStake[uuid].started, "Stake not started");
+    // require(walletStake[uuid].started, "Stake not started");
 
     uint256 multiplier = ILepton(lepton).getMultiplier(tokenId);
 
@@ -114,8 +114,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyBasketManager
   {
-    require(walletStake[uuid].started, "Stake not started");
-    require(leptonsStake[uuid].depositBlockNumber > 0, "No lepton deposit");
+    // require(walletStake[uuid].started, "Stake not started");
+    // require(leptonsStake[uuid].depositBlockNumber > 0, "No lepton deposit");
 
     LeptonsStake storage leptonStake = leptonsStake[uuid];
     leptonStake.released = block.number;
@@ -170,11 +170,11 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 percentageOfLeptonInReward = leptonDepositLength.mul(PERCENTAGE_SCALE).div(rewardBlockLength);
 
     // Amount of reward that the lepton is responsible for 
-    uint256 amountGenerateDurningLeptonDeposit = amount.mul(percentageOfLeptonInReward);
+    uint256 amountGenerateDuringLeptonDeposit = amount.mul(percentageOfLeptonInReward);
 
-    uint256 multipliedReward = amountGenerateDurningLeptonDeposit.mul(multiplier).div(PERCENTAGE_SCALE);
+    uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier).div(PERCENTAGE_SCALE);
 
-    uint256 amountGeneratedWithoutLeptonDeposit = amount.sub(amountGenerateDurningLeptonDeposit.div(PERCENTAGE_SCALE));
+    uint256 amountGeneratedWithoutLeptonDeposit = amount.sub(amountGenerateDuringLeptonDeposit.div(PERCENTAGE_SCALE));
 
     return amountGeneratedWithoutLeptonDeposit.add(multipliedReward);
   }
