@@ -190,7 +190,6 @@ module.exports = {
         'Lepton',
         'Lepton2',
         'ERC20',
-        'ERC721',
         'ExternalERC721',
         'FungibleERC1155',
         'NonFungibleERC1155',
