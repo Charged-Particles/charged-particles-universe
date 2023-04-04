@@ -100,19 +100,25 @@ describe('Reward program', function () {
   });
 
   describe ('Reward basket manager', async () => {
+
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
-    console.log(ddChargedParticles);
 
     // impersonate charged particles address
-    // await network.provider.request({
-    //   method: "hardhat_impersonateAccount",
-    //   params: []
-    // });
+    await network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [ddChargedParticles.address]
+    });
+    const chargedParticlesSigner = ethers.provider.getSigner(ddChargedParticles.address);
 
-    // usdcSigner = ethers.provider.getSigner(usdcHodler);
+    const ddRewardBasketManager = getDeployData('RewardBasketManager', chainId);
+    const RewardBasketManager = await ethers.getContractFactory('RewardBasketManager');
+    const rewardBasketManager = await RewardBasketManager.attach(ddRewardBasketManager.address);
+    console.log(rewardBasketManager.address);
 
     // test add basket 
-    // it ('')
+    it ('Adds into basket', async () => {
+      
+    });
 
     // test release from basket
   });

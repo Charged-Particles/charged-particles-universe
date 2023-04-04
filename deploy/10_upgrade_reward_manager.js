@@ -23,20 +23,31 @@ const {
     const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 5);
   
     await log('  Deploying RewardWalletManager...')(alchemyTimeout);
+
     const RewardWalletManager = await hre.ethers.getContractFactory('RewardWalletManager');
-
     const RewardWalletManagerInstance = await RewardWalletManager.deploy();
-
     const rewardWalletManager = await RewardWalletManagerInstance.deployed();
+
     deployData['RewardWalletManager'] = {
         contract: "contracts/yield/ionx/RewardWalletManager.sol:RewardWalletManager",
         address: rewardWalletManager.address,
         deployTransaction: rewardWalletManager.deployTransaction,
     }
+
+    const RewardBasketManager = await hre.ethers.getContractFactory('RewardWalletManager');
+    const RewardBasketManagerInstance = await RewardBasketManager.deploy();
+    const rewardBasketManager = await RewardBasketManagerInstance.deployed();
+
+    deployData['RewardBasketManager'] = {
+        contract: "contracts/yield/ionx/RewardBasketManager.sol:RewardBasketManager",
+        address: rewardBasketManager.address,
+        deployTransaction: rewardBasketManager.deployTransaction,
+    }
+
     saveDeploymentData(chainId, deployData, true);
 
     log('  - RewardWalletManager: ', rewardWalletManager.address);
-    log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: rewardWalletManager.deployTransaction }));
+    log('  - RewardBasketManager: ', rewardBasketManager.address);
     accumulatedGasCost(rewardWalletManager.deployTransaction);
   };
 
