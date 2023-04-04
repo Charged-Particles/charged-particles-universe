@@ -34,6 +34,7 @@ import "../../lib/TokenInfo.sol";
 import "../../lib/NftTokenType.sol";
 import "../../incentives/RewardProgram.sol";
 import "../generic/ERC721/GenericSmartBasketB.sol";
+import "hardhat/console.sol";
 
 /**
  * @notice Generic ERC721 Basket Manager
@@ -129,6 +130,7 @@ contract RewardBasketManager is Ownable, BlackholePrevention, IBasketManager {
     whenNotPaused
     returns (bool added)
   {
+    console.log("addToBasket");
     uint256 uuid = contractAddress.getTokenUUID(tokenId);
     address basket = _baskets[uuid];
     require(basket != address(0x0), "GBM:E-403");

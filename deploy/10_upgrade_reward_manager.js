@@ -51,5 +51,5 @@ const {
     accumulatedGasCost(rewardWalletManager.deployTransaction);
   };
 
-  module.exports.tags = ['RewardWalletManager']
+  module.exports.tags = ['RewardManager']
   

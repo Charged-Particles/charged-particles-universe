@@ -99,8 +99,8 @@ describe('Reward program', function () {
     });
   });
 
-  describe ('Reward basket manager', async () => {
-
+  it ('Reward basket manager', async () => {
+    await leptonMock.mock.getMultiplier.returns(2);
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
 
     // impersonate charged particles address
@@ -111,16 +111,25 @@ describe('Reward program', function () {
     const chargedParticlesSigner = ethers.provider.getSigner(ddChargedParticles.address);
 
     const ddRewardBasketManager = getDeployData('RewardBasketManager', chainId);
-    const RewardBasketManager = await ethers.getContractFactory('RewardBasketManager');
-    const rewardBasketManager = await RewardBasketManager.attach(ddRewardBasketManager.address);
-    console.log(rewardBasketManager.address);
+    const RewardBasketManager = await ethers.getContractFactory('RewardBasketManager', deployerSigner);
+    const rewardBasketManager = RewardBasketManager.attach(ddRewardBasketManager.address);
 
     // test add basket 
-    it ('Adds into basket', async () => {
-      
-    });
+    const leptonTokenAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A';
+    const leptonTokenId = 1;
+    const basketTokenAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'; 
+    const basketId = 2; 
 
-    // test release from basket
+    await rewardBasketManager.setController(deployerAddress).then(tx => tx.wait());
+    await rewardBasketManager.setRewardProgram(rewardProgram.address, leptonTokenAddress).then(tx => tx.wait());
+
+    // console.log(rewardBasketManager);
+    await rewardBasketManager.callStatic.addToBasket(
+      basketTokenAddress,
+      basketId,
+      leptonTokenAddress,
+      leptonTokenId
+    ).then(tx => tx.wait());
   });
 
   describe('Leptons staking', async () => {
