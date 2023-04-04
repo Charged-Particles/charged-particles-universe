@@ -26,14 +26,14 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "../../../interfaces/IBasketManager.sol";
-import "../../../interfaces/ISmartBasket.sol";
-import "../../../interfaces/ITokenInfoProxy.sol";
-import "../../../lib/BlackholePrevention.sol";
-import "../../../lib/TokenInfo.sol";
-import "../../../lib/NftTokenType.sol";
-import "./GenericSmartBasketB.sol";
-import "../../../incentives/RewardProgram.sol";
+import "../../interfaces/IBasketManager.sol";
+import "../../interfaces/ISmartBasket.sol";
+import "../../interfaces/ITokenInfoProxy.sol";
+import "../../lib/BlackholePrevention.sol";
+import "../../lib/TokenInfo.sol";
+import "../../lib/NftTokenType.sol";
+import "../../incentives/RewardProgram.sol";
+import "../generic/ERC721/GenericSmartBasketB.sol";
 
 /**
  * @notice Generic ERC721 Basket Manager
