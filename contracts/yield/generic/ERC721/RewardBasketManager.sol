@@ -57,7 +57,7 @@ contract RewardBasketManager is Ownable, BlackholePrevention, IBasketManager {
   // Template Contract for creating Token Smart-Baskets
   address internal _basketTemplate;
 
-  //       TokenID => Token Smart-Basket Address
+  // TokenID => Token Smart-Basket Address
   mapping (uint256 => address) internal _baskets;
 
   // Prepared Amount
@@ -232,13 +232,19 @@ contract RewardBasketManager is Ownable, BlackholePrevention, IBasketManager {
     external 
     returns (address)
   {
-    address rewardProgram = _rewardPrograms[assetToken];
-
-    require (rewardProgram != address(0), "Non existing reward program.");
-
-    return rewardProgram;
+    return _getRewardProgram(assetToken);
   }
 
+  function _getRewardProgram(
+    address assetToken
+  )
+    internal
+    returns (address rewardProgram)
+  {
+    rewardProgram = _rewardPrograms[assetToken];
+
+    require (rewardProgram != address(0), "Non existing reward program.");
+  }
 
   /***********************************|
   |          Only Admin/DAO           |

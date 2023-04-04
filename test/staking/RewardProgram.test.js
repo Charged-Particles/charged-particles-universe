@@ -34,7 +34,6 @@ describe('Reward program', function () {
 
   before(async () => {
     chainId = await getChainId();
-
     const ddIonx = getDeployData('Ionx', chainId);
     const Ionx = await ethers.getContractFactory('Ionx');
     ionx = await Ionx.attach(ddIonx.address);
@@ -100,6 +99,24 @@ describe('Reward program', function () {
     });
   });
 
+  describe ('Reward basket manager', async () => {
+    const ddChargedParticles = getDeployData('ChargedParticles', chainId);
+    console.log(ddChargedParticles);
+
+    // impersonate charged particles address
+    // await network.provider.request({
+    //   method: "hardhat_impersonateAccount",
+    //   params: []
+    // });
+
+    // usdcSigner = ethers.provider.getSigner(usdcHodler);
+
+    // test add basket 
+    // it ('')
+
+    // test release from basket
+  });
+
   describe('Leptons staking', async () => {
     it ('Changes wallet and basket manager address', async () => {
       await expect(rewardProgramDeployerSigner.leptonDeposit(1,1)).to.be.revertedWith('Not basket manager');
@@ -159,8 +176,8 @@ describe('Reward program', function () {
       // calculate reward
      const reward = await rewardProgramDeployerSigner.calculateLeptonReward(uuid, principal);
 
-     // Has multiplier but time spent is 0 so reward is multiplied by 1.
-     expect(reward).to.be.eq(100);
+      // Has multiplier but time spent is 0 so reward is multiplied by 1.
+      expect(reward).to.be.eq(100);
     });
 
     it('Checks lepton reward calculation with time spent', async () => {
