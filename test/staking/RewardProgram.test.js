@@ -22,6 +22,7 @@ describe('Reward program', function () {
     deployerSigner,
     chainId,
     leptonMock,
+    leptonData,
     rewardProgramDeployerSigner;
 
   before(async () => {
@@ -47,7 +48,7 @@ describe('Reward program', function () {
     rewardProgramDeployerSigner = rewardProgram.connect(deployerSigner);
 
     // mock lepton
-    const leptonData = getDeployData('Lepton', chainId);
+    leptonData = getDeployData('Lepton', chainId);
     leptonMock = await deployMockContract(deployerSigner, leptonData.abi);
     rewardProgramDeployerSigner.setLepton(leptonMock.address).then(tx => tx.wait());
   });
@@ -107,7 +108,8 @@ describe('Reward program', function () {
     const rewardBasketManager = RewardBasketManager.attach(ddRewardBasketManager.address);
 
     // test add basket 
-    const leptonTokenAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A';
+    // const leptonTokenAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A';
+    const leptonTokenAddress = leptonData.address;
     const leptonTokenId = 1;
     const basketTokenAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'; 
     const basketId = 2; 
