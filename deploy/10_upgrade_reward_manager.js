@@ -34,7 +34,8 @@ const {
         deployTransaction: rewardWalletManager.deployTransaction,
     }
 
-    const RewardBasketManager = await hre.ethers.getContractFactory('RewardWalletManager');
+    await log('  Deploying Basket...')(alchemyTimeout);
+    const RewardBasketManager = await hre.ethers.getContractFactory('RewardBasketManager');
     const RewardBasketManagerInstance = await RewardBasketManager.deploy();
     const rewardBasketManager = await RewardBasketManagerInstance.deployed();
 

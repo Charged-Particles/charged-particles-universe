@@ -123,8 +123,9 @@ describe('Reward program', function () {
     await rewardBasketManager.setController(deployerAddress).then(tx => tx.wait());
     await rewardBasketManager.setRewardProgram(rewardProgram.address, leptonTokenAddress).then(tx => tx.wait());
 
-    // console.log(rewardBasketManager);
-    await rewardBasketManager.callStatic.addToBasket(
+    console.log(rewardBasketManager);
+
+    await rewardBasketManager.addToBasket(
       basketTokenAddress,
       basketId,
       leptonTokenAddress,
