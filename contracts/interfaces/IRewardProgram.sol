@@ -11,6 +11,8 @@ interface IRewardProgram {
 
   event Staked(uint256 uuid, uint256 amount);
   event Unstaked(uint256 uuid, uint256 amount);
+  event LeptonDeposit(uint256 uuid, uint256 amount);
+  event LeptonRelease(uint256 uuid, uint256 amount);
   // event RewardClaimed(address vault, address token, uint256 amount);
 
   /* data types */

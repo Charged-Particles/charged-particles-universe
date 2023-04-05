@@ -130,9 +130,6 @@ describe('Reward program', function () {
       tx => tx.wait()
     );
 
-    const basketManagerAddress = await rewardProgramDeployerSigner.rewardBasketManager();
-    console.log(basketManagerAddress);
-
     await rewardBasketManager.addToBasket(
       basketTokenAddress,
       basketId,

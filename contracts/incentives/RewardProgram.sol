@@ -105,6 +105,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 multiplier = ILepton(lepton).getMultiplier(tokenId);
 
     leptonsStake[uuid] = LeptonsStake(multiplier, block.number, 0);
+    emit LeptonDeposit(uuid, tokenId);
   }
 
   function leptonRelease(uint256 uuid)
