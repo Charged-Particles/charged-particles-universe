@@ -130,12 +130,12 @@ describe('Reward program', function () {
       tx => tx.wait()
     );
 
-    await rewardBasketManager.addToBasket(
+    await expect(rewardBasketManager.addToBasket(
       basketTokenAddress,
       basketId,
       leptonTokenAddress,
       leptonTokenId
-    ).then(tx => tx.wait());
+    )).to.emit(rewardProgram, 'LeptonDeposit');
 
     const zeroAddress = '0x0000000000000000000000000000000000000000';
     await rewardProgramDeployerSigner.setRewardBasketManager(zeroAddress).then(
