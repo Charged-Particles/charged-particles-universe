@@ -100,15 +100,11 @@ describe('Reward program', function () {
   });
 
   it ('Reward basket manager', async () => {
-    await leptonMock.mock.getMultiplier.returns(2);
-    const ddChargedParticles = getDeployData('ChargedParticles', chainId);
+    // await rewardProgramDeployerSigner.setRewardBasketManager().then(
+    //   tx => tx.wait()
+    // );
 
-    // impersonate charged particles address
-    await network.provider.request({
-      method: "hardhat_impersonateAccount",
-      params: [ddChargedParticles.address]
-    });
-    const chargedParticlesSigner = ethers.provider.getSigner(ddChargedParticles.address);
+    await leptonMock.mock.getMultiplier.returns(2);
 
     const ddRewardBasketManager = getDeployData('RewardBasketManager', chainId);
     const RewardBasketManager = await ethers.getContractFactory('RewardBasketManager', deployerSigner);
@@ -123,7 +119,19 @@ describe('Reward program', function () {
     await rewardBasketManager.setController(deployerAddress).then(tx => tx.wait());
     await rewardBasketManager.setRewardProgram(rewardProgram.address, leptonTokenAddress).then(tx => tx.wait());
 
-    console.log(rewardBasketManager);
+    // Create wallet
+    await rewardBasketManager.getBasketAddressById(
+      basketTokenAddress,
+      basketId
+    ).then(tx => tx.wait());
+
+    
+    await rewardProgramDeployerSigner.setRewardBasketManager(rewardBasketManager.address).then(
+      tx => tx.wait()
+    );
+
+    const basketManagerAddress = await rewardProgramDeployerSigner.rewardBasketManager();
+    console.log(basketManagerAddress);
 
     await rewardBasketManager.addToBasket(
       basketTokenAddress,
@@ -131,6 +139,11 @@ describe('Reward program', function () {
       leptonTokenAddress,
       leptonTokenId
     ).then(tx => tx.wait());
+
+    const zeroAddress = '0x0000000000000000000000000000000000000000';
+    await rewardProgramDeployerSigner.setRewardBasketManager(zeroAddress).then(
+      tx => tx.wait()
+    );
   });
 
   describe('Leptons staking', async () => {
