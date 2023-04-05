@@ -105,18 +105,17 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 multiplier = ILepton(lepton).getMultiplier(tokenId);
 
     leptonsStake[uuid] = LeptonsStake(multiplier, block.number, 0);
-    emit LeptonDeposit(uuid, tokenId);
+    emit LeptonDeposit(uuid);
   }
 
   function leptonRelease(uint256 uuid)
     external
     onlyBasketManager
   {
-    // require(walletStake[uuid].started, "Stake not started");
-    // require(leptonsStake[uuid].depositBlockNumber > 0, "No lepton deposit");
-
     LeptonsStake storage leptonStake = leptonsStake[uuid];
     leptonStake.released = block.number;
+
+    emit LeptonRelease(uuid);
   }
 
   // Reward calculation

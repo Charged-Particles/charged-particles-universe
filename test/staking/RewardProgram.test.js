@@ -100,10 +100,6 @@ describe('Reward program', function () {
   });
 
   it ('Reward basket manager', async () => {
-    // await rewardProgramDeployerSigner.setRewardBasketManager().then(
-    //   tx => tx.wait()
-    // );
-
     await leptonMock.mock.getMultiplier.returns(2);
 
     const ddRewardBasketManager = getDeployData('RewardBasketManager', chainId);
@@ -136,6 +132,17 @@ describe('Reward program', function () {
       leptonTokenAddress,
       leptonTokenId
     )).to.emit(rewardProgram, 'LeptonDeposit');
+
+    // await expect()).to.emit(rewardProgram, 'LeptonRelease');
+    // console.log(rewardBasketManager);
+    await rewardBasketManager.removeFromBasket(
+      deployerAddress,
+      basketTokenAddress,
+      basketId,
+      leptonTokenAddress,
+      leptonTokenId
+    );
+
 
     const zeroAddress = '0x0000000000000000000000000000000000000000';
     await rewardProgramDeployerSigner.setRewardBasketManager(zeroAddress).then(
