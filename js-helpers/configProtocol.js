@@ -313,6 +313,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await rewardWalletManager.setController(ddChargedParticles.address)
     );
 
+    console.log('>>>>>>>>>>>>>>>>>>>> ', ddAaveBridgeV2.address)
     await executeTx('11-b', 'RewardWalletManager: Setting Aave Bridge to V2', async () =>
       await rewardWalletManager.setAaveBridge(ddAaveBridgeV2.address)
     );
