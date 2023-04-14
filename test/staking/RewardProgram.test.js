@@ -183,10 +183,10 @@ describe('Reward program', function () {
       expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.depositBlockNumber.toNumber());
 
       const principalForEmptyMultiplier = 100;
-      const emptyMultiplierReward = await rewardProgramDeployerSigner.callStatic.calculateLeptonReward(2, principalForEmptyMultiplier);
+      const emptyMultiplierReward = await rewardProgramDeployerSigner.callStatic.calculateLeptonMultipliedReward(2, principalForEmptyMultiplier);
       expect(emptyMultiplierReward).to.be.eq(principalForEmptyMultiplier);
 
-      const emptyRewardMultiplier = await rewardProgramDeployerSigner.callStatic.calculateLeptonReward(2, 0);
+      const emptyRewardMultiplier = await rewardProgramDeployerSigner.callStatic.calculateLeptonMultipliedReward(2, 0);
       expect(emptyRewardMultiplier).to.be.eq(0);
     });
 
@@ -204,7 +204,7 @@ describe('Reward program', function () {
       await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
       // calculate reward
-     const reward = await rewardProgramDeployerSigner.calculateLeptonReward(uuid, principal);
+     const reward = await rewardProgramDeployerSigner.calculateLeptonMultipliedReward(uuid, principal);
 
       // Has multiplier but time spent is 0 so reward is multiplied by 1.
       expect(reward).to.be.eq(100);
@@ -260,7 +260,7 @@ describe('Reward program', function () {
 
         await mineBlocks(stakeInfoCases[i].blocksUntilCalculation);
   
-        const reward = await rewardProgramDeployerSigner.calculateLeptonReward(i, stakeInfoCases[i].amount);
+        const reward = await rewardProgramDeployerSigner.calculateLeptonMultipliedReward(i, stakeInfoCases[i].amount);
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
       }
     });
@@ -278,7 +278,7 @@ describe('Reward program', function () {
         
       await mineBlocks(100)
 
-      const reward = await rewardProgramDeployerSigner.calculateLeptonReward(uuid, amount); 
+      const reward = await rewardProgramDeployerSigner.calculateLeptonMultipliedReward(uuid, amount); 
       expect(reward).to.be.eq((amount * multiplier) - 1);
     });
     
@@ -298,7 +298,7 @@ describe('Reward program', function () {
 
       await mineBlocks(1000);
 
-      const reward = await rewardProgramDeployerSigner.calculateLeptonReward(uuid, amount); 
+      const reward = await rewardProgramDeployerSigner.calculateLeptonMultipliedReward(uuid, amount); 
       expect(reward).to.be.eq(200);
     });
   });
