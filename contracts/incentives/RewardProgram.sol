@@ -146,7 +146,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 multiplier = leptonStake.multiplier;
 
     uint256 rewardBlockLength = block.number.sub(walletStake[uuid].start);
-    uint leptonDepositLength;
+    uint256 leptonDepositLength;
 
     if (leptonStake.released > 0 ) {
       leptonDepositLength = leptonStake.released.sub(leptonStake.depositBlockNumber);
@@ -184,7 +184,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       uint256 rewardAjustedDecimals
     )
   {
-    // todo: convert into generic.
     rewardAjustedDecimals = reward.mul(10**(12));
   }
 
