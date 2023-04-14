@@ -85,16 +85,16 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     onlyWalletManager
   {
     uint256 baseReward = calculateBaseReward(generatedCharge);
-    uint256 reward = calculateLeptonMultipliedReward(uuid, baseReward);
+    uint256 totalReward = calculateLeptonMultipliedReward(uuid, baseReward);
 
     // Stake storage stake = walletStake[uuid];
     // stake.generatedCharge = stake.generatedCharge + amount;
     // stake.reward = stake.reward + reward;
 
     // transfer ionx to user
-    IERC20(_programData.rewardToken).transfer(receiver, reward);
+    IERC20(_programData.rewardToken).transfer(receiver, totalReward);
 
-    emit Unstaked(uuid, reward);
+    emit Unstaked(uuid, totalReward);
   }
 
   function registerLeptonDeposit(uint256 uuid, uint256 tokenId)
