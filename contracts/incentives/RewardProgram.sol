@@ -112,7 +112,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     onlyBasketManager
   {
     LeptonsStake storage leptonStake = leptonsStake[uuid];
-    leptonStake.released = block.number;
+    leptonStake.releaseBlockNumber = block.number;
 
     emit LeptonRelease(uuid);
   }
@@ -148,8 +148,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 rewardBlockLength = block.number.sub(walletStake[uuid].start);
     uint256 leptonDepositLength;
 
-    if (leptonStake.released > 0 ) {
-      leptonDepositLength = leptonStake.released.sub(leptonStake.depositBlockNumber);
+    if (leptonStake.releaseBlockNumber > 0 ) {
+      leptonDepositLength = leptonStake.releaseBlockNumber.sub(leptonStake.depositBlockNumber);
     } else {
       leptonDepositLength = block.number.sub(leptonStake.depositBlockNumber);
     }
