@@ -20,7 +20,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   address public rewardWalletManager;
   address public rewardBasketManager;
   uint256 public baseMultiplier;
-  address public lepton = 0xc5a5C42992dECbae36851359345FE25997F5C42d;
+  address public lepton = 0x3Cd2410EAa9c2dCE50aF6CCAb72Dc93879a09c1F;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
 
