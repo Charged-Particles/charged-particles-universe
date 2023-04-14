@@ -51,7 +51,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     token.transferFrom(msg.sender, address(this), amount);
 
-    _programData.rewardPoolBalance = amount;
+    _programData.rewardPoolBalance += amount;
 
     emit RewardProgramFunded(amount);
   }
