@@ -152,7 +152,7 @@ describe('Reward program', function () {
 
   describe('Leptons staking', async () => {
     it ('Changes wallet and basket manager address', async () => {
-      await expect(rewardProgramDeployerSigner.leptonDeposit(1,1)).to.be.revertedWith('Not basket manager');
+      await expect(rewardProgramDeployerSigner.registerLeptonDeposit(1,1)).to.be.revertedWith('Not basket manager');
 
       await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
         tx => tx.wait()
@@ -175,7 +175,7 @@ describe('Reward program', function () {
       // start reward program with usdc
       await rewardProgramDeployerSigner.stake(uuid, 100).then(tx => tx.wait());
 
-      await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
       const leptonsData = await rewardProgramDeployerSigner.leptonsStake(uuid);
 
@@ -201,7 +201,7 @@ describe('Reward program', function () {
       await rewardProgramDeployerSigner.stake(uuid, principal).then(tx => tx.wait());
 
       // deposit lepton
-      await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
       // calculate reward
      const reward = await rewardProgramDeployerSigner.calculateLeptonMultipliedReward(uuid, principal);
@@ -253,7 +253,7 @@ describe('Reward program', function () {
         await rewardProgramDeployerSigner.stake(i, stakeInfoCases[i].amount).then(tx => tx.wait());
         
         await mineBlocks(stakeInfoCases[i].blocksUntilLeptonDeposit);
-        await rewardProgramDeployerSigner.leptonDeposit(i, i).then(tx => tx.wait());
+        await rewardProgramDeployerSigner.registerLeptonDeposit(i, i).then(tx => tx.wait());
 
         await mineBlocks(stakeInfoCases[i].blocksUntilLeptonRelease);
         await rewardProgramDeployerSigner.leptonRelease(i).then(tx => tx.wait());
@@ -274,7 +274,7 @@ describe('Reward program', function () {
       await leptonMock.mock.getMultiplier.returns(multiplier);
 
       await rewardProgramDeployerSigner.stake(uuid, amount).then(tx => tx.wait());
-      await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
         
       await mineBlocks(100)
 
@@ -291,10 +291,10 @@ describe('Reward program', function () {
       await leptonMock.mock.getMultiplier.returns(multiplier);
 
       await rewardProgramDeployerSigner.stake(uuid, amount).then(tx => tx.wait());
-      await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
       await rewardProgramDeployerSigner.leptonRelease(uuid).then(tx => tx.wait());
-      await rewardProgramDeployerSigner.leptonDeposit(uuid, leptonId).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
       await mineBlocks(1000);
 
