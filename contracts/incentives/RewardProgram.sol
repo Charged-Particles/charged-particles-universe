@@ -78,13 +78,13 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   function unstake(
     uint256 uuid,
     address receiver,
-    uint256 amount
+    uint256 generatedCharged
   ) 
     override
     external
     onlyWalletManager
   {
-    uint256 baseReward = calculateBaseReward(amount);
+    uint256 baseReward = calculateBaseReward(generatedCharged);
     uint256 reward = calculateLeptonMultipliedReward(uuid, baseReward);
 
     // Stake storage stake = walletStake[uuid];
