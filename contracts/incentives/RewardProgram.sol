@@ -84,7 +84,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyWalletManager
   {
-    uint256 baseReward = calculateReward(amount);
+    uint256 baseReward = calculateBaseReward(amount);
     uint256 reward = calculateLeptonReward(uuid, baseReward);
 
     // Stake storage stake = walletStake[uuid];
@@ -118,7 +118,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   }
 
   // Reward calculation
-  function calculateReward(
+  function calculateBaseReward(
     uint256 amount
   )
     public
@@ -129,7 +129,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   {
     // todo here should be the lepton calculation
     uint256 baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
-    ajustedReward = this.convertDecimals(baseReward);
+    ajustedReward = convertDecimals(baseReward);
   }
 
   function calculateLeptonReward(
@@ -178,7 +178,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   function convertDecimals(
     uint256 reward
   )
-    external
+    internal
     view
     returns (
       uint256 rewardAjustedDecimals

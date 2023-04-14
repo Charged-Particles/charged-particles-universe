@@ -83,7 +83,7 @@ describe('Reward program', function () {
 
     it ('Calculates reward with multiplier as 100%', async () => {
       const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
-      const reward = await rewardProgram.calculateReward(chargedGeneratedInUsdc);
+      const reward = await rewardProgram.calculateBaseReward(chargedGeneratedInUsdc);
       expect(ethers.utils.formatEther(reward.toString(), 18)).to.be.eq('1.0');
     });
 
@@ -91,11 +91,11 @@ describe('Reward program', function () {
       await rewardProgram.connect(deployerSigner).setBaseMultiplier(5000);
 
       const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
-      const reward = await rewardProgram.calculateReward(chargedGeneratedInUsdc);
+      const reward = await rewardProgram.calculateBaseReward(chargedGeneratedInUsdc);
       expect(ethers.utils.formatEther(reward.toString(), 18)).to.be.eq('0.5');
 
       await rewardProgram.connect(deployerSigner).setBaseMultiplier(15000);
-      expect(ethers.utils.formatEther(await rewardProgram.calculateReward(chargedGeneratedInUsdc), 18)).to.be.eq('1.5');
+      expect(ethers.utils.formatEther(await rewardProgram.calculateBaseReward(chargedGeneratedInUsdc), 18)).to.be.eq('1.5');
       await rewardProgram.connect(deployerSigner).setBaseMultiplier(1000);
     });
   });
