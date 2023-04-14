@@ -107,7 +107,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     emit LeptonDeposit(uuid);
   }
 
-  function leptonRelease(uint256 uuid)
+  function registerLeptonRelease(uint256 uuid)
     external
     onlyBasketManager
   {

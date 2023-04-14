@@ -171,7 +171,7 @@ contract RewardBasketManager is Ownable, BlackholePrevention, IBasketManager {
 
     removed = GenericSmartBasketB(basket).removeFromBasket(receiver, basketTokenAddress, basketTokenId, nftTokenAmount);
     if (removed) {
-      RewardProgram(_getRewardProgram(basketTokenAddress)).leptonRelease(uuid);
+      RewardProgram(_getRewardProgram(basketTokenAddress)).registerLeptonRelease(uuid);
       emit BasketRemove(receiver, contractAddress, tokenId, basketTokenAddress, basketTokenId, nftTokenAmount);
     }
   }

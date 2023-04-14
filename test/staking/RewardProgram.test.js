@@ -256,7 +256,7 @@ describe('Reward program', function () {
         await rewardProgramDeployerSigner.registerLeptonDeposit(i, i).then(tx => tx.wait());
 
         await mineBlocks(stakeInfoCases[i].blocksUntilLeptonRelease);
-        await rewardProgramDeployerSigner.leptonRelease(i).then(tx => tx.wait());
+        await rewardProgramDeployerSigner.registerLeptonRelease(i).then(tx => tx.wait());
 
         await mineBlocks(stakeInfoCases[i].blocksUntilCalculation);
   
@@ -293,7 +293,7 @@ describe('Reward program', function () {
       await rewardProgramDeployerSigner.stake(uuid, amount).then(tx => tx.wait());
       await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
-      await rewardProgramDeployerSigner.leptonRelease(uuid).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.registerLeptonRelease(uuid).then(tx => tx.wait());
       await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
       await mineBlocks(1000);
