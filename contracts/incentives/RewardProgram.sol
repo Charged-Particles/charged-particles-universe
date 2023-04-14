@@ -14,16 +14,15 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using SafeMath for uint256;
 
   ProgramRewardData public _programData;
-
-  uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
-  uint256 public baseMultiplier;
+  mapping(uint256 => Stake) public walletStake;
+  mapping(uint256 => LeptonsStake) public leptonsStake;
 
   address public rewardWalletManager;
   address public rewardBasketManager;
+  uint256 public baseMultiplier;
   address public lepton = 0xc5a5C42992dECbae36851359345FE25997F5C42d;
 
-  mapping(uint256 => Stake) public walletStake;
-  mapping(uint256 => LeptonsStake) public leptonsStake;
+  uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
 
   constructor(
     address _stakingToken,
@@ -32,9 +31,9 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 _duration,
     uint256 _baseMultiplier
   ) public {
+    _programData.rewardDuration = _duration;
     _programData.stakingToken = _stakingToken;
     _programData.rewardToken = _rewardToken;
-    _programData.rewardDuration = _duration;
     _programData.rewardPool = address(this);
 
     rewardWalletManager = _rewardWalletManager;
