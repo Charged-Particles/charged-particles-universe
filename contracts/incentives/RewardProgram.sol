@@ -22,7 +22,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   uint256 public baseMultiplier;
   address public lepton = 0x3Cd2410EAa9c2dCE50aF6CCAb72Dc93879a09c1F;
 
-  uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000  (100%)
+  uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000 (100%)
 
   constructor(
     address _stakingToken,
@@ -87,12 +87,12 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 baseReward = calculateBaseReward(generatedCharge);
     uint256 totalReward = calculateLeptonMultipliedReward(uuid, baseReward);
 
-    // Stake storage stake = walletStake[uuid];
+    Stake storage stake = walletStake[uuid];
     // stake.generatedCharge = stake.generatedCharge + amount;
-    // stake.reward = stake.reward + reward;
+    stake.reward = stake.reward + totalReward;
 
     // transfer ionx to user
-    IERC20(_programData.rewardToken).transfer(receiver, totalReward);
+    IERC20(_programData.rewardToken).transfer(receiver, stake.reward);
 
     emit Unstaked(uuid, totalReward);
   }
