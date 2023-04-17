@@ -126,7 +126,9 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     Stake storage stake = walletStake[uuid];
 
     leptonStake.releaseBlockNumber = block.number;
-    stake.generatedCharge += reward;
+
+    stake.start = block.number;
+    stake.reward += reward;
 
     emit LeptonRelease(uuid);
   }
