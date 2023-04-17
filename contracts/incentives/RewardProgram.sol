@@ -84,12 +84,12 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyWalletManager
   {
-    uint256 totalReward = calculateReward(uuid, generatedCharge);
+    uint256 totalReward = calculateRewardsEarned(uuid, generatedCharge);
 
     Stake storage stake = walletStake[uuid];
 
     // stake.generatedCharge = stake.generatedCharge + amount;
-    stake.reward = stake.reward + totalReward;
+    stake.reward += totalReward;
 
     // transfer ionx to user
     IERC20(_programData.rewardToken).transfer(receiver, stake.reward);
@@ -111,6 +111,13 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyBasketManager
   {
+    // get this charged amount 
+
+    // Calculate reward
+    // uint256 reward = calculateRewardsEarned(uuid, generatedCharge);
+
+    // Update reward ofr basket nft
+    // reset state
     LeptonsStake storage leptonStake = leptonsStake[uuid];
     leptonStake.releaseBlockNumber = block.number;
 
@@ -187,7 +194,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     rewardAjustedDecimals = reward.mul(10**(12));
   }
 
-  function calculateReward(
+  function calculateRewardsEarned(
     uint256 uuid,
     uint256 generatedCharge
   )
@@ -238,4 +245,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     require(msg.sender == rewardBasketManager, "Not basket manager");
     _;
   }
+}
+
+interface IBaseWalletManager {
+    function getInterest(address contractAddress, uint256 tokenId, address assetToken)
+    external
+    returns (uint256 creatorInterest, uint256 ownerInterest);
 }
