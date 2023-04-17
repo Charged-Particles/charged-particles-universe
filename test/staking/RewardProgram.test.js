@@ -226,7 +226,7 @@ describe('Reward program', function () {
           blocksUntilLeptonRelease: 500,
           blocksUntilCalculation: 495,
           leptonStakeMultiplier: 2,
-          expectedReward: 150,
+          expectedReward: 200,
         },
         {
           amount: 100,
@@ -234,7 +234,7 @@ describe('Reward program', function () {
           blocksUntilLeptonRelease: 1000,
           blocksUntilCalculation: 0,
           leptonStakeMultiplier: 4,
-          expectedReward: 399,
+          expectedReward: 400,
         },
         {
           amount: 100,
@@ -242,7 +242,7 @@ describe('Reward program', function () {
           blocksUntilLeptonRelease: 500,
           blocksUntilCalculation: 500,
           leptonStakeMultiplier: 2,
-          expectedReward: 133,
+          expectedReward: 200, //200
         },
         {
           amount: 100,
@@ -252,11 +252,36 @@ describe('Reward program', function () {
           leptonStakeMultiplier: 0,
           expectedReward: 100,
         },
+        {
+          amount: 100,
+          blocksUntilLeptonDeposit: 0,
+          blocksUntilLeptonRelease: 0,
+          blocksUntilCalculation: 500,
+          leptonStakeMultiplier: 1,
+          expectedReward: 100,
+        },
+        {
+          amount: 100,
+          blocksUntilLeptonDeposit: 0,
+          blocksUntilLeptonRelease: 0,
+          blocksUntilCalculation: 500,
+          leptonStakeMultiplier: 1,
+          generatedCharged: 1000000,
+          expectedReward: 100,
+        },
+        {
+          amount: 100,
+          blocksUntilLeptonDeposit: 0,
+          blocksUntilLeptonRelease: 1000,
+          blocksUntilCalculation: 500,
+          leptonStakeMultiplier: 2,
+          generatedCharged: 10000000,
+          expectedReward: 200,
+        },
       ];
       
       for(let i = 0; i < stakeInfoCases.length; i++) {
-        await rewardWalletManagerMock.mock.getInterest.returns(0,2);
-
+        await rewardWalletManagerMock.mock.getInterest.returns(0,stakeInfoCases[i]?.generatedCharged || 1);
         await leptonMock.mock.getMultiplier.returns(stakeInfoCases[i].leptonStakeMultiplier);
   
         await rewardProgramDeployerSigner.stake(i, stakeInfoCases[i].amount).then(tx => tx.wait());
@@ -323,7 +348,6 @@ describe('Reward program', function () {
       await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
         tx => tx.wait()
       );
-
 
       await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
