@@ -84,10 +84,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyWalletManager
   {
-    uint256 baseReward = calculateBaseReward(generatedCharge);
-    uint256 totalReward = calculateLeptonMultipliedReward(uuid, baseReward);
+    uint256 totalReward = calculateReward(uuid, generatedCharge);
 
     Stake storage stake = walletStake[uuid];
+
     // stake.generatedCharge = stake.generatedCharge + amount;
     stake.reward = stake.reward + totalReward;
 
@@ -185,6 +185,19 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     )
   {
     rewardAjustedDecimals = reward.mul(10**(12));
+  }
+
+  function calculateReward(
+    uint256 uuid,
+    uint256 generatedCharge
+  )
+    public
+    view
+    returns (
+      uint256 totalReward
+  ) {
+    uint256 baseReward = calculateBaseReward(generatedCharge);
+    totalReward = calculateLeptonMultipliedReward(uuid, baseReward);
   }
 
   // Admin
