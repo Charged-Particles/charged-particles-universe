@@ -116,14 +116,17 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     onlyBasketManager
   {
     // get this charged amount 
+   (, uint256 generatedCharge) = IBaseWalletManager(rewardWalletManager) 
+      .getInterest(basketNFT, basketTokenId, _programData.stakingToken);
 
     // Calculate reward
-    // uint256 reward = calculateRewardsEarned(uuid, generatedCharge);
+    uint256 reward = calculateRewardsEarned(uuid, generatedCharge);
 
-    // Update reward ofr basket nft
-    // reset state
     LeptonsStake storage leptonStake = leptonsStake[uuid];
+    Stake storage stake = walletStake[uuid];
+
     leptonStake.releaseBlockNumber = block.number;
+    stake.generatedCharge += reward;
 
     emit LeptonRelease(uuid);
   }

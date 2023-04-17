@@ -214,6 +214,11 @@ describe('Reward program', function () {
       const basketContractAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
       const basketTokenId = 32;
 
+      // mock reward wallet manager
+      const walletManager = getDeployData('AaveWalletManagerB', chainId);
+      const rewardWalletManagerMock = await deployMockContract(deployerSigner, walletManager.abi);
+
+      
 
       const stakeInfoCases = [
         {
@@ -251,6 +256,8 @@ describe('Reward program', function () {
       ];
       
       for(let i = 0; i < stakeInfoCases.length; i++) {
+        await rewardWalletManagerMock.mock.getInterest.returns(0,2);
+
         await leptonMock.mock.getMultiplier.returns(stakeInfoCases[i].leptonStakeMultiplier);
   
         await rewardProgramDeployerSigner.stake(i, stakeInfoCases[i].amount).then(tx => tx.wait());
@@ -259,11 +266,16 @@ describe('Reward program', function () {
         await rewardProgramDeployerSigner.registerLeptonDeposit(i, i).then(tx => tx.wait());
 
         await mineBlocks(stakeInfoCases[i].blocksUntilLeptonRelease);
+
+        rewardProgramDeployerSigner.setRewardWalletManager(rewardWalletManagerMock.address).then(tx => tx.wait());
         await rewardProgramDeployerSigner.registerLeptonRelease(
           basketContractAddress,
           basketTokenId,
           i
         ).then(tx => tx.wait());
+        await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
+          tx => tx.wait()
+        );
 
         await mineBlocks(stakeInfoCases[i].blocksUntilCalculation);
   
