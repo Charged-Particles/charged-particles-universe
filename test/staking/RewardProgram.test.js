@@ -22,6 +22,7 @@ describe('Reward program', function () {
     deployerSigner,
     chainId,
     leptonMock,
+    rewardWalletManagerMock,
     leptonData,
     rewardProgramDeployerSigner;
 
@@ -51,6 +52,10 @@ describe('Reward program', function () {
     leptonData = getDeployData('Lepton', chainId);
     leptonMock = await deployMockContract(deployerSigner, leptonData.abi);
     rewardProgramDeployerSigner.setLepton(leptonMock.address).then(tx => tx.wait());
+
+    // mock wallet manager
+    const walletManager = getDeployData('AaveWalletManagerB', chainId);
+    rewardWalletManagerMock = await deployMockContract(deployerSigner, walletManager.abi);
   });
 
   it('should be deployed', async () =>{
@@ -214,12 +219,6 @@ describe('Reward program', function () {
       const basketContractAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
       const basketTokenId = 32;
 
-      // mock reward wallet manager
-      const walletManager = getDeployData('AaveWalletManagerB', chainId);
-      const rewardWalletManagerMock = await deployMockContract(deployerSigner, walletManager.abi);
-
-      
-
       const stakeInfoCases = [
         {
           amount: 100,
@@ -310,15 +309,21 @@ describe('Reward program', function () {
       const multiplier = 2;
 
       await leptonMock.mock.getMultiplier.returns(multiplier);
+      await rewardWalletManagerMock.mock.getInterest.returns(0,2);
 
       await rewardProgramDeployerSigner.stake(uuid, amount).then(tx => tx.wait());
       await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
+      rewardProgramDeployerSigner.setRewardWalletManager(rewardWalletManagerMock.address).then(tx => tx.wait());
       await rewardProgramDeployerSigner.registerLeptonRelease(
         basketContractAddress,
         basketTokenId,
         uuid
       ).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
+        tx => tx.wait()
+      );
+
 
       await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
