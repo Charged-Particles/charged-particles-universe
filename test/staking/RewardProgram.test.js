@@ -211,6 +211,9 @@ describe('Reward program', function () {
     });
 
     it('Checks lepton reward calculation with time spent', async () => {
+      const basketContractAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
+      const basketTokenId = 32;
+
 
       const stakeInfoCases = [
         {
@@ -256,7 +259,11 @@ describe('Reward program', function () {
         await rewardProgramDeployerSigner.registerLeptonDeposit(i, i).then(tx => tx.wait());
 
         await mineBlocks(stakeInfoCases[i].blocksUntilLeptonRelease);
-        await rewardProgramDeployerSigner.registerLeptonRelease(i).then(tx => tx.wait());
+        await rewardProgramDeployerSigner.registerLeptonRelease(
+          basketContractAddress,
+          basketTokenId,
+          i
+        ).then(tx => tx.wait());
 
         await mineBlocks(stakeInfoCases[i].blocksUntilCalculation);
   
@@ -283,6 +290,8 @@ describe('Reward program', function () {
     });
     
     it ('Calculates reward with lepton re-staking, resets lepton staking.', async () => {
+      const basketContractAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
+      const basketTokenId = 32;
       const uuid = 101;
       const amount = 100;
       const leptonId = 36;
@@ -293,7 +302,12 @@ describe('Reward program', function () {
       await rewardProgramDeployerSigner.stake(uuid, amount).then(tx => tx.wait());
       await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
-      await rewardProgramDeployerSigner.registerLeptonRelease(uuid).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.registerLeptonRelease(
+        basketContractAddress,
+        basketTokenId,
+        uuid
+      ).then(tx => tx.wait());
+
       await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
       await mineBlocks(1000);
