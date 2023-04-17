@@ -84,15 +84,16 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     onlyWalletManager
   {
-    uint256 totalReward = calculateRewardsEarned(uuid, generatedCharge);
+    uint256 reward = calculateRewardsEarned(uuid, generatedCharge);
 
     Stake storage stake = walletStake[uuid];
 
+    uint256 totalReward = stake.reward + reward;
+
     // stake.generatedCharge = stake.generatedCharge + amount;
-    stake.reward += totalReward;
 
     // transfer ionx to user
-    IERC20(_programData.rewardToken).transfer(receiver, stake.reward);
+    IERC20(_programData.rewardToken).transfer(receiver, totalReward);
 
     emit Unstaked(uuid, totalReward);
   }
