@@ -87,15 +87,12 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 reward = calculateRewardsEarned(uuid, generatedCharge);
 
     Stake storage stake = walletStake[uuid];
-
-    uint256 totalReward = stake.reward + reward;
-
-    // stake.generatedCharge = stake.generatedCharge + amount;
+    stake.reward += reward;
 
     // transfer ionx to user
-    IERC20(_programData.rewardToken).transfer(receiver, totalReward);
+    IERC20(_programData.rewardToken).transfer(receiver, stake.reward);
 
-    emit Unstaked(uuid, totalReward);
+    emit Unstaked(uuid, stake.reward);
   }
 
   function registerLeptonDeposit(uint256 uuid, uint256 tokenId)
@@ -129,7 +126,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     leptonStake.releaseBlockNumber = block.number;
 
     stake.start = block.number;
-    stake.reward += reward;
+    stake.reward += (reward - stake.reward);
 
     emit LeptonRelease(uuid);
   }
@@ -144,7 +141,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       uint256 ajustedReward
     )
   {
-    // todo here should be the lepton calculation
     uint256 baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
     ajustedReward = convertDecimals(baseReward);
   }
@@ -215,6 +211,21 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   ) {
     uint256 baseReward = calculateBaseReward(generatedCharge);
     totalReward = calculateLeptonMultipliedReward(uuid, baseReward);
+  }
+
+  function adjustRewardPreviousLeptonReleases(
+    uint256 uuid,
+    uint256 totalReward
+  )
+    internal
+    returns (
+      uint256 latestReward
+    )
+  {
+    Stake storage stake = walletStake[uuid];
+    uint256 previouslyGeneratedReward = stake.reward;
+
+    latestReward = totalReward.sub(previouslyGeneratedReward);
   }
 
   // Admin
