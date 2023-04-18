@@ -70,7 +70,7 @@ interface IRewardProgram {
 
   // /* admin functions */
 
-  function fund(uint256 amount) external;
+  function fundProgram(uint256 amount) external;
 
   // function rescueTokensFromRewardPool(
   //   address token,

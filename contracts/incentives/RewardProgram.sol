@@ -42,7 +42,15 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     emit RewardProgramCreated(address(this));
   }
 
-  function fund(uint256 amount)
+  function getProgramData()
+    external
+    view
+    returns (ProgramRewardData memory programData)
+  {
+    return _programData;
+  }
+
+  function fundProgram(uint256 amount)
     external
     override
     onlyOwner
@@ -56,17 +64,19 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     emit RewardProgramFunded(amount);
   }
 
-  function getProgramData()
+  function stake(
+    uint256 uuid,
+    uint256 amount
+  )
+    override
     external
-    view
-    returns (ProgramRewardData memory programData)
+    onlyWalletManager
   {
-    return _programData;
-  }
+    bool stakeInitialized = walletStake[uuid].started;
 
-  function stake(uint256 uuid, uint256 amount) override external onlyWalletManager {
-    if (!walletStake[uuid].started) {
+    if (!stakeInitialized) {
       walletStake[uuid] = Stake(true, block.number, amount,0,0);
+
     } else {
       Stake storage onGoingStake = walletStake[uuid];
       onGoingStake.principal += amount;
@@ -94,7 +104,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     // transfer ionx to user
     IERC20(_programData.rewardToken).transfer(receiver, totalReward);
 
-    emit Unstaked(uuid, stake.reward);
+    emit Unstaked(uuid, totalReward);
   }
 
   function registerLeptonDeposit(uint256 uuid, uint256 tokenId)

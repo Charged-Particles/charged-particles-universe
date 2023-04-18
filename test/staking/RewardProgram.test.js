@@ -81,7 +81,7 @@ describe('Reward program', function () {
       await ionx.connect(deployerSigner).approve(rewardProgram.address, fundingAmount).then((tx) => tx.wait());
 
       // Fund reward program
-      await rewardProgram.connect(deployerSigner).fund(fundingAmount).then(tx => tx.wait());
+      await rewardProgram.connect(deployerSigner).fundProgram(fundingAmount).then(tx => tx.wait());
 
       expect(await ionx.balanceOf(rewardProgram.address)).to.equal(fundingAmount);
     });
