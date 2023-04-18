@@ -121,10 +121,9 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 reward = calculateRewardsEarned(uuid, generatedCharge);
 
     LeptonsStake storage leptonStake = leptonsStake[uuid];
-    Stake storage stake = walletStake[uuid];
-
     leptonStake.releaseBlockNumber = block.number;
 
+    Stake storage stake = walletStake[uuid];
     stake.start = block.number;
     stake.reward += (reward - stake.reward);
 
@@ -211,21 +210,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   ) {
     uint256 baseReward = calculateBaseReward(generatedCharge);
     totalReward = calculateLeptonMultipliedReward(uuid, baseReward);
-  }
-
-  function adjustRewardPreviousLeptonReleases(
-    uint256 uuid,
-    uint256 totalReward
-  )
-    internal
-    returns (
-      uint256 latestReward
-    )
-  {
-    Stake storage stake = walletStake[uuid];
-    uint256 previouslyGeneratedReward = stake.reward;
-
-    latestReward = totalReward.sub(previouslyGeneratedReward);
   }
 
   // Admin
