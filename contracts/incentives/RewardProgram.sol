@@ -87,10 +87,12 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 reward = calculateRewardsEarned(uuid, generatedCharge);
 
     Stake storage stake = walletStake[uuid];
-    stake.reward += reward;
+    uint256 totalReward = stake.reward.add(reward.sub(stake.reward));
 
+    stake.reward = 0;
+    
     // transfer ionx to user
-    IERC20(_programData.rewardToken).transfer(receiver, stake.reward);
+    IERC20(_programData.rewardToken).transfer(receiver, totalReward);
 
     emit Unstaked(uuid, stake.reward);
   }
@@ -125,7 +127,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     Stake storage stake = walletStake[uuid];
     stake.start = block.number;
-    stake.reward += (reward - stake.reward);
+    stake.reward = stake.reward.add(reward.sub(stake.reward));
 
     emit LeptonRelease(uuid);
   }
