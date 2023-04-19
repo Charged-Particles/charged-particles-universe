@@ -23,6 +23,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   address public lepton = 0x3Cd2410EAa9c2dCE50aF6CCAb72Dc93879a09c1F;
 
   uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000 (100%)
+  uint256 constant internal LEPTON_MULTIPLIER_SCALE = 1e2;   // 100
 
   constructor(
     address _stakingToken,
@@ -192,7 +193,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     // Amount of reward that the lepton is responsible for 
     uint256 amountGenerateDuringLeptonDeposit = amount.mul(percentageOfLeptonInReward);
 
-    uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier.mul(100)).div(PERCENTAGE_SCALE * 100);
+    uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier.mul(LEPTON_MULTIPLIER_SCALE))
+      .div(PERCENTAGE_SCALE * LEPTON_MULTIPLIER_SCALE);
 
     uint256 amountGeneratedWithoutLeptonDeposit = amount.sub(amountGenerateDuringLeptonDeposit.div(PERCENTAGE_SCALE));
 
