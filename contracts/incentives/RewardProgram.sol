@@ -136,8 +136,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     leptonStake.releaseBlockNumber = block.number;
 
     Stake storage stake = walletStake[uuid];
-    stake.start = block.number;
     stake.reward = stake.reward.add(reward.sub(stake.reward));
+    stake.start = block.number;
 
     emit LeptonRelease(uuid);
   }
@@ -192,7 +192,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     // Amount of reward that the lepton is responsible for 
     uint256 amountGenerateDuringLeptonDeposit = amount.mul(percentageOfLeptonInReward);
 
-    uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier).div(PERCENTAGE_SCALE);
+    uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier.mul(100)).div(PERCENTAGE_SCALE * 100);
 
     uint256 amountGeneratedWithoutLeptonDeposit = amount.sub(amountGenerateDuringLeptonDeposit.div(PERCENTAGE_SCALE));
 
