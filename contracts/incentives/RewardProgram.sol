@@ -196,16 +196,17 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     }
     
     // Percentage of the total program that the lepton was deposited for
+    // TODO: Dis resolves to 0 if the difference between the two is small.
     uint256 percentageOfLeptonInReward = leptonDepositLength.mul(PERCENTAGE_SCALE).div(rewardBlockLength.mul(PERCENTAGE_SCALE));
 
     // Amount of reward that the lepton is responsible for 
     uint256 amountGenerateDuringLeptonDeposit = baseReward.mul(PERCENTAGE_SCALE).mul(percentageOfLeptonInReward);
 
-    uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier).div(PERCENTAGE_SCALE);
-
-    console.log(baseReward, amountGenerateDuringLeptonDeposit, amountGenerateDuringLeptonDeposit.div(PERCENTAGE_SCALE));
+    uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier.mul(PERCENTAGE_SCALE)).div(PERCENTAGE_SCALE);
 
     uint256 amountGeneratedWithoutLeptonDeposit = baseReward.sub(amountGenerateDuringLeptonDeposit.div(PERCENTAGE_SCALE));
+
+    console.log('>>>> ', leptonDepositLength, rewardBlockLength, percentageOfLeptonInReward);
 
     return amountGeneratedWithoutLeptonDeposit.add(multipliedReward);
   }
