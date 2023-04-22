@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../lib/BlackholePrevention.sol";
 import "../interfaces/ILepton.sol";
+import "hardhat/console.sol";
 
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using SafeMath for uint256;
@@ -98,7 +99,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 reward = calculateRewardsEarned(uuid, generatedCharge);
 
     Stake storage stake = walletStake[uuid];
-    uint256 totalReward = stake.reward.add(reward.sub(stake.reward));
+
+    // uint256 totalReward = stake.reward.add(reward.sub(stake.reward));
+
+    uint256 totalReward = stake.reward + reward;
 
     stake.reward = 0;
     
@@ -130,14 +134,18 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
    (, uint256 generatedCharge) = IBaseWalletManager(rewardWalletManager) 
       .getInterest(basketNFT, basketTokenId, _programData.stakingToken);
 
+    console.log("reward >>>>>>>>>>>>>>>>>. ", generatedCharge);
     // Calculate reward
     uint256 reward = calculateRewardsEarned(uuid, generatedCharge);
 
+
     LeptonsStake storage leptonStake = leptonsStake[uuid];
+    leptonStake.multiplier = 0;
     leptonStake.releaseBlockNumber = block.number;
 
     Stake storage stake = walletStake[uuid];
-    stake.reward = stake.reward.add(reward.sub(stake.reward));
+    // stake.reward = stake.reward.add(stake.sub(stake.a));
+    stake.reward += reward;
     stake.start = block.number;
 
     emit LeptonRelease(uuid);
@@ -145,21 +153,21 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
   // Reward calculation
   function calculateBaseReward(
-    uint256 amount
+    uint256 generatedCharge 
   )
     public
     view
     returns(
-      uint256 ajustedReward
+      uint256 baseReward
     )
   {
-    uint256 baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
-    ajustedReward = convertDecimals(baseReward);
+    uint256 adjustedGeneratedChagedDecimals = convertDecimals(generatedCharge);
+    baseReward = adjustedGeneratedChagedDecimals.mul(PERCENTAGE_SCALE).mul(baseMultiplier).div(PERCENTAGE_SCALE);
   }
 
   function calculateLeptonMultipliedReward(
     uint256 uuid,
-    uint256 amount
+    uint256 baseReward
   )
     public
     view
@@ -180,7 +188,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     }
 
     if (multiplier == 0 || leptonDepositLength == 0 || rewardBlockLength == 0) {
-      return amount;
+      return baseReward;
     }
 
     if (leptonDepositLength > rewardBlockLength) {
@@ -188,15 +196,16 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     }
     
     // Percentage of the total program that the lepton was deposited for
-    uint256 percentageOfLeptonInReward = leptonDepositLength.mul(PERCENTAGE_SCALE).div(rewardBlockLength);
+    uint256 percentageOfLeptonInReward = leptonDepositLength.mul(PERCENTAGE_SCALE).div(rewardBlockLength.mul(PERCENTAGE_SCALE));
 
     // Amount of reward that the lepton is responsible for 
-    uint256 amountGenerateDuringLeptonDeposit = amount.mul(percentageOfLeptonInReward);
+    uint256 amountGenerateDuringLeptonDeposit = baseReward.mul(PERCENTAGE_SCALE).mul(percentageOfLeptonInReward);
 
-    uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier.mul(LEPTON_MULTIPLIER_SCALE))
-      .div(PERCENTAGE_SCALE * LEPTON_MULTIPLIER_SCALE);
+    uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier).div(PERCENTAGE_SCALE);
 
-    uint256 amountGeneratedWithoutLeptonDeposit = amount.sub(amountGenerateDuringLeptonDeposit.div(PERCENTAGE_SCALE));
+    console.log(baseReward, amountGenerateDuringLeptonDeposit, amountGenerateDuringLeptonDeposit.div(PERCENTAGE_SCALE));
+
+    uint256 amountGeneratedWithoutLeptonDeposit = baseReward.sub(amountGenerateDuringLeptonDeposit.div(PERCENTAGE_SCALE));
 
     return amountGeneratedWithoutLeptonDeposit.add(multipliedReward);
   }
