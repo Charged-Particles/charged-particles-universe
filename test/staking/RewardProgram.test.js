@@ -70,7 +70,7 @@ describe('Reward program', function () {
       expect(balance).to.gt(0)
     });
     
-    it.only('Deposits IONX into the reward pool', async () => {
+    it('Deposits IONX into the reward pool', async () => {
       const fundingAmount = 100;
 
       // Fund owner of reward program contract aka deployer
@@ -156,6 +156,10 @@ describe('Reward program', function () {
   });
 
   describe('Leptons staking', async () => {
+    before(() => {
+      console.log('!!! ~~~~~~~>>>>>>>>>>.');
+    });
+
     it.only('Changes wallet and basket manager address', async () => {
       await expect(rewardProgramDeployerSigner.registerLeptonDeposit(1,1)).to.be.revertedWith('Not basket manager');
 

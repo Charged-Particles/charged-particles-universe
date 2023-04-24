@@ -201,7 +201,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     uint256 amountGeneratedWithoutLeptonDeposit = baseReward.sub(amountGenerateDuringLeptonDeposit.div(PERCENTAGE_SCALE));
 
-    console.log(amountGeneratedWithoutLeptonDeposit.add(multipliedReward));
     return amountGeneratedWithoutLeptonDeposit.add(multipliedReward);
   }
 
@@ -251,6 +250,13 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     onlyOwner
   {
     baseMultiplier = newMultiplier;
+  }
+
+  function setRewardToken(address newRewardToken)
+    external
+    onlyOwner
+  {
+    _programData.rewardToken = newRewardToken;
   }
 
   function setRewardWalletManager(address newRewardWalletManager)
