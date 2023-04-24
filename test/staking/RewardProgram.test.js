@@ -298,6 +298,7 @@ describe('Reward program', function () {
       for(let i = 0; i < stakeInfoCases.length; i++) {
         await rewardWalletManagerMock.mock.getInterest.returns(0 ,stakeInfoCases[i]?.generatedCharged || 1);
         await leptonMock.mock.getMultiplier.returns(stakeInfoCases[i].leptonStakeMultiplier);
+        await ionxMock.mock.transfer.returns(true);
   
         await rewardProgramDeployerSigner.stake(i, stakeInfoCases[i].amount).then(tx => tx.wait());
         
