@@ -179,13 +179,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 multiplier = leptonStake.multiplier;
 
     uint256 rewardBlockLength = block.number.sub(walletStake[uuid].start);
-    uint256 leptonDepositLength;
 
-    if (leptonStake.releaseBlockNumber > 0 ) {
-      leptonDepositLength = leptonStake.releaseBlockNumber.sub(leptonStake.depositBlockNumber);
-    } else {
-      leptonDepositLength = block.number.sub(leptonStake.depositBlockNumber);
-    }
+    uint256 leptonDepositLength = _getLeptonDepositLength(leptonStake);
 
     if (multiplier == 0 || leptonDepositLength == 0 || rewardBlockLength == 0) {
       return baseReward;
@@ -196,7 +191,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     }
     
     // Percentage of the total program that the lepton was deposited for
-    // TODO: Dis resolves to 0 if the difference between the two is small.
+    // TODO: This resolves to 0 if the difference between the two is small.
     uint256 percentageOfLeptonInReward = leptonDepositLength.mul(PERCENTAGE_SCALE).div(rewardBlockLength.mul(PERCENTAGE_SCALE));
 
     // Amount of reward that the lepton is responsible for 
@@ -234,6 +229,21 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   ) {
     uint256 baseReward = calculateBaseReward(generatedCharge);
     totalReward = calculateLeptonMultipliedReward(uuid, baseReward);
+  }
+
+  // Internal
+  function _getLeptonDepositLength(
+    LeptonsStake memory leptonStake
+  )
+    internal
+    view
+    returns (uint256 leptonDepositLength)
+  {
+    if (leptonStake.releaseBlockNumber > 0 ) {
+      leptonDepositLength = leptonStake.releaseBlockNumber.sub(leptonStake.depositBlockNumber);
+    } else {
+      leptonDepositLength = block.number.sub(leptonStake.depositBlockNumber);
+    }
   }
 
   // Admin

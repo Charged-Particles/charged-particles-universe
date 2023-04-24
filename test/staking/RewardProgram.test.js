@@ -242,7 +242,7 @@ describe('Reward program', function () {
           amount: 100,
           blocksUntilLeptonDeposit: 500,
           blocksUntilLeptonRelease: 500,
-          blocksUntilCalculation: 500,
+          blocksUntilCalculation: 5000,
           leptonStakeMultiplier: 200,
           generatedCharged: 100000,
           expectedReward: 200, //200
