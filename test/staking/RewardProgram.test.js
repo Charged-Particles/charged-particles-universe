@@ -58,6 +58,7 @@ describe('Reward program', function () {
     rewardWalletManagerMock = await deployMockContract(deployerSigner, walletManager.abi);
   });
 
+
   it('should be deployed', async () =>{
     expect(rewardProgramDeployerSigner.address).to.not.equal(0);
     const rewardData = await rewardProgramDeployerSigner.getProgramData();
@@ -156,10 +157,6 @@ describe('Reward program', function () {
   });
 
   describe('Leptons staking', async () => {
-    before(() => {
-      console.log('!!! ~~~~~~~>>>>>>>>>>.');
-    });
-
     it.only('Changes wallet and basket manager address', async () => {
       await expect(rewardProgramDeployerSigner.registerLeptonDeposit(1,1)).to.be.revertedWith('Not basket manager');
 
@@ -222,6 +219,13 @@ describe('Reward program', function () {
     it.only('Checks lepton reward calculation with time spent', async () => {
       const basketContractAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
       const basketTokenId = 32;
+
+      // set reward mock token into reward program.
+      const stakingToken = '0x0000000000000000000000000000000000000000';
+      await rewardProgramDeployerSigner.setRewardToken(stakingToken).then( tx => tx.wait());
+
+      const rewardProgramData = await rewardProgramDeployerSigner.getProgramData();
+      expect(rewardProgram.rewardToken).to.eq(stakingToken);
 
       const stakeInfoCases = [
         {

@@ -196,7 +196,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     // TOOD: check if we need to convert decimals on base reward since it has base of 18.
     uint256 amountGenerateDuringLeptonDeposit = baseReward.mul(percentageOfLeptonInReward).div(PERCENTAGE_SCALE);
 
-
     uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier).div(PERCENTAGE_SCALE);
 
     uint256 amountGeneratedWithoutLeptonDeposit = baseReward.sub(amountGenerateDuringLeptonDeposit.div(PERCENTAGE_SCALE));
