@@ -22,6 +22,7 @@ describe('Reward program', function () {
     deployerSigner,
     chainId,
     leptonMock,
+    ionxMock,
     rewardWalletManagerMock,
     leptonData,
     rewardProgramDeployerSigner;
@@ -39,6 +40,9 @@ describe('Reward program', function () {
     const ddIonx = getDeployData('Ionx', chainId);
     const Ionx = await ethers.getContractFactory('Ionx');
     ionx = await Ionx.attach(ddIonx.address);
+
+    // Ionx mock
+    ionxMock = await deployMockContract(deployerSigner, ddIonx.abi);
   });
 
   beforeEach(async function () {
@@ -221,11 +225,11 @@ describe('Reward program', function () {
       const basketTokenId = 32;
 
       // set reward mock token into reward program.
-      const stakingToken = '0x0000000000000000000000000000000000000000';
+      const stakingToken = ionxMock.address;
       await rewardProgramDeployerSigner.setRewardToken(stakingToken).then( tx => tx.wait());
 
       const rewardProgramData = await rewardProgramDeployerSigner.getProgramData();
-      expect(rewardProgram.rewardToken).to.eq(stakingToken);
+      expect(rewardProgramData.rewardToken).to.eq(stakingToken);
 
       const stakeInfoCases = [
         {
