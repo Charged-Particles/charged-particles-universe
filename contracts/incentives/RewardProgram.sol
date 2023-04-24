@@ -105,7 +105,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 totalReward = stake.reward + reward;
 
     stake.reward = 0;
-    
+    console.log('totalReward', totalReward);
     // transfer ionx to user
     IERC20(_programData.rewardToken).transfer(receiver, totalReward);
 
@@ -134,7 +134,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
    (, uint256 generatedCharge) = IBaseWalletManager(rewardWalletManager) 
       .getInterest(basketNFT, basketTokenId, _programData.stakingToken);
 
-    console.log("reward >>>>>>>>>>>>>>>>>. ", generatedCharge);
     // Calculate reward
     uint256 reward = calculateRewardsEarned(uuid, generatedCharge);
 
@@ -191,17 +190,14 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     }
     
     // Percentage of the total program that the lepton was deposited for
-    // TODO: This resolves to 0 if the difference between the two is small.
-    uint256 percentageOfLeptonInReward = leptonDepositLength.mul(PERCENTAGE_SCALE).div(rewardBlockLength.mul(PERCENTAGE_SCALE));
+    uint256 percentageOfLeptonInReward = leptonDepositLength.mul(PERCENTAGE_SCALE).div(rewardBlockLength);
 
     // Amount of reward that the lepton is responsible for 
-    uint256 amountGenerateDuringLeptonDeposit = baseReward.mul(PERCENTAGE_SCALE).mul(percentageOfLeptonInReward);
+    uint256 amountGenerateDuringLeptonDeposit = baseReward.mul(percentageOfLeptonInReward);
 
-    uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier.mul(PERCENTAGE_SCALE)).div(PERCENTAGE_SCALE);
+    uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier).div(PERCENTAGE_SCALE);
 
     uint256 amountGeneratedWithoutLeptonDeposit = baseReward.sub(amountGenerateDuringLeptonDeposit.div(PERCENTAGE_SCALE));
-
-    console.log('>>>> ', leptonDepositLength, rewardBlockLength, percentageOfLeptonInReward);
 
     return amountGeneratedWithoutLeptonDeposit.add(multipliedReward);
   }

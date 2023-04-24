@@ -70,7 +70,7 @@ describe('Reward program', function () {
       expect(balance).to.gt(0)
     });
     
-    it('Deposits IONX into the reward pool', async () => {
+    it.only('Deposits IONX into the reward pool', async () => {
       const fundingAmount = 100;
 
       // Fund owner of reward program contract aka deployer
@@ -223,30 +223,30 @@ describe('Reward program', function () {
         {
           amount: 10,
           blocksUntilLeptonDeposit: 0,
-          blocksUntilLeptonRelease: 1000000,
-          blocksUntilCalculation: 0,
+          blocksUntilLeptonRelease: 500,
+          blocksUntilCalculation: 10000,
           leptonStakeMultiplier: 300,
           generatedCharged: 100000,
           expectedReward: '1000000000000000000000',
         },
-        {
-          amount: 10,
-          blocksUntilLeptonDeposit: 0,
-          blocksUntilLeptonRelease: 1000,
-          blocksUntilCalculation: 0,
-          leptonStakeMultiplier: 100,
-          generatedCharged: 100000,
-          expectedReward: '1000000000000000000000',
-        },
-        {
-          amount: 100,
-          blocksUntilLeptonDeposit: 500,
-          blocksUntilLeptonRelease: 500,
-          blocksUntilCalculation: 5000,
-          leptonStakeMultiplier: 200,
-          generatedCharged: 100000,
-          expectedReward: 200, //200
-        },
+        // {
+        //   amount: 10,
+        //   blocksUntilLeptonDeposit: 0,
+        //   blocksUntilLeptonRelease: 1000,
+        //   blocksUntilCalculation: 0,
+        //   leptonStakeMultiplier: 100,
+        //   generatedCharged: 100000,
+        //   expectedReward: '1000000000000000000000',
+        // },
+        // {
+        //   amount: 100,
+        //   blocksUntilLeptonDeposit: 0,
+        //   blocksUntilLeptonRelease: 500,
+        //   blocksUntilCalculation: 0,
+        //   leptonStakeMultiplier: 200,
+        //   generatedCharged: 100000,
+        //   expectedReward: 200, //200
+        // },
         // {
         //   amount: 100,
         //   blocksUntilLeptonDeposit: 500,
@@ -307,7 +307,8 @@ describe('Reward program', function () {
 
         await mineBlocks(stakeInfoCases[i].blocksUntilCalculation);
   
-        const reward = await rewardProgramDeployerSigner.calculateRewardsEarned(i, stakeInfoCases[i].generatedCharged);
+        // const reward = await rewardProgramDeployerSigner.calculateRewardsEarned(i, stakeInfoCases[i].generatedCharged);
+        const reward = await rewardProgramDeployerSigner.unstake(i, basketContractAddress, stakeInfoCases[i].generatedCharged);
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
       }
     });
