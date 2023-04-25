@@ -57,16 +57,13 @@ interface IRewardProgram {
   // }
 
   /* user functions */
-
-  function stake(uint256 uuid, uint256 amount)
-    external;
+  function stake(uint256 uuid, uint256 amount) external ; 
 
   function unstake(
     uint256 uuid,
     address receiver,
     uint256 amount
-  )
-    external;
+  ) external returns (uint256);
 
   // /* admin functions */
 

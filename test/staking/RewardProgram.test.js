@@ -320,8 +320,14 @@ describe('Reward program', function () {
 
         await mineBlocks(stakeInfoCases[i].blocksUntilCalculation);
   
-        // const reward = await rewardProgramDeployerSigner.calculateRewardsEarned(i, stakeInfoCases[i].generatedCharged);
-        const reward = await rewardProgramDeployerSigner.unstake(i, basketContractAddress, stakeInfoCases[i].generatedCharged);
+        const reward = await rewardProgramDeployerSigner.callStatic.unstake(
+          i,
+          basketContractAddress,
+          stakeInfoCases[i].generatedCharged
+        );
+
+        console.log(reward);
+
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
       }
     });
