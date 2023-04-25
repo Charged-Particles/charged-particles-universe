@@ -39,24 +39,8 @@ interface IRewardProgram {
     uint256 releaseBlockNumber;
   }
 
-  // struct VaultData {
-  //   uint256 totalStake;
-  //   StakeData[] stakes;
-  // }
-
-  // struct StakeData {
-  //   uint256 amount;
-  //   uint256 timestamp;
-  // }
-
-  // struct RewardOutput {
-  //   uint256 lastStakeAmount;
-  //   uint256 newStakesCount;
-  //   uint256 reward;
-  //   uint256 newTotalStakeUnits;
-  // }
-
   /* user functions */
+
   function stake(uint256 uuid, uint256 amount) external ; 
 
   function unstake(
@@ -65,14 +49,7 @@ interface IRewardProgram {
     uint256 amount
   ) external returns (uint256);
 
-  // /* admin functions */
+  /* admin functions */
 
   function fundProgram(uint256 amount) external;
-
-  // function rescueTokensFromRewardPool(
-  //   address token,
-  //   address recipient,
-  //   uint256 amount
-  // )
-  //   external;
 }
