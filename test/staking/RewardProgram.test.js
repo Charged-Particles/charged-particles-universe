@@ -14,6 +14,8 @@ const {
 
 describe('Reward program', function () {
 
+  const basketContractAddressMock = '0x0000000000000000000000000000000000000000'
+
   let rewardProgram,
     ionx,
     protocolOwnerAddress,
@@ -221,7 +223,7 @@ describe('Reward program', function () {
     });
 
     it.only('Checks lepton reward calculation with time spent', async () => {
-      const basketContractAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
+      const receiverAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
       const basketTokenId = 32;
 
       // set reward mock token into reward program.
@@ -310,7 +312,7 @@ describe('Reward program', function () {
         rewardProgramDeployerSigner.setRewardWalletManager(rewardWalletManagerMock.address).then(tx => tx.wait());
 
         await rewardProgramDeployerSigner.registerLeptonRelease(
-          basketContractAddress,
+          basketContractAddressMock,
           basketTokenId,
           i
         ).then(tx => tx.wait());
@@ -322,7 +324,7 @@ describe('Reward program', function () {
   
         const reward = await rewardProgramDeployerSigner.callStatic.unstake(
           i,
-          basketContractAddress,
+          receiverAddress,
           stakeInfoCases[i].generatedCharged
         );
 
@@ -350,7 +352,6 @@ describe('Reward program', function () {
     });
     
     it ('Calculates reward with lepton re-staking, resets lepton staking.', async () => {
-      const basketContractAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
       const basketTokenId = 32;
       const uuid = 101;
       const amount = 100;
@@ -365,7 +366,7 @@ describe('Reward program', function () {
 
       rewardProgramDeployerSigner.setRewardWalletManager(rewardWalletManagerMock.address).then(tx => tx.wait());
       await rewardProgramDeployerSigner.registerLeptonRelease(
-        basketContractAddress,
+        basketContractAddressMock,
         basketTokenId,
         uuid
       ).then(tx => tx.wait());
