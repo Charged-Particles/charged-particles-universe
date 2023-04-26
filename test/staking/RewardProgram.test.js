@@ -235,9 +235,9 @@ describe('Reward program', function () {
         {
           amount: 10,
           blocksUntilLeptonDeposit: 0,
-          blocksUntilLeptonRelease: 500,
-          blocksUntilCalculation: 10000,
-          leptonStakeMultiplier: 300,
+          blocksUntilLeptonRelease: 100,
+          blocksUntilCalculation: 0,
+          leptonStakeMultiplier: 120,
           generatedCharged: 100000,
           expectedReward: '1000000000000000000000',
         },
@@ -326,7 +326,7 @@ describe('Reward program', function () {
           stakeInfoCases[i].generatedCharged
         );
 
-        console.log(reward);
+        console.log(ethers.utils.formatUnits(reward, 18));
 
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
       }
