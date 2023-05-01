@@ -160,7 +160,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     )
   {
     uint256 adjustedGeneratedChagedDecimals = convertDecimals(generatedCharge);
-    baseReward = adjustedGeneratedChagedDecimals.mul(PERCENTAGE_SCALE).mul(baseMultiplier).div(PERCENTAGE_SCALE);
+    baseReward = adjustedGeneratedChagedDecimals.mul(baseMultiplier).div(PERCENTAGE_SCALE);
   }
 
   function calculateLeptonMultipliedReward(

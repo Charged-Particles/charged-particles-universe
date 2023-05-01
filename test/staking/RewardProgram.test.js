@@ -92,16 +92,19 @@ describe('Reward program', function () {
       expect(await ionx.balanceOf(rewardProgram.address)).to.equal(fundingAmount);
     });
 
-    it ('Calculates reward with multiplier as 100%', async () => {
+    it.only('Calculates reward with multiplier as 100%', async () => {
       await rewardProgram.connect(deployerSigner).setBaseMultiplier(10000);
 
       const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
+
       const reward = await rewardProgram.calculateBaseReward(chargedGeneratedInUsdc);
+
+      console.log(reward.toString());
 
       expect(ethers.utils.formatEther(reward.toString(), 18)).to.be.eq('1.0');
     });
 
-    it ('Changes the base reward multiplier', async () => {
+    it.only('Changes the base reward multiplier', async () => {
       await rewardProgram.connect(deployerSigner).setBaseMultiplier(5000);
 
       const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
@@ -165,7 +168,7 @@ describe('Reward program', function () {
   });
 
   describe('Leptons staking', async () => {
-    it.only('Changes wallet and basket manager address', async () => {
+    it ('Changes wallet and basket manager address', async () => {
       await expect(rewardProgramDeployerSigner.registerLeptonDeposit(1,1)).to.be.revertedWith('Not basket manager');
 
       await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
@@ -224,7 +227,7 @@ describe('Reward program', function () {
       expect(reward).to.be.eq(100);
     });
 
-    it.only('Checks lepton reward calculation with time spent', async () => {
+    it ('Checks lepton reward calculation with time spent', async () => {
       const receiverAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
       const basketTokenId = 32;
 
