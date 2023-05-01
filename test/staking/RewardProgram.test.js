@@ -243,58 +243,6 @@ describe('Reward program', function () {
           generatedCharged: 100000,
           expectedReward: '1000000000000000000000',
         },
-        // {
-        //   amount: 10,
-        //   blocksUntilLeptonDeposit: 0,
-        //   blocksUntilLeptonRelease: 1000,
-        //   blocksUntilCalculation: 0,
-        //   leptonStakeMultiplier: 100,
-        //   generatedCharged: 100000,
-        //   expectedReward: '1000000000000000000000',
-        // },
-        // {
-        //   amount: 100,
-        //   blocksUntilLeptonDeposit: 0,
-        //   blocksUntilLeptonRelease: 500,
-        //   blocksUntilCalculation: 0,
-        //   leptonStakeMultiplier: 200,
-        //   generatedCharged: 100000,
-        //   expectedReward: 200, //200
-        // },
-        // {
-        //   amount: 100,
-        //   blocksUntilLeptonDeposit: 500,
-        //   blocksUntilLeptonRelease: 500,
-        //   blocksUntilCalculation: 500,
-        //   leptonStakeMultiplier: 0,
-        //   expectedReward: 100,
-        // },
-        // {
-        //   amount: 100,
-        //   blocksUntilLeptonDeposit: 0,
-        //   blocksUntilLeptonRelease: 0,
-        //   blocksUntilCalculation: 500,
-        //   leptonStakeMultiplier: 1,
-        //   expectedReward: 100,
-        // },
-        // {
-        //   amount: 100,
-        //   blocksUntilLeptonDeposit: 0,
-        //   blocksUntilLeptonRelease: 0,
-        //   blocksUntilCalculation: 500,
-        //   leptonStakeMultiplier: 1,
-        //   generatedCharged: 1000000,
-        //   expectedReward: 100,
-        // },
-        // {
-        //   amount: 100,
-        //   blocksUntilLeptonDeposit: 0,
-        //   blocksUntilLeptonRelease: 1000,
-        //   blocksUntilCalculation: 500,
-        //   leptonStakeMultiplier: 2,
-        //   generatedCharged: 10000000,
-        //   expectedReward: 200,
-        // },
       ];
       
       for(let i = 0; i < stakeInfoCases.length; i++) {
