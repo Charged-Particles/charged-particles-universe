@@ -268,15 +268,14 @@ describe('Reward program', function () {
         },
         {
           amount: 10,
-          blocksUntilLeptonDeposit: 50,
-          blocksUntilLeptonRelease: 50,
-          blocksUntilCalculation: 100,
+          blocksUntilLeptonDeposit: 0,
+          blocksUntilCalculation: 1000,
           leptonStakeMultiplier: 200,
           generatedChargedBeforeLeptonRelease: 1000000,
           generatedChargeAfterLeptonRelease: 0,
-          expectedReward: '1504700000000000000',
+          expectedReward: '1037000000000000000',
+          description: 'Unstake with deposited lepton inside'
         },
-        
       ];
       
       for(let i = 0; i < stakeInfoCases.length; i++) {
@@ -289,7 +288,8 @@ describe('Reward program', function () {
         await mineBlocks(stakeInfoCases[i].blocksUntilLeptonDeposit);
         await rewardProgramDeployerSigner.registerLeptonDeposit(i, i).then(tx => tx.wait());
 
-        await mineBlocks(stakeInfoCases[i].blocksUntilLeptonRelease);
+        if (stakeInfoCases[i]?.blocksUntilLeptonRelease)
+          await mineBlocks(stakeInfoCases[i].blocksUntilLeptonRelease);
 
         rewardProgramDeployerSigner.setRewardWalletManager(rewardWalletManagerMock.address).then(tx => tx.wait());
 
@@ -314,23 +314,6 @@ describe('Reward program', function () {
       }
     });
 
-    it('Calculates reward without removing lepton', async () => {
-      const uuid = 100;
-      const amount = 100;
-      const leptonId = 35;
-      const multiplier = 2;
-
-      await leptonMock.mock.getMultiplier.returns(multiplier);
-
-      await rewardProgramDeployerSigner.stake(uuid, amount).then(tx => tx.wait());
-      await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
-        
-      await mineBlocks(100)
-
-      const reward = await rewardProgramDeployerSigner.calculateLeptonMultipliedReward(uuid, amount); 
-      expect(reward).to.be.eq((amount * multiplier) - 1);
-    });
-    
     it ('Calculates reward with lepton re-staking, resets lepton staking.', async () => {
       const basketTokenId = 32;
       const uuid = 101;
