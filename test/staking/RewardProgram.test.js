@@ -92,19 +92,17 @@ describe('Reward program', function () {
       expect(await ionx.balanceOf(rewardProgram.address)).to.equal(fundingAmount);
     });
 
-    it.only('Calculates reward with multiplier as 100%', async () => {
+    it ('Calculates reward with multiplier as 100%', async () => {
       await rewardProgram.connect(deployerSigner).setBaseMultiplier(10000);
 
       const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
 
       const reward = await rewardProgram.calculateBaseReward(chargedGeneratedInUsdc);
 
-      console.log(reward.toString());
-
       expect(ethers.utils.formatEther(reward.toString(), 18)).to.be.eq('1.0');
     });
 
-    it.only('Changes the base reward multiplier', async () => {
+    it ('Changes the base reward multiplier', async () => {
       await rewardProgram.connect(deployerSigner).setBaseMultiplier(5000);
 
       const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
@@ -152,7 +150,6 @@ describe('Reward program', function () {
       leptonTokenId
     )).to.emit(rewardProgram, 'LeptonDeposit');
 
-    // console.log(rewardBasketManager);
     await rewardBasketManager.removeFromBasket(
       deployerAddress,
       leptonTokenAddress,
@@ -280,8 +277,6 @@ describe('Reward program', function () {
           receiverAddress,
           stakeInfoCases[i].generatedCharged
         );
-
-        console.log(ethers.utils.formatUnits(reward, 18));
 
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
       }
