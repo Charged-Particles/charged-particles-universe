@@ -64,14 +64,14 @@ describe('Reward program', function () {
   });
 
 
-  it('should be deployed', async () =>{
+  it('Should be deployed', async () =>{
     expect(rewardProgramDeployerSigner.address).to.not.equal(0);
     const rewardData = await rewardProgramDeployerSigner.getProgramData();
     expect(rewardData.rewardPool).to.equal(rewardProgramDeployerSigner.address);
   });
 
   describe('Funds reward pool', () => {
-    it('Has balance', async() => {
+    it('Protocol owner account has balance', async() => {
       const balance = await ionx.balanceOf(protocolOwnerAddress);
       expect(balance).to.gt(0)
     });
@@ -93,12 +93,15 @@ describe('Reward program', function () {
     });
 
     it ('Calculates reward with multiplier as 100%', async () => {
+      await rewardProgram.connect(deployerSigner).setBaseMultiplier(10000);
+
       const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
       const reward = await rewardProgram.calculateBaseReward(chargedGeneratedInUsdc);
+
       expect(ethers.utils.formatEther(reward.toString(), 18)).to.be.eq('1.0');
     });
 
-    it ('Reward with .5 multiplier', async () => {
+    it ('Changes the base reward multiplier', async () => {
       await rewardProgram.connect(deployerSigner).setBaseMultiplier(5000);
 
       const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
@@ -107,7 +110,7 @@ describe('Reward program', function () {
 
       await rewardProgram.connect(deployerSigner).setBaseMultiplier(15000);
       expect(ethers.utils.formatEther(await rewardProgram.calculateBaseReward(chargedGeneratedInUsdc), 18)).to.be.eq('1.5');
-      await rewardProgram.connect(deployerSigner).setBaseMultiplier(1000);
+      await rewardProgram.connect(deployerSigner).setBaseMultiplier(10000);
     });
   });
 
