@@ -103,6 +103,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     uint256 totalReward = stake.reward + reward;
 
+    console.log(totalReward, stake.reward, reward);
+
     stake.reward = 0;
 
     IERC20(_programData.rewardToken).transfer(receiver, totalReward);

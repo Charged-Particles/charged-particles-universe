@@ -242,13 +242,14 @@ describe('Reward program', function () {
           blocksUntilLeptonRelease: 100,
           blocksUntilCalculation: 0,
           leptonStakeMultiplier: 120,
-          generatedCharged: 100000,
-          expectedReward: '1000000000000000000000',
+          generatedChargedBeforeLeptonRelease: 1000000,
+          generatedChargeAfterLeptonRelease: 0,
+          expectedReward: '1196180000000000000',
         },
       ];
       
       for(let i = 0; i < stakeInfoCases.length; i++) {
-        await rewardWalletManagerMock.mock.getInterest.returns(0 ,stakeInfoCases[i]?.generatedCharged || 1);
+        await rewardWalletManagerMock.mock.getInterest.returns(0 ,stakeInfoCases[i]?.generatedChargedBeforeLeptonRelease || 1);
         await leptonMock.mock.getMultiplier.returns(stakeInfoCases[i].leptonStakeMultiplier);
         await ionxMock.mock.transfer.returns(true);
   
@@ -275,7 +276,7 @@ describe('Reward program', function () {
         const reward = await rewardProgramDeployerSigner.callStatic.unstake(
           i,
           receiverAddress,
-          stakeInfoCases[i].generatedCharged
+          stakeInfoCases[i]?.generatedChargeAfterLeptonRelease 
         );
 
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
