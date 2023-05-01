@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../lib/BlackholePrevention.sol";
 import "../interfaces/ILepton.sol";
-import "hardhat/console.sol";
 
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using SafeMath for uint256;
@@ -160,7 +159,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     )
   {
     uint256 adjustedGeneratedChagedDecimals = convertDecimals(generatedCharge);
-    baseReward = adjustedGeneratedChagedDecimals.mul(PERCENTAGE_SCALE).mul(baseMultiplier).div(PERCENTAGE_SCALE);
+    baseReward = adjustedGeneratedChagedDecimals.mul(baseMultiplier).div(PERCENTAGE_SCALE);
   }
 
   function calculateLeptonMultipliedReward(
@@ -187,7 +186,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     if (leptonDepositLength > rewardBlockLength) {
       leptonDepositLength = rewardBlockLength;
     }
-    
+
     // Percentage of the total program that the lepton was deposited for
     uint256 percentageOfLeptonInReward = leptonDepositLength.mul(PERCENTAGE_SCALE).div(rewardBlockLength);
 
