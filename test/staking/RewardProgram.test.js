@@ -266,6 +266,16 @@ describe('Reward program', function () {
           generatedChargeAfterLeptonRelease: 0,
           expectedReward: '1980900000000000000',
         },
+        {
+          amount: 10,
+          blocksUntilLeptonDeposit: 50,
+          blocksUntilLeptonRelease: 50,
+          blocksUntilCalculation: 100,
+          leptonStakeMultiplier: 200,
+          generatedChargedBeforeLeptonRelease: 1000000,
+          generatedChargeAfterLeptonRelease: 0,
+          expectedReward: '1504700000000000000',
+        },
         
       ];
       
