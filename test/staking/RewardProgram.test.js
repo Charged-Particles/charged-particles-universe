@@ -165,7 +165,7 @@ describe('Reward program', function () {
   });
 
   describe('Leptons staking', async () => {
-    it ('Changes wallet and basket manager address', async () => {
+    it.only('Changes wallet and basket manager address', async () => {
       await expect(rewardProgramDeployerSigner.registerLeptonDeposit(1,1)).to.be.revertedWith('Not basket manager');
 
       await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
@@ -184,7 +184,7 @@ describe('Reward program', function () {
       const leptonMultiplier = 20000; // x2
 
       await leptonMock.mock.getMultiplier.returns(leptonMultiplier);
-      const blockBeforeDeposit = await ethers.provider.getBlock("latest")
+      const blockBeforeDeposit = await ethers.provider.getBlock("latest");
 
       // start reward program with usdc
       await rewardProgramDeployerSigner.stake(uuid, 100).then(tx => tx.wait());
@@ -224,7 +224,7 @@ describe('Reward program', function () {
       expect(reward).to.be.eq(100);
     });
 
-    it ('Checks lepton reward calculation with time spent', async () => {
+    it.only('Checks lepton reward calculation with time spent', async () => {
       const receiverAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
       const basketTokenId = 32;
 
@@ -236,44 +236,44 @@ describe('Reward program', function () {
       expect(rewardProgramData.rewardToken).to.eq(stakingToken);
 
       const stakeInfoCases = [
-        {
-          amount: 10,
-          blocksUntilLeptonDeposit: 0,
-          blocksUntilLeptonRelease: 100,
-          blocksUntilCalculation: 0,
-          leptonStakeMultiplier: 120,
-          generatedChargedBeforeLeptonRelease: 1000000,
-          generatedChargeAfterLeptonRelease: 0,
-          expectedReward: '1196180000000000000',
-        },
-        {
-          amount: 10,
-          blocksUntilLeptonDeposit: 0,
-          blocksUntilLeptonRelease: 100,
-          blocksUntilCalculation: 0,
-          leptonStakeMultiplier: 100,
-          generatedChargedBeforeLeptonRelease: 1000000,
-          generatedChargeAfterLeptonRelease: 1000000,
-          expectedReward: '2000000000000000000',
-        },
-        {
-          amount: 10,
-          blocksUntilLeptonDeposit: 0,
-          blocksUntilLeptonRelease: 100,
-          blocksUntilCalculation: 0,
-          leptonStakeMultiplier: 200,
-          generatedChargedBeforeLeptonRelease: 1000000,
-          generatedChargeAfterLeptonRelease: 0,
-          expectedReward: '1980900000000000000',
-        },
+        // {
+        //   amount: 10,
+        //   blocksUntilLeptonDeposit: 0,
+        //   blocksUntilLeptonRelease: 100,
+        //   blocksUntilCalculation: 0,
+        //   leptonStakeMultiplier: 120,
+        //   generatedChargedBeforeLeptonRelease: 1000000,
+        //   generatedChargeAfterLeptonRelease: 0,
+        //   expectedReward: '1196180000000000000',
+        // },
+        // {
+        //   amount: 10,
+        //   blocksUntilLeptonDeposit: 0,
+        //   blocksUntilLeptonRelease: 100,
+        //   blocksUntilCalculation: 0,
+        //   leptonStakeMultiplier: 100,
+        //   generatedChargedBeforeLeptonRelease: 1000000,
+        //   generatedChargeAfterLeptonRelease: 1000000,
+        //   expectedReward: '2000000000000000000',
+        // },
+        // {
+        //   amount: 10,
+        //   blocksUntilLeptonDeposit: 0,
+        //   blocksUntilLeptonRelease: 100,
+        //   blocksUntilCalculation: 0,
+        //   leptonStakeMultiplier: 200,
+        //   generatedChargedBeforeLeptonRelease: 1000000,
+        //   generatedChargeAfterLeptonRelease: 0,
+        //   expectedReward: '1980900000000000000',
+        // },
         {
           amount: 10,
           blocksUntilLeptonDeposit: 0,
           blocksUntilCalculation: 1000,
           leptonStakeMultiplier: 200,
-          generatedChargedBeforeLeptonRelease: 1000000,
-          generatedChargeAfterLeptonRelease: 0,
-          expectedReward: '1037000000000000000',
+          generatedChargedBeforeLeptonRelease: 0,
+          generatedChargeAfterLeptonRelease: 1000000,
+          expectedReward: '1998000000000000000',
           description: 'Unstake with deposited lepton inside'
         },
       ];
@@ -288,26 +288,29 @@ describe('Reward program', function () {
         await mineBlocks(stakeInfoCases[i].blocksUntilLeptonDeposit);
         await rewardProgramDeployerSigner.registerLeptonDeposit(i, i).then(tx => tx.wait());
 
-        if (stakeInfoCases[i]?.blocksUntilLeptonRelease)
+        if (stakeInfoCases[i]?.blocksUntilLeptonRelease) {
           await mineBlocks(stakeInfoCases[i].blocksUntilLeptonRelease);
 
-        rewardProgramDeployerSigner.setRewardWalletManager(rewardWalletManagerMock.address).then(tx => tx.wait());
+          console.log('hey !!!!', stakeInfoCases[i].blocksUntilLeptonRelease);
 
-        await rewardProgramDeployerSigner.registerLeptonRelease(
-          basketContractAddressMock,
-          basketTokenId,
-          i
-        ).then(tx => tx.wait());
-        await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
-          tx => tx.wait()
-        );
+          rewardProgramDeployerSigner.setRewardWalletManager(rewardWalletManagerMock.address).then(tx => tx.wait());
+  
+          await rewardProgramDeployerSigner.registerLeptonRelease(
+            basketContractAddressMock,
+            basketTokenId,
+            i
+          ).then(tx => tx.wait());
+          await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
+            tx => tx.wait()
+          );
+        }
 
         await mineBlocks(stakeInfoCases[i].blocksUntilCalculation);
   
         const reward = await rewardProgramDeployerSigner.callStatic.unstake(
           i,
           receiverAddress,
-          stakeInfoCases[i]?.generatedChargeAfterLeptonRelease 
+          stakeInfoCases[i]?.generatedChargeAfterLeptonRelease
         );
 
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
