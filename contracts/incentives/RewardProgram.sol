@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../lib/BlackholePrevention.sol";
 import "../interfaces/ILepton.sol";
-import "hardhat/console.sol";
 
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using SafeMath for uint256;
@@ -102,8 +101,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     Stake storage stake = walletStake[uuid];
 
     uint256 totalReward = stake.reward + reward;
-
-    console.log(totalReward, stake.reward, reward);
 
     stake.reward = 0;
 

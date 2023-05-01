@@ -246,6 +246,27 @@ describe('Reward program', function () {
           generatedChargeAfterLeptonRelease: 0,
           expectedReward: '1196180000000000000',
         },
+        {
+          amount: 10,
+          blocksUntilLeptonDeposit: 0,
+          blocksUntilLeptonRelease: 100,
+          blocksUntilCalculation: 0,
+          leptonStakeMultiplier: 100,
+          generatedChargedBeforeLeptonRelease: 1000000,
+          generatedChargeAfterLeptonRelease: 1000000,
+          expectedReward: '2000000000000000000',
+        },
+        {
+          amount: 10,
+          blocksUntilLeptonDeposit: 0,
+          blocksUntilLeptonRelease: 100,
+          blocksUntilCalculation: 0,
+          leptonStakeMultiplier: 200,
+          generatedChargedBeforeLeptonRelease: 1000000,
+          generatedChargeAfterLeptonRelease: 0,
+          expectedReward: '1980900000000000000',
+        },
+        
       ];
       
       for(let i = 0; i < stakeInfoCases.length; i++) {
