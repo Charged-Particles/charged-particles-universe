@@ -21,7 +21,6 @@ module.exports = async (hre) => {
 
     const chainId = chainIdByName(network.name);
     const {isProd, isHardhat} = chainTypeById(chainId);
-    const alchemyTimeout = isHardhat ? 0 : (isProd ? 5 : 3);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Deployment');
@@ -52,7 +51,7 @@ module.exports = async (hre) => {
     log('     - Block:         ', universe.deployTransaction.blockNumber);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
 
-    await log('  Deploying ChargedState...')(alchemyTimeout);
+    await log('  Deploying ChargedState...');
     const ChargedState = await ethers.getContractFactory('ChargedState');
     const ChargedStateInstance = await upgrades.deployProxy(ChargedState, [deployer]);
     const chargedState = await ChargedStateInstance.deployed();
@@ -66,7 +65,7 @@ module.exports = async (hre) => {
     log('     - Block:         ', chargedState.deployTransaction.blockNumber);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedState.deployTransaction }));
 
-    await log('  Deploying ChargedSettings...')(alchemyTimeout);
+    await log('  Deploying ChargedSettings...');
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     const ChargedSettingsInstance = await upgrades.deployProxy(ChargedSettings, [deployer]);
     const chargedSettings = await ChargedSettingsInstance.deployed();
@@ -80,7 +79,7 @@ module.exports = async (hre) => {
     log('     - Block:         ', chargedSettings.deployTransaction.blockNumber);
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedSettings.deployTransaction }));
 
-    await log('  Deploying ChargedManagers...')(alchemyTimeout);
+    await log('  Deploying ChargedManagers...');
     const ChargedManagers = await ethers.getContractFactory('ChargedManagers');
     const ChargedManagersInstance = await upgrades.deployProxy(ChargedManagers, [deployer]);
     const chargedManagers = await ChargedManagersInstance.deployed();
@@ -95,7 +94,7 @@ module.exports = async (hre) => {
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: chargedManagers.deployTransaction }));
 
 
-    await log('  Deploying ChargedParticles...')(alchemyTimeout);
+    await log('  Deploying ChargedParticles...');
     const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
     const ChargedParticlesInstance = await upgrades.deployProxy(ChargedParticles, [deployer], { unsafeAllowCustomTypes: true });
     const chargedParticles = await ChargedParticlesInstance.deployed();
@@ -113,7 +112,7 @@ module.exports = async (hre) => {
     // Non-upgradeable Contracts
     //
 
-    await log('  Deploying TokenInfoProxy...')(alchemyTimeout);
+    await log('  Deploying TokenInfoProxy...');
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
     const TokenInfoProxyInstance = await TokenInfoProxy.deploy();
     const tokenInfoProxy = await TokenInfoProxyInstance.deployed();
@@ -128,7 +127,7 @@ module.exports = async (hre) => {
     log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: tokenInfoProxy.deployTransaction }));
 
 
-    await log('  Deploying ParticleSplitter...')(alchemyTimeout);
+    await log('  Deploying ParticleSplitter...');
     const ParticleSplitter = await ethers.getContractFactory('ParticleSplitter');
     const ParticleSplitterInstance = await ParticleSplitter.deploy();
     const particleSplitter = await ParticleSplitterInstance.deployed();

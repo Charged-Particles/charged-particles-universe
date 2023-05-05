@@ -17,7 +17,6 @@ module.exports = async (hre) => {
     const network = await hre.network;
 
     const chainId = chainIdByName(network.name);
-    const alchemyTimeout = 5;
 
     if (chainId !== 1) { return; } // Only for Mainnet
 
@@ -88,43 +87,43 @@ module.exports = async (hre) => {
     // Transfer Ownership of All Contracts
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await log(`  - Universe: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await log(`  - Universe: Transferring Contract Ownership to '${owner}'`);
     await universe.transferOwnership(owner);
 
-    await log(`  - ChargedState: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await log(`  - ChargedState: Transferring Contract Ownership to '${owner}'`);
     await chargedState.transferOwnership(owner);
 
-    await log(`  - ChargedSettings: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await log(`  - ChargedSettings: Transferring Contract Ownership to '${owner}'`);
     await chargedSettings.transferOwnership(owner);
 
-    await log(`  - ChargedParticles: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await log(`  - ChargedParticles: Transferring Contract Ownership to '${owner}'`);
     await chargedParticles.transferOwnership(owner);
 
-    await log(`  - GenericWalletManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await log(`  - GenericWalletManager: Transferring Contract Ownership to '${owner}'`);
     await genericWalletManager.transferOwnership(owner);
 
-    await log(`  - GenericBasketManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await log(`  - GenericBasketManager: Transferring Contract Ownership to '${owner}'`);
     await genericBasketManager.transferOwnership(owner);
 
-    await log(`  - AaveWalletManager: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await log(`  - AaveWalletManager: Transferring Contract Ownership to '${owner}'`);
     await aaveWalletManager.transferOwnership(owner);
 
-    await log(`  - Proton: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await log(`  - Proton: Transferring Contract Ownership to '${owner}'`);
     await proton.transferOwnership(owner);
 
-    await log(`  - Lepton: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await log(`  - Lepton: Transferring Contract Ownership to '${owner}'`);
     await lepton.transferOwnership(owner);
 
-    await log(`  - Ionx: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await log(`  - Ionx: Transferring Contract Ownership to '${owner}'`);
     await ionx.transferOwnership(owner);
 
     log('  Loading AaveBridgeV2 from: ', ddAaveBridgeV2.address);
     const AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');
     const aaveBridgeV2 = await AaveBridgeV2.attach(ddAaveBridgeV2.address);
-    await log(`  - AaveBridgeV2: Transferring Contract Ownership to '${owner}'`)(alchemyTimeout);
+    await log(`  - AaveBridgeV2: Transferring Contract Ownership to '${owner}'`);
     await aaveBridgeV2.transferOwnership(owner);
 
-    await log(`\n  Contract Initialization Complete!`)(alchemyTimeout);
+    await log(`\n  Contract Initialization Complete!`);
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };
 

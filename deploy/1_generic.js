@@ -20,7 +20,6 @@ module.exports = async (hre) => {
 
     const chainId = chainIdByName(network.name);
     const {isProd, isHardhat} = chainTypeById(chainId);
-    const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 1);
     const deployData = {};
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
@@ -33,7 +32,7 @@ module.exports = async (hre) => {
     log('  - Owner:       ', protocolOwner);
     log(' ');
 
-    await log('\n  Deploying GenericWalletManager...')(alchemyTimeout);
+    await log('\n  Deploying GenericWalletManager...');
     const GenericWalletManager = await hre.ethers.getContractFactory('GenericWalletManager');
     const GenericWalletManagerInstance = await GenericWalletManager.deploy();
     const genericWalletManager = await GenericWalletManagerInstance.deployed();
@@ -47,7 +46,7 @@ module.exports = async (hre) => {
     log('     - Block:              ', genericWalletManager.deployTransaction.blockNumber);
     log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
 
-    await log('\n  Deploying GenericWalletManagerB...')(alchemyTimeout);
+    await log('\n  Deploying GenericWalletManagerB...');
     const GenericWalletManagerB = await hre.ethers.getContractFactory('GenericWalletManagerB');
     const GenericWalletManagerBInstance = await GenericWalletManagerB.deploy();
     const genericWalletManagerB = await GenericWalletManagerBInstance.deployed();
@@ -61,7 +60,7 @@ module.exports = async (hre) => {
     log('     - Block:              ', genericWalletManagerB.deployTransaction.blockNumber);
     log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManagerB.deployTransaction }));
 
-    await log('  Deploying GenericBasketManager...')(alchemyTimeout);
+    await log('  Deploying GenericBasketManager...');
     const GenericBasketManager = await hre.ethers.getContractFactory('GenericBasketManager');
     const GenericBasketManagerInstance = await GenericBasketManager.deploy();
     const genericBasketManager = await GenericBasketManagerInstance.deployed();
@@ -75,7 +74,7 @@ module.exports = async (hre) => {
     log('     - Block:              ', genericBasketManager.deployTransaction.blockNumber);
     log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericBasketManager.deployTransaction }));
 
-    await log('  Deploying GenericBasketManagerB...')(alchemyTimeout);
+    await log('  Deploying GenericBasketManagerB...');
     const GenericBasketManagerB = await hre.ethers.getContractFactory('GenericBasketManagerB');
     const GenericBasketManagerBInstance = await GenericBasketManagerB.deploy();
     const genericBasketManagerB = await GenericBasketManagerBInstance.deployed();

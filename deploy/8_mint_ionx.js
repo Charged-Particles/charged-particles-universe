@@ -17,7 +17,6 @@ module.exports = async (hre) => {
   const network = await hre.network;
 
   const chainId = chainIdByName(network.name);
-  const alchemyTimeout = chainId === 31337 ? 0 : (chainId === 1 ? 10 : 1);
 
   const ionxMaxSupply = presets.Ionx.maxSupply;
 
@@ -38,7 +37,7 @@ module.exports = async (hre) => {
   const Ionx = await ethers.getContractFactory('Ionx');
   const ionx = await Ionx.attach(ddIonx.address).connect(daoSigner);
 
-  await log(`  - Ionx: Minting to DAO`)(alchemyTimeout);
+  await log(`  - Ionx: Minting to DAO`);
   await ionx.mint(protocolOwner, ionxMaxSupply);
 
 

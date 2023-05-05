@@ -39,7 +39,7 @@ task(
 
 
 const mnemonic = {
-  testnet: `${process.env.TESTNET_MNEMONIC}`.replace(/_/g, ' '),
+  testnet: `${process.env.TESTNET_MNEMONIC_2}`.replace(/_/g, ' '),
   mainnet: `${process.env.MAINNET_MNEMONIC}`.replace(/_/g, ' '),
 };
 
@@ -85,6 +85,11 @@ module.exports = {
             blockGasLimit: 200000000,
             allowUnlimitedContractSize: true,
             gasPrice: 1e9,
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            },
             forking: {
                 url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
                 blockNumber: 11400000,  // MUST be after Aave V2 was deployed
@@ -127,7 +132,7 @@ module.exports = {
         polygon: {
             // url: `https://rpc-mainnet.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
             url: `https://polygon-mainnet.g.alchemy.com/v2/HFlv2m48GYEDLf9sHMTBuy2Z80xFwlVC`,
-            gasPrice: 50e9,
+            gasPrice: 80e9,
             accounts: {
                 mnemonic: mnemonic.mainnet,
                 initialIndex: 0,

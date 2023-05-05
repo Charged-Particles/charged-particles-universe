@@ -60,7 +60,6 @@ module.exports = async (hre) => {
 
     const chainId = chainIdByName(network.name);
     const {isProd, isHardhat} = chainTypeById(chainId);
-    const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
     const leptonMaxMint = presets.Lepton.maxMintPerTx;
 
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);

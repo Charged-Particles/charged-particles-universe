@@ -110,6 +110,7 @@ const _WHITELISTED_CONTRACTS = {
     // "0x96c89cc7c5d2fbfa41afa10da5917742ff35941b", // Elder ENTS
     // "0x135dE69e2C8A6f14f00dcf9c9e8D8120FBebeF5a", // HMNZone
     // "0x4bf5a99ea2f8de061f7d77ba9edd749503d945da", // .BASIN (FlexiPunkTLD)
+    "0xf6a44012d24ca5d67ece21ea7d34886a55754e86" // TaterDAO Land
   ],
   '80001': [
     // "0xd02cB38f5D68333219d32Ea2a08c3BCdC92753F2", // Proton
@@ -130,7 +131,6 @@ module.exports = async (hre) => {
 
     const chainId = chainIdByName(network.name);
     const {isProd, isHardhat} = chainTypeById(chainId);
-    const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
 
     // if (chainId !== 42) { return; } // Kovan only
 

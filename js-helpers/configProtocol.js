@@ -24,7 +24,6 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const network = await hre.network;
     const chainId = chainIdByName(network.name);
     const {isProd, isHardhat} = chainTypeById(chainId);
-    const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
 
     const referralCode = presets.Aave.referralCode[chainId];
     const ionxMaxSupply = presets.Ionx.maxSupply;
@@ -48,7 +47,6 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ddGenericWalletManagerB = getDeployData('GenericWalletManagerB', chainId);
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddGenericBasketManagerB = getDeployData('GenericBasketManagerB', chainId);
-    const ddRewardWalletManager = getDeployData('RewardWalletManager', chainId);
     const ddRewardProgram = getDeployData('RewardProgram', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddProtonB = getDeployData('ProtonB', chainId);
@@ -110,11 +108,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const AaveWalletManagerB = await ethers.getContractFactory('AaveWalletManagerB');
     const aaveWalletManagerB = await AaveWalletManagerB.attach(ddAaveWalletManagerB.address);
 
-    log('  Loading RewardWalletManager from:    ', ddRewardWalletManager.address, ` (${_.get(ddRewardWalletManager, 'deployTransaction.blockNumber', '0')})`);
-    const RewardWalletManager = await ethers.getContractFactory('RewardWalletManager');
-    const rewardWalletManager = await RewardWalletManager.attach(ddRewardWalletManager.address);
-
-    log('  Loading RewardProgram from:    ', ddRewardProgram.address, ` (${_.get(ddRewardProgram, 'deployTransaction.blockNumber', '0')})`);
+    log('  Loading RewardProgram from:         ', ddRewardProgram.address, ` (${_.get(ddRewardProgram, 'deployTransaction.blockNumber', '0')})`);
     const RewardProgram = await ethers.getContractFactory('RewardProgram');
     const rewardProgram = await RewardProgram.attach(ddRewardProgram.address);
 
@@ -306,31 +300,6 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // // }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Setup Aave Wallet Manager
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    await executeTx('11-a', 'RewardWalletManager: Setting Charged Particles as Controller', async () =>
-      await rewardWalletManager.setController(ddChargedParticles.address)
-    );
-
-    console.log('>>>>>>>>>>>>>>>>>>>> ', ddAaveBridgeV2.address)
-    await executeTx('11-b', 'RewardWalletManager: Setting Aave Bridge to V2', async () =>
-      await rewardWalletManager.setAaveBridge(ddAaveBridgeV2.address)
-    );
-
-    await executeTx('11-c', 'RewardWalletManager: Registering ChargedSettings', async () =>
-      await rewardWalletManager.setChargedSettings(ddChargedSettings.address)
-    );
-
-    await executeTx('11-d', 'RewardWalletManager: Registering wallet manager with ChargedParticles', async () =>
-      await chargedManagers.registerWalletManager('reward', ddRewardWalletManager.address)
-    );
-
-    await executeTx('11-d', 'RewardWalletManager: register reward program into wallet manager', async () =>
-      await rewardWalletManager.setRewardProgram(ddRewardProgram.address, usdcAddress)
-    );
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Proton
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -519,24 +488,55 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       );
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Setup RewardProgram
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    await executeTx('10-a', 'RewardProgram: Set Staking Token', async () =>
+      await rewardProgram.setStakingToken(usdcAddress)
+    );
+
+    await executeTx('10-b', 'RewardProgram: Set Reward Token', async () =>
+      await rewardProgram.setRewardToken(ddIonx.address)
+    );
+
+    await executeTx('10-c', 'RewardProgram: Set Base Multiplier (10000 = 100%)', async () =>
+      await rewardProgram.setBaseMultiplier(10000) // 100%
+    );
+
+    await executeTx('10-d', 'RewardProgram: Set ChargedManagers', async () =>
+      await rewardProgram.setChargedManagers(ddChargedManagers.address)
+    );
+
+    await executeTx('10-e', 'RewardProgram: Set Universe', async () =>
+      await rewardProgram.setUniverse(ddUniverse.address)
+    );
+
+    await executeTx('10-f', 'RewardProgram: Set Reward NFT (Lepton2)', async () =>
+      await rewardProgram.setRewardNft(ddLepton2.address)
+    );
+
+    await executeTx('10-g', 'Universe: Registering Reward Program', async () =>
+      await universe.setRewardProgram(ddRewardProgram.address, usdcAddress)
+    );
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup External Executors
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('10-a', 'Generic Wallet Manager "B": Registering Executor', async () =>
+    await executeTx('11-a', 'Generic Wallet Manager "B": Registering Executor', async () =>
       await genericWalletManagerB.setExecutor(ddParticleSplitter.address)
     );
 
-    await executeTx('10-b', 'Generic Basket Manager "B": Registering Executor', async () =>
+    await executeTx('11-b', 'Generic Basket Manager "B": Registering Executor', async () =>
       await genericBasketManagerB.setExecutor(ddParticleSplitter.address)
     );
 
-    await executeTx('10-c', 'Aave Wallet Manager "B": Registering Executor', async () =>
+    await executeTx('11-c', 'Aave Wallet Manager "B": Registering Executor', async () =>
       await aaveWalletManagerB.setExecutor(ddParticleSplitter.address)
     );
 
-    await executeTx('10-a', 'Reward Wallet Manager: Registering Executor', async () =>
+    await executeTx('11-a', 'Reward Wallet Manager: Registering Executor', async () =>
       await rewardWalletManager.setExecutor(deployer)
     );
 

@@ -28,7 +28,6 @@ module.exports = async (hre) => {
   const network = await hre.network;
 
   const chainId = chainIdByName(network.name);
-  const alchemyTimeout = 0;
 
   if (chainId !== 1) { return; } // Mainnet only
 
@@ -54,7 +53,7 @@ module.exports = async (hre) => {
   // Migrate Leptons
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  await log(`  - Migrating ${_AMOUNT_TO_MIGRATE} Tokens from ${ddLepton.address}...`)(alchemyTimeout);
+  await log(`  - Migrating ${_AMOUNT_TO_MIGRATE} Tokens from ${ddLepton.address}...`);
   const result = await lepton2.migrateAccounts(ddLepton.address, _AMOUNT_TO_MIGRATE);
   log('     - Gas Cost: ', (await getActualTxGasCost(result)));
 

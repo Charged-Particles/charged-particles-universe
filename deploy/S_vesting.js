@@ -33,7 +33,6 @@ module.exports = async (hre) => {
 
   const chainId = chainIdByName(network.name);
   const {isProd, isHardhat} = chainTypeById(chainId);
-  const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
   const vesting = presets.Vesting[`month${__VESTING_CLAIM_INDEX}`];
 
   const daoSigner = ethers.provider.getSigner(protocolOwner);
@@ -56,7 +55,7 @@ module.exports = async (hre) => {
   const Ionx = await ethers.getContractFactory('Ionx');
   const ionx = await Ionx.attach(ddIonx.address);
 
-  await log(`\n  Deploying VestingClaim${__VESTING_CLAIM_INDEX} with Expiry: ${new Date(vesting.expiryDate * 1000).toLocaleDateString("en-US")}...`)(alchemyTimeout);
+  await log(`\n  Deploying VestingClaim${__VESTING_CLAIM_INDEX} with Expiry: ${new Date(vesting.expiryDate * 1000).toLocaleDateString("en-US")}...`);
   const VestingClaimInstance = await VestingClaim.deploy(ddIonx.address, vesting.merkleRoot, vesting.expiryDate);
   const vestingClaim = await VestingClaimInstance.deployed();
   deployData[`VestingClaim${__VESTING_CLAIM_INDEX}`] = {
@@ -78,7 +77,7 @@ module.exports = async (hre) => {
   }
 
   // Display Contract Addresses
-  await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
+  await log('\n  Contract Deployments Complete!\n\n  Contracts:');
   log(`  - VestingClaim${__VESTING_CLAIM_INDEX}: ${vestingClaim.address}`);
   log('     - Gas Cost:  ', getTxGasCost({ deployTransaction: vestingClaim.deployTransaction }));
 

@@ -23,7 +23,6 @@ module.exports = async (hre) => {
 
   const chainId = chainIdByName(network.name);
   const {isProd, isHardhat} = chainTypeById(chainId);
-  const alchemyTimeout = isHardhat ? 0 : (isProd ? 3 : 2);
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles: Proton C - Contract Deployment & Setup');
@@ -52,7 +51,7 @@ module.exports = async (hre) => {
   // Deploy ProtonC
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  await log('\n  Deploying ProtonC NFT...')(alchemyTimeout);
+  await log('\n  Deploying ProtonC NFT...');
   const ProtonC = await ethers.getContractFactory('ProtonC');
   const ProtonCInstance = await ProtonC.deploy();
   const protonC = await ProtonCInstance.deployed();
@@ -95,7 +94,7 @@ module.exports = async (hre) => {
 
 
   // Display Contract Addresses
-  await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
+  await log('\n  Contract Deployments Complete!\n\n  Contracts:');
   log('  - ProtonC:     ', protonC.address);
   log('     - Block:    ', protonC.deployTransaction.blockNumber);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: protonC.deployTransaction }));

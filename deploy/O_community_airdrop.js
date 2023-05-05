@@ -30,7 +30,6 @@ module.exports = async (hre) => {
 
   const chainId = chainIdByName(network.name);
   const {isProd, isHardhat} = chainTypeById(chainId);
-  const alchemyTimeout = isHardhat ? 0 : (isProd ? 10 : 7);
   const incentives = presets.Incentives[chainId];
 
   const daoSigner = ethers.provider.getSigner(protocolOwner);
@@ -56,7 +55,7 @@ module.exports = async (hre) => {
   const Ionx = await ethers.getContractFactory('Ionx');
   const ionx = await Ionx.attach(ddIonx.address);
 
-  await log(`\n  Deploying MerkleDistributor...`)(alchemyTimeout);
+  await log(`\n  Deploying MerkleDistributor...`);
   const MerkleDistributorInstance = await MerkleDistributor.deploy(ddIonx.address, incentives.airdrop.merkleRoot);
   const merkleDistributor = await MerkleDistributorInstance.deployed();
   deployData['MerkleDistributor'] = {
@@ -67,7 +66,7 @@ module.exports = async (hre) => {
   };
 
   if (!isHardhat) {
-    await log(`\n  Deploying MerkleDistributor2 with Expiry: ${new Date(incentives.airdrop.expiryDate * 1000).toLocaleDateString("en-US")}...`)(alchemyTimeout);
+    await log(`\n  Deploying MerkleDistributor2 with Expiry: ${new Date(incentives.airdrop.expiryDate * 1000).toLocaleDateString("en-US")}...`);
     const MerkleDistributor2Instance = await MerkleDistributor2.deploy(ddIonx.address, incentives.airdrop.merkleRoot, incentives.airdrop.expiryDate);
     const merkleDistributor2 = await MerkleDistributor2Instance.deployed();
     deployData['MerkleDistributor2'] = {
@@ -77,7 +76,7 @@ module.exports = async (hre) => {
       deployTransaction: merkleDistributor2.deployTransaction,
     };
 
-    await log(`\n  Deploying MerkleDistributor3 with Expiry: ${new Date(incentives.airdrop.expiryDate * 1000).toLocaleDateString("en-US")}...`)(alchemyTimeout);
+    await log(`\n  Deploying MerkleDistributor3 with Expiry: ${new Date(incentives.airdrop.expiryDate * 1000).toLocaleDateString("en-US")}...`);
     const MerkleDistributor3Instance = await MerkleDistributor3.deploy(ddIonx.address, incentives.airdrop.merkleRoot, incentives.airdrop.expiryDate);
     const merkleDistributor3 = await MerkleDistributor3Instance.deployed();
     deployData['MerkleDistributor3'] = {
@@ -118,7 +117,7 @@ module.exports = async (hre) => {
   }
 
   // Display Contract Addresses
-  await log('\n  Contract Deployments Complete!\n\n  Contracts:')(alchemyTimeout);
+  await log('\n  Contract Deployments Complete!\n\n  Contracts:');
   log('  - MerkleDistributor: ', merkleDistributor.address);
   log('     - Gas Cost:       ', getTxGasCost({ deployTransaction: merkleDistributor.deployTransaction }));
   if (!isHardhat) {
