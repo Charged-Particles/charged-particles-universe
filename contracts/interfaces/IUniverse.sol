@@ -38,6 +38,7 @@ interface IUniverse {
   event EsaMultiplierSet(address indexed assetToken, uint256 multiplier);
   event ElectrostaticAttraction(address indexed account, address photonSource, uint256 energy, uint256 multiplier);
   event ElectrostaticDischarge(address indexed account, address photonSource, uint256 energy);
+  event RewardProgramSet(address indexed assetToken, address indexed rewardProgram);
 
   function onEnergize(
     address sender,

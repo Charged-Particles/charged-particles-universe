@@ -1,297 +1,387 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.12;
 
+// RewardProgram.sol -- Part of the Charged Particles Protocol
+// Copyright (c) 2023 Firma Lux, Inc. <https://charged.fi>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
 import "../interfaces/IRewardProgram.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../lib/BlackholePrevention.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
+import "@openzeppelin/contracts/utils/EnumerableSet.sol";
+import "../interfaces/IChargedManagers.sol";
 import "../interfaces/ILepton.sol";
-import "hardhat/console.sol";
+import "../interfaces/IWalletManager.sol";
+import "../interfaces/IRewardNft.sol";
+import "../lib/TokenInfo.sol";
+import "../lib/BlackholePrevention.sol";
 
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using SafeMath for uint256;
+  using SafeERC20 for IERC20;
+  using TokenInfo for address;
+  using EnumerableSet for EnumerableSet.UintSet;
 
-  ProgramRewardData public _programData;
-  mapping(uint256 => Stake) public walletStake;
-  mapping(uint256 => LeptonsStake) public leptonsStake;
+  uint256 constant private PERCENTAGE_SCALE = 1e4;   // 10000 (100%)
 
-  address public rewardWalletManager;
-  address public rewardBasketManager;
-  uint256 public baseMultiplier;
-  address public lepton = 0x3Cd2410EAa9c2dCE50aF6CCAb72Dc93879a09c1F;
+  address private _universe;
+  IChargedManagers private _chargedManagers;
+  ProgramRewardData private _programData;
 
-  uint256 constant internal PERCENTAGE_SCALE = 1e4;   // 10000 (100%)
-  uint256 constant internal LEPTON_MULTIPLIER_SCALE = 1e2;   // 100
+  EnumerableSet.UintSet private _multiplierNftsSet;
+  mapping(uint256 => AssetStake) private _assetStake;
+  mapping(uint256 => NftStake) private _nftStake;
 
-  constructor(
-    address _stakingToken,
-    address _rewardToken,
-    address _rewardWalletManager,
-    uint256 _duration,
-    uint256 _baseMultiplier
-  ) public {
-    _programData.rewardDuration = _duration;
-    _programData.stakingToken = _stakingToken;
-    _programData.rewardToken = _rewardToken;
-    _programData.rewardPool = address(this);
 
-    rewardWalletManager = _rewardWalletManager;
-    baseMultiplier = _baseMultiplier;
+  /***********************************|
+  |          Initialization           |
+  |__________________________________*/
 
-    emit RewardProgramCreated(address(this));
-  }
+  constructor() public {}
 
-  function getProgramData()
-    external
-    view
-    returns (ProgramRewardData memory programData)
-  {
+
+  /***********************************|
+  |         Public Functions          |
+  |__________________________________*/
+
+  function getProgramData() external view override returns (ProgramRewardData memory programData) {
     return _programData;
   }
 
-  function fundProgram(uint256 amount)
-    external
-    override
-    onlyOwner
-  {
-    IERC20 token = IERC20(_programData.rewardToken);
-
-    token.transferFrom(msg.sender, address(this), amount);
-
-    _programData.rewardPoolBalance += amount;
-
-    emit RewardProgramFunded(amount);
+  function getFundBalance() external view override returns (uint256) {
+    return _getFundBalance();
   }
 
-  function stake(
-    uint256 uuid,
-    uint256 amount
-  )
-    override
-    external
-    onlyWalletManager
-  {
-    bool stakeInitialized = walletStake[uuid].started;
+  function getClaimableRewards(address contractAddress, uint256 tokenId) external view override returns (uint256) {
+    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+    AssetStake storage assetStake = _assetStake[parentNftUuid];
+    return assetStake.claimableRewards;
+  }
 
-    if (!stakeInitialized) {
-      walletStake[uuid] = Stake(true, block.number, amount,0,0);
+  function claimRewards(address contractAddress, uint256 tokenId, address receiver) external override {
+    // Verifiy Owner or Approved Operator
+    IERC721 nft = IERC721(contractAddress);
+    address owner = nft.ownerOf(tokenId);
+    bool isApproved = nft.isApprovedForAll(owner, msg.sender);
+    require(msg.sender == owner || isApproved, "RP:E-102");
 
-    } else {
-      Stake storage onGoingStake = walletStake[uuid];
-      onGoingStake.principal += amount;
+    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+    AssetStake storage assetStake = _assetStake[parentNftUuid];
+
+    // Ensure Reward Pool has Sufficient Balance
+    uint256 totalReward = assetStake.claimableRewards;
+    uint256 fundBalance = _getFundBalance();
+    uint256 unavailReward = totalReward > fundBalance ? totalReward.sub(fundBalance) : 0;
+
+    // Update Asset Stake
+    assetStake.claimableRewards = unavailReward;
+
+    // Determine amount of Rewards to Transfer
+    if (unavailReward > 0) {
+      totalReward = totalReward.sub(unavailReward);
+      emit RewardProgramOutOfFunds();
     }
 
-    emit Staked(uuid, amount);
+    // Transfer Available Rewards to Receiver
+    if (totalReward > 0) {
+      IERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
+    }
+
+    emit RewardsClaimed(contractAddress, tokenId, receiver, totalReward, unavailReward);
   }
 
-  function unstake(
-    uint256 uuid,
-    address receiver,
-    uint256 generatedCharge
-  ) 
+
+  /***********************************|
+  |          Only Universe            |
+  |__________________________________*/
+
+  function registerExistingDeposits(address contractAddress, uint256 tokenId, string calldata walletManagerId)
+    external
     override
+    onlyUniverse
+  {
+    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+    require(_assetStake[parentNftUuid].start == 0 && _assetStake[parentNftUuid].claimableRewards == 0, "RP:E-002");
+
+    // Initiate Asset Stake
+    IWalletManager walletMgr = _chargedManagers.getWalletManager(walletManagerId);
+    uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, _programData.stakingToken);
+    if (principal > 0) {
+      _assetStake[parentNftUuid] = AssetStake(block.number, 0, walletManagerId);
+      emit AssetRegistered(contractAddress, tokenId, walletManagerId, principal);
+    }
+  }
+
+  function registerAssetDeposit(address contractAddress, uint256 tokenId, string calldata walletManagerId, uint256 principalAmount)
     external
-    onlyWalletManager
-    returns (uint256)
+    override
+    onlyUniverse
   {
-    uint256 reward = calculateRewardsEarned(uuid, generatedCharge);
-
-    Stake storage stake = walletStake[uuid];
-
-    uint256 totalReward = stake.reward + reward;
-
-    stake.reward = 0;
-
-    IERC20(_programData.rewardToken).transfer(receiver, totalReward);
-
-    emit Unstaked(uuid, totalReward);
-
-    return totalReward;
+    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+    if (_assetStake[parentNftUuid].start == 0) {
+      _assetStake[parentNftUuid].start = block.number;
+      _assetStake[parentNftUuid].walletManagerId = walletManagerId;
+      emit AssetDeposit(contractAddress, tokenId, walletManagerId, principalAmount);
+    }
   }
 
-  function registerLeptonDeposit(uint256 uuid, uint256 tokenId)
+  function registerAssetRelease(address contractAddress, uint256 tokenId, uint256 interestAmount)
     external
-    onlyBasketManager
+    override
+    onlyUniverse
   {
-    uint256 multiplier = ILepton(lepton).getMultiplier(tokenId);
+    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+    AssetStake storage assetStake = _assetStake[parentNftUuid];
 
-    leptonsStake[uuid] = LeptonsStake(multiplier, block.number, 0);
-    emit LeptonDeposit(uuid);
+    // Update Claimable Rewards
+    uint256 newRewards = calculateRewardsEarned(parentNftUuid, interestAmount);
+    assetStake.claimableRewards = assetStake.claimableRewards.add(newRewards);
+
+    // Reset Stake if Principal Balance falls to Zero
+    IWalletManager walletMgr = _chargedManagers.getWalletManager(assetStake.walletManagerId);
+    uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, _programData.stakingToken);
+    if (principal == 0) {
+      assetStake.start = 0;
+    }
+    emit AssetRelease(contractAddress, tokenId, interestAmount);
   }
 
-  function registerLeptonRelease(
-    address basketNFT,
-    uint256 basketTokenId,
-    uint256 uuid
-  )
+
+  function registerNftDeposit(address contractAddress, uint256 tokenId, address depositNftAddress, uint256 depositNftTokenId, uint256 /* nftTokenAmount */)
     external
-    onlyBasketManager
+    override
+    onlyUniverse
   {
-    // get this charged amount 
-   (, uint256 generatedCharge) = IBaseWalletManager(rewardWalletManager) 
-      .getInterest(basketNFT, basketTokenId, _programData.stakingToken);
+    // We only care about the Multiplier NFT
+    if (_programData.multiplierNft != depositNftAddress) { return; }
 
-    // Calculate reward
-    uint256 reward = calculateRewardsEarned(uuid, generatedCharge);
+    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+    uint256 multiplier = _getNftMultiplier(depositNftAddress, depositNftTokenId);
+    if (multiplier > 0 && !_multiplierNftsSet.contains(multiplier)) {
+      // Add to Multipliers Set
+      _multiplierNftsSet.add(multiplier);
 
-    LeptonsStake storage leptonStake = leptonsStake[uuid];
-    leptonStake.multiplier = 0;
-    leptonStake.releaseBlockNumber = block.number;
-
-    Stake storage stake = walletStake[uuid];
-    // stake.reward = stake.reward.add(stake.sub(stake.a));
-    stake.reward += reward;
-    stake.start = block.number;
-
-    emit LeptonRelease(uuid);
+      // Update NFT Stake
+      uint256 combinedMultiplier = _calculateTotalMultiplier();
+      _nftStake[parentNftUuid] = NftStake(combinedMultiplier, block.number, 0);
+    }
+    emit NftDeposit(contractAddress, tokenId, depositNftAddress, depositNftTokenId);
   }
 
-  // Reward calculation
-  function calculateBaseReward(
-    uint256 generatedCharge 
-  )
-    public
-    view
-    returns(
-      uint256 baseReward
-    )
+  function registerNftRelease(address contractAddress, uint256 tokenId, address releaseNftAddress, uint256 releaseNftTokenId, uint256 /* nftTokenAmount */)
+    external
+    override
+    onlyUniverse
   {
-    uint256 adjustedGeneratedChagedDecimals = convertDecimals(generatedCharge);
-    baseReward = adjustedGeneratedChagedDecimals.mul(PERCENTAGE_SCALE).mul(baseMultiplier).div(PERCENTAGE_SCALE);
+    // We only care about the Multiplier NFT
+    if (_programData.multiplierNft != releaseNftAddress) { return; }
+
+    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+    NftStake storage nftStake = _nftStake[parentNftUuid];
+
+    // Remove from Multipliers Set
+    uint256 multiplier = _getNftMultiplier(releaseNftAddress, releaseNftTokenId);
+    _multiplierNftsSet.remove(multiplier);
+
+    // Determine New Multiplier or Mark as Released
+    if (_multiplierNftsSet.length() > 0) {
+      nftStake.multiplier = _calculateTotalMultiplier();
+    } else {
+      nftStake.releaseBlockNumber = block.number;
+    }
+
+    emit NftRelease(contractAddress, tokenId, releaseNftAddress, releaseNftTokenId);
   }
 
-  function calculateLeptonMultipliedReward(
-    uint256 uuid,
-    uint256 baseReward
-  )
-    public
-    view
-    returns(
-      uint256
-    )
-  {
-    LeptonsStake memory leptonStake = leptonsStake[uuid];
-    uint256 multiplier = leptonStake.multiplier;
 
-    uint256 rewardBlockLength = block.number.sub(walletStake[uuid].start);
+  /***********************************|
+  |         Reward Calculation        |
+  |__________________________________*/
 
-    uint256 leptonDepositLength = _getLeptonDepositLength(leptonStake);
+  function calculateRewardsEarned(uint256 parentNftUuid, uint256 interestAmount) internal view returns (uint256 totalReward) {
+    uint256 baseReward = calculateBaseReward(interestAmount);
+    totalReward = calculateMultipliedReward(parentNftUuid, baseReward);
+  }
 
-    if (multiplier == 0 || leptonDepositLength == 0 || rewardBlockLength == 0) {
+  function calculateBaseReward(uint256 amount) internal view returns(uint256 baseReward) {
+    baseReward = amount.mul(_programData.baseMultiplier).div(PERCENTAGE_SCALE);
+  }
+
+  function calculateMultipliedReward(uint256 parentNftUuid, uint256 baseReward) internal view returns(uint256) {
+    AssetStake storage assetStake = _assetStake[parentNftUuid];
+    NftStake memory nftStake = _nftStake[parentNftUuid];
+    uint256 multiplierBP = nftStake.multiplier;
+
+    if (assetStake.start == 0) { return baseReward; }
+
+    uint256 assetDepositLength = block.number.sub(assetStake.start);
+    uint256 nftDepositLength = _getNftDepositLength(nftStake);
+
+    if (multiplierBP == 0 || nftDepositLength == 0 || assetDepositLength == 0) {
       return baseReward;
     }
 
-    if (leptonDepositLength > rewardBlockLength) {
-      leptonDepositLength = rewardBlockLength;
+    if (nftDepositLength > assetDepositLength) {
+      nftDepositLength = assetDepositLength;
     }
-    
-    // Percentage of the total program that the lepton was deposited for
-    uint256 percentageOfLeptonInReward = leptonDepositLength.mul(PERCENTAGE_SCALE).div(rewardBlockLength);
 
-    // Amount of reward that the lepton is responsible for 
-    // TOOD: check if we need to convert decimals on base reward since it has base of 18.
-    uint256 amountGenerateDuringLeptonDeposit = baseReward.mul(percentageOfLeptonInReward).div(PERCENTAGE_SCALE);
+    // Percentage of the total program that the _programData.multiplierNft was deposited for
+    uint256 nftRewardRatioBP = nftDepositLength.mul(PERCENTAGE_SCALE).div(assetDepositLength);
 
-    uint256 multipliedReward = amountGenerateDuringLeptonDeposit.mul(multiplier).div(100);
+    // Amount of reward that the _programData.multiplierNft is responsible for
+    uint256 amountGeneratedDuringNftDeposit = baseReward.mul(nftRewardRatioBP).div(PERCENTAGE_SCALE);
 
-    uint256 amountGeneratedWithoutLeptonDeposit = baseReward.sub(amountGenerateDuringLeptonDeposit);
-    console.log(amountGeneratedWithoutLeptonDeposit.add(multipliedReward));
+    // Amount of Multiplied Reward from NFT
+    uint256 multipliedReward = amountGeneratedDuringNftDeposit.mul(multiplierBP).div(PERCENTAGE_SCALE);
 
-    return amountGeneratedWithoutLeptonDeposit.add(multipliedReward);
+    // Amount of Base Reward without Multiplied NFT Rewards
+    uint256 amountGeneratedWithoutNftDeposit = baseReward.sub(amountGeneratedDuringNftDeposit);
+
+    // Amount of Base Rewards + Multiplied NFT Rewards
+    return amountGeneratedWithoutNftDeposit.add(multipliedReward);
   }
 
-  function convertDecimals(
-    uint256 reward
-  )
-    internal
-    view
-    returns (
-      uint256 rewardAjustedDecimals
-    )
-  {
-    rewardAjustedDecimals = reward.mul(10**(12));
+
+  /***********************************|
+  |          Only Admin/DAO           |
+  |__________________________________*/
+
+  function fundProgram(uint256 amount) external onlyOwner {
+    require(_programData.rewardToken != address(0), "RP:E-405");
+    IERC20 token = IERC20(_programData.rewardToken);
+    token.safeTransferFrom(msg.sender, address(this), amount);
+    emit RewardProgramFunded(amount);
   }
 
-  function calculateRewardsEarned(
-    uint256 uuid,
-    uint256 generatedCharge
-  )
-    public
-    view
-    returns (
-      uint256 totalReward
-  ) {
-    uint256 baseReward = calculateBaseReward(generatedCharge);
-    totalReward = calculateLeptonMultipliedReward(uuid, baseReward);
+  function setStakingToken(address newStakingToken) external onlyOwner {
+    _programData.stakingToken = newStakingToken;
   }
 
-  // Internal
-  function _getLeptonDepositLength(
-    LeptonsStake memory leptonStake
-  )
-    internal
-    view
-    returns (uint256 leptonDepositLength)
-  {
-    if (leptonStake.releaseBlockNumber > 0 ) {
-      leptonDepositLength = leptonStake.releaseBlockNumber.sub(leptonStake.depositBlockNumber);
-    } else {
-      leptonDepositLength = block.number.sub(leptonStake.depositBlockNumber);
-    }
-  }
-
-  // Admin
-  function setBaseMultiplier(uint256 newMultiplier)
-    external
-    onlyOwner
-  {
-    baseMultiplier = newMultiplier;
-  }
-
-  function setRewardToken(address newRewardToken)
-    external
-    onlyOwner
-  {
+  function setRewardToken(address newRewardToken) external onlyOwner {
     _programData.rewardToken = newRewardToken;
   }
 
-  function setRewardWalletManager(address newRewardWalletManager)
-    external
-    onlyOwner
-  {
-    rewardWalletManager = newRewardWalletManager;
+  function setBaseMultiplier(uint256 newMultiplier) external onlyOwner {
+    _programData.baseMultiplier = newMultiplier; // Basis Points
   }
 
-  function setRewardBasketManager(address newRewardBasketManager)
-    external
-    onlyOwner
-  {
-    rewardBasketManager = newRewardBasketManager;
+  function setChargedManagers(address manager) external onlyOwner {
+    _chargedManagers = IChargedManagers(manager);
   }
 
-  function setLepton(address leptonAddress)
-    external
-    onlyOwner
-  {
-    lepton = leptonAddress;
+  function setUniverse(address universe) external onlyOwner {
+    _universe = universe;
   }
 
-  modifier onlyWalletManager() {
-    require(msg.sender == rewardWalletManager, "Not wallet manager");
+  function setRewardNft(address nftTokenAddress) external onlyOwner {
+    _programData.multiplierNft = nftTokenAddress;
+  }
+
+
+  /***********************************|
+  |          Only Admin/DAO           |
+  |      (blackhole prevention)       |
+  |__________________________________*/
+
+  function withdrawEther(address payable receiver, uint256 amount) external onlyOwner {
+    _withdrawEther(receiver, amount);
+  }
+
+  function withdrawErc20(address payable receiver, address tokenAddress, uint256 amount) external onlyOwner {
+    _withdrawERC20(receiver, tokenAddress, amount);
+  }
+
+  function withdrawERC721(address payable receiver, address tokenAddress, uint256 tokenId) external onlyOwner {
+    _withdrawERC721(receiver, tokenAddress, tokenId);
+  }
+
+  function withdrawERC1155(address payable receiver, address tokenAddress, uint256 tokenId, uint256 amount) external onlyOwner {
+    _withdrawERC1155(receiver, tokenAddress, tokenId, amount);
+  }
+
+
+  /***********************************|
+  |         Private Functions         |
+  |__________________________________*/
+
+  function _calculateTotalMultiplier() internal view returns (uint256) {
+    uint256 len = _multiplierNftsSet.length();
+    uint256 indexOfSmallest;
+    uint256 multiplier;
+    uint256 i;
+
+    // If holding all 6, Max Multiplier of 10X
+    if (len == 6) {
+      return PERCENTAGE_SCALE.mul(10);
+    }
+
+    // If holding more than 4, Ignore the Smallest
+    if (len > 4) {
+      for (; i < len; i++) {
+        if (_multiplierNftsSet.at(i) < _multiplierNftsSet.at(indexOfSmallest)) {
+          indexOfSmallest = i;
+        }
+      }
+      i = 0;
+    }
+
+    // If holding less than or equal to 4, Multiplier = Half of the Sum of all
+    for (; i < len; i++) {
+      if (len > 4 && i == indexOfSmallest) { continue; }
+      multiplier = multiplier.add(_multiplierNftsSet.at(i));
+    }
+
+    return multiplier.div(2); // Half of the Sum
+  }
+
+  function _getNftDepositLength(NftStake memory nftStake) internal view returns (uint256 nftDepositLength) {
+    if (nftStake.releaseBlockNumber > 0 ) {
+      nftDepositLength = nftStake.releaseBlockNumber.sub(nftStake.depositBlockNumber);
+    } else {
+      nftDepositLength = block.number.sub(nftStake.depositBlockNumber);
+    }
+  }
+
+  function _getNftMultiplier(address contractAddress, uint256 tokenId) internal returns (uint256) {
+    bytes4 fnSig = IRewardNft.getMultiplier.selector;
+    // solhint-disable-next-line
+    (bool success, bytes memory returnData) = contractAddress.call(abi.encodeWithSelector(fnSig, tokenId));
+    if (success) {
+      return abi.decode(returnData, (uint256));
+    } else {
+      return 0;
+    }
+  }
+
+  function _getFundBalance() internal view returns (uint256) {
+    return IERC20(_programData.rewardToken).balanceOf(address(this));
+  }
+
+  modifier onlyUniverse() {
+    require(msg.sender == _universe, "RP:E-108");
     _;
   }
-
-  modifier onlyBasketManager() {
-    require(msg.sender == rewardBasketManager, "Not basket manager");
-    _;
-  }
-}
-
-interface IBaseWalletManager {
-    function getInterest(address contractAddress, uint256 tokenId, address assetToken)
-    external
-    returns (uint256 creatorInterest, uint256 ownerInterest);
 }

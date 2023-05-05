@@ -35,6 +35,7 @@ import "./interfaces/IChargedParticles.sol";
 import "./interfaces/ILepton.sol";
 import "./lib/TokenInfo.sol";
 import "./lib/BlackholePrevention.sol";
+import "./interfaces/IRewardProgram.sol";
 
 
 /**
@@ -88,42 +89,42 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   |         Public Functions          |
   |__________________________________*/
 
-  function getStaticCharge(address account) external view virtual returns (uint256 positiveEnergy) {
-    return esaLevel[account];
+  function getStaticCharge(address /* account */) external pure virtual returns (uint256 positiveEnergy) {
+    return 0;
   }
 
-  function conductElectrostaticDischarge(address account, uint256 amount) external virtual returns (uint256 positiveEnergy) {
-    require(esaLevel[account] > 0, "UNI:E-411");
-    require(photonSource.balanceOf(address(this)) > 0, "UNI:E-413");
-    return _conductElectrostaticDischarge(account, amount);
+  function conductElectrostaticDischarge(address /* account */, uint256 /* amount */) external pure virtual returns (uint256 positiveEnergy) {
+    return 0;
   }
-
 
   /***********************************|
   |      Only Charged Particles       |
   |__________________________________*/
 
   function onEnergize(
-    address sender,
-    address referrer,
-    address /* contractAddress */,
-    uint256 /* tokenId */,
-    string calldata /* walletManagerId */,
-    address /* assetToken */,
-    uint256 /* assetAmount */
+    address /* sender */,
+    address /* referrer */,
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken,
+    uint256 assetAmount
   )
     external
     virtual
     override
     onlyChargedParticles
   {
-    // no-op
+    address rewardProgram = getRewardProgram(assetToken);
+    if (rewardProgram != address(0)) {
+      IRewardProgram(rewardProgram).registerAssetDeposit(contractAddress, tokenId, walletManagerId, assetAmount);
+    }
   }
 
   function onDischarge(
     address contractAddress,
     uint256 tokenId,
-    string calldata,
+    string calldata /* walletManagerId */,
     address assetToken,
     uint256 creatorEnergy,
     uint256 receiverEnergy
@@ -133,13 +134,17 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    // no-op
+    address rewardProgram = getRewardProgram(assetToken);
+    if (rewardProgram != address(0)) {
+      uint256 totalInterest = receiverEnergy.add(creatorEnergy);
+      IRewardProgram(rewardProgram).registerAssetRelease(contractAddress, tokenId, totalInterest);
+    }
   }
 
   function onDischargeForCreator(
     address contractAddress,
     uint256 tokenId,
-    string calldata,
+    string calldata /* walletManagerId */,
     address /* creator */,
     address assetToken,
     uint256 receiverEnergy
@@ -149,13 +154,16 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    // no-op
+    address rewardProgram = getRewardProgram(assetToken);
+    if (rewardProgram != address(0)) {
+      IRewardProgram(rewardProgram).registerAssetRelease(contractAddress, tokenId, receiverEnergy);
+    }
   }
 
   function onRelease(
     address contractAddress,
     uint256 tokenId,
-    string calldata,
+    string calldata /* walletManagerId */,
     address assetToken,
     uint256 principalAmount,
     uint256 creatorEnergy,
@@ -166,7 +174,12 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    // no-op
+    address rewardProgram = getRewardProgram(assetToken);
+    if (rewardProgram != address(0)) {
+      // "receiverEnergy" includes the "principalAmount"
+      uint256 totalInterest = receiverEnergy.sub(principalAmount).add(creatorEnergy);
+      IRewardProgram(rewardProgram).registerAssetRelease(contractAddress, tokenId, totalInterest);
+    }
   }
 
   function onCovalentBond(
@@ -182,7 +195,10 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    // no-op
+    address rewardProgram = getRewardProgram(nftTokenAddress);
+    if (rewardProgram != address(0)) {
+      IRewardProgram(rewardProgram).registerNftDeposit(contractAddress, tokenId, nftTokenAddress, nftTokenId, nftTokenAmount);
+    }
   }
 
   function onCovalentBreak(
@@ -190,15 +206,18 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     uint256 tokenId,
     string calldata /* managerId */,
     address nftTokenAddress,
-    uint256 /* nftTokenId */,
-    uint256 /* nftTokenAmount */
+    uint256 nftTokenId,
+    uint256 nftTokenAmount
   )
     external
     virtual
     override
     onlyChargedParticles
   {
-    // no-op
+    address rewardProgram = getRewardProgram(nftTokenAddress);
+    if (rewardProgram != address(0)) {
+      IRewardProgram(rewardProgram).registerNftRelease(contractAddress, tokenId, nftTokenAddress, nftTokenId, nftTokenAmount);
+    }
   }
 
   function onProtonSale(
@@ -331,39 +350,10 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   |__________________________________*/
 
   function _electrostaticAttraction(uint256 tokenUuid, address receiver, address assetToken, uint256 baseAmount) internal virtual {
-    if (address(photonSource) == address(0x0) || receiver == address(0x0)) { return; }
-    if (totalPhotonDischarged >= photonMaxSupply) { return; }
-
-    uint256 energy = baseAmount.mul(esaMultiplier[assetToken]).div(PERCENTAGE_SCALE);
-    uint256 bondedMass = bondedLeptonMass[tokenUuid];
-    if (bondedMass > 0) {
-      energy = energy.mul(bondedMass.add(PERCENTAGE_SCALE)).div(PERCENTAGE_SCALE);
-    }
-    if (totalPhotonDischarged.add(energy) > photonMaxSupply) {
-      energy = photonMaxSupply.sub(totalPhotonDischarged);
-    }
-    totalPhotonDischarged = totalPhotonDischarged.add(energy);
-    esaLevel[receiver] = esaLevel[receiver].add(energy);
-
-    emit ElectrostaticAttraction(receiver, address(photonSource), energy, bondedMass);
   }
 
-  function _conductElectrostaticDischarge(address account, uint256 energy) internal virtual returns (uint256) {
-    uint256 electrostaticAttraction = esaLevel[account];
-    if (energy > electrostaticAttraction) {
-      energy = electrostaticAttraction;
-    }
-
-    uint256 bondable = photonSource.balanceOf(address(this));
-    if (energy > bondable) {
-      energy = bondable;
-    }
-
-    esaLevel[account] = esaLevel[account].sub(energy);
-    photonSource.safeTransfer(account, energy);
-
-    emit ElectrostaticDischarge(account, address(photonSource), energy);
-    return energy;
+  function _conductElectrostaticDischarge(address /* account */, uint256 /* energy */) internal virtual pure returns (uint256) {
+    return 0;
   }
 
   /***********************************|
@@ -386,5 +376,46 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   modifier onlyProton() {
     require(proton == msg.sender, "UNI:E-110");
     _;
+  }
+
+
+  /***********************************|
+  |    Upgrade 1 - Reward Program     |
+  |__________________________________*/
+
+  // Asset Token => Reward Program
+  mapping (address => address) internal assetRewardPrograms;
+
+  function getRewardProgram(address assetToken) public view returns (address) {
+    return _getRewardProgram(assetToken);
+  }
+
+  function registerExistingDeposits(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken
+  ) external {
+    address rewardProgram = getRewardProgram(assetToken);
+    if (rewardProgram != address(0)) {
+      IRewardProgram(rewardProgram).registerExistingDeposits(contractAddress, tokenId, walletManagerId);
+    }
+  }
+
+  function setRewardProgram(
+    address rewardProgam,
+    address assetToken
+  )
+    external
+    onlyOwner
+    onlyValidContractAddress(rewardProgam)
+  {
+    require(assetToken != address(0x0), "UNI:E-403");
+    assetRewardPrograms[assetToken] = rewardProgam;
+    emit RewardProgramSet(assetToken, rewardProgam);
+  }
+
+  function _getRewardProgram(address assetToken) internal view returns (address) {
+    return assetRewardPrograms[assetToken];
   }
 }
