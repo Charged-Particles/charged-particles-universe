@@ -49,7 +49,7 @@ describe('Reward program', function () {
   beforeEach(async function () {
     const ddRewardProgram = getDeployData('RewardProgram');
     const RewardProgram = await ethers.getContractFactory('RewardProgram');
-    rewardProgram = RewardProgram.attach(ddRewardProgram.address); 
+    rewardProgram = RewardProgram.attach(ddRewardProgram.address);
 
     rewardProgramDeployerSigner = rewardProgram.connect(deployerSigner);
 
@@ -75,7 +75,7 @@ describe('Reward program', function () {
       const balance = await ionx.balanceOf(protocolOwnerAddress);
       expect(balance).to.gt(0)
     });
-    
+
     it('Deposits IONX into the reward pool', async () => {
       const fundingAmount = 100;
 
@@ -123,12 +123,10 @@ describe('Reward program', function () {
     const RewardBasketManager = await ethers.getContractFactory('RewardBasketManager', deployerSigner);
     const rewardBasketManager = RewardBasketManager.attach(ddRewardBasketManager.address);
 
-    // test add basket 
-    // const leptonTokenAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A';
+    // test add basket
     const leptonTokenAddress = leptonMock.address;
     const leptonTokenId = 1;
-    const basketTokenAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'; 
-    const basketId = 2; 
+    const basketId = 2;
 
     await rewardBasketManager.setController(deployerAddress).then(tx => tx.wait());
     await rewardBasketManager.setRewardProgram(rewardProgram.address, leptonTokenAddress).then(tx => tx.wait());
@@ -138,7 +136,7 @@ describe('Reward program', function () {
       leptonTokenAddress,
       basketId
     ).then(tx => tx.wait());
-    
+
     await rewardProgramDeployerSigner.setRewardBasketManager(rewardBasketManager.address).then(
       tx => tx.wait()
     );
@@ -211,7 +209,7 @@ describe('Reward program', function () {
       const leptonMultiplier = 20000; // x2
 
       await leptonMock.mock.getMultiplier.returns(leptonMultiplier);
-      // stake 
+      // stake
       await rewardProgramDeployerSigner.stake(uuid, principal).then(tx => tx.wait());
 
       // deposit lepton
@@ -277,14 +275,14 @@ describe('Reward program', function () {
           description: 'Unstake with deposited lepton inside'
         },
       ];
-      
+
       for(let i = 0; i < stakeInfoCases.length; i++) {
         await rewardWalletManagerMock.mock.getInterest.returns(0 ,stakeInfoCases[i]?.generatedChargedBeforeLeptonRelease || 1);
         await leptonMock.mock.getMultiplier.returns(stakeInfoCases[i].leptonStakeMultiplier);
         await ionxMock.mock.transfer.returns(true);
-  
+
         await rewardProgramDeployerSigner.stake(i, stakeInfoCases[i].amount).then(tx => tx.wait());
-        
+
         await mineBlocks(stakeInfoCases[i].blocksUntilLeptonDeposit);
         await rewardProgramDeployerSigner.registerLeptonDeposit(i, i).then(tx => tx.wait());
 
@@ -294,7 +292,7 @@ describe('Reward program', function () {
           console.log('hey !!!!', stakeInfoCases[i].blocksUntilLeptonRelease);
 
           rewardProgramDeployerSigner.setRewardWalletManager(rewardWalletManagerMock.address).then(tx => tx.wait());
-  
+
           await rewardProgramDeployerSigner.registerLeptonRelease(
             basketContractAddressMock,
             basketTokenId,
@@ -306,7 +304,7 @@ describe('Reward program', function () {
         }
 
         await mineBlocks(stakeInfoCases[i].blocksUntilCalculation);
-  
+
         const reward = await rewardProgramDeployerSigner.callStatic.unstake(
           i,
           receiverAddress,
@@ -344,7 +342,7 @@ describe('Reward program', function () {
 
       await mineBlocks(1000);
 
-      const reward = await rewardProgramDeployerSigner.calculateLeptonMultipliedReward(uuid, amount); 
+      const reward = await rewardProgramDeployerSigner.calculateLeptonMultipliedReward(uuid, amount);
       expect(reward).to.be.eq(200);
     });
   });

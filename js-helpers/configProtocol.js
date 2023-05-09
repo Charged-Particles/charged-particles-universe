@@ -405,18 +405,18 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await ionx.setMinter(protocolOwner)
     );
 
-    let assetTokenId;
-    let assetTokenAddress;
-    let assetTokenMultiplier;
-    for (let i = 0; i < rewardsForAssetTokens.length; i++) {
-      assetTokenId = rewardsForAssetTokens[i].assetTokenId;
-      assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
-      assetTokenMultiplier = rewardsForAssetTokens[i].multiplier;
+    // let assetTokenId;
+    // let assetTokenAddress;
+    // let assetTokenMultiplier;
+    // for (let i = 0; i < rewardsForAssetTokens.length; i++) {
+    //   assetTokenId = rewardsForAssetTokens[i].assetTokenId;
+    //   assetTokenAddress = _.get(presets, assetTokenId, {})[chainId];
+    //   assetTokenMultiplier = rewardsForAssetTokens[i].multiplier;
 
-      await executeTx(`6-c-${i}`, `Universe: Setting ESA Multiplier for Asset Token (${assetTokenAddress} = ${assetTokenMultiplier})`, async () =>
-        await universe.setEsaMultiplier(assetTokenAddress, assetTokenMultiplier)
-      );
-    }
+    //   await executeTx(`6-c-${i}`, `Universe: Setting ESA Multiplier for Asset Token (${assetTokenAddress} = ${assetTokenMultiplier})`, async () =>
+    //     await universe.setEsaMultiplier(assetTokenAddress, assetTokenMultiplier)
+    //   );
+    // }
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
