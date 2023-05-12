@@ -85,11 +85,11 @@ module.exports = {
             blockGasLimit: 200000000,
             allowUnlimitedContractSize: true,
             gasPrice: 1e9,
-            accounts: {
-                mnemonic: mnemonic.testnet,
-                initialIndex: 0,
-                count: 10,
-            },
+            // accounts: {
+            //     mnemonic: mnemonic.testnet,
+            //     initialIndex: 0,
+            //     count: 10,
+            // },
             forking: {
                 url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
                 blockNumber: 11400000,  // MUST be after Aave V2 was deployed
