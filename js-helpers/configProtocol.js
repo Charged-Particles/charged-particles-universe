@@ -536,12 +536,6 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await aaveWalletManagerB.setExecutor(ddParticleSplitter.address)
     );
 
-    await executeTx('11-a', 'Reward Wallet Manager: Registering Executor', async () =>
-      await rewardWalletManager.setExecutor(deployer)
-    );
-
-
-
     log(`\n  Contract Initialization Complete!`);
     const gasCosts = getAccumulatedGasCost();
     log('     - Total Gas Cost');
