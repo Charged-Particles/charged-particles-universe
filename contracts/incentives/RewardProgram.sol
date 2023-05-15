@@ -215,7 +215,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     emit NftRelease(contractAddress, tokenId, releaseNftAddress, releaseNftTokenId);
   }
-
+ 
   function calculateBaseReward(uint256 amount) public view returns(uint256 baseReward) {
     baseReward = _calculateBaseReward(amount);
   }

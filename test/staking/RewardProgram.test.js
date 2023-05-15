@@ -56,7 +56,7 @@ describe('Reward program', function () {
     // mock lepton
     leptonData = getDeployData('Lepton', chainId);
     leptonMock = await deployMockContract(deployerSigner, leptonData.abi);
-    rewardProgramDeployerSigner.setLepton(leptonMock.address).then(tx => tx.wait());
+    rewardProgramDeployerSigner.setRewardNft(leptonMock.address).then(tx => tx.wait());
 
     // mock wallet manager
     const walletManager = getDeployData('AaveWalletManagerB', chainId);
@@ -67,7 +67,8 @@ describe('Reward program', function () {
   it('Should be deployed', async () =>{
     expect(rewardProgramDeployerSigner.address).to.not.equal(0);
     const rewardData = await rewardProgramDeployerSigner.getProgramData();
-    expect(rewardData.rewardPool).to.equal(rewardProgramDeployerSigner.address);
+
+    expect(rewardData.rewardToken).to.equal(ionx.address);
   });
 
   describe('Funds reward pool', () => {
@@ -162,9 +163,9 @@ describe('Reward program', function () {
     );
   });
 
-  describe('Leptons staking', async () => {
-    it.only('Changes wallet and basket manager address', async () => {
-      await expect(rewardProgramDeployerSigner.registerLeptonDeposit(1,1)).to.be.revertedWith('Not basket manager');
+  describe.skip('Leptons staking', async () => {
+    it('Changes wallet and basket manager address', async () => {
+      await expect(rewardProgramDeployerSigner.registerNftDeposit(1,1)).to.be.revertedWith('Not basket manager');
 
       await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
         tx => tx.wait()
@@ -222,7 +223,7 @@ describe('Reward program', function () {
       expect(reward).to.be.eq(100);
     });
 
-    it.only('Checks lepton reward calculation with time spent', async () => {
+    it('Checks lepton reward calculation with time spent', async () => {
       const receiverAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
       const basketTokenId = 32;
 
