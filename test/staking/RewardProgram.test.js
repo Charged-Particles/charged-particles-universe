@@ -132,7 +132,13 @@ describe('Reward program', function () {
         100
       )).to.emit(rewardProgram, 'AssetDeposit');
 
-      // await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.registerNftDeposit(
+        contractAddress,
+        tokenId,
+        leptonMock.address,
+        1,
+        0
+      ).then(tx => tx.wait());
 
       // const leptonsData = await rewardProgramDeployerSigner.leptonsStake(uuid);
 
