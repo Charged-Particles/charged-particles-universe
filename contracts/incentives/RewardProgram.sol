@@ -216,17 +216,20 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     emit NftRelease(contractAddress, tokenId, releaseNftAddress, releaseNftTokenId);
   }
 
+  function calculateBaseReward(uint256 amount) public view returns(uint256 baseReward) {
+    baseReward = _calculateBaseReward(amount);
+  }
 
   /***********************************|
   |         Reward Calculation        |
   |__________________________________*/
 
   function calculateRewardsEarned(uint256 parentNftUuid, uint256 interestAmount) internal view returns (uint256 totalReward) {
-    uint256 baseReward = calculateBaseReward(interestAmount);
+    uint256 baseReward = _calculateBaseReward(interestAmount);
     totalReward = calculateMultipliedReward(parentNftUuid, baseReward);
   }
 
-  function calculateBaseReward(uint256 amount) internal view returns(uint256 baseReward) {
+  function _calculateBaseReward(uint256 amount) internal view returns(uint256 baseReward) {
     baseReward = amount.mul(_programData.baseMultiplier).div(PERCENTAGE_SCALE);
   }
 
