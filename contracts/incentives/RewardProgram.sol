@@ -113,7 +113,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     emit RewardsClaimed(contractAddress, tokenId, receiver, totalReward, unavailReward);
   }
 
-  function getAssetStake(uint256 uuid) external returns (AssetStake memory) {
+  function getAssetStake(uint256 uuid) view external returns (AssetStake memory) {
     return _assetStake[uuid];
   }
 

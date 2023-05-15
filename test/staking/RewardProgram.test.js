@@ -132,15 +132,18 @@ describe('Reward program', function () {
         100
       )).to.emit(rewardProgram, 'AssetDeposit');
 
-      await rewardProgramDeployerSigner.registerNftDeposit(
+      await expect(rewardProgramDeployerSigner.registerNftDeposit(
         contractAddress,
         tokenId,
         leptonMock.address,
         1,
         0
-      ).then(tx => tx.wait());
+      )).to.emit(rewardProgram, 'NftDeposit');
 
-      // const leptonsData = await rewardProgramDeployerSigner.leptonsStake(uuid);
+      const uuid1 = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
+      
+      const leptonsData = await rewardProgramDeployerSigner.getAssetStake(uuid1);
+      console.log('>>>>>> ', leptonsData);
 
       // expect(leptonsData.multiplier).to.be.eq(leptonMultiplier);
       // expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.depositBlockNumber.toNumber());
