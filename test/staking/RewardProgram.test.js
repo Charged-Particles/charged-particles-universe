@@ -114,91 +114,37 @@ describe('Reward program', function () {
     });
   });
 
-  it.skip('Reward basket manager', async () => {
-    await leptonMock.mock.getMultiplier.returns(2);
-    await leptonMock.mock.safeTransferFrom.returns();
-
-    const ddRewardBasketManager = getDeployData('RewardBasketManager', chainId);
-    const RewardBasketManager = await ethers.getContractFactory('RewardBasketManager', deployerSigner);
-    const rewardBasketManager = RewardBasketManager.attach(ddRewardBasketManager.address);
-
-    // test add basket
-    const leptonTokenAddress = leptonMock.address;
-    const leptonTokenId = 1;
-    const basketId = 2;
-
-    await rewardBasketManager.setController(deployerAddress).then(tx => tx.wait());
-    await rewardBasketManager.setRewardProgram(rewardProgram.address, leptonTokenAddress).then(tx => tx.wait());
-
-    // Create wallet
-    await rewardBasketManager.getBasketAddressById(
-      leptonTokenAddress,
-      basketId
-    ).then(tx => tx.wait());
-
-    await rewardProgramDeployerSigner.setRewardBasketManager(rewardBasketManager.address).then(
-      tx => tx.wait()
-    );
-
-    await expect(rewardBasketManager.addToBasket(
-      leptonTokenAddress,
-      basketId,
-      leptonTokenAddress,
-      leptonTokenId
-    )).to.emit(rewardProgram, 'LeptonDeposit');
-
-    await rewardBasketManager.removeFromBasket(
-      deployerAddress,
-      leptonTokenAddress,
-      basketId,
-      leptonTokenAddress,
-      leptonTokenId
-    );
-
-    const zeroAddress = '0x0000000000000000000000000000000000000000';
-    await rewardProgramDeployerSigner.setRewardBasketManager(zeroAddress).then(
-      tx => tx.wait()
-    );
-  });
-
-  describe.skip('Leptons staking', async () => {
-    it('Changes wallet and basket manager address', async () => {
-      await expect(rewardProgramDeployerSigner.registerNftDeposit(1,1)).to.be.revertedWith('Not basket manager');
-
-      await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
-        tx => tx.wait()
-      );
-      await rewardProgramDeployerSigner.setRewardBasketManager(deployerAddress).then(
-        tx => tx.wait()
-      );
-      expect(await rewardProgram.rewardWalletManager()).to.be.eq(deployerAddress);
-      expect(await rewardProgram.rewardBasketManager()).to.be.eq(deployerAddress);
-    });
-
+  describe('Leptons staking', async () => {
     it('Registers lepton deposit in reward program', async () => {
-      const uuid = 20;
-      const leptonId = 1;
+      const tokenId = 12;
       const leptonMultiplier = 20000; // x2
+      const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a9';
 
       await leptonMock.mock.getMultiplier.returns(leptonMultiplier);
-      const blockBeforeDeposit = await ethers.provider.getBlock("latest");
+      // const blockBeforeDeposit = await ethers.provider.getBlock("latest");
 
+      await rewardProgramDeployerSigner.setUniverse(await deployerSigner.getAddress()).then(tx => tx.wait());
       // start reward program with usdc
-      await rewardProgramDeployerSigner.stake(uuid, 100).then(tx => tx.wait());
+      await expect(rewardProgramDeployerSigner.registerAssetDeposit(
+        contractAddress,
+        tokenId,
+        'basic.B',
+        100
+      )).to.emit(rewardProgram, 'AssetDeposit');
 
-      await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
+      // await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
-      const leptonsData = await rewardProgramDeployerSigner.leptonsStake(uuid);
+      // const leptonsData = await rewardProgramDeployerSigner.leptonsStake(uuid);
 
-      expect(leptonsData.multiplier).to.be.eq(leptonMultiplier);
-      expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.depositBlockNumber.toNumber());
+      // expect(leptonsData.multiplier).to.be.eq(leptonMultiplier);
+      // expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.depositBlockNumber.toNumber());
 
-      const principalForEmptyMultiplier = 100;
-      const emptyMultiplierReward = await rewardProgramDeployerSigner.callStatic.calculateLeptonMultipliedReward(2, principalForEmptyMultiplier);
-      expect(emptyMultiplierReward).to.be.eq(principalForEmptyMultiplier);
+      // const principalForEmptyMultiplier = 100;
+      // const emptyMultiplierReward = await rewardProgramDeployerSigner.callStatic.calculateLeptonMultipliedReward(2, principalForEmptyMultiplier);
+      // expect(emptyMultiplierReward).to.be.eq(principalForEmptyMultiplier);
 
-      const emptyRewardMultiplier = await rewardProgramDeployerSigner.callStatic.calculateLeptonMultipliedReward(2, 0);
-      expect(emptyRewardMultiplier).to.be.eq(0);
+      // const emptyRewardMultiplier = await rewardProgramDeployerSigner.callStatic.calculateLeptonMultipliedReward(2, 0);
+      // expect(emptyRewardMultiplier).to.be.eq(0);
     });
 
     it('Verifies simple lepton reward calculation', async () => {
