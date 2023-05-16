@@ -38,6 +38,7 @@ import "../interfaces/IWalletManager.sol";
 import "../interfaces/IRewardNft.sol";
 import "../lib/TokenInfo.sol";
 import "../lib/BlackholePrevention.sol";
+import "hardhat/console.sol";
 
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using SafeMath for uint256;
@@ -117,6 +118,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     return _assetStake[uuid];
   }
 
+  function getNftStake(uint256 uuid) view external returns (NftStake memory) {
+    return _nftStake[uuid];
+  }
+
   /***********************************|
   |          Only Universe            |
   |__________________________________*/
@@ -144,6 +149,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     onlyUniverse
   {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+
     if (_assetStake[parentNftUuid].start == 0) {
       _assetStake[parentNftUuid].start = block.number;
       _assetStake[parentNftUuid].walletManagerId = walletManagerId;
@@ -183,6 +189,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     uint256 multiplier = _getNftMultiplier(depositNftAddress, depositNftTokenId);
+
     if (multiplier > 0 && !_multiplierNftsSet.contains(multiplier)) {
       // Add to Multipliers Set
       _multiplierNftsSet.add(multiplier);
@@ -191,6 +198,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       uint256 combinedMultiplier = _calculateTotalMultiplier();
       _nftStake[parentNftUuid] = NftStake(combinedMultiplier, block.number, 0);
     }
+
     emit NftDeposit(contractAddress, tokenId, depositNftAddress, depositNftTokenId);
   }
 
@@ -227,7 +235,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   |         Reward Calculation        |
   |__________________________________*/
 
-  function calculateRewardsEarned(uint256 parentNftUuid, uint256 interestAmount) internal view returns (uint256 totalReward) {
+  function calculateRewardsEarned(uint256 parentNftUuid, uint256 interestAmount) public view returns (uint256 totalReward) {
     uint256 baseReward = _calculateBaseReward(interestAmount);
     totalReward = calculateMultipliedReward(parentNftUuid, baseReward);
   }
@@ -236,7 +244,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     baseReward = amount.mul(_programData.baseMultiplier).div(PERCENTAGE_SCALE);
   }
 
-  function calculateMultipliedReward(uint256 parentNftUuid, uint256 baseReward) internal view returns(uint256) {
+  function calculateMultipliedReward(uint256 parentNftUuid, uint256 baseReward) public view returns(uint256) {
     AssetStake storage assetStake = _assetStake[parentNftUuid];
     NftStake memory nftStake = _nftStake[parentNftUuid];
     uint256 multiplierBP = nftStake.multiplier;

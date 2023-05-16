@@ -117,11 +117,11 @@ describe('Reward program', function () {
   describe('Leptons staking', async () => {
     it('Registers lepton deposit in reward program', async () => {
       const tokenId = 12;
-      const leptonMultiplier = 20000; // x2
+      const leptonMultiplier = 40000; // x2
       const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a9';
 
       await leptonMock.mock.getMultiplier.returns(leptonMultiplier);
-      // const blockBeforeDeposit = await ethers.provider.getBlock("latest");
+      const blockBeforeDeposit = await ethers.provider.getBlock("latest");
 
       await rewardProgramDeployerSigner.setUniverse(await deployerSigner.getAddress()).then(tx => tx.wait());
       // start reward program with usdc
@@ -144,24 +144,26 @@ describe('Reward program', function () {
       const uuidBigNumber = ethers.BigNumber.from(uuid);
 
       const leptonsData = await rewardProgramDeployerSigner.getNftStake(uuidBigNumber);
-      const assetToken = await rewardProgramDeployerSigner.getAssetStake(uuidBigNumber);
+      // const assetToken = await rewardProgramDeployerSigner.getAssetStake(uuidBigNumber);
 
-      expect(leptonsData.multiplier).to.be.eq(leptonMultiplier);
+      expect(leptonsData?.multiplier).to.be.eq("20000");
       expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.depositBlockNumber.toNumber());
 
-      // const principalForEmptyMultiplier = 100;
-      // const emptyMultiplierReward = await rewardProgramDeployerSigner.callStatic.calculateLeptonMultipliedReward(2, principalForEmptyMultiplier);
-      // expect(emptyMultiplierReward).to.be.eq(principalForEmptyMultiplier);
+      await mineBlocks(10000);
+      const principalForEmptyMultiplier = 100;
+      const emptyMultiplierReward = await rewardProgramDeployerSigner.callStatic.calculateMultipliedReward(uuidBigNumber, principalForEmptyMultiplier);
+      
+      expect(emptyMultiplierReward).to.be.eq('199');
 
-      // const emptyRewardMultiplier = await rewardProgramDeployerSigner.callStatic.calculateLeptonMultipliedReward(2, 0);
-      // expect(emptyRewardMultiplier).to.be.eq(0);
+      const emptyRewardMultiplier = await rewardProgramDeployerSigner.callStatic.calculateMultipliedReward(uuidBigNumber, 0);
+      expect(emptyRewardMultiplier).to.be.eq(0);
     });
 
     it('Verifies simple lepton reward calculation', async () => {
-      const principal = 100;
-      const uuid = 21;
-      const leptonId = 1;
       const leptonMultiplier = 20000; // x2
+      const principal = 100;
+      const leptonId = 1;
+      const uuid = 21;
 
       await leptonMock.mock.getMultiplier.returns(leptonMultiplier);
       // stake
