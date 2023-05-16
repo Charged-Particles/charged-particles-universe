@@ -61,6 +61,8 @@ describe('Reward program', function () {
     // mock wallet manager
     const walletManager = getDeployData('AaveWalletManagerB', chainId);
     rewardWalletManagerMock = await deployMockContract(deployerSigner, walletManager.abi);
+
+    await rewardProgramDeployerSigner.setUniverse(await deployerSigner.getAddress()).then(tx => tx.wait());
   });
 
 
@@ -123,7 +125,7 @@ describe('Reward program', function () {
       await leptonMock.mock.getMultiplier.returns(leptonMultiplier);
       const blockBeforeDeposit = await ethers.provider.getBlock("latest");
 
-      await rewardProgramDeployerSigner.setUniverse(await deployerSigner.getAddress()).then(tx => tx.wait());
+
       // start reward program with usdc
       await expect(rewardProgramDeployerSigner.registerAssetDeposit(
         contractAddress,
@@ -160,21 +162,37 @@ describe('Reward program', function () {
     });
 
     it('Verifies simple lepton reward calculation', async () => {
-      const leptonMultiplier = 20000; // x2
+      const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a9';
+      const tokenId = 2
+      const leptonMultiplier = 40000; // x2
       const principal = 100;
       const leptonId = 1;
-      const uuid = 21;
+
+      const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
+      const uuidBigNumber = ethers.BigNumber.from(uuid);
 
       await leptonMock.mock.getMultiplier.returns(leptonMultiplier);
       // stake
-      await rewardProgramDeployerSigner.stake(uuid, principal).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.registerAssetDeposit(
+        contractAddress,
+        tokenId,
+        'basic.B',
+        100
+      ).then(tx => tx.wait());
 
       // deposit lepton
-      await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.registerNftDeposit(
+        contractAddress,
+        tokenId,
+        leptonMock.address,
+        leptonId,
+        0
+      ).then(tx => tx.wait());
 
+      // await mineBlocks(10000);
       // calculate reward
-     const reward = await rewardProgramDeployerSigner.calculateLeptonMultipliedReward(uuid, principal);
-
+     const reward = await rewardProgramDeployerSigner.calculateRewardsEarned(uuidBigNumber, principal);
+     
       // Has multiplier but time spent is 0 so reward is multiplied by 1.
       expect(reward).to.be.eq(100);
     });
