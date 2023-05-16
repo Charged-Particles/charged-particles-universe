@@ -140,13 +140,14 @@ describe('Reward program', function () {
         0
       )).to.emit(rewardProgram, 'NftDeposit');
 
-      const uuid1 = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
-      
-      const leptonsData = await rewardProgramDeployerSigner.getAssetStake(uuid1);
-      console.log('>>>>>> ', leptonsData);
+      const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
+      const uuidBigNumber = ethers.BigNumber.from(uuid);
 
-      // expect(leptonsData.multiplier).to.be.eq(leptonMultiplier);
-      // expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.depositBlockNumber.toNumber());
+      const leptonsData = await rewardProgramDeployerSigner.getNftStake(uuidBigNumber);
+      const assetToken = await rewardProgramDeployerSigner.getAssetStake(uuidBigNumber);
+
+      expect(leptonsData.multiplier).to.be.eq(leptonMultiplier);
+      expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.depositBlockNumber.toNumber());
 
       // const principalForEmptyMultiplier = 100;
       // const emptyMultiplierReward = await rewardProgramDeployerSigner.callStatic.calculateLeptonMultipliedReward(2, principalForEmptyMultiplier);
