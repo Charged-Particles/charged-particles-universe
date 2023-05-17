@@ -269,11 +269,11 @@ describe('Reward program', function () {
           stakeInfoCases[i].amount
         ).then(tx => tx.wait());
 
-        const uuid = ethers.utils.solidityKeccak256(
-          ['address', 'uint256'],
-          [stakeInfoCases[i].contractAddress, stakeInfoCases[i].tokenId]
-        );
-        const uuidBigNumber = ethers.BigNumber.from(uuid);
+        // const uuid = ethers.utils.solidityKeccak256(
+        //   ['address', 'uint256'],
+        //   [stakeInfoCases[i].contractAddress, stakeInfoCases[i].tokenId]
+        // );
+        // const uuidBigNumber = ethers.BigNumber.from(uuid);
         
         await mineBlocks(stakeInfoCases[i].blocksUntilLeptonDeposit);
         
@@ -310,17 +310,25 @@ describe('Reward program', function () {
         // console.log(assetState);
         // expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
 
-        const reward = await rewardProgramDeployerSigner.getClaimableRewards(
+        await rewardProgramDeployerSigner.getClaimableRewards(
           stakeInfoCases[i].contractAddress,
           stakeInfoCases[i].tokenId
         );
 
         // console.log(reward.toString());
-        await rewardProgramDeployerSigner.claimRewards(
+        const reward = await rewardProgramDeployerSigner.callStatic.claimRewards(
           leptonMock.address,
           stakeInfoCases[i].tokenId,
           receiverAddress
         );
+
+        await rewardProgramDeployerSigner.claimRewards(
+          leptonMock.address,
+          stakeInfoCases[i].tokenId,
+          receiverAddress
+        ).then(tx => tx.wait());
+
+        console.log(reward);
       }
     });
 

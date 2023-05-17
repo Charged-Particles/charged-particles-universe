@@ -82,7 +82,15 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     return assetStake.claimableRewards;
   }
 
-  function claimRewards(address contractAddress, uint256 tokenId, address receiver) external override {
+  function claimRewards(
+    address contractAddress,
+    uint256 tokenId,
+    address receiver
+  ) 
+    external
+    override
+    returns (uint256 totalReward)
+  {
     // Verifiy Owner or Approved Operator
     IERC721 nft = IERC721(contractAddress);
     address owner = nft.ownerOf(tokenId);
@@ -93,11 +101,9 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     AssetStake storage assetStake = _assetStake[parentNftUuid];
 
     // Ensure Reward Pool has Sufficient Balance
-    uint256 totalReward = assetStake.claimableRewards;
+    totalReward = assetStake.claimableRewards;
     uint256 fundBalance = _getFundBalance();
     uint256 unavailReward = totalReward > fundBalance ? totalReward.sub(fundBalance) : 0;
-
-
 
     // Determine amount of Rewards to Transfer
     if (unavailReward > 0) {
@@ -105,10 +111,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       emit RewardProgramOutOfFunds();
     }
 
-    // Transfer Available Rewards to Receiver
     if (totalReward > 0) {
       // Update Asset Stake
       assetStake.claimableRewards = 0;
+      // Transfer Available Rewards to Receiver
       IERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
     }
 
