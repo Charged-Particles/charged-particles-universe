@@ -244,17 +244,12 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   |__________________________________*/
 
   function calculateRewardsEarned(uint256 parentNftUuid, uint256 interestAmount) public view returns (uint256 totalReward) {
-    uint256 interestInCorrectDecimals = _convertDecimals(interestAmount);
-    uint256 baseReward = _calculateBaseReward(interestInCorrectDecimals);
+    uint256 baseReward = _calculateBaseReward(interestAmount);
     totalReward = calculateMultipliedReward(parentNftUuid, baseReward);
   }
 
   function _calculateBaseReward(uint256 amount) internal view returns(uint256 baseReward) {
     baseReward = amount.mul(_programData.baseMultiplier).div(PERCENTAGE_SCALE);
-  }
-
-  function _convertDecimals(uint256 reward) internal view returns (uint256) {
-    return reward.mul(10**(12));
   }
 
   function calculateMultipliedReward(uint256 parentNftUuid, uint256 baseReward) public view returns(uint256) {
@@ -267,7 +262,6 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 assetDepositLength = block.number.sub(assetStake.start);
     uint256 nftDepositLength = _getNftDepositLength(nftStake);
     
-    console.log(multiplierBP, nftDepositLength, assetDepositLength);
     if (multiplierBP == 0 || nftDepositLength == 0 || assetDepositLength == 0) {
       return baseReward;
     }
@@ -382,7 +376,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       multiplier = multiplier.add(_multiplierNftsSet.at(i));
     }
 
-    return multiplier; // Half of the Sum
+    return len > 1 ? multiplier : multiplier.div(2); // Half of the Sum
   }
 
   function _getNftDepositLength(NftStake memory nftStake) internal view returns (uint256 nftDepositLength) {
