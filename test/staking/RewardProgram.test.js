@@ -206,36 +206,18 @@ describe('Reward program', function () {
       expect(rewardProgramData.rewardToken).to.eq(stakingToken);
 
       const stakeInfoCases = [
-        // {
-        //   amount: 10,
-        //   blocksUntilLeptonDeposit: 0,
-        //   blocksUntilLeptonRelease: 100,
-        //   blocksUntilCalculation: 0,
-        //   leptonStakeMultiplier: 120,
-        //   generatedChargedBeforeLeptonRelease: 1000000,
-        //   generatedChargeAfterLeptonRelease: 0,
-        //   expectedReward: '1196180000000000000',
-        // },
-        // {
-        //   amount: 10,
-        //   blocksUntilLeptonDeposit: 0,
-        //   blocksUntilLeptonRelease: 100,
-        //   blocksUntilCalculation: 0,
-        //   leptonStakeMultiplier: 100,
-        //   generatedChargedBeforeLeptonRelease: 1000000,
-        //   generatedChargeAfterLeptonRelease: 1000000,
-        //   expectedReward: '2000000000000000000',
-        // },
-        // {
-        //   amount: 10,
-        //   blocksUntilLeptonDeposit: 0,
-        //   blocksUntilLeptonRelease: 100,
-        //   blocksUntilCalculation: 0,
-        //   leptonStakeMultiplier: 200,
-        //   generatedChargedBeforeLeptonRelease: 1000000,
-        //   generatedChargeAfterLeptonRelease: 0,
-        //   expectedReward: '1980900000000000000',
-        // },
+        {
+          amount: 10,
+          blocksUntilLeptonDeposit: 0,
+          blocksUntilCalculation: 500,
+          leptonStakeMultiplier: 200,
+          generatedChargedBeforeLeptonRelease: 1000000,
+          generatedChargeAfterLeptonRelease: 1000000,
+          blocksUntilLeptonRelease: 500,
+          expectedReward: '1499000',
+          tokenId: 42,
+          description: 'Lepton deposited half of the reward length'
+        },
         {
           amount: 10,
           blocksUntilLeptonDeposit: 0,

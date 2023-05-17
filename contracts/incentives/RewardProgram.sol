@@ -198,7 +198,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     uint256 multiplier = _getNftMultiplier(depositNftAddress, depositNftTokenId);
 
-    if (multiplier > 0) {
+    if (multiplier > 0 && !_multiplierNftsSet[parentNftUuid].contains(multiplier)) {
       // Add to Multipliers Set
       _multiplierNftsSet[parentNftUuid].add(multiplier);
 
