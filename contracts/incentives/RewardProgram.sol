@@ -47,6 +47,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using EnumerableSet for EnumerableSet.UintSet;
 
   uint256 constant private PERCENTAGE_SCALE = 1e4;   // 10000 (100%)
+  uint256 constant private LEPTON_MULTIPLIER_SCALE = 1e2; 
 
   address private _universe;
   IChargedManagers private _chargedManagers;
@@ -197,7 +198,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     uint256 multiplier = _getNftMultiplier(depositNftAddress, depositNftTokenId);
 
-    if (multiplier > 0 && !_multiplierNftsSet.contains(multiplier)) {
+    if (multiplier > 0) {
       // Add to Multipliers Set
       _multiplierNftsSet.add(multiplier);
 
@@ -243,12 +244,17 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   |__________________________________*/
 
   function calculateRewardsEarned(uint256 parentNftUuid, uint256 interestAmount) public view returns (uint256 totalReward) {
-    uint256 baseReward = _calculateBaseReward(interestAmount);
+    uint256 interestInCorrectDecimals = _convertDecimals(interestAmount);
+    uint256 baseReward = _calculateBaseReward(interestInCorrectDecimals);
     totalReward = calculateMultipliedReward(parentNftUuid, baseReward);
   }
 
   function _calculateBaseReward(uint256 amount) internal view returns(uint256 baseReward) {
     baseReward = amount.mul(_programData.baseMultiplier).div(PERCENTAGE_SCALE);
+  }
+
+  function _convertDecimals(uint256 reward) internal view returns (uint256) {
+    return reward.mul(10**(12));
   }
 
   function calculateMultipliedReward(uint256 parentNftUuid, uint256 baseReward) public view returns(uint256) {
@@ -260,7 +266,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     uint256 assetDepositLength = block.number.sub(assetStake.start);
     uint256 nftDepositLength = _getNftDepositLength(nftStake);
-
+    
+    console.log(multiplierBP, nftDepositLength, assetDepositLength);
     if (multiplierBP == 0 || nftDepositLength == 0 || assetDepositLength == 0) {
       return baseReward;
     }
@@ -276,7 +283,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 amountGeneratedDuringNftDeposit = baseReward.mul(nftRewardRatioBP).div(PERCENTAGE_SCALE);
 
     // Amount of Multiplied Reward from NFT
-    uint256 multipliedReward = amountGeneratedDuringNftDeposit.mul(multiplierBP).div(PERCENTAGE_SCALE);
+    uint256 multipliedReward = amountGeneratedDuringNftDeposit.mul(multiplierBP.mul(LEPTON_MULTIPLIER_SCALE)).div(PERCENTAGE_SCALE);
 
     // Amount of Base Reward without Multiplied NFT Rewards
     uint256 amountGeneratedWithoutNftDeposit = baseReward.sub(amountGeneratedDuringNftDeposit);
@@ -375,7 +382,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
       multiplier = multiplier.add(_multiplierNftsSet.at(i));
     }
 
-    return multiplier.div(2); // Half of the Sum
+    return multiplier; // Half of the Sum
   }
 
   function _getNftDepositLength(NftStake memory nftStake) internal view returns (uint256 nftDepositLength) {
