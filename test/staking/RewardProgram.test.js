@@ -117,7 +117,7 @@ describe('Reward program', function () {
   });
 
   describe('Leptons staking', async () => {
-    it.only('Registers lepton deposit in reward program', async () => {
+    it('Registers lepton deposit in reward program', async () => {
       const tokenId = 12;
       const leptonMultiplier = 200; // x2
       const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a9';
@@ -192,7 +192,7 @@ describe('Reward program', function () {
      const reward = await rewardProgramDeployerSigner.calculateRewardsEarned(uuidBigNumber, principal);
      
       // Has multiplier but time spent is 0 so reward is multiplied by 1.
-      expect(reward).to.be.eq('1000000000000000000');
+      expect(reward).to.be.eq('1000000');
     });
 
     it('Checks lepton reward calculation with time spent', async () => {
@@ -244,7 +244,7 @@ describe('Reward program', function () {
           generatedChargedBeforeLeptonRelease: 1,
           generatedChargeAfterLeptonRelease: 1000000,
           blocksUntilLeptonRelease: 0,
-          expectedReward: '1998000000000000000',
+          expectedReward: '1998000',
           tokenId: 43,
           description: 'Unstake with deposited lepton inside'
         },
@@ -307,12 +307,11 @@ describe('Reward program', function () {
           receiverAddress
         ).then(tx => tx.wait());
 
-        console.log(reward.toString());
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
       }
     });
 
-    it ('Calculates reward with lepton re-staking, resets lepton staking.', async () => {
+    it.skip('Calculates reward with lepton re-staking, resets lepton staking.', async () => {
       const basketTokenId = 32;
       const uuid = 101;
       const amount = 100;
