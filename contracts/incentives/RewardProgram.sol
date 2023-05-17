@@ -97,8 +97,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 fundBalance = _getFundBalance();
     uint256 unavailReward = totalReward > fundBalance ? totalReward.sub(fundBalance) : 0;
 
-    // Update Asset Stake
-    assetStake.claimableRewards = unavailReward;
+
 
     // Determine amount of Rewards to Transfer
     if (unavailReward > 0) {
@@ -108,6 +107,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     // Transfer Available Rewards to Receiver
     if (totalReward > 0) {
+      // Update Asset Stake
+      assetStake.claimableRewards = 0;
       IERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
     }
 
