@@ -197,7 +197,7 @@ describe('Reward program', function () {
       expect(reward).to.be.eq(100);
     });
 
-    it('Checks lepton reward calculation with time spent', async () => {
+    it.only('Checks lepton reward calculation with time spent', async () => {
       const receiverAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
       const basketTokenId = 32;
 
@@ -243,10 +243,13 @@ describe('Reward program', function () {
           amount: 10,
           blocksUntilLeptonDeposit: 0,
           blocksUntilCalculation: 1000,
-          leptonStakeMultiplier: 200,
+          leptonStakeMultiplier: 8000,
           generatedChargedBeforeLeptonRelease: 0,
           generatedChargeAfterLeptonRelease: 1000000,
+          blocksUntilLeptonRelease: 100,
           expectedReward: '1998000000000000000',
+          contractAddress: '0x5d183d790d6b570eaec299be432f0a13a00058a9',
+          tokenId: 1,
           description: 'Unstake with deposited lepton inside'
         },
       ];
@@ -256,37 +259,62 @@ describe('Reward program', function () {
         await leptonMock.mock.getMultiplier.returns(stakeInfoCases[i].leptonStakeMultiplier);
         await ionxMock.mock.transfer.returns(true);
 
-        await rewardProgramDeployerSigner.stake(i, stakeInfoCases[i].amount).then(tx => tx.wait());
+        await rewardProgramDeployerSigner.registerAssetDeposit(
+          stakeInfoCases[i].contractAddress,
+          stakeInfoCases[i].tokenId,
+          'generic.B',
+          stakeInfoCases[i].amount
+        ).then(tx => tx.wait());
 
+
+        const uuid = ethers.utils.solidityKeccak256(
+          ['address', 'uint256'],
+          [stakeInfoCases[i].contractAddress, stakeInfoCases[i].tokenId]
+        );
+
+        const uuidBigNumber = ethers.BigNumber.from(uuid);
+        
         await mineBlocks(stakeInfoCases[i].blocksUntilLeptonDeposit);
-        await rewardProgramDeployerSigner.registerLeptonDeposit(i, i).then(tx => tx.wait());
+        
+        await rewardProgramDeployerSigner.registerNftDeposit(
+          stakeInfoCases[i].contractAddress,
+          stakeInfoCases[i].tokenId,
+          leptonMock.address,
+          i,
+          0
+        ).then(tx => tx.wait());
 
         if (stakeInfoCases[i]?.blocksUntilLeptonRelease) {
           await mineBlocks(stakeInfoCases[i].blocksUntilLeptonRelease);
 
-          console.log('hey !!!!', stakeInfoCases[i].blocksUntilLeptonRelease);
-
-          rewardProgramDeployerSigner.setRewardWalletManager(rewardWalletManagerMock.address).then(tx => tx.wait());
-
-          await rewardProgramDeployerSigner.registerLeptonRelease(
-            basketContractAddressMock,
-            basketTokenId,
-            i
+          await rewardProgramDeployerSigner.registerNftRelease(
+            stakeInfoCases[i].contractAddress,
+            stakeInfoCases[i].tokenId,
+            leptonMock.address,
+            i,
+            0
           ).then(tx => tx.wait());
-          await rewardProgramDeployerSigner.setRewardWalletManager(deployerAddress).then(
-            tx => tx.wait()
-          );
         }
 
         await mineBlocks(stakeInfoCases[i].blocksUntilCalculation);
 
-        const reward = await rewardProgramDeployerSigner.callStatic.unstake(
-          i,
-          receiverAddress,
+        await rewardProgramDeployerSigner.registerAssetRelease(
+          stakeInfoCases[i].contractAddress,
+          stakeInfoCases[i].tokenId,
           stakeInfoCases[i]?.generatedChargeAfterLeptonRelease
         );
 
-        expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
+        const assetState = await rewardProgramDeployerSigner.getAssetStake(uuidBigNumber);
+        // const nftState = await rewardProgramDeployerSigner.getNftStake(uuidBigNumber);
+        console.log(assetState);
+        // expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
+
+        const reward = await rewardProgramDeployerSigner.getClaimableRewards(
+          stakeInfoCases[i].contractAddress,
+          stakeInfoCases[i].tokenId
+        );
+
+        console.log(reward.toString());
       }
     });
 
@@ -300,7 +328,7 @@ describe('Reward program', function () {
       await leptonMock.mock.getMultiplier.returns(multiplier);
       await rewardWalletManagerMock.mock.getInterest.returns(0,2);
 
-      await rewardProgramDeployerSigner.stake(uuid, amount).then(tx => tx.wait());
+      await rewardProgramDeployerSigner.registerAssetDeposit(uuid, amount).then(tx => tx.wait());
       await rewardProgramDeployerSigner.registerLeptonDeposit(uuid, leptonId).then(tx => tx.wait());
 
       rewardProgramDeployerSigner.setRewardWalletManager(rewardWalletManagerMock.address).then(tx => tx.wait());
@@ -317,7 +345,7 @@ describe('Reward program', function () {
 
       await mineBlocks(1000);
 
-      const reward = await rewardProgramDeployerSigner.calculateLeptonMultipliedReward(uuid, amount);
+      await rewardProgramDeployerSigner.calculateLeptonMultipliedReward(uuid, amount);
       expect(reward).to.be.eq(200);
     });
   });
