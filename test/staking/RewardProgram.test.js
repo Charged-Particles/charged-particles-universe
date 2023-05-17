@@ -243,10 +243,10 @@ describe('Reward program', function () {
           amount: 10,
           blocksUntilLeptonDeposit: 0,
           blocksUntilCalculation: 1000,
-          leptonStakeMultiplier: 8000,
+          leptonStakeMultiplier: 4000,
           generatedChargedBeforeLeptonRelease: 0,
           generatedChargeAfterLeptonRelease: 1000000,
-          blocksUntilLeptonRelease: 100,
+          blocksUntilLeptonRelease: 0,
           expectedReward: '1998000000000000000',
           contractAddress: '0x5d183d790d6b570eaec299be432f0a13a00058a9',
           tokenId: 1,
@@ -305,17 +305,11 @@ describe('Reward program', function () {
           stakeInfoCases[i]?.generatedChargeAfterLeptonRelease
         );
 
-        // const assetState = await rewardProgramDeployerSigner.getAssetStake(uuidBigNumber);
-        // const nftState = await rewardProgramDeployerSigner.getNftStake(uuidBigNumber);
-        // console.log(assetState);
-        // expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
-
         await rewardProgramDeployerSigner.getClaimableRewards(
           stakeInfoCases[i].contractAddress,
           stakeInfoCases[i].tokenId
         );
 
-        // console.log(reward.toString());
         const reward = await rewardProgramDeployerSigner.callStatic.claimRewards(
           leptonMock.address,
           stakeInfoCases[i].tokenId,
@@ -328,7 +322,7 @@ describe('Reward program', function () {
           receiverAddress
         ).then(tx => tx.wait());
 
-        console.log(reward);
+        console.log(reward.toString());
       }
     });
 
