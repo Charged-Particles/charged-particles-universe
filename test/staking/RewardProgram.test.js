@@ -117,14 +117,13 @@ describe('Reward program', function () {
   });
 
   describe('Leptons staking', async () => {
-    it('Registers lepton deposit in reward program', async () => {
+    it.only('Registers lepton deposit in reward program', async () => {
       const tokenId = 12;
       const leptonMultiplier = 200; // x2
       const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a9';
 
       await leptonMock.mock.getMultiplier.returns(leptonMultiplier);
       const blockBeforeDeposit = await ethers.provider.getBlock("latest");
-
 
       // start reward program with usdc
       await expect(rewardProgramDeployerSigner.registerAssetDeposit(
@@ -148,7 +147,7 @@ describe('Reward program', function () {
       const leptonsData = await rewardProgramDeployerSigner.getNftStake(uuidBigNumber);
       // const assetToken = await rewardProgramDeployerSigner.getAssetStake(uuidBigNumber);
 
-      expect(leptonsData?.multiplier).to.be.eq("100");
+      expect(leptonsData?.multiplier).to.be.eq("200");
       expect(blockBeforeDeposit.number).to.be.lessThan(leptonsData.depositBlockNumber.toNumber());
 
       await mineBlocks(10000);

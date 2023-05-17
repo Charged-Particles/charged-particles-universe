@@ -53,7 +53,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   IChargedManagers private _chargedManagers;
   ProgramRewardData private _programData;
 
-  EnumerableSet.UintSet private _multiplierNftsSet;
+  mapping(uint256 => EnumerableSet.UintSet) private _multiplierNftsSet;
   mapping(uint256 => AssetStake) private _assetStake;
   mapping(uint256 => NftStake) private _nftStake;
 
@@ -200,10 +200,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     if (multiplier > 0) {
       // Add to Multipliers Set
-      _multiplierNftsSet.add(multiplier);
+      _multiplierNftsSet[parentNftUuid].add(multiplier);
 
       // Update NFT Stake
-      uint256 combinedMultiplier = _calculateTotalMultiplier();
+      uint256 combinedMultiplier = _calculateTotalMultiplier(parentNftUuid);
       _nftStake[parentNftUuid] = NftStake(combinedMultiplier, block.number, 0);
     }
 
@@ -223,11 +223,11 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     // Remove from Multipliers Set
     uint256 multiplier = _getNftMultiplier(releaseNftAddress, releaseNftTokenId);
-    _multiplierNftsSet.remove(multiplier);
+    _multiplierNftsSet[parentNftUuid].remove(multiplier);
 
     // Determine New Multiplier or Mark as Released
-    if (_multiplierNftsSet.length() > 0) {
-      nftStake.multiplier = _calculateTotalMultiplier();
+    if (_multiplierNftsSet[parentNftUuid].length() > 0) {
+      nftStake.multiplier = _calculateTotalMultiplier(parentNftUuid);
     } else {
       nftStake.releaseBlockNumber = block.number;
     }
@@ -349,8 +349,8 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   |         Private Functions         |
   |__________________________________*/
 
-  function _calculateTotalMultiplier() internal view returns (uint256) {
-    uint256 len = _multiplierNftsSet.length();
+  function _calculateTotalMultiplier(uint256 parentNftUuid) internal view returns (uint256) {
+    uint256 len = _multiplierNftsSet[parentNftUuid].length();
     uint256 indexOfSmallest;
     uint256 multiplier;
     uint256 i;
@@ -363,7 +363,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     // If holding more than 4, Ignore the Smallest
     if (len > 4) {
       for (; i < len; i++) {
-        if (_multiplierNftsSet.at(i) < _multiplierNftsSet.at(indexOfSmallest)) {
+        if (_multiplierNftsSet[parentNftUuid].at(i) < _multiplierNftsSet[parentNftUuid].at(indexOfSmallest)) {
           indexOfSmallest = i;
         }
       }
@@ -373,10 +373,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     // If holding less than or equal to 4, Multiplier = Half of the Sum of all
     for (; i < len; i++) {
       if (len > 4 && i == indexOfSmallest) { continue; }
-      multiplier = multiplier.add(_multiplierNftsSet.at(i));
+      multiplier = multiplier.add(_multiplierNftsSet[parentNftUuid].at(i));
     }
 
-    return len > 1 ? multiplier : multiplier.div(2); // Half of the Sum
+    return len > 1 ? multiplier.div(2) : multiplier; // Half of the Sum
   }
 
   function _getNftDepositLength(NftStake memory nftStake) internal view returns (uint256 nftDepositLength) {
