@@ -357,7 +357,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
     // If holding all 6, Max Multiplier of 10X
     if (len == 6) {
-      return PERCENTAGE_SCALE.mul(10);
+      return LEPTON_MULTIPLIER_SCALE.mul(10);
     }
 
     // If holding more than 4, Ignore the Smallest
