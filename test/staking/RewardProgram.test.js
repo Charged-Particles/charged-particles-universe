@@ -294,95 +294,55 @@ describe('Reward program', function () {
   });
 
   describe('_calculateTotalMultiplier', () => {
-    it('Lepton deposit length 4', async () => {
-      const leptonMultipliers = [120, 130, 140, 150];
-      const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a8';
-      const tokenId = 32
+    const leptonDepositCases = [
+      {
+        description: 'Lepton deposit length 4',
+        leptonDepositMultipliers: [120, 130, 140, 150],
+        expectedTotalMultiplier: '270'
+      },
+      {
+        description: 'Lepton deposit length 5',
+        leptonDepositMultipliers: [120, 130, 140, 150, 160],
+        expectedTotalMultiplier: '290'
+      },
+      {
+        description: 'Lepton deposit length 6',
+        leptonDepositMultipliers: [120, 130, 140, 150, 160, 170],
+        expectedTotalMultiplier: '1000'
+      }
+    ];
 
-      await rewardProgramDeployerSigner.registerAssetDeposit(
-        contractAddress,
-        tokenId,
-        'basic.B',
-        100
-        ).then(tx => tx.wait());
-        
-        for(let i = 0; i < leptonMultipliers.length; i++) {
-          await leptonMock.mock.getMultiplier.returns(leptonMultipliers[i]);
-          await rewardProgramDeployerSigner.registerNftDeposit(
-            contractAddress,
-            tokenId,
-            leptonMock.address,
-            i,
-            0
+    for (let i = 0; i < leptonDepositCases.length; i++) {
+      it(`${leptonDepositCases[i].description}`, async () => {
+        const leptonMultipliers = leptonDepositCases[i]?.leptonDepositMultipliers;
+        const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a8';
+        const tokenId = 32 + i;
+
+        await rewardProgramDeployerSigner.registerAssetDeposit(
+          contractAddress,
+          tokenId,
+          'basic.B',
+          100
           ).then(tx => tx.wait());
-        }
+          
+          for(let z = 0; z < leptonMultipliers.length; z++) {
+            await leptonMock.mock.getMultiplier.returns(leptonMultipliers[z]);
+            await rewardProgramDeployerSigner.registerNftDeposit(
+              contractAddress,
+              tokenId,
+              leptonMock.address,
+              z,
+              0
+            ).then(tx => tx.wait());
+          }
 
-      const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
-      const uuidBigNumber = ethers.BigNumber.from(uuid);
-      const nftStake = await rewardProgramDeployerSigner.getNftStake(uuidBigNumber);
+        const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
+        const uuidBigNumber = ethers.BigNumber.from(uuid);
+        const nftStake = await rewardProgramDeployerSigner.getNftStake(uuidBigNumber);
 
-      expect(nftStake.multiplier).to.be.eq('270');
-    });
-
-    it('Lepton deposit length 4', async () => {
-      const leptonMultipliers = [120, 130, 140, 150, 160];
-      const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a8';
-      const tokenId = 32
-
-      await rewardProgramDeployerSigner.registerAssetDeposit(
-        contractAddress,
-        tokenId,
-        'basic.B',
-        100
-        ).then(tx => tx.wait());
-        
-        for(let i = 0; i < leptonMultipliers.length; i++) {
-          await leptonMock.mock.getMultiplier.returns(leptonMultipliers[i]);
-          await rewardProgramDeployerSigner.registerNftDeposit(
-            contractAddress,
-            tokenId,
-            leptonMock.address,
-            i,
-            0
-          ).then(tx => tx.wait());
-        }
-
-      const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
-      const uuidBigNumber = ethers.BigNumber.from(uuid);
-      const nftStake = await rewardProgramDeployerSigner.getNftStake(uuidBigNumber);
-
-      expect(nftStake.multiplier).to.be.eq('290');
-    });
-
-    it('Lepton deposit length 4', async () => {
-      const leptonMultipliers = [120, 130, 140, 150, 160, 170];
-      const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a8';
-      const tokenId = 32
-
-      await rewardProgramDeployerSigner.registerAssetDeposit(
-        contractAddress,
-        tokenId,
-        'basic.B',
-        100
-        ).then(tx => tx.wait());
-        
-        for(let i = 0; i < leptonMultipliers.length; i++) {
-          await leptonMock.mock.getMultiplier.returns(leptonMultipliers[i]);
-          await rewardProgramDeployerSigner.registerNftDeposit(
-            contractAddress,
-            tokenId,
-            leptonMock.address,
-            i,
-            0
-          ).then(tx => tx.wait());
-        }
-
-      const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
-      const uuidBigNumber = ethers.BigNumber.from(uuid);
-      const nftStake = await rewardProgramDeployerSigner.getNftStake(uuidBigNumber);
-
-      expect(nftStake.multiplier).to.be.eq('1000');
-    });
+        expect(nftStake.multiplier).to.be.eq(leptonDepositCases[i].expectedTotalMultiplier);
+      });
+    }
   });
 });
 
