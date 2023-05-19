@@ -156,10 +156,11 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     onlyUniverse
   {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+    AssetStake storage assetStake = _assetStake[parentNftUuid];
 
-    if (_assetStake[parentNftUuid].start == 0) {
-      _assetStake[parentNftUuid].start = block.number;
-      _assetStake[parentNftUuid].walletManagerId = walletManagerId;
+    if (assetStake.start == 0) {
+      assetStake.start = block.number;
+      assetStake.walletManagerId = walletManagerId;
       emit AssetDeposit(contractAddress, tokenId, walletManagerId, principalAmount);
     }
   }
