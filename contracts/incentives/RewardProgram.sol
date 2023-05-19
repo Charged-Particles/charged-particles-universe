@@ -210,7 +210,13 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     emit NftDeposit(contractAddress, tokenId, depositNftAddress, depositNftTokenId);
   }
 
-  function registerNftRelease(address contractAddress, uint256 tokenId, address releaseNftAddress, uint256 releaseNftTokenId, uint256 /* nftTokenAmount */)
+  function registerNftRelease(
+    address contractAddress,
+    uint256 tokenId,
+    address releaseNftAddress,
+    uint256 releaseNftTokenId,
+    uint256 /* nftTokenAmount */
+  )
     external
     override
     onlyUniverse
