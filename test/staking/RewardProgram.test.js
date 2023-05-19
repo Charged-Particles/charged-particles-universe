@@ -269,11 +269,21 @@ describe('Reward program', function () {
 
         await mineBlocks(stakeInfoCases[i].blocksUntilCalculation);
 
+        expect(await rewardProgramDeployerSigner.getClaimableRewards(
+          leptonMock.address,
+          stakeInfoCases[i].tokenId
+        )).to.be.eq(0);
+
         await rewardProgramDeployerSigner.registerAssetRelease(
           leptonMock.address,
           stakeInfoCases[i].tokenId,
           stakeInfoCases[i]?.generatedChargeAfterLeptonRelease
         );
+
+        expect(await rewardProgramDeployerSigner.getClaimableRewards(
+          leptonMock.address,
+          stakeInfoCases[i].tokenId
+        )).to.be.eq(stakeInfoCases[i].expectedReward);
 
         const reward = await rewardProgramDeployerSigner.callStatic.claimRewards(
           leptonMock.address,

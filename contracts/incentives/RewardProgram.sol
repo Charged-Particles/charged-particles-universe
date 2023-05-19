@@ -79,8 +79,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
   function getClaimableRewards(address contractAddress, uint256 tokenId) external view override returns (uint256) {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
-    AssetStake storage assetStake = _assetStake[parentNftUuid];
-    return assetStake.claimableRewards;
+    return _assetStake[parentNftUuid].claimableRewards;
   }
 
   function claimRewards(
