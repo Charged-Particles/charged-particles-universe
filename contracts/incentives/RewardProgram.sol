@@ -38,7 +38,6 @@ import "../interfaces/IWalletManager.sol";
 import "../interfaces/IRewardNft.sol";
 import "../lib/TokenInfo.sol";
 import "../lib/BlackholePrevention.sol";
-import "hardhat/console.sol";
 
 contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
   using SafeMath for uint256;
@@ -357,9 +356,9 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
 
   function _calculateTotalMultiplier(uint256 parentNftUuid) internal view returns (uint256) {
     uint256 len = _multiplierNftsSet[parentNftUuid].length();
-    uint256 indexOfSmallest;
-    uint256 multiplier;
-    uint256 i;
+    uint256 indexOfSmallest = 0;
+    uint256 multiplier = 0;
+    uint256 i = 0;
 
     // If holding all 6, Max Multiplier of 10X
     if (len == 6) {
