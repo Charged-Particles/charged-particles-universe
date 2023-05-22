@@ -86,8 +86,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     uint256 tokenId,
     address receiver
   ) 
-    external
-    override
+    public
     returns (uint256 totalReward)
   {
     // Verifiy Owner or Approved Operator
@@ -182,6 +181,10 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     if (principal == 0) {
       assetStake.start = 0;
     }
+
+    address owner = IERC721(contractAddress).ownerOf(tokenId);
+    claimRewards(contractAddress, tokenId, owner);
+
     emit AssetRelease(contractAddress, tokenId, interestAmount);
   }
 
