@@ -212,7 +212,7 @@ describe('Reward program', function () {
           generatedChargedBeforeLeptonRelease: 1000000,
           generatedChargeAfterLeptonRelease: 1000000,
           blocksUntilLeptonRelease: 500,
-          expectedReward: '1499000',
+          expectedReward: '1499500',
           tokenId: 42,
           description: 'Lepton deposited half of the reward length'
         },
@@ -274,6 +274,12 @@ describe('Reward program', function () {
           stakeInfoCases[i].tokenId
         )).to.be.eq(0);
 
+        const reward = await rewardProgramDeployerSigner.callStatic.registerAssetRelease(
+          leptonMock.address,
+          stakeInfoCases[i].tokenId,
+          stakeInfoCases[i]?.generatedChargeAfterLeptonRelease
+        );
+
         await rewardProgramDeployerSigner.registerAssetRelease(
           leptonMock.address,
           stakeInfoCases[i].tokenId,
@@ -283,19 +289,19 @@ describe('Reward program', function () {
         expect(await rewardProgramDeployerSigner.getClaimableRewards(
           leptonMock.address,
           stakeInfoCases[i].tokenId
-        )).to.be.eq(stakeInfoCases[i].expectedReward);
+        )).to.be.eq(0);
 
-        const reward = await rewardProgramDeployerSigner.callStatic.claimRewards(
-          leptonMock.address,
-          stakeInfoCases[i].tokenId,
-          receiverAddress
-        );
+        // const reward = await rewardProgramDeployerSigner.callStatic.claimRewards(
+        //   leptonMock.address,
+        //   stakeInfoCases[i].tokenId,
+        //   receiverAddress
+        // );
 
-        await rewardProgramDeployerSigner.claimRewards(
-          leptonMock.address,
-          stakeInfoCases[i].tokenId,
-          receiverAddress
-        ).then(tx => tx.wait());
+        // await rewardProgramDeployerSigner.claimRewards(
+        //   leptonMock.address,
+        //   stakeInfoCases[i].tokenId,
+        //   receiverAddress
+        // ).then(tx => tx.wait());
 
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
       }

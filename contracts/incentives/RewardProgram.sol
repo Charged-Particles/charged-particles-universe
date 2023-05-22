@@ -163,10 +163,15 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     }
   }
 
-  function registerAssetRelease(address contractAddress, uint256 tokenId, uint256 interestAmount)
+  function registerAssetRelease(
+    address contractAddress,
+    uint256 tokenId,
+    uint256 interestAmount
+  )
     external
     override
     onlyUniverse
+    returns (uint256 rewards)
   {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     AssetStake storage assetStake = _assetStake[parentNftUuid];
@@ -183,7 +188,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     }
 
     address owner = IERC721(contractAddress).ownerOf(tokenId);
-    claimRewards(contractAddress, tokenId, owner);
+    rewards = claimRewards(contractAddress, tokenId, owner);
 
     emit AssetRelease(contractAddress, tokenId, interestAmount);
   }
