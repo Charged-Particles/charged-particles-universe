@@ -108,7 +108,7 @@ module.exports = {
             }
         },
         goerli: {
-            url: `https://eth-goerli.g.alchemy.com/v2/mCtpp6DQI8VDJ9F4kIovVrGncmsUnM_n`,
+            url: `https://eth-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
             gasPrice: 80e9,
             // blockGasLimit: 12400000,
             accounts: {
