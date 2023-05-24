@@ -37,9 +37,15 @@ import "../interfaces/ILepton.sol";
 import "../interfaces/IWalletManager.sol";
 import "../interfaces/IRewardNft.sol";
 import "../lib/TokenInfo.sol";
+import "../lib/ReentrancyGuard.sol";
 import "../lib/BlackholePrevention.sol";
 
-contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
+contract RewardProgram is 
+  IRewardProgram,
+  Ownable,
+  BlackholePrevention,
+  ReentrancyGuard
+{
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
   using TokenInfo for address;
@@ -135,6 +141,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     override
     onlyUniverse
+    nonReentrant
   {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     require(_assetStake[parentNftUuid].start == 0 && _assetStake[parentNftUuid].claimableRewards == 0, "RP:E-002");
@@ -171,6 +178,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     override
     onlyUniverse
+    nonReentrant
     returns (uint256 rewards)
   {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
@@ -198,6 +206,7 @@ contract RewardProgram is IRewardProgram, Ownable, BlackholePrevention {
     external
     override
     onlyUniverse
+    nonReentrant
   {
     // We only care about the Multiplier NFT
     if (_programData.multiplierNft != depositNftAddress) { return; }
