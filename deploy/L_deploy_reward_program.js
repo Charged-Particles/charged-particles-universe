@@ -83,6 +83,15 @@ module.exports = async (hre) => {
   accumulatedGasCost(rewardProgram.deployTransaction);
 
 
+
+  log('  Loading ProtonB from:               ', ddProtonB.address, ` (${_.get(ddProtonB, 'deployTransaction.blockNumber', '0')})`);
+  const ProtonB = await ethers.getContractFactory('ProtonB');
+  const protonB = await ProtonB.attach(ddProtonB.address);
+
+  log('  Loading ChargedParticles from:      ', ddChargedParticles.address, ` (${_.get(ddChargedParticles, 'deployTransaction.blockNumber', '0')})`);
+  const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
+  const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
+
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Setup RewardProgram
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -130,7 +139,7 @@ module.exports = async (hre) => {
 
   // Check empty address is correct.
   await executeTx('4-f', 'ProtonA: Unregistering Universe', async () =>
-    await proton.setUniverse(ethers.constants.AddressZero)
+    await protonB.setUniverse(ethers.constants.AddressZero)
   );
 
   await executeTx('4-g', 'Universe: Registering ProtonB', async () =>
@@ -139,10 +148,6 @@ module.exports = async (hre) => {
 
   await executeTx('6-a', 'Universe: Registering Ionx', async () =>
     await universe.setPhoton(ddIonx.address, presets.Ionx.maxSupply.div(2))
-  );
-
-  await executeTx('6-b', 'Ionx: Setting Minter', async () =>
-    await ionx.setMinter(protocolOwner)
   );
 
   await executeTx('10-a', 'RewardProgram: Set Staking Token', async () =>
