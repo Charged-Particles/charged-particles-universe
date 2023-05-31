@@ -37,6 +37,9 @@ module.exports = async (hre) => {
   const ddLepton2 = getDeployData('Lepton2', chainId);
   const ddIonx = getDeployData('Ionx', chainId);
 
+  const ddChargedParticles = getDeployData('ChargedParticles', chainId);
+  const ddProtonB = getDeployData('ProtonB', chainId);
+
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles: Rewards Program - Contract Deployment');
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
@@ -101,7 +104,7 @@ module.exports = async (hre) => {
   );
 
   await executeTx('1-e', 'RewardProgram: Set Universe', async () =>
-    await rewardProgram.setUniverse(ddUniverse.address)
+    await rewardProgram.setUniverse(ddProtonB.address)
   );
 
   await executeTx('1-f', 'RewardProgram: Set Reward NFT (Lepton2)', async () =>
@@ -112,7 +115,39 @@ module.exports = async (hre) => {
     await universe.setRewardProgram(ddRewardProgram.address, usdcAddress)
   );
 
+  // 
+  await executeTx('1-a', 'Universe: Registering ChargedParticles', async () =>
+    await universe.setChargedParticles(ddChargedParticles.address)
+  );
 
+  await executeTx('1-b', 'ChargedParticles: Registering Universe', async () =>
+    await chargedParticles.setController(ddProtonB.address, 'universe')
+  );
+
+  await executeTx('4-f', 'Universe: Registering Proton', async () =>
+    await universe.setProtonToken(ddProtonB.address)
+  );
+
+  // Check empty address is correct.
+  await executeTx('4-f', 'ProtonA: Unregistering Universe', async () =>
+    await proton.setUniverse(ethers.constants.AddressZero)
+  );
+
+  await executeTx('4-g', 'Universe: Registering ProtonB', async () =>
+    await universe.setProtonToken(ddProtonB.address)
+  );
+
+  await executeTx('6-a', 'Universe: Registering Ionx', async () =>
+    await universe.setPhoton(ddIonx.address, presets.Ionx.maxSupply.div(2))
+  );
+
+  await executeTx('6-b', 'Ionx: Setting Minter', async () =>
+    await ionx.setMinter(protocolOwner)
+  );
+
+  await executeTx('10-a', 'RewardProgram: Set Staking Token', async () =>
+   await rewardProgram.setStakingToken(usdcAddress)
+  );
 
   log('\n  Contract Deployment Complete - data saved to "deployments" directory.');
   const gasCosts = getAccumulatedGasCost();
