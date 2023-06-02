@@ -61,20 +61,20 @@ module.exports = async (hre) => {
     log('     - Block:           ', aaveWalletManagerB.deployTransaction.blockNumber);
     log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: aaveWalletManagerB.deployTransaction }));
 
-    await log('\n  Deploying AaveBridgeV2 with LP Provider: ', lendingPoolProviderV2);
-    const AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');
-    const AaveBridgeV2Instance = await AaveBridgeV2.deploy(lendingPoolProviderV2);
-    const aaveBridgeV2 = await AaveBridgeV2Instance.deployed();
-    deployData['AaveBridgeV2'] = {
-      abi: getContractAbi('AaveBridgeV2'),
-      address: aaveBridgeV2.address,
-      lendingPoolProvider: lendingPoolProviderV2,
-      deployTransaction: aaveBridgeV2.deployTransaction,
-    }
-    saveDeploymentData(chainId, deployData);
-    log('  - AaveBridgeV2:       ', aaveBridgeV2.address);
-    log('     - Block:           ', aaveBridgeV2.deployTransaction.blockNumber);
-    log('     - Gas Cost:        ', getTxGasCost({deployTransaction: aaveBridgeV2.deployTransaction}));
+    // await log('\n  Deploying AaveBridgeV2 with LP Provider: ', lendingPoolProviderV2);
+    // const AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');
+    // const AaveBridgeV2Instance = await AaveBridgeV2.deploy(lendingPoolProviderV2);
+    // const aaveBridgeV2 = await AaveBridgeV2Instance.deployed();
+    // deployData['AaveBridgeV2'] = {
+    //   abi: getContractAbi('AaveBridgeV2'),
+    //   address: aaveBridgeV2.address,
+    //   lendingPoolProvider: lendingPoolProviderV2,
+    //   deployTransaction: aaveBridgeV2.deployTransaction,
+    // }
+    // saveDeploymentData(chainId, deployData);
+    // log('  - AaveBridgeV2:       ', aaveBridgeV2.address);
+    // log('     - Block:           ', aaveBridgeV2.deployTransaction.blockNumber);
+    // log('     - Gas Cost:        ', getTxGasCost({deployTransaction: aaveBridgeV2.deployTransaction}));
 
 
     log('\n  Contract Deployment Data saved to "deployments" directory.');

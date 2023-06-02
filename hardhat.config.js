@@ -82,7 +82,7 @@ module.exports = {
     },
     networks: {
         hardhat: {
-            chainId: 1,
+            // chainId: 1,
             // blockGasLimit: 200000000,
             allowUnlimitedContractSize: true,
             // gasPrice: 1e9,
@@ -91,11 +91,11 @@ module.exports = {
                 initialIndex: 0,
                 count: 10,
             },
-            forking: {
-                url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-                blockNumber: 15400000,  // MUST be after Aave V2 was deployed
-                timeout: 1000000
-            },
+            // forking: {
+            //     url: 'https://eth-mainnet.g.alchemy.com/v2/onL35MUKZeTnQ3XZ3K_fbyg4ZcDyAbu5',
+            //     blockNumber: 15400000,  // MUST be after Aave V2 was deployed
+            //     timeout: 1000000
+            // },
         },
         kovan: {
             // url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,

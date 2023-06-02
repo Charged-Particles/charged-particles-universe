@@ -42,7 +42,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ddTokenInfoProxy = getDeployData('TokenInfoProxy', chainId);
     const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
     const ddAaveWalletManagerB = getDeployData('AaveWalletManagerB', chainId);
-    const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
+    // const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
     const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
     const ddGenericWalletManagerB = getDeployData('GenericWalletManagerB', chainId);
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
@@ -263,9 +263,9 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await aaveWalletManager.setController(ddChargedParticles.address)
     );
 
-    await executeTx('3-b', 'AaveWalletManager: Setting Aave Bridge to V2', async () =>
-      await aaveWalletManager.setAaveBridge(ddAaveBridgeV2.address)
-    );
+    // await executeTx('3-b', 'AaveWalletManager: Setting Aave Bridge to V2', async () =>
+    //   await aaveWalletManager.setAaveBridge(ddAaveBridgeV2.address)
+    // );
 
     await executeTx('3-c', 'AaveWalletManager: Registering Aave as LP with ChargedParticles', async () =>
       await chargedManagers.registerWalletManager('aave', ddAaveWalletManager.address)
@@ -281,9 +281,9 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await aaveWalletManagerB.setController(ddChargedParticles.address)
     );
 
-    await executeTx('3-f', 'AaveWalletManagerB: Setting Aave Bridge to V2', async () =>
-      await aaveWalletManagerB.setAaveBridge(ddAaveBridgeV2.address)
-    );
+    // await executeTx('3-f', 'AaveWalletManagerB: Setting Aave Bridge to V2', async () =>
+    //   await aaveWalletManagerB.setAaveBridge(ddAaveBridgeV2.address)
+    // );
 
     await executeTx('3-g', 'AaveWalletManagerB: Registering Aave as LP with ChargedParticles', async () =>
       await chargedManagers.registerWalletManager('aave.B', ddAaveWalletManagerB.address)

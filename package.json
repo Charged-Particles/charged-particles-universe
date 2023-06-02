@@ -8,8 +8,8 @@
     "defi"
   ],
   "engines": {
-    "node": ">=12.16.3",
-    "npm": ">=6.14.4"
+    "node": ">=18.12.1",
+    "npm": ">=8.19.2"
   },
   "scripts": {
     "reinstall": "rm -rf node_modules && rm -f yarn.lock && yarn clean && yarn",
@@ -28,6 +28,7 @@
     "deploy": "yarn clean-test && hardhat deploy",
     "deploy-only": "hardhat deploy --tags",
     "deploy-fresh-v2": "hardhat deploy --tags protocol,generic,aave,tokens,setup --network",
+    "deploy-rewards": "hardhat deploy --tags protocol,generic,aave,tokens,reward-program,setup,reward-deploy --network",
     "deploy-upgrade-v2": "hardhat deploy --tags upgrades --network",
     "migrate-v2": "hardhat deploy --tags migrations --network",
     "deploy-setup": "hardhat deploy --tags setup --network",

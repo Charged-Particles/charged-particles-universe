@@ -32,7 +32,7 @@ module.exports = async (hre) => {
   const chainId = chainIdByName(network.name);
   const { isProd, isHardhat } = chainTypeById(chainId);
 
-  if (chainId === 31337) { return; } // Don't upgrade for Unit-Tests
+  if (isHardhat) { return; } // Don't upgrade for Unit-Tests
 
   // V1 Contracts
   const ddUniverse = getDeployData('Universe', chainId);

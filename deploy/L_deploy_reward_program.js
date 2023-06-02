@@ -2,6 +2,7 @@ const {
   saveDeploymentData,
   getTxGasCost,
   getDeployData,
+  getContractAbi,
   presets,
 } = require('../js-helpers/deploy');
 
@@ -27,17 +28,18 @@ module.exports = async (hre) => {
   const deployData = {};
 
   const chainId = chainIdByName(network.name);
+  const chainOverride = 31337;
   // if (chainId === 31337) { return; } // Don't upgrade for Unit-Tests
 
   const usdcAddress = presets.Aave.v2.usdc[chainId];
-  const ddUniverse = getDeployData('Universe', 1);
-  const ddChargedManagers = getDeployData('ChargedManagers', 1);
-  // const ddRewardProgram = getDeployData('RewardProgram', 1);
-  const ddLepton2 = getDeployData('Lepton2', 1);
-  const ddIonx = getDeployData('Ionx', 1);
+  const ddUniverse = getDeployData('Universe', chainOverride);
+  const ddChargedManagers = getDeployData('ChargedManagers', chainOverride);
+  // const ddRewardProgram = getDeployData('RewardProgram', chainOverride);
+  const ddLepton2 = getDeployData('Lepton2', chainOverride);
+  const ddIonx = getDeployData('Ionx', chainOverride);
 
-  const ddChargedParticles = getDeployData('ChargedParticles', 1);
-  const ddProtonB = getDeployData('ProtonB', 1);
+  const ddChargedParticles = getDeployData('ChargedParticles', chainOverride);
+  const ddProtonB = getDeployData('ProtonB', chainOverride);
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles: Rewards Program - Contract Deployment');
@@ -52,7 +54,7 @@ module.exports = async (hre) => {
   //
   // Upgrade Contracts
   //
-  await log('  Upgrading Universe...');
+  // await log('  Upgrading Universe...');
   // const Universe = await ethers.getContractFactory('Universe');
   // const UniverseInstance = await upgrades.upgradeProxy(ddUniverse.address, Universe, [deployer], {initialize: 'initialize'});
   // const universe = await UniverseInstance.deployed();
@@ -82,7 +84,7 @@ module.exports = async (hre) => {
 
   log('\n  Deploying RewardProgram...');
   const RewardProgram = await ethers.getContractFactory('RewardProgram');
-  console.log(RewardProgram);
+  // console.log(RewardProgram);
   const RewardProgramInstance = await RewardProgram.deploy();
   const rewardProgram = await RewardProgramInstance.deployed();
   deployData['RewardProgram'] = {
@@ -134,13 +136,13 @@ module.exports = async (hre) => {
     await universe.setRewardProgram(rewardProgram.address, usdcAddress)
   );
 
-  // 
+  //
   await executeTx('1-a', 'Universe: Registering ChargedParticles', async () =>
     await universe.setChargedParticles(ddChargedParticles.address)
   );
 
   await executeTx('1-b', 'ChargedParticles: Registering Universe', async () =>
-    await chargedParticles.setController(ddProtonB.address, 'universe')
+    await chargedParticles.setController(universe.address, 'universe')
   );
 
   await executeTx('4-f', 'Universe: Registering Proton', async () =>
@@ -176,4 +178,4 @@ module.exports = async (hre) => {
   log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 };
 
-module.exports.tags = ['reward-program']
+module.exports.tags = ['reward-deploy']

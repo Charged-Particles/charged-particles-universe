@@ -43,4 +43,4 @@ const {
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
   }
 
-  module.exports.tags = ['RewardProgram']
+  module.exports.tags = ['reward-program']

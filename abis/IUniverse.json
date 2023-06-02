@@ -159,6 +159,25 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "rewardProgram",
+        "type": "address"
+      }
+    ],
+    "name": "RewardProgramSet",
+    "type": "event"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
