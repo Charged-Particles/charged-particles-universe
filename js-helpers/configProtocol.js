@@ -489,38 +489,6 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Setup RewardProgram
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    await executeTx('10-a', 'RewardProgram: Set Staking Token', async () =>
-      await rewardProgram.setStakingToken(usdcAddress)
-    );
-
-    await executeTx('10-b', 'RewardProgram: Set Reward Token', async () =>
-      await rewardProgram.setRewardToken(ddIonx.address)
-    );
-
-    await executeTx('10-c', 'RewardProgram: Set Base Multiplier (10000 = 100%)', async () =>
-      await rewardProgram.setBaseMultiplier(10000) // 100%
-    );
-
-    await executeTx('10-d', 'RewardProgram: Set ChargedManagers', async () =>
-      await rewardProgram.setChargedManagers(ddChargedManagers.address)
-    );
-
-    await executeTx('10-e', 'RewardProgram: Set Universe', async () =>
-      await rewardProgram.setUniverse(ddUniverse.address)
-    );
-
-    await executeTx('10-f', 'RewardProgram: Set Reward NFT (Lepton2)', async () =>
-      await rewardProgram.setRewardNft(ddLepton2.address)
-    );
-
-    await executeTx('10-g', 'Universe: Registering Reward Program', async () =>
-      await universe.setRewardProgram(ddRewardProgram.address, usdcAddress)
-    );
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup External Executors
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
