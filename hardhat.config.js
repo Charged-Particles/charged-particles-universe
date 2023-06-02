@@ -82,17 +82,18 @@ module.exports = {
     },
     networks: {
         hardhat: {
-            blockGasLimit: 200000000,
+            chainId: 1,
+            // blockGasLimit: 200000000,
             allowUnlimitedContractSize: true,
-            gasPrice: 1e9,
-            // accounts: {
-            //     mnemonic: mnemonic.testnet,
-            //     initialIndex: 0,
-            //     count: 10,
-            // },
+            // gasPrice: 1e9,
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            },
             forking: {
                 url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-                blockNumber: 11400000,  // MUST be after Aave V2 was deployed
+                blockNumber: 15400000,  // MUST be after Aave V2 was deployed
                 timeout: 1000000
             },
         },

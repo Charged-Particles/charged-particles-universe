@@ -1,6 +1,5 @@
 const {
   saveDeploymentData,
-  getContractAbi,
   getTxGasCost,
   getDeployData,
   presets,
@@ -28,17 +27,17 @@ module.exports = async (hre) => {
   const deployData = {};
 
   const chainId = chainIdByName(network.name);
-  if (chainId === 31337) { return; } // Don't upgrade for Unit-Tests
+  // if (chainId === 31337) { return; } // Don't upgrade for Unit-Tests
 
   const usdcAddress = presets.Aave.v2.usdc[chainId];
-  const ddUniverse = getDeployData('Universe', chainId);
-  const ddChargedManagers = getDeployData('ChargedManagers', chainId);
-  const ddRewardProgram = getDeployData('RewardProgram', chainId);
-  const ddLepton2 = getDeployData('Lepton2', chainId);
-  const ddIonx = getDeployData('Ionx', chainId);
+  const ddUniverse = getDeployData('Universe', 1);
+  const ddChargedManagers = getDeployData('ChargedManagers', 1);
+  // const ddRewardProgram = getDeployData('RewardProgram', 1);
+  const ddLepton2 = getDeployData('Lepton2', 1);
+  const ddIonx = getDeployData('Ionx', 1);
 
-  const ddChargedParticles = getDeployData('ChargedParticles', chainId);
-  const ddProtonB = getDeployData('ProtonB', chainId);
+  const ddChargedParticles = getDeployData('ChargedParticles', 1);
+  const ddProtonB = getDeployData('ProtonB', 1);
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
   log('Charged Particles: Rewards Program - Contract Deployment');
@@ -53,24 +52,37 @@ module.exports = async (hre) => {
   //
   // Upgrade Contracts
   //
-
   await log('  Upgrading Universe...');
+  // const Universe = await ethers.getContractFactory('Universe');
+  // const UniverseInstance = await upgrades.upgradeProxy(ddUniverse.address, Universe, [deployer], {initialize: 'initialize'});
+  // const universe = await UniverseInstance.deployed();
+  // deployData['Universe'] = {
+  //   abi: getntractAbi('Universe'),
+  //   address: universe.address,
+  //   upgradeTransaction: universe.deployTransaction,
+  // }
+  // saveDeploymentData(chainId, deployData, true);
+  // log('  - Universe: ', universe.address);
+  // log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
+  // accumulatedGasCost(universe.deployTransaction);
+
+  log('  Deploying Universe...');
   const Universe = await ethers.getContractFactory('Universe');
-  const UniverseInstance = await upgrades.upgradeProxy(ddUniverse.address, Universe, [deployer], {initialize: 'initialize'});
+  const UniverseInstance = await upgrades.deployProxy(Universe, []);
   const universe = await UniverseInstance.deployed();
   deployData['Universe'] = {
     abi: getContractAbi('Universe'),
     address: universe.address,
-    upgradeTransaction: universe.deployTransaction,
+    deployTransaction: universe.deployTransaction,
   }
-  saveDeploymentData(chainId, deployData, true);
-  log('  - Universe: ', universe.address);
+  saveDeploymentData(chainId, deployData);
+  log('  - Universe:         ', universe.address);
+  log('     - Block:         ', universe.deployTransaction.blockNumber);
   log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
-  accumulatedGasCost(universe.deployTransaction);
 
-
-  await log('\n  Deploying RewardProgram...');
+  log('\n  Deploying RewardProgram...');
   const RewardProgram = await ethers.getContractFactory('RewardProgram');
+  console.log(RewardProgram);
   const RewardProgramInstance = await RewardProgram.deploy();
   const rewardProgram = await RewardProgramInstance.deployed();
   deployData['RewardProgram'] = {
@@ -81,8 +93,6 @@ module.exports = async (hre) => {
   log('  - RewardProgram: ', rewardProgram.address);
   log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: rewardProgram.deployTransaction }));
   accumulatedGasCost(rewardProgram.deployTransaction);
-
-
 
   log('  Loading ProtonB from:               ', ddProtonB.address, ` (${_.get(ddProtonB, 'deployTransaction.blockNumber', '0')})`);
   const ProtonB = await ethers.getContractFactory('ProtonB');
@@ -121,7 +131,7 @@ module.exports = async (hre) => {
   );
 
   await executeTx('1-g', 'Universe: Registering Reward Program', async () =>
-    await universe.setRewardProgram(ddRewardProgram.address, usdcAddress)
+    await universe.setRewardProgram(rewardProgram.address, usdcAddress)
   );
 
   // 
