@@ -110,7 +110,7 @@ module.exports = {
         },
         goerli: {
             url: `https://eth-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 80e9,
+            gasPrice: 'auto',
             // blockGasLimit: 12400000,
             accounts: {
                 mnemonic: mnemonic.testnet,

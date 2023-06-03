@@ -28,7 +28,7 @@ module.exports = async (hre) => {
   const deployData = {};
 
   const chainId = chainIdByName(network.name);
-  const chainOverride = 31337;
+  const chainOverride = chainId;
   // if (chainId === 31337) { return; } // Don't upgrade for Unit-Tests
 
   const usdcAddress = presets.Aave.v2.usdc[chainId];
@@ -72,7 +72,7 @@ module.exports = async (hre) => {
   const Universe = await ethers.getContractFactory('Universe');
   const UniverseInstance = await upgrades.deployProxy(Universe, []);
   const universe = await UniverseInstance.deployed();
-  deployData['Universe'] = {
+  deployData['UniverseReward'] = {
     abi: getContractAbi('Universe'),
     address: universe.address,
     deployTransaction: universe.deployTransaction,
@@ -136,7 +136,6 @@ module.exports = async (hre) => {
     await universe.setRewardProgram(rewardProgram.address, usdcAddress)
   );
 
-  //
   await executeTx('1-a', 'Universe: Registering ChargedParticles', async () =>
     await universe.setChargedParticles(ddChargedParticles.address)
   );
