@@ -87,20 +87,14 @@ contract RewardProgram is
     return _assetStake[parentNftUuid].claimableRewards;
   }
 
-  function claimRewards(
+  function _claimRewards(
     address contractAddress,
     uint256 tokenId,
     address receiver
   ) 
-    public
+    internal
     returns (uint256 totalReward)
   {
-    // Verifiy Owner or Approved Operator
-    IERC721 nft = IERC721(contractAddress);
-    address owner = nft.ownerOf(tokenId);
-    bool isApproved = nft.isApprovedForAll(owner, msg.sender);
-    require(msg.sender == owner || isApproved, "RP:E-102");
-
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     AssetStake storage assetStake = _assetStake[parentNftUuid];
 
@@ -155,15 +149,24 @@ contract RewardProgram is
     }
   }
 
-  function registerAssetDeposit(address contractAddress, uint256 tokenId, string calldata walletManagerId, uint256 principalAmount)
+  function registerAssetDeposit(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address assetToken,
+    uint256 principalAmount
+  )
     external
     override
     onlyUniverse
   {
+    if (assetToken != _programData.stakingToken) {
+      return;
+    }
+
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     AssetStake storage assetStake = _assetStake[parentNftUuid];
 
-    // todo: check if deposited asset belongs to reward.
     if (assetStake.start == 0) {
       assetStake.start = block.number;
       assetStake.walletManagerId = walletManagerId;
@@ -198,7 +201,7 @@ contract RewardProgram is
     }
 
     address owner = IERC721(contractAddress).ownerOf(tokenId);
-    rewards = claimRewards(contractAddress, tokenId, owner);
+    rewards = _claimRewards(contractAddress, tokenId, owner);
 
     emit AssetRelease(contractAddress, tokenId, interestAmount);
   }

@@ -15,6 +15,7 @@ async function main() {
 
   const ddUniverse = getDeployData('Universe', network.chainId);
   const ddLepton = getDeployData('Lepton2', network.chainId);
+  const ddIonx = getDeployData('Ionx', network.chainId);
   const ddRewardProgram = getDeployData('RewardProgram', network.chainId);
 //   const ddAaveWalletManager = getDeployData('AaveWalletManager', network.config.chainId);
 
@@ -29,36 +30,45 @@ async function main() {
   log(' ');
 
   log('  Loading reward program from: ', ddLepton.address);
-  // const RewardProgram = await ethers.getContractFactory('RewardProgram');
-  // const rewardProgram = await RewardProgram.attach(ddRewardProgram.address);
+  const RewardProgram = await ethers.getContractFactory('RewardProgram');
+  const rewardProgram = await RewardProgram.attach(ddRewardProgram.address);
 
-  // log('  Loading universe from: ', ddUniverse.address);
-  // const Universe = await ethers.getContractFactory('Universe');
-  // const universe = await Universe.attach(ddUniverse.address);
+  log('  Loading universe from: ', ddUniverse.address);
+  const Universe = await ethers.getContractFactory('Universe');
+  const universe = await Universe.attach(ddUniverse.address);
 
-  // await universe.setRewardProgram(ddRewardProgram.address, ddLepton.address);
-
-  // await rewardProgram.setUniverse('0x0114A7aE15f998E7e1387fE64B1b90c233c73243').then(tx => tx.wait());
-  // const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [ '0xc5b2d04669b6b701195f90c15c560edaa3509c92', 11]);
-  const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [ '0xc5b2d04669b6b701195f90c15c560edaa3509c92', 102]);
-  console.log(uuid);
-
-  // const daiMumbai = '0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F';
-  // await rewardProgram.setStakingToken(daiMumbai).then(tx => tx.wait());
-  // await rewardProgram.setRewardToken(daiMumbai).then(tx => tx.wait());
-  // await rewardProgram.setRewardNft(ddLepton.address).then(tx => tx.wait());
-
-  // log('  Loading lepton2 from: ', ddLepton.address);
-  // const Lepton = await ethers.getContractFactory('Lepton2');
-  // const lepton = await Lepton.attach(ddLepton.address);
-
-  // await lepton.setPausedState(false).then(tx => tx.wait());
-  // const mintedTokenId = await lepton.callStatic.mintLepton({ value: '300000000000' });
-  // await lepton.mintLepton({ value: '300000000000' }).then(tx => tx.wait());
-  // await lepton.transferFrom(deployer, '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A', mintedTokenId).then(tx => tx.wait());
- 
-  // log(mintedTokenId.toString());
+  await universe.setRewardProgram(ddRewardProgram.address, ddLepton.address);
   
+  // const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [ '0xc5b2d04669b6b701195f90c15c560edaa3509c92', 11]);
+  // const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [ '0xc5b2d04669b6b701195f90c15c560edaa3509c92', 102]);
+  // console.log(uuid);
+  
+  // Configure reward program default values
+  const daiMumbai = '0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F';
+  await rewardProgram.setStakingToken(daiMumbai).then(tx => tx.wait());
+  await rewardProgram.setRewardToken(ddIonx.address).then(tx => tx.wait());
+  await rewardProgram.setRewardNft(ddLepton.address).then(tx => tx.wait());
+  await rewardProgram.setUniverse(ddUniverse.address).then(tx => tx.wait());
+
+  // Mint and grand lepton to test address
+  log('  Loading lepton2 from: ', ddLepton.address);
+  const Lepton = await ethers.getContractFactory('Lepton2');
+  const lepton = await Lepton.attach(ddLepton.address);
+
+  await lepton.setPausedState(false).then(tx => tx.wait());
+  const mintedTokenId = await lepton.callStatic.mintLepton({ value: '300000000000' });
+  await lepton.mintLepton({ value: '300000000000' }).then(tx => tx.wait());
+  await lepton.transferFrom(deployer, '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A', mintedTokenId).then(tx => tx.wait());
+ 
+  log('  Loading lepton2 from: ', ddIonx.address);
+  // Found program.
+  const Ionx = await ethers.getContractFactory('Ionx');
+  const ionx = await Ionx.attach(ddIonx.address);
+  await rewardProgram.setRewardToken(ddIonx.address).then(tx => tx.wait());
+  
+  const fundingAmount = '13333333333333333333333333';
+  await ionx.connect(ethers.provider.getSigner(owner)).approve(rewardProgram.address, fundingAmount).then((tx) => tx.wait());
+  await rewardProgram.connect(ethers.provider.getSigner(deployer)).fundProgram(fundingAmount).then(tx => tx.wait());
 
   log('\n  Transaction Execution Complete!');
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
