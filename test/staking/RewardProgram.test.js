@@ -118,7 +118,7 @@ describe('Reward program', function () {
 
   describe('Leptons staking', async () => {
     it('Registers lepton deposit in reward program', async () => {
-      const usdcAddress = programData.rewardToken;
+      const usdcAddress = programData.stakingToken;
       const tokenId = 12;
       const leptonMultiplier = 200; // x2
       const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a9';
@@ -201,7 +201,6 @@ describe('Reward program', function () {
 
     it('Checks lepton reward calculation with time spent', async () => {
       const receiverAddress = '0x277BFc4a8dc79a9F194AD4a83468484046FAFD3A'
-
       // set reward mock token into reward program.
       const stakingToken = ionxMock.address;
       await rewardProgramDeployerSigner.setRewardToken(stakingToken).then( tx => tx.wait());
@@ -248,7 +247,7 @@ describe('Reward program', function () {
           leptonMock.address,
           stakeInfoCases[i].tokenId,
           'generic.B',
-          programData.rewardToken,
+          programData.stakingToken,
           stakeInfoCases[i].amount
         ).then(tx => tx.wait());
 
@@ -323,7 +322,7 @@ describe('Reward program', function () {
       contractAddress,
       tokenId,
       'basic.B',
-      programData.rewardToken,
+      programData.stakingToken,
       100
     ).then(tx => tx.wait());
 
@@ -405,7 +404,7 @@ describe('Reward program', function () {
           contractAddress,
           tokenId,
           'basic.B',
-          programData.rewardToken,
+          programData.stakingToken,
           100
           ).then(tx => tx.wait());
           

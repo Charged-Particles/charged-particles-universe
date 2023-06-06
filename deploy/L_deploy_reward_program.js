@@ -29,9 +29,10 @@ module.exports = async (hre) => {
 
   const chainId = chainIdByName(network.name);
   const chainOverride = chainId;
-  // if (chainId === 31337) { return; } // Don't upgrade for Unit-Tests
 
   const usdcAddress = presets.Aave.v2.usdc[chainId];
+  const daiMumbai = '0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F';
+
   const ddUniverse = getDeployData('Universe', chainOverride);
   const ddChargedManagers = getDeployData('ChargedManagers', chainOverride);
   // const ddRewardProgram = getDeployData('RewardProgram', chainOverride);
@@ -92,10 +93,9 @@ module.exports = async (hre) => {
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Setup RewardProgram
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  const daiMumbai = '0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F';
 
   await executeTx('1-a', 'RewardProgram: Set Staking Token', async () =>
-    await rewardProgram.setStakingToken(daiMumbai)
+    await rewardProgram.setStakingToken(usdcAddress)
   );
 
   await executeTx('1-b', 'RewardProgram: Set Reward Token', async () =>
@@ -150,10 +150,6 @@ module.exports = async (hre) => {
 
   await executeTx('6-a', 'Universe: Registering Ionx', async () =>
     await universe.setPhoton(ddIonx.address, presets.Ionx.maxSupply.div(2))
-  );
-
-  await executeTx('10-a', 'RewardProgram: Set Staking Token', async () =>
-   await rewardProgram.setStakingToken(daiMumbai)
   );
 
   log('\n  Contract Deployment Complete - data saved to "deployments" directory.');

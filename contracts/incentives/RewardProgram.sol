@@ -159,7 +159,7 @@ contract RewardProgram is
     external
     override
     onlyUniverse
-  {
+  { 
     if (assetToken != _programData.stakingToken) {
       return;
     }
