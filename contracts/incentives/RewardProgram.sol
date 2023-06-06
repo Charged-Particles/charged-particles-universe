@@ -40,7 +40,7 @@ import "../lib/TokenInfo.sol";
 import "../lib/ReentrancyGuard.sol";
 import "../lib/BlackholePrevention.sol";
 
-contract RewardProgram is 
+contract RewardProgram is
   IRewardProgram,
   Ownable,
   BlackholePrevention,
@@ -52,7 +52,7 @@ contract RewardProgram is
   using EnumerableSet for EnumerableSet.UintSet;
 
   uint256 constant private PERCENTAGE_SCALE = 1e4;   // 10000 (100%)
-  uint256 constant private LEPTON_MULTIPLIER_SCALE = 1e2; 
+  uint256 constant private LEPTON_MULTIPLIER_SCALE = 1e2;
 
   address private _universe;
   IChargedManagers private _chargedManagers;
@@ -85,38 +85,6 @@ contract RewardProgram is
   function getClaimableRewards(address contractAddress, uint256 tokenId) external view override returns (uint256) {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     return _assetStake[parentNftUuid].claimableRewards;
-  }
-
-  function _claimRewards(
-    address contractAddress,
-    uint256 tokenId,
-    address receiver
-  ) 
-    internal
-    returns (uint256 totalReward)
-  {
-    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
-    AssetStake storage assetStake = _assetStake[parentNftUuid];
-
-    // Ensure Reward Pool has Sufficient Balance
-    totalReward = assetStake.claimableRewards;
-    uint256 fundBalance = _getFundBalance();
-    uint256 unavailReward = totalReward > fundBalance ? totalReward.sub(fundBalance) : 0;
-
-    // Determine amount of Rewards to Transfer
-    if (unavailReward > 0) {
-      totalReward = totalReward.sub(unavailReward);
-      emit RewardProgramOutOfFunds();
-    }
-
-    if (totalReward > 0) {
-      // Update Asset Stake
-      assetStake.claimableRewards = 0;
-      // Transfer Available Rewards to Receiver
-      IERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
-    }
-
-    emit RewardsClaimed(contractAddress, tokenId, receiver, totalReward, unavailReward);
   }
 
   function getAssetStake(uint256 uuid) view external returns (AssetStake memory) {
@@ -159,7 +127,7 @@ contract RewardProgram is
     external
     override
     onlyUniverse
-  { 
+  {
     if (assetToken != _programData.stakingToken) {
       return;
     }
@@ -172,7 +140,6 @@ contract RewardProgram is
       assetStake.walletManagerId = walletManagerId;
       emit AssetDeposit(contractAddress, tokenId, walletManagerId, principalAmount);
     }
-
   }
 
   function registerAssetRelease(
@@ -200,8 +167,8 @@ contract RewardProgram is
       assetStake.start = 0;
     }
 
-    address owner = IERC721(contractAddress).ownerOf(tokenId);
-    rewards = _claimRewards(contractAddress, tokenId, owner);
+    // Issue Rewards to NFT Owner
+    rewards = _claimRewards(contractAddress, tokenId);
 
     emit AssetRelease(contractAddress, tokenId, interestAmount);
   }
@@ -261,7 +228,7 @@ contract RewardProgram is
 
     emit NftRelease(contractAddress, tokenId, releaseNftAddress, releaseNftTokenId);
   }
- 
+
   function calculateBaseReward(uint256 amount) public view returns(uint256 baseReward) {
     baseReward = _calculateBaseReward(amount);
   }
@@ -288,7 +255,7 @@ contract RewardProgram is
 
     uint256 assetDepositLength = block.number.sub(assetStake.start);
     uint256 nftDepositLength = _getNftDepositLength(nftStake);
-    
+
     if (multiplierBP == 0 || nftDepositLength == 0 || assetDepositLength == 0) {
       return baseReward;
     }
@@ -375,6 +342,40 @@ contract RewardProgram is
   /***********************************|
   |         Private Functions         |
   |__________________________________*/
+
+  function _claimRewards(
+    address contractAddress,
+    uint256 tokenId
+  )
+    internal
+    returns (uint256 totalReward)
+  {
+    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+    AssetStake storage assetStake = _assetStake[parentNftUuid];
+
+    // Rewards Receiver
+    address receiver = IERC721(contractAddress).ownerOf(tokenId);
+
+    // Ensure Reward Pool has Sufficient Balance
+    totalReward = assetStake.claimableRewards;
+    uint256 fundBalance = _getFundBalance();
+    uint256 unavailReward = totalReward > fundBalance ? totalReward.sub(fundBalance) : 0;
+
+    // Determine amount of Rewards to Transfer
+    if (unavailReward > 0) {
+      totalReward = totalReward.sub(unavailReward);
+      emit RewardProgramOutOfFunds();
+    }
+
+    if (totalReward > 0) {
+      // Update Asset Stake
+      assetStake.claimableRewards = 0;
+      // Transfer Available Rewards to Receiver
+      IERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
+    }
+
+    emit RewardsClaimed(contractAddress, tokenId, receiver, totalReward, unavailReward);
+  }
 
   function _calculateTotalMultiplier(uint256 parentNftUuid) internal view returns (uint256) {
     uint256 len = _multiplierNftsSet[parentNftUuid].length();
