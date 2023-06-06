@@ -67,7 +67,7 @@ interface IRewardProgram {
 
   function registerExistingDeposits(address contractAddress, uint256 tokenId, string calldata walletManagerId) external;
 
-  function registerAssetDeposit(address contractAddress, uint256 tokenId, string calldata walletManagerId, address registerAssetDeposit, uint256 principalAmount) external;
+  function registerAssetDeposit(address contractAddress, uint256 tokenId, string calldata walletManagerId, uint256 principalAmount) external;
   function registerAssetRelease(address contractAddress, uint256 tokenId, uint256 interestAmount) external returns (uint256 rewards);
 
   function registerNftDeposit(address contractAddress, uint256 tokenId, address nftTokenAddress, uint256 nftTokenId, uint256 nftTokenAmount) external;

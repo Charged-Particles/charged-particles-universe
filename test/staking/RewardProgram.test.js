@@ -118,7 +118,6 @@ describe('Reward program', function () {
 
   describe('Leptons staking', async () => {
     it('Registers lepton deposit in reward program', async () => {
-      const usdcAddress = programData.stakingToken;
       const tokenId = 12;
       const leptonMultiplier = 200; // x2
       const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a9';
@@ -131,7 +130,6 @@ describe('Reward program', function () {
         contractAddress,
         tokenId,
         'basic.B',
-        usdcAddress,
         100
       )).to.emit(rewardProgram, 'AssetDeposit');
 
@@ -164,7 +162,6 @@ describe('Reward program', function () {
 
     it('Verifies simple lepton reward calculation', async () => {
       const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a7';
-      const usdcAddress = programData.rewardToken;
       const tokenId = 6
       const leptonMultiplier = 200; // x2
       const principal = 1000000;
@@ -179,7 +176,6 @@ describe('Reward program', function () {
         contractAddress,
         tokenId,
         'basic.B',
-        usdcAddress,
         100
       ).then(tx => tx.wait());
 
@@ -247,7 +243,6 @@ describe('Reward program', function () {
           leptonMock.address,
           stakeInfoCases[i].tokenId,
           'generic.B',
-          programData.stakingToken,
           stakeInfoCases[i].amount
         ).then(tx => tx.wait());
 
@@ -322,7 +317,6 @@ describe('Reward program', function () {
       contractAddress,
       tokenId,
       'basic.B',
-      programData.stakingToken,
       100
     ).then(tx => tx.wait());
 
@@ -404,7 +398,6 @@ describe('Reward program', function () {
           contractAddress,
           tokenId,
           'basic.B',
-          programData.stakingToken,
           100
           ).then(tx => tx.wait());
           

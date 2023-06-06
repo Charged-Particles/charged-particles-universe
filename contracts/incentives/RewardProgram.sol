@@ -121,17 +121,12 @@ contract RewardProgram is
     address contractAddress,
     uint256 tokenId,
     string calldata walletManagerId,
-    address assetToken,
     uint256 principalAmount
   )
     external
     override
     onlyUniverse
   {
-    if (assetToken != _programData.stakingToken) {
-      return;
-    }
-
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     AssetStake storage assetStake = _assetStake[parentNftUuid];
 

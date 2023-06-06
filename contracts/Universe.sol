@@ -121,7 +121,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
         contractAddress,
         tokenId,
         walletManagerId,
-        assetToken,
         assetAmount
       );
     }

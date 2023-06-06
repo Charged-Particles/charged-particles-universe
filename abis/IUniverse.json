@@ -170,6 +170,12 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "nftMultiplier",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "rewardProgram",
         "type": "address"
       }
