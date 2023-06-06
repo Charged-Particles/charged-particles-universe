@@ -54,20 +54,6 @@ module.exports = async (hre) => {
   //
   // Upgrade Contracts
   //
-  // await log('  Upgrading Universe...');
-  // const Universe = await ethers.getContractFactory('Universe');
-  // const UniverseInstance = await upgrades.upgradeProxy(ddUniverse.address, Universe, [deployer], {initialize: 'initialize'});
-  // const universe = await UniverseInstance.deployed();
-  // deployData['Universe'] = {
-  //   abi: getntractAbi('Universe'),
-  //   address: universe.address,
-  //   upgradeTransaction: universe.deployTransaction,
-  // }
-  // saveDeploymentData(chainId, deployData, true);
-  // log('  - Universe: ', universe.address);
-  // log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universe.deployTransaction }));
-  // accumulatedGasCost(universe.deployTransaction);
-
   log('  Deploying Universe...');
   const Universe = await ethers.getContractFactory('Universe');
   const UniverseInstance = await upgrades.deployProxy(Universe, []);
@@ -84,7 +70,6 @@ module.exports = async (hre) => {
 
   log('\n  Deploying RewardProgram...');
   const RewardProgram = await ethers.getContractFactory('RewardProgram');
-  // console.log(RewardProgram);
   const RewardProgramInstance = await RewardProgram.deploy();
   const rewardProgram = await RewardProgramInstance.deployed();
   deployData['RewardProgram'] = {
@@ -107,9 +92,10 @@ module.exports = async (hre) => {
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Setup RewardProgram
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  const daiMumbai = '0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F';
 
   await executeTx('1-a', 'RewardProgram: Set Staking Token', async () =>
-    await rewardProgram.setStakingToken(usdcAddress)
+    await rewardProgram.setStakingToken(daiMumbai)
   );
 
   await executeTx('1-b', 'RewardProgram: Set Reward Token', async () =>
@@ -125,7 +111,7 @@ module.exports = async (hre) => {
   );
 
   await executeTx('1-e', 'RewardProgram: Set Universe', async () =>
-    await rewardProgram.setUniverse(ddProtonB.address)
+    await rewardProgram.setUniverse(ddUniverse.address)
   );
 
   await executeTx('1-f', 'RewardProgram: Set Reward NFT (Lepton2)', async () =>
@@ -133,8 +119,13 @@ module.exports = async (hre) => {
   );
 
   await executeTx('1-g', 'Universe: Registering Reward Program', async () =>
-    await universe.setRewardProgram(rewardProgram.address, usdcAddress)
+    await universe.setRewardProgram(rewardProgram.address, daiMumbai)
   );
+
+  // lepton
+  // await executeTx('1-g', 'Universe: Registering Reward Program', async () =>
+  //   await universe.setRewardProgram(rewardProgram.address, daiMumbai)
+  // );
 
   await executeTx('1-a', 'Universe: Registering ChargedParticles', async () =>
     await universe.setChargedParticles(ddChargedParticles.address)
@@ -162,7 +153,7 @@ module.exports = async (hre) => {
   );
 
   await executeTx('10-a', 'RewardProgram: Set Staking Token', async () =>
-   await rewardProgram.setStakingToken(usdcAddress)
+   await rewardProgram.setStakingToken(daiMumbai)
   );
 
   log('\n  Contract Deployment Complete - data saved to "deployments" directory.');

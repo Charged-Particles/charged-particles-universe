@@ -163,11 +163,13 @@ contract RewardProgram is
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     AssetStake storage assetStake = _assetStake[parentNftUuid];
 
+    // todo: check if deposited asset belongs to reward.
     if (assetStake.start == 0) {
       assetStake.start = block.number;
       assetStake.walletManagerId = walletManagerId;
       emit AssetDeposit(contractAddress, tokenId, walletManagerId, principalAmount);
     }
+
   }
 
   function registerAssetRelease(
