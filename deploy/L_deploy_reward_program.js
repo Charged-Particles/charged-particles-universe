@@ -119,13 +119,8 @@ module.exports = async (hre) => {
   );
 
   await executeTx('1-g', 'Universe: Registering Reward Program', async () =>
-    await universe.setRewardProgram(rewardProgram.address, daiMumbai)
+    await universe.setRewardProgram(rewardProgram.address, daiMumbai, ddLepton2.address)
   );
-
-  // lepton
-  // await executeTx('1-g', 'Universe: Registering Reward Program', async () =>
-  //   await universe.setRewardProgram(rewardProgram.address, daiMumbai)
-  // );
 
   await executeTx('1-a', 'Universe: Registering ChargedParticles', async () =>
     await universe.setChargedParticles(ddChargedParticles.address)

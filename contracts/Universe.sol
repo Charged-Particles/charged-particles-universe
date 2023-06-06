@@ -410,7 +410,8 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
 
   function setRewardProgram(
     address rewardProgam,
-    address assetToken
+    address assetToken,
+    address nftMultiplier
   )
     external
     onlyOwner
@@ -418,7 +419,8 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   {
     require(assetToken != address(0x0), "UNI:E-403");
     assetRewardPrograms[assetToken] = rewardProgam;
-    emit RewardProgramSet(assetToken, rewardProgam);
+    assetRewardPrograms[nftMultiplier] = rewardProgam;
+    emit RewardProgramSet(assetToken, nftMultiplier, rewardProgam);
   }
 
   function _getRewardProgram(address assetToken) internal view returns (address) {
