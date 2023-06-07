@@ -391,8 +391,8 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   // Asset Token => Reward Program
   mapping (address => address) internal assetRewardPrograms;
 
-  function getRewardProgram(address assetToken) public view returns (address) {
-    return _getRewardProgram(assetToken);
+  function getRewardProgram(address asset) public view returns (address) {
+    return _getRewardProgram(asset);
   }
 
   function registerExistingDeposits(

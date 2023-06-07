@@ -25,6 +25,8 @@ describe('Reward program', function () {
     rewardWalletManagerMock,
     leptonData,
     rewardProgramDeployerSigner,
+    universe,
+    universeData,
     programData;
 
   before(async () => {
@@ -63,6 +65,11 @@ describe('Reward program', function () {
 
     await rewardProgramDeployerSigner.setUniverse(await deployerSigner.getAddress()).then(tx => tx.wait());
     programData = await rewardProgramDeployerSigner.getProgramData();
+
+    // Instantiate universe
+    const Universe= await ethers.getContractFactory('Universe');
+    universeData = getDeployData('Universe');
+    universe = Universe.attach(universeData.address);
   });
 
 
@@ -307,61 +314,61 @@ describe('Reward program', function () {
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
       }
     });
-  });
 
-  it('Closes nft stake struck after all leptons are released', async () => {
-    const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a2';
-    const tokenId = 3;
-
-    await rewardProgramDeployerSigner.registerAssetDeposit(
-      contractAddress,
-      tokenId,
-      'basic.B',
-      100
-    ).then(tx => tx.wait());
-
-    await leptonMock.mock.getMultiplier.returns(200);
-    await rewardProgramDeployerSigner.registerNftDeposit(
-      contractAddress,
-      tokenId,
-      leptonMock.address,
-      4, //lepton id
-      0
-    ).then(tx => tx.wait());
-
-    await leptonMock.mock.getMultiplier.returns(220);
-    await rewardProgramDeployerSigner.registerNftDeposit(
-      contractAddress,
-      tokenId,
-      leptonMock.address,
-      5, //lepton id
-      0
-    ).then(tx => tx.wait());
-
-    await leptonMock.mock.getMultiplier.returns(200);
-    await rewardProgramDeployerSigner.registerNftRelease(
-      contractAddress,
-      tokenId,
-      leptonMock.address,
-      4, //lepton id
-      0
-    ).then(tx => tx.wait());
-
-    await leptonMock.mock.getMultiplier.returns(220);
-    await rewardProgramDeployerSigner.registerNftRelease(
-      contractAddress,
-      tokenId,
-      leptonMock.address,
-      5, //lepton id
-      0
-    ).then(tx => tx.wait());
-
-    const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
-    const uuidBigNumber = ethers.BigNumber.from(uuid);
-    const nftStake = await rewardProgramDeployerSigner.getNftStake(uuidBigNumber);
-
-    expect(nftStake.multiplier).to.be.eq(220);
-    expect(nftStake.releaseBlockNumber).to.be.gt(0);
+    it('Closes nft stake struck after all leptons are released', async () => {
+      const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a2';
+      const tokenId = 3;
+  
+      await rewardProgramDeployerSigner.registerAssetDeposit(
+        contractAddress,
+        tokenId,
+        'basic.B',
+        100
+      ).then(tx => tx.wait());
+  
+      await leptonMock.mock.getMultiplier.returns(200);
+      await rewardProgramDeployerSigner.registerNftDeposit(
+        contractAddress,
+        tokenId,
+        leptonMock.address,
+        4, //lepton id
+        0
+      ).then(tx => tx.wait());
+  
+      await leptonMock.mock.getMultiplier.returns(220);
+      await rewardProgramDeployerSigner.registerNftDeposit(
+        contractAddress,
+        tokenId,
+        leptonMock.address,
+        5, //lepton id
+        0
+      ).then(tx => tx.wait());
+  
+      await leptonMock.mock.getMultiplier.returns(200);
+      await rewardProgramDeployerSigner.registerNftRelease(
+        contractAddress,
+        tokenId,
+        leptonMock.address,
+        4, //lepton id
+        0
+      ).then(tx => tx.wait());
+  
+      await leptonMock.mock.getMultiplier.returns(220);
+      await rewardProgramDeployerSigner.registerNftRelease(
+        contractAddress,
+        tokenId,
+        leptonMock.address,
+        5, //lepton id
+        0
+      ).then(tx => tx.wait());
+  
+      const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
+      const uuidBigNumber = ethers.BigNumber.from(uuid);
+      const nftStake = await rewardProgramDeployerSigner.getNftStake(uuidBigNumber);
+  
+      expect(nftStake.multiplier).to.be.eq(220);
+      expect(nftStake.releaseBlockNumber).to.be.gt(0);
+    });
   });
 
   describe('_calculateTotalMultiplier', () => {
@@ -420,6 +427,39 @@ describe('Reward program', function () {
       });
     }
   });
+
+  describe('Universe set up', async() => {
+    it.only('Sets a reward program in the universe', async () => {
+
+      await universe.setRewardProgram(
+        rewardProgram.address,
+        programData.stakingToken,
+        programData.multiplierNft
+      ).then(tx => tx.wait());
+
+      const rewardProgramSet = await universe.getRewardProgram(programData.stakingToken);
+      expect(rewardProgramSet).to.be.eq(rewardProgram.address);
+
+      await universe.removeRewardProgram(
+        programData.stakingToken,
+        programData.multiplierNft
+      ).then(tx => tx.wait());
+
+      const rewardProgramRemoved = await universe.getRewardProgram(programData.stakingToken);
+      expect(rewardProgramRemoved).to.be.eq('0x0000000000000000000000000000000000000000');
+
+      await universe.setRewardProgram(
+        rewardProgram.address,
+        programData.stakingToken,
+        programData.multiplierNft
+      ).then(tx => tx.wait());
+
+      expect(rewardProgramSet).to.be.eq(rewardProgram.address);
+      
+    });
+  });
+
+
 });
 
 const mineBlocks = async (numberOfBlocks) => {
