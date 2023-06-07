@@ -39,6 +39,7 @@ interface IUniverse {
   event ElectrostaticAttraction(address indexed account, address photonSource, uint256 energy, uint256 multiplier);
   event ElectrostaticDischarge(address indexed account, address photonSource, uint256 energy);
   event RewardProgramSet(address indexed assetToken, address indexed nftMultiplier, address indexed rewardProgram);
+  event RewardProgramRemoved(address indexed assetToken, address indexed nftMultiplier);
 
   function onEnergize(
     address sender,

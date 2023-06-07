@@ -422,6 +422,18 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     emit RewardProgramSet(assetToken, nftMultiplier, rewardProgam);
   }
 
+  function removeRewardProgram(
+    address assetToken,
+    address nftMultiplier
+  )
+    external
+    onlyOwner
+  {
+    delete assetRewardPrograms[assetToken];
+    delete assetRewardPrograms[nftMultiplier];
+    emit RewardProgramRemoved(assetToken, nftMultiplier);
+  }
+
   function _getRewardProgram(address assetToken) internal view returns (address) {
     return assetRewardPrograms[assetToken];
   }
