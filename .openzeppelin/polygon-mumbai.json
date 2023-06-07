@@ -44,6 +44,16 @@
       "address": "0x0114A7aE15f998E7e1387fE64B1b90c233c73243",
       "txHash": "0xfe197ffd7a509e182b0511a2c6dfc42fef2b21cbf20376fbc8ce11e6c5312159",
       "kind": "transparent"
+    },
+    {
+      "address": "0xd2b2501caF533a68135Bf3257330f5a8c889a6ED",
+      "txHash": "0x11a1ae3ae6b6ee5a01d115b8d88f7759af3f05621b8a27bd841e9329d30bbc66",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xb3D609A0B3d047c202A256E20FbfDa69E8EBe91D",
+      "txHash": "0x3c3047ad363cf97e5e3e835ebc248b0fdbf25fd7bc32d6a2a77bca9108284d13",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -776,6 +786,197 @@
             "type": "t_mapping(t_address,t_address)",
             "contract": "Universe",
             "src": "contracts/Universe.sol:387"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IERC20Upgradeable)1510": {
+            "label": "contract IERC20Upgradeable",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "dab6def2b84b10fcee3da31fb002e7fb96e9d6ee724cb15198f90af51516c90a": {
+      "address": "0x61FB1CD01DF782DaC68fb2EbC4fa4a05E6FF701F",
+      "txHash": "0xfbb5e7be2558e7bb2fc7c4ea0e12842cf0f7bf35b27e7d3f9b4a79eec9835732",
+      "layout": {
+        "solcVersion": "0.6.12",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "label": "chargedParticles",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:51"
+          },
+          {
+            "label": "proton",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_address",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:52"
+          },
+          {
+            "label": "lepton",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_address",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:53"
+          },
+          {
+            "label": "quark",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_address",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:54"
+          },
+          {
+            "label": "boson",
+            "offset": 0,
+            "slot": "105",
+            "type": "t_address",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:55"
+          },
+          {
+            "label": "photonMaxSupply",
+            "offset": 0,
+            "slot": "106",
+            "type": "t_uint256",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:60"
+          },
+          {
+            "label": "totalPhotonDischarged",
+            "offset": 0,
+            "slot": "107",
+            "type": "t_uint256",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:61"
+          },
+          {
+            "label": "photonSource",
+            "offset": 0,
+            "slot": "108",
+            "type": "t_contract(IERC20Upgradeable)1510",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:64"
+          },
+          {
+            "label": "esaMultiplier",
+            "offset": 0,
+            "slot": "109",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:67"
+          },
+          {
+            "label": "esaLevel",
+            "offset": 0,
+            "slot": "110",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:70"
+          },
+          {
+            "label": "referralSource",
+            "offset": 0,
+            "slot": "111",
+            "type": "t_mapping(t_address,t_address)",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:73"
+          },
+          {
+            "label": "bondedLeptonMass",
+            "offset": 0,
+            "slot": "112",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:76"
+          },
+          {
+            "label": "assetRewardPrograms",
+            "offset": 0,
+            "slot": "113",
+            "type": "t_mapping(t_address,t_address)",
+            "contract": "Universe",
+            "src": "contracts/Universe.sol:392"
           }
         ],
         "types": {

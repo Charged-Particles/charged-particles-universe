@@ -33,9 +33,10 @@ module.exports = async (hre) => {
   const usdcAddress = presets.Aave.v2.usdc[chainId];
   const daiMumbai = '0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F';
 
+  const rewardStakingToken = chainOverride == 80001 ? daiMumbai : usdcAddress;
+
   const ddUniverse = getDeployData('Universe', chainOverride);
   const ddChargedManagers = getDeployData('ChargedManagers', chainOverride);
-  // const ddRewardProgram = getDeployData('RewardProgram', chainOverride);
   const ddLepton2 = getDeployData('Lepton2', chainOverride);
   const ddIonx = getDeployData('Ionx', chainOverride);
 
@@ -95,7 +96,7 @@ module.exports = async (hre) => {
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   await executeTx('1-a', 'RewardProgram: Set Staking Token', async () =>
-    await rewardProgram.setStakingToken(usdcAddress)
+    await rewardProgram.setStakingToken(rewardStakingToken)
   );
 
   await executeTx('1-b', 'RewardProgram: Set Reward Token', async () =>
@@ -119,7 +120,7 @@ module.exports = async (hre) => {
   );
 
   await executeTx('1-g', 'Universe: Registering Reward Program', async () =>
-    await universe.setRewardProgram(rewardProgram.address, daiMumbai, ddLepton2.address)
+    await universe.setRewardProgram(rewardProgram.address, rewardStakingToken, ddLepton2.address)
   );
 
   await executeTx('1-a', 'Universe: Registering ChargedParticles', async () =>
