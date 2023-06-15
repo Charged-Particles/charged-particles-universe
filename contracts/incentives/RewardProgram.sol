@@ -62,6 +62,8 @@ contract RewardProgram is
   mapping(uint256 => AssetStake) private _assetStake;
   mapping(uint256 => NftStake) private _nftStake;
 
+  bool public assetDepositEnabled;
+
 
   /***********************************|
   |          Initialization           |
@@ -127,6 +129,8 @@ contract RewardProgram is
     override
     onlyUniverse
   {
+    require(assetDepositEnabled, "Locked");
+
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     AssetStake storage assetStake = _assetStake[parentNftUuid];
 
@@ -285,6 +289,10 @@ contract RewardProgram is
     IERC20 token = IERC20(_programData.rewardToken);
     token.safeTransferFrom(msg.sender, address(this), amount);
     emit RewardProgramFunded(amount);
+  }
+
+  function setAssetDepositEnabled(bool status) external onlyOwner {
+    assetDepositEnabled = status;
   }
 
   function setStakingToken(address newStakingToken) external onlyOwner {

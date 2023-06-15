@@ -124,6 +124,22 @@ describe('Reward program', function () {
   });
 
   describe('Leptons staking', async () => {
+    it.only('Attempts to register deposit when reward program is blocked', async () => {
+      const tokenId = 12;
+      const tokenContractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a9';
+
+      // Block deposits
+      await rewardProgramDeployerSigner.setAssetDepositEnabled(false);
+
+      // start reward program with usdc
+      await expect(rewardProgramDeployerSigner.registerAssetDeposit(
+        tokenContractAddress,
+        tokenId,
+        'basic.B',
+        100
+      )).to.be.revertedWith('Locked');
+    });
+
     it('Registers lepton deposit in reward program', async () => {
       const tokenId = 12;
       const leptonMultiplier = 200; // x2
@@ -429,8 +445,7 @@ describe('Reward program', function () {
   });
 
   describe('Universe set up', async() => {
-    it.only('Sets a reward program in the universe', async () => {
-
+    it('Sets a reward program in the universe', async () => {
       await universe.setRewardProgram(
         rewardProgram.address,
         programData.stakingToken,
@@ -455,11 +470,8 @@ describe('Reward program', function () {
       ).then(tx => tx.wait());
 
       expect(rewardProgramSet).to.be.eq(rewardProgram.address);
-      
     });
   });
-
-
 });
 
 const mineBlocks = async (numberOfBlocks) => {
