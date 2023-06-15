@@ -124,9 +124,14 @@ describe('Reward program', function () {
   });
 
   describe('Leptons staking', async () => {
-    it.only('Attempts to register deposit when reward program is blocked', async () => {
+    it('Attempts to register deposit when reward program is blocked', async () => {
       const tokenId = 12;
       const tokenContractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a9';
+
+      await expect(rewardProgram.connect(protocolOwnerSigner).setAssetDepositEnabled(false))
+        .to.be.revertedWith('Ownable: caller is not the owner');
+
+      const owner = await rewardProgram.connect(deployerSigner).owner();
 
       // Block deposits
       await rewardProgramDeployerSigner.setAssetDepositEnabled(false);
@@ -138,6 +143,8 @@ describe('Reward program', function () {
         'basic.B',
         100
       )).to.be.revertedWith('Locked');
+
+      await rewardProgramDeployerSigner.setAssetDepositEnabled(true);
     });
 
     it('Registers lepton deposit in reward program', async () => {

@@ -62,7 +62,7 @@ contract RewardProgram is
   mapping(uint256 => AssetStake) private _assetStake;
   mapping(uint256 => NftStake) private _nftStake;
 
-  bool public assetDepositEnabled;
+  bool public assetDepositEnabled = true;
 
 
   /***********************************|
