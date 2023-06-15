@@ -131,12 +131,8 @@ describe('Reward program', function () {
       await expect(rewardProgram.connect(protocolOwnerSigner).setAssetDepositEnabled(false))
         .to.be.revertedWith('Ownable: caller is not the owner');
 
-      const owner = await rewardProgram.connect(deployerSigner).owner();
-
-      // Block deposits
       await rewardProgramDeployerSigner.setAssetDepositEnabled(false);
 
-      // start reward program with usdc
       await expect(rewardProgramDeployerSigner.registerAssetDeposit(
         tokenContractAddress,
         tokenId,
@@ -145,6 +141,23 @@ describe('Reward program', function () {
       )).to.be.revertedWith('Locked');
 
       await rewardProgramDeployerSigner.setAssetDepositEnabled(true);
+    });
+
+    it('Locked release test', async () => {
+      const tokenId = 12;
+      const tokenContractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a9';
+
+      await expect(rewardProgram.connect(protocolOwnerSigner).setAssetReleaseEnabled(false))
+        .to.be.revertedWith('Ownable: caller is not the owner');
+
+      await rewardProgramDeployerSigner.setAssetReleaseEnabled(false);
+
+      await expect(rewardProgramDeployerSigner.registerAssetRelease(
+        leptonMock.address,
+        tokenId,
+        1000000 //generatedChargeAfterLeptonRelease
+      )).to.be.revertedWith('Locked');
+      await rewardProgramDeployerSigner.setAssetReleaseEnabled(true);
     });
 
     it('Registers lepton deposit in reward program', async () => {
@@ -321,18 +334,6 @@ describe('Reward program', function () {
           leptonMock.address,
           stakeInfoCases[i].tokenId
         )).to.be.eq(0);
-
-        // const claimRewards = await rewardProgramDeployerSigner.callStatic.claimRewards(
-        //   leptonMock.address,
-        //   stakeInfoCases[i].tokenId,
-        //   receiverAddress
-        // );
-
-        // await rewardProgramDeployerSigner.claimRewards(
-        //   leptonMock.address,
-        //   stakeInfoCases[i].tokenId,
-        //   receiverAddress
-        // ).then(tx => tx.wait());
 
         expect(reward).to.be.eq(stakeInfoCases[i].expectedReward);
       }

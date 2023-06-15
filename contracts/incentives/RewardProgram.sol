@@ -153,6 +153,8 @@ contract RewardProgram is
     nonReentrant
     returns (uint256 rewards)
   {
+    require(assetReleaseEnabled, "Locked");
+
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     AssetStake storage assetStake = _assetStake[parentNftUuid];
 
