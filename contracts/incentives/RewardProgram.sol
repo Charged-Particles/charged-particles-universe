@@ -63,6 +63,7 @@ contract RewardProgram is
   mapping(uint256 => NftStake) private _nftStake;
 
   bool public assetDepositEnabled = true;
+  bool public assetReleaseEnabled = true;
 
 
   /***********************************|
@@ -293,6 +294,10 @@ contract RewardProgram is
 
   function setAssetDepositEnabled(bool status) external onlyOwner {
     assetDepositEnabled = status;
+  }
+
+  function setAssetReleaseEnabled(bool status) external onlyOwner {
+    assetReleaseEnabled = status;
   }
 
   function setStakingToken(address newStakingToken) external onlyOwner {
