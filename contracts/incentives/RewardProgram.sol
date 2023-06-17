@@ -53,6 +53,8 @@ contract RewardProgram is
 
   uint256 constant private PERCENTAGE_SCALE = 1e4;   // 10000 (100%)
   uint256 constant private LEPTON_MULTIPLIER_SCALE = 1e2;
+  bool public assetDepositEnabled = true;
+  bool public assetReleaseEnabled = true;
 
   address private _universe;
   IChargedManagers private _chargedManagers;
@@ -61,9 +63,6 @@ contract RewardProgram is
   mapping(uint256 => EnumerableSet.UintSet) private _multiplierNftsSet;
   mapping(uint256 => AssetStake) private _assetStake;
   mapping(uint256 => NftStake) private _nftStake;
-
-  bool public assetDepositEnabled = true;
-  bool public assetReleaseEnabled = true;
 
 
   /***********************************|
@@ -76,6 +75,7 @@ contract RewardProgram is
   /***********************************|
   |         Public Functions          |
   |__________________________________*/
+
 
   function getProgramData() external view override returns (ProgramRewardData memory programData) {
     return _programData;
@@ -130,7 +130,7 @@ contract RewardProgram is
     override
     onlyUniverse
   {
-    require(assetDepositEnabled, "Locked");
+    require(assetDepositEnabled, "Deposit concluded");
 
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     AssetStake storage assetStake = _assetStake[parentNftUuid];
@@ -153,7 +153,7 @@ contract RewardProgram is
     nonReentrant
     returns (uint256 rewards)
   {
-    require(assetReleaseEnabled, "Locked");
+    require(assetReleaseEnabled, "Release concluded");
 
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     AssetStake storage assetStake = _assetStake[parentNftUuid];
@@ -427,8 +427,8 @@ contract RewardProgram is
 
   function _getNftMultiplier(address contractAddress, uint256 tokenId) internal returns (uint256) {
     bytes4 fnSig = IRewardNft.getMultiplier.selector;
-    // solhint-disable-next-line
     (bool success, bytes memory returnData) = contractAddress.call(abi.encodeWithSelector(fnSig, tokenId));
+
     if (success) {
       return abi.decode(returnData, (uint256));
     } else {
