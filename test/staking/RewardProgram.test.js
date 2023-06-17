@@ -131,33 +131,32 @@ describe('Reward program', function () {
       await expect(rewardProgram.connect(protocolOwnerSigner).setAssetDepositEnabled(false))
         .to.be.revertedWith('Ownable: caller is not the owner');
 
-      await rewardProgramDeployerSigner.setAssetDepositEnabled(false);
+      await rewardProgramDeployerSigner.setAssetDepositEnabled(false).then(tx => tx.wait());
 
       await expect(rewardProgramDeployerSigner.registerAssetDeposit(
         tokenContractAddress,
         tokenId,
         'basic.B',
         100
-      )).to.be.revertedWith('Locked');
+      )).to.be.revertedWith('Deposit concluded');
 
-      await rewardProgramDeployerSigner.setAssetDepositEnabled(true);
+      await rewardProgramDeployerSigner.setAssetDepositEnabled(true).then(tx => tx.wait());
     });
 
     it('Locked release test', async () => {
       const tokenId = 12;
-      const tokenContractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a9';
 
       await expect(rewardProgram.connect(protocolOwnerSigner).setAssetReleaseEnabled(false))
         .to.be.revertedWith('Ownable: caller is not the owner');
 
-      await rewardProgramDeployerSigner.setAssetReleaseEnabled(false);
+      await rewardProgramDeployerSigner.setAssetReleaseEnabled(false).then(tx => tx.wait());
 
       await expect(rewardProgramDeployerSigner.registerAssetRelease(
         leptonMock.address,
         tokenId,
         1000000 //generatedChargeAfterLeptonRelease
-      )).to.be.revertedWith('Locked');
-      await rewardProgramDeployerSigner.setAssetReleaseEnabled(true);
+      )).to.be.revertedWith('Release concluded');
+      await rewardProgramDeployerSigner.setAssetReleaseEnabled(true).then(tx => tx.wait());
     });
 
     it('Registers lepton deposit in reward program', async () => {
