@@ -20,7 +20,7 @@ module.exports = async (hre) => {
 
   const ionxMaxSupply = presets.Ionx.maxSupply;
 
-  const daoSigner = ethers.provider.getSigner(protocolOwner);
+  const daoSigner = ethers.provider.getSigner(deployer);
   const ddIonx = getDeployData('Ionx', chainId);
 
   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
@@ -35,7 +35,9 @@ module.exports = async (hre) => {
 
   log('  Loading Ionx from: ', ddIonx.address);
   const Ionx = await ethers.getContractFactory('Ionx');
-  const ionx = await Ionx.attach(ddIonx.address).connect(ethers.provider.getSigner(protocolOwner));
+  const ionx = await Ionx.attach(ddIonx.address).connect(daoSigner);
+
+  await Ionx.attach(ddIonx.address).setMinter(deployer).then(tx => tx.wait());
 
   await log(`  - Ionx: Minting to DAO`);
   await ionx.mint(protocolOwner, ionxMaxSupply);

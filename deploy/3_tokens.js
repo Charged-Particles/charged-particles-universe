@@ -145,12 +145,12 @@ module.exports = async (hre) => {
     log('     - Block:    ', lepton.deployTransaction.blockNumber);
     log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
   }
-  log('  - Lepton2:     ', lepton2.address);
-  log('     - Block:    ', lepton2.deployTransaction.blockNumber);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
-  log('  - Ionx:        ', ionx.address);
-  log('     - Block:    ', ionx.deployTransaction.blockNumber);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionx.deployTransaction }));
+  // log('  - Lepton2:     ', lepton2.address);
+  // log('     - Block:    ', lepton2.deployTransaction.blockNumber);
+  // log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
+  // log('  - Ionx:        ', ionx.address);
+  // log('     - Block:    ', ionx.deployTransaction.blockNumber);
+  // log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionx.deployTransaction }));
   if (!isProd) {
     log('  - ExternalERC721:     ', externalERC721.address);
     log('     - Block:           ', externalERC721.deployTransaction.blockNumber);
