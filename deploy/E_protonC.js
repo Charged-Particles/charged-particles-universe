@@ -51,7 +51,7 @@ module.exports = async (hre) => {
   // Deploy ProtonC
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  await log('\n  Deploying ProtonC NFT...');
+  log('\n  Deploying ProtonC NFT...');
   const ProtonC = await ethers.getContractFactory('ProtonC');
   const ProtonCInstance = await ProtonC.deploy();
   const protonC = await ProtonCInstance.deployed();
@@ -94,7 +94,7 @@ module.exports = async (hre) => {
 
 
   // Display Contract Addresses
-  await log('\n  Contract Deployments Complete!\n\n  Contracts:');
+  log('\n  Contract Deployments Complete!\n\n  Contracts:');
   log('  - ProtonC:     ', protonC.address);
   log('     - Block:    ', protonC.deployTransaction.blockNumber);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: protonC.deployTransaction }));

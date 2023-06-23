@@ -38,7 +38,7 @@ task(
 
 
 const mnemonic = {
-  testnet: `${process.env.TESTNET_MNEMONIC_2}`.replace(/_/g, ' '),
+  testnet: `${process.env.TESTNET_MNEMONIC}`.replace(/_/g, ' '),
   mainnet: `${process.env.MAINNET_MNEMONIC}`.replace(/_/g, ' '),
 };
 
@@ -120,7 +120,7 @@ module.exports = {
         mumbai: {
             // url: `https://rpc-mumbai.matic.today`,
             // url: `https://rpc-mumbai.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
-            url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_MUMBAI_APIKEY}`,
+            url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
             // gasPrice: 50e9,
             accounts: {
                 mnemonic: mnemonic.testnet,
@@ -199,6 +199,7 @@ module.exports = {
       flat: true,
       only: [
         'Universe',
+        'UniverseRP',
         'ChargedState',
         'ChargedSettings',
         'ChargedManagers',
@@ -211,9 +212,11 @@ module.exports = {
         'GenericWalletManagerB',
         'GenericBasketManager',
         'GenericBasketManagerB',
+        'RewardProgram',
         'Ionx',
         'Proton',
         'ProtonB',
+        'ProtonC',
         'Lepton',
         'Lepton2',
         'ERC20',

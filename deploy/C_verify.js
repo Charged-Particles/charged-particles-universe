@@ -23,15 +23,20 @@ const _findImplementationAddress = (implementations, contractName) => {
   return _.get(implementations, `${implKey}.address`, '');
 };
 
-const _verifyProxyContract = async ({name, networkName}) => {
+const _verifyProxyContract = async ({name, networkName, implAddressOverride = null}) => {
   const chainId = chainIdByName(networkName);
   const projectData = getOZProjectData(chainId);
 
   let implementationAddress = '';
-  const deployData = getDeployData(name, chainId);
-  const deployTx = _.get(deployData, 'upgradeTransaction', _.get(deployData, 'deployTransaction', ''));
-  if (!_.isEmpty(deployTx)) {
-    implementationAddress = _findImplementationAddress(projectData.impls, name);
+
+  if (implAddressOverride !== null) {
+    implementationAddress = implAddressOverride;
+  } else {
+    const deployData = getDeployData(name, chainId);
+    const deployTx = _.get(deployData, 'upgradeTransaction', _.get(deployData, 'deployTransaction', ''));
+    if (!_.isEmpty(deployTx)) {
+      implementationAddress = _findImplementationAddress(projectData.impls, name);
+    }
   }
 
   if (_.isEmpty(implementationAddress)) {
@@ -97,7 +102,7 @@ module.exports = async (hre) => {
 
   // Protocol
   // await _verifyProxyContract({name: 'Universe', networkName});
-  // await _verifyProxyContract({name: 'ChargedParticles', networkName});
+  // await _verifyProxyContract({name: 'ChargedParticles', networkName, implAddressOverride: '0xA85B3d84f54Fb238Ef257158da99FdfCe905C7aA'});
   // await _verifyProxyContract({name: 'ChargedState', networkName});
   // await _verifyProxyContract({name: 'ChargedSettings', networkName});
   // await _verifyProxyContract({name: 'ChargedManagers', networkName});
@@ -114,9 +119,9 @@ module.exports = async (hre) => {
   // await _verifyContract({name: 'AaveWalletManagerB', networkName});
 
   // NFTs
-  await _verifyContract({name: 'Proton', networkName});
-  await _verifyContract({name: 'ProtonB', networkName});
-  await _verifyContract({name: 'ProtonC', networkName});
+  // await _verifyContract({name: 'Proton', networkName});
+  // await _verifyContract({name: 'ProtonB', networkName});
+  // await _verifyContract({name: 'ProtonC', networkName});
   // await _verifyContract({name: 'Lepton', networkName});
   // await _verifyContract({name: 'Lepton2', networkName});
   // await _verifyContract({name: 'ExternalERC721', networkName});

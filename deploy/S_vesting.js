@@ -55,7 +55,7 @@ module.exports = async (hre) => {
   const Ionx = await ethers.getContractFactory('Ionx');
   const ionx = await Ionx.attach(ddIonx.address);
 
-  await log(`\n  Deploying VestingClaim${__VESTING_CLAIM_INDEX} with Expiry: ${new Date(vesting.expiryDate * 1000).toLocaleDateString("en-US")}...`);
+  log(`\n  Deploying VestingClaim${__VESTING_CLAIM_INDEX} with Expiry: ${new Date(vesting.expiryDate * 1000).toLocaleDateString("en-US")}...`);
   const VestingClaimInstance = await VestingClaim.deploy(ddIonx.address, vesting.merkleRoot, vesting.expiryDate);
   const vestingClaim = await VestingClaimInstance.deployed();
   deployData[`VestingClaim${__VESTING_CLAIM_INDEX}`] = {
@@ -77,7 +77,7 @@ module.exports = async (hre) => {
   }
 
   // Display Contract Addresses
-  await log('\n  Contract Deployments Complete!\n\n  Contracts:');
+  log('\n  Contract Deployments Complete!\n\n  Contracts:');
   log(`  - VestingClaim${__VESTING_CLAIM_INDEX}: ${vestingClaim.address}`);
   log('     - Gas Cost:  ', getTxGasCost({ deployTransaction: vestingClaim.deployTransaction }));
 

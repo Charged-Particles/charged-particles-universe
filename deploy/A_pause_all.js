@@ -87,22 +87,22 @@ module.exports = async (hre) => {
   // Set Paused State
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  await log(`  - ${_ACTION} GenericWalletManager...`);
+  log(`  - ${_ACTION} GenericWalletManager...`);
   await genericWalletManager.setPausedState(_PAUSED_STATE);
 
-  await log(`  - ${_ACTION} GenericBasketManager...`);
+  log(`  - ${_ACTION} GenericBasketManager...`);
   await genericBasketManager.setPausedState(_PAUSED_STATE);
 
-  await log(`  - ${_ACTION} AaveWalletManager...`);
+  log(`  - ${_ACTION} AaveWalletManager...`);
   await aaveWalletManager.setPausedState(_PAUSED_STATE);
 
-  await log(`  - ${_ACTION} Proton...`);
+  log(`  - ${_ACTION} Proton...`);
   await proton.setPausedState(_PAUSED_STATE);
 
-  await log(`  - ${_ACTION} Lepton...`);
+  log(`  - ${_ACTION} Lepton...`);
   await lepton.setPausedState(_PAUSED_STATE);
 
-  await log(`  - ${_ACTION} Lepton2...`);
+  log(`  - ${_ACTION} Lepton2...`);
   await lepton2.setPausedState(_PAUSED_STATE);
 
 

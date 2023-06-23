@@ -53,7 +53,7 @@ module.exports = async (hre) => {
   // Migrate Leptons
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  await log(`  - Migrating ${_AMOUNT_TO_MIGRATE} Tokens from ${ddLepton.address}...`);
+  log(`  - Migrating ${_AMOUNT_TO_MIGRATE} Tokens from ${ddLepton.address}...`);
   const result = await lepton2.migrateAccounts(ddLepton.address, _AMOUNT_TO_MIGRATE);
   log('     - Gas Cost: ', (await getActualTxGasCost(result)));
 

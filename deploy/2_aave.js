@@ -33,7 +33,7 @@ module.exports = async (hre) => {
     log('  - Owner:       ', protocolOwner);
     log(' ');
 
-    await log('\n  Deploying AaveWalletManager...');
+    log('\n  Deploying AaveWalletManager...');
     const AaveWalletManager = await hre.ethers.getContractFactory('AaveWalletManager');
     const AaveWalletManagerInstance = await AaveWalletManager.deploy();
     const aaveWalletManager = await AaveWalletManagerInstance.deployed();
@@ -47,7 +47,7 @@ module.exports = async (hre) => {
     log('     - Block:           ', aaveWalletManager.deployTransaction.blockNumber);
     log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: aaveWalletManager.deployTransaction }));
 
-    await log('\n  Deploying AaveWalletManagerB...');
+    log('\n  Deploying AaveWalletManagerB...');
     const AaveWalletManagerB = await hre.ethers.getContractFactory('AaveWalletManagerB');
     const AaveWalletManagerBInstance = await AaveWalletManagerB.deploy();
     const aaveWalletManagerB = await AaveWalletManagerBInstance.deployed();
@@ -61,7 +61,7 @@ module.exports = async (hre) => {
     log('     - Block:           ', aaveWalletManagerB.deployTransaction.blockNumber);
     log('     - Gas Cost:        ', getTxGasCost({ deployTransaction: aaveWalletManagerB.deployTransaction }));
 
-    // await log('\n  Deploying AaveBridgeV2 with LP Provider: ', lendingPoolProviderV2);
+    // log('\n  Deploying AaveBridgeV2 with LP Provider: ', lendingPoolProviderV2);
     // const AaveBridgeV2 = await ethers.getContractFactory('AaveBridgeV2');
     // const AaveBridgeV2Instance = await AaveBridgeV2.deploy(lendingPoolProviderV2);
     // const aaveBridgeV2 = await AaveBridgeV2Instance.deployed();

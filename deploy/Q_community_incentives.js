@@ -62,7 +62,7 @@ const {
     let communityVault;
 
     if (isHardhat) {
-      await log(`\n  Deploying CommunityVault...`);
+      log(`\n  Deploying CommunityVault...`);
       CommunityVault = await ethers.getContractFactory('CommunityVault');
       CommunityVaultInstance = await CommunityVault.deploy(ddIonx.address);
       communityVault = await CommunityVaultInstance.deployed();
@@ -79,7 +79,7 @@ const {
       communityVault = await CommunityVault.attach(ddCommunityVault.address);
     }
 
-    await log(`\n  Deploying Staking Contract ${__STAKING_INDEX}...`);
+    log(`\n  Deploying Staking Contract ${__STAKING_INDEX}...`);
     const stakingArgs = [incentives.staking.epoch1Start, incentives.staking.epochDuration];
     const StakingInstance = await Staking.deploy(...stakingArgs);
     const staking = await StakingInstance.deployed();
@@ -90,7 +90,7 @@ const {
         deployTransaction: staking.deployTransaction,
     };
 
-    await log(`\n  Deploying IONX Yield Farm ${__STAKING_INDEX}...`);
+    log(`\n  Deploying IONX Yield Farm ${__STAKING_INDEX}...`);
     const ionxYieldFarmDeployArgs = [
       ionx.address,
       ionx.address,
@@ -117,7 +117,7 @@ const {
     // Transfer ownership?
 
     // Deploying LP Yield Farm Contract
-    await log(`\n  Deploying LP Yield Farm ${__STAKING_INDEX}...`);
+    log(`\n  Deploying LP Yield Farm ${__STAKING_INDEX}...`);
     const lpYieldFarmDeployArgs = [
       ionx.address,
       incentives.uniswapLPTokenAddress,
@@ -156,7 +156,7 @@ const {
     }
 
     // Display Contract Addresses
-    await log('\n  Contract Deployments Complete!\n\n  Contracts:');
+    log('\n  Contract Deployments Complete!\n\n  Contracts:');
     if (isHardhat) {
       log('  - CommunityVault: ', communityVault.address);
       log('     - Gas Cost:    ', getTxGasCost({ deployTransaction: communityVault.deployTransaction }));

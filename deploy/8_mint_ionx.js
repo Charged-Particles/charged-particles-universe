@@ -39,7 +39,7 @@ module.exports = async (hre) => {
 
   await Ionx.attach(ddIonx.address).setMinter(deployer).then(tx => tx.wait());
 
-  await log(`  - Ionx: Minting to DAO`);
+  log(`  - Ionx: Minting to DAO`);
   await ionx.mint(protocolOwner, ionxMaxSupply);
 
   log('\n  Contract Universe Ionx Minting Complete!');

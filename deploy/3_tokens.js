@@ -33,7 +33,7 @@ module.exports = async (hre) => {
   log('  - Trusted Forwarder: ', trustedForwarder);
   log(' ');
 
-  await log('\n  Deploying Proton NFT...');
+  log('\n  Deploying Proton NFT...');
   const Proton = await ethers.getContractFactory('Proton');
   const ProtonInstance = await Proton.deploy();
   const proton = await ProtonInstance.deployed();
@@ -43,7 +43,7 @@ module.exports = async (hre) => {
     deployTransaction: proton.deployTransaction,
   }
 
-  await log('\n  Deploying ProtonB NFT...');
+  log('\n  Deploying ProtonB NFT...');
   const ProtonB = await ethers.getContractFactory('ProtonB');
   const ProtonBInstance = await ProtonB.deploy();
   const protonB = await ProtonBInstance.deployed();
@@ -53,7 +53,7 @@ module.exports = async (hre) => {
     deployTransaction: protonB.deployTransaction,
   }
 
-  await log('\n  Deploying ProtonC NFT...');
+  log('\n  Deploying ProtonC NFT...');
   const ProtonC = await ethers.getContractFactory('ProtonC');
   const ProtonCInstance = await ProtonC.deploy();
   const protonC = await ProtonCInstance.deployed();
@@ -65,7 +65,7 @@ module.exports = async (hre) => {
 
   let LeptonInstance, Lepton, lepton;
   if (isHardhat) {
-    await log('\n  Deploying Lepton NFT...');
+    log('\n  Deploying Lepton NFT...');
     Lepton = await ethers.getContractFactory('Lepton');
     LeptonInstance = await Lepton.deploy();
     lepton = await LeptonInstance.deployed();
@@ -76,7 +76,7 @@ module.exports = async (hre) => {
     }
   }
 
-  await log('\n  Deploying Lepton2 NFT...');
+  log('\n  Deploying Lepton2 NFT...');
   const Lepton2 = await ethers.getContractFactory('Lepton2');
   const Lepton2Instance = await Lepton2.deploy();
   const lepton2 = await Lepton2Instance.deployed();
@@ -86,7 +86,7 @@ module.exports = async (hre) => {
     deployTransaction: lepton2.deployTransaction,
   }
 
-  await log('\n  Deploying Ionx FT...');
+  log('\n  Deploying Ionx FT...');
   const Ionx = await ethers.getContractFactory('Ionx');
   const IonxInstance = await Ionx.deploy();
   const ionx = await IonxInstance.deployed();
@@ -98,7 +98,7 @@ module.exports = async (hre) => {
 
   let externalERC721, nonFungibleERC1155, fungibleERC1155
   if (!isProd) {
-    await log('\n  Deploying ExternalERC721...');
+    log('\n  Deploying ExternalERC721...');
     const ExternalERC721 = await ethers.getContractFactory('ExternalERC721');
     const ExternalERC721Instance = await ExternalERC721.deploy();
     externalERC721 = await ExternalERC721Instance.deployed();
@@ -108,7 +108,7 @@ module.exports = async (hre) => {
       deployTransaction: externalERC721.deployTransaction,
     }
 
-    await log('\n  Deploying NonFungibleERC1155...');
+    log('\n  Deploying NonFungibleERC1155...');
     const NonFungibleERC1155 = await ethers.getContractFactory('NonFungibleERC1155');
     const NonFungibleERC1155Instance = await NonFungibleERC1155.deploy();
     nonFungibleERC1155 = await NonFungibleERC1155Instance.deployed();
@@ -118,7 +118,7 @@ module.exports = async (hre) => {
       deployTransaction: nonFungibleERC1155.deployTransaction,
     }
 
-    await log('\n  Deploying FungibleERC1155...');
+    log('\n  Deploying FungibleERC1155...');
     const FungibleERC1155 = await ethers.getContractFactory('FungibleERC1155');
     const FungibleERC1155Instance = await FungibleERC1155.deploy();
     fungibleERC1155 = await FungibleERC1155Instance.deployed();
@@ -130,7 +130,7 @@ module.exports = async (hre) => {
   }
 
   // Display Contract Addresses
-  await log('\n  Contract Deployments Complete!\n\n  Contracts:');
+  log('\n  Contract Deployments Complete!\n\n  Contracts:');
   log('  - Proton:      ', proton.address);
   log('     - Block:    ', proton.deployTransaction.blockNumber);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
@@ -145,12 +145,12 @@ module.exports = async (hre) => {
     log('     - Block:    ', lepton.deployTransaction.blockNumber);
     log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
   }
-  // log('  - Lepton2:     ', lepton2.address);
-  // log('     - Block:    ', lepton2.deployTransaction.blockNumber);
-  // log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
-  // log('  - Ionx:        ', ionx.address);
-  // log('     - Block:    ', ionx.deployTransaction.blockNumber);
-  // log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionx.deployTransaction }));
+  log('  - Lepton2:     ', lepton2.address);
+  log('     - Block:    ', lepton2.deployTransaction.blockNumber);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
+  log('  - Ionx:        ', ionx.address);
+  log('     - Block:    ', ionx.deployTransaction.blockNumber);
+  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionx.deployTransaction }));
   if (!isProd) {
     log('  - ExternalERC721:     ', externalERC721.address);
     log('     - Block:           ', externalERC721.deployTransaction.blockNumber);

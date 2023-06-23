@@ -53,8 +53,6 @@ contract RewardProgram is
 
   uint256 constant private PERCENTAGE_SCALE = 1e4;   // 10000 (100%)
   uint256 constant private LEPTON_MULTIPLIER_SCALE = 1e2;
-  bool public assetDepositEnabled = true;
-  bool public assetReleaseEnabled = true;
 
   address private _universe;
   IChargedManagers private _chargedManagers;
@@ -130,8 +128,6 @@ contract RewardProgram is
     override
     onlyUniverse
   {
-    require(assetDepositEnabled, "Deposit concluded");
-
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     AssetStake storage assetStake = _assetStake[parentNftUuid];
 
@@ -153,8 +149,6 @@ contract RewardProgram is
     nonReentrant
     returns (uint256 rewards)
   {
-    require(assetReleaseEnabled, "Release concluded");
-
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     AssetStake storage assetStake = _assetStake[parentNftUuid];
 
@@ -231,21 +225,17 @@ contract RewardProgram is
     emit NftRelease(contractAddress, tokenId, releaseNftAddress, releaseNftTokenId);
   }
 
-  function calculateBaseReward(uint256 amount) public view returns(uint256 baseReward) {
-    baseReward = _calculateBaseReward(amount);
-  }
-
   /***********************************|
   |         Reward Calculation        |
   |__________________________________*/
 
+  function calculateBaseReward(uint256 amount) public view returns(uint256 baseReward) {
+    baseReward = _calculateBaseReward(amount);
+  }
+
   function calculateRewardsEarned(uint256 parentNftUuid, uint256 interestAmount) public view returns (uint256 totalReward) {
     uint256 baseReward = _calculateBaseReward(interestAmount);
     totalReward = calculateMultipliedReward(parentNftUuid, baseReward);
-  }
-
-  function _calculateBaseReward(uint256 amount) internal view returns(uint256 baseReward) {
-    baseReward = amount.mul(_programData.baseMultiplier).div(PERCENTAGE_SCALE);
   }
 
   function calculateMultipliedReward(uint256 parentNftUuid, uint256 baseReward) public view returns(uint256) {
@@ -292,14 +282,6 @@ contract RewardProgram is
     IERC20 token = IERC20(_programData.rewardToken);
     token.safeTransferFrom(msg.sender, address(this), amount);
     emit RewardProgramFunded(amount);
-  }
-
-  function setAssetDepositEnabled(bool status) external onlyOwner {
-    assetDepositEnabled = status;
-  }
-
-  function setAssetReleaseEnabled(bool status) external onlyOwner {
-    assetReleaseEnabled = status;
   }
 
   function setStakingToken(address newStakingToken) external onlyOwner {
@@ -385,6 +367,10 @@ contract RewardProgram is
     }
 
     emit RewardsClaimed(contractAddress, tokenId, receiver, totalReward, unavailReward);
+  }
+
+  function _calculateBaseReward(uint256 amount) internal view returns (uint256 baseReward) {
+    baseReward = amount.mul(_programData.baseMultiplier).div(PERCENTAGE_SCALE);
   }
 
   function _calculateTotalMultiplier(uint256 parentNftUuid) internal view returns (uint256) {

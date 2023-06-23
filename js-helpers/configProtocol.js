@@ -50,8 +50,8 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ddRewardProgram = getDeployData('RewardProgram', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddProtonB = getDeployData('ProtonB', chainId);
-    // const ddLepton2 = getDeployData('Lepton2', chainId);
-    // const ddIonx = getDeployData('Ionx', chainId);
+    const ddLepton2 = getDeployData('Lepton2', chainId);
+    const ddIonx = getDeployData('Ionx', chainId);
 
     log(`  Using Network: ${chainNameById(chainId)} (${chainId})`);
     log('  Using Accounts:');
@@ -108,10 +108,6 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // const AaveWalletManagerB = await ethers.getContractFactory('AaveWalletManagerB');
     // const aaveWalletManagerB = await AaveWalletManagerB.attach(ddAaveWalletManagerB.address);
 
-    log('  Loading RewardProgram from:         ', ddRewardProgram.address, ` (${_.get(ddRewardProgram, 'deployTransaction.blockNumber', '0')})`);
-    const RewardProgram = await ethers.getContractFactory('RewardProgram');
-    const rewardProgram = await RewardProgram.attach(ddRewardProgram.address);
-
     log('  Loading TokenInfoProxy from:        ', ddTokenInfoProxy.address, ` (${_.get(ddTokenInfoProxy, 'deployTransaction.blockNumber', '0')})`);
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
     const tokenInfoProxy = await TokenInfoProxy.attach(ddTokenInfoProxy.address);
@@ -124,21 +120,21 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ProtonB = await ethers.getContractFactory('ProtonB');
     const protonB = await ProtonB.attach(ddProtonB.address);
 
-    // let ddLepton, Lepton, lepton;
-    // if (isHardhat) {
-    //   ddLepton = getDeployData('Lepton', chainId);
-    //   log('  Loading Lepton from:                ', ddLepton.address, ` (${_.get(ddLepton, 'deployTransaction.blockNumber', '0')})`);
-    //   Lepton = await ethers.getContractFactory('Lepton');
-    //   lepton = await Lepton.attach(ddLepton.address);
-    // }
+    let ddLepton, Lepton, lepton;
+    if (isHardhat) {
+      ddLepton = getDeployData('Lepton', chainId);
+      log('  Loading Lepton from:                ', ddLepton.address, ` (${_.get(ddLepton, 'deployTransaction.blockNumber', '0')})`);
+      Lepton = await ethers.getContractFactory('Lepton');
+      lepton = await Lepton.attach(ddLepton.address);
+    }
 
-    // log('  Loading Lepton2 from:               ', ddLepton2.address, ` (${_.get(ddLepton2, 'deployTransaction.blockNumber', '0')})`);
-    // const Lepton2 = await ethers.getContractFactory('Lepton2');
-    // const lepton2 = await Lepton2.attach(ddLepton2.address);
+    log('  Loading Lepton2 from:               ', ddLepton2.address, ` (${_.get(ddLepton2, 'deployTransaction.blockNumber', '0')})`);
+    const Lepton2 = await ethers.getContractFactory('Lepton2');
+    const lepton2 = await Lepton2.attach(ddLepton2.address);
 
-    // log('  Loading Ionx from:                  ', ddIonx.address, ` (${_.get(ddIonx, 'deployTransaction.blockNumber', '0')})`);
-    // const Ionx = await ethers.getContractFactory('Ionx');
-    // const ionx = await Ionx.attach(ddIonx.address);
+    log('  Loading Ionx from:                  ', ddIonx.address, ` (${_.get(ddIonx, 'deployTransaction.blockNumber', '0')})`);
+    const Ionx = await ethers.getContractFactory('Ionx');
+    const ionx = await Ionx.attach(ddIonx.address);
 
 
     // skipToTxId('9-c');
@@ -456,37 +452,37 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // Setup Lepton2
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    // await executeTx('9-a', 'Lepton2: Setting Max Mint per Transaction', async () =>
-    //   await lepton2.setMaxMintPerTx(leptonMaxMint)
-    // );
+    await executeTx('9-a', 'Lepton2: Setting Max Mint per Transaction', async () =>
+      await lepton2.setMaxMintPerTx(leptonMaxMint)
+    );
 
-    // await executeTx('9-b', 'ChargedParticles: Registering Lepton2', async () =>
-    //   await chargedParticles.setController(ddLepton2.address, 'leptons')
-    // );
+    await executeTx('9-b', 'ChargedParticles: Registering Lepton2', async () =>
+      await chargedParticles.setController(ddLepton2.address, 'leptons')
+    );
 
-    // await executeTx('9-c', 'ChargedParticles: Enabling Lepton2', async () =>
-    //   await chargedSettings.enableNftContracts([ddLepton2.address])
-    // );
+    await executeTx('9-c', 'ChargedParticles: Enabling Lepton2', async () =>
+      await chargedSettings.enableNftContracts([ddLepton2.address])
+    );
 
-    // let useChainId = parseInt(chainId, 10);
-    // if (useChainId === 5) { useChainId = 42; }
-    // if (useChainId === 80001) { useChainId = 42; }
-    // if (useChainId === 137) { useChainId = 1; }
+    let useChainId = parseInt(chainId, 10);
+    if (useChainId === 5) { useChainId = 42; }
+    if (useChainId === 80001) { useChainId = 42; }
+    if (useChainId === 137) { useChainId = 1; }
 
-    // // let lepton2Type;
-    // for (let i = 0; i < presets.Lepton.types.length; i++) {
-    //   lepton2Type = presets.Lepton.types[i];
+    // let lepton2Type;
+    for (let i = 0; i < presets.Lepton.types.length; i++) {
+      lepton2Type = presets.Lepton.types[i];
 
-    //   await executeTx(`9-d-${i}`, `Lepton2: Adding Lepton Type: ${lepton2Type.name}`, async () =>
-    //     await lepton2.addLeptonType(
-    //       lepton2Type.tokenUri,
-    //       lepton2Type.price[useChainId],
-    //       lepton2Type.supply[useChainId],
-    //       lepton2Type.multiplier,
-    //       lepton2Type.bonus,
-    //     )
-    //   );
-    // }
+      await executeTx(`9-d-${i}`, `Lepton2: Adding Lepton Type: ${lepton2Type.name}`, async () =>
+        await lepton2.addLeptonType(
+          lepton2Type.tokenUri,
+          lepton2Type.price[useChainId],
+          lepton2Type.supply[useChainId],
+          lepton2Type.multiplier,
+          lepton2Type.bonus,
+        )
+      );
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup External Executors
