@@ -41,6 +41,7 @@ const erc20ABI = require('../abis/erc20');
 const { balanceOf } = require('../../js-helpers/balanceOf');
 const daiHodler = "0x55e4d16f9c3041EfF17Ca32850662f3e9Dddbce7"; // Hodler with the highest current amount of DAI, used for funding our operations on mainnet fork.
 const amplHodler = "0x6723B7641c8Ac48a61F5f505aB1E9C03Bb44a301";
+const usdcHodler = "0xF977814e90dA44bFA03b6295A0616a897441aceC";
 
 let overrides = { gasLimit: 20000000 }
 const buyProtonGasLimit = toWei('0.5');
@@ -53,6 +54,8 @@ describe("[INTEGRATION] Charged Particles", () => {
   let daiAddress;
   let ampl;
   let amplAddress;
+  let usdc;
+  let usdcAddress
   let cryptoPunksMarket;
 
   // Internal contracts
@@ -62,6 +65,8 @@ describe("[INTEGRATION] Charged Particles", () => {
   let chargedManagers;
   let chargedParticles;
   let particleSplitter;
+  let rewardProgram;
+  let rewardWalletManager;
   let aaveWalletManager;
   let genericWalletManager;
   let genericBasketManager;
@@ -82,7 +87,10 @@ describe("[INTEGRATION] Charged Particles", () => {
 
   let daiSigner;
   let amplSigner;
+  let usdcSigner;
   let deployer;
+  let protocolOwner
+  let protocolOwnerSigner
   let user1;
   let user2;
   let user3;
@@ -95,6 +103,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     chainId = await getChainId(); // chainIdByName(network.name);
     daiAddress = presets.Aave.v2.dai[chainId];
     amplAddress = presets.Aave.v2.ampl[chainId];
+    usdcAddress = presets.Aave.v2.usdc[chainId];
 
     // With Forked Mainnet
     await network.provider.request({
@@ -105,15 +114,24 @@ describe("[INTEGRATION] Charged Particles", () => {
       method: "hardhat_impersonateAccount",
       params: [amplHodler]
     });
+    await network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [usdcHodler]
+    });
 
     daiSigner = ethers.provider.getSigner(daiHodler);
     amplSigner = ethers.provider.getSigner(amplHodler);
+    usdcSigner = ethers.provider.getSigner(usdcHodler);
+
     const namedAccts = (await getNamedAccounts());
     deployer = namedAccts.deployer
     trustedForwarder = namedAccts.trustedForwarder;
     user1 = namedAccts.user1;
     user2 = namedAccts.user2;
     user3 = namedAccts.user3;
+    protocolOwner = namedAccts.protocolOwner;
+
+    protocolOwnerSigner = ethers.provider.getSigner(protocolOwner);
     signerD = ethers.provider.getSigner(deployer);
     signer1 = ethers.provider.getSigner(user1);
     signer2 = ethers.provider.getSigner(user2);
@@ -122,6 +140,7 @@ describe("[INTEGRATION] Charged Particles", () => {
     // With Forked Mainnet
     dai = new ethers.Contract(daiAddress, daiABI, daiSigner);
     ampl = new ethers.Contract(amplAddress, erc20ABI, amplSigner);
+    usdc = new ethers.Contract(usdcAddress, erc20ABI, usdcSigner);
 
     // test NFTs that are non-compliant with ERC721 standard
     cryptoPunksMarket = await deployMockContract(signerD, CryptoPunksMarket.abi, overrides);
@@ -137,12 +156,14 @@ describe("[INTEGRATION] Charged Particles", () => {
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
+    const RewardWalletManager = await ethers.getContractFactory('RewardWalletManager');
     const Proton = await ethers.getContractFactory('Proton');
     const ProtonB = await ethers.getContractFactory('ProtonB');
     const ProtonC = await ethers.getContractFactory('ProtonC');
     const Lepton = await ethers.getContractFactory('Lepton2');
     const Ionx = await ethers.getContractFactory('Ionx');
-    const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy')
+    const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
+    const RewardProgram = await ethers.getContractFactory('RewardProgram');
 
     universe = Universe.attach(getDeployData('Universe', chainId).address);
     chargedState = ChargedState.attach(getDeployData('ChargedState', chainId).address);
@@ -159,6 +180,8 @@ describe("[INTEGRATION] Charged Particles", () => {
     lepton = Lepton.attach(getDeployData('Lepton2', chainId).address);
     ionx = Ionx.attach(getDeployData('Ionx', chainId).address);
     tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address);
+    rewardProgram = RewardProgram.attach(getDeployData('RewardProgram', chainId).address);
+    rewardWalletManager = RewardWalletManager.attach(getDeployData('RewardWalletManager', chainId).address);
 
     await proton.connect(signerD).setPausedState(false);
     await protonB.connect(signerD).setPausedState(false);
@@ -175,6 +198,10 @@ describe("[INTEGRATION] Charged Particles", () => {
     await network.provider.request({
       method: "hardhat_stopImpersonatingAccount",
       params: [amplHodler]
+    });
+    await network.provider.request({
+      method: "hardhat_stopImpersonatingAccount",
+      params: [usdcHodler]
     });
   });
 
@@ -1319,12 +1346,12 @@ describe("[INTEGRATION] Charged Particles", () => {
     const balanceDifference = user1BalanceBeforeMint.sub(user1BalanceAfterMint);
 
     expect(firstMintId).to.be.eq(ethers.BigNumber.from(1));
-    // // mint cost + gas 
+    // // mint cost + gas
     expect(balanceDifference).to.be.within(
       ethers.BigNumber.from(ethers.utils.parseUnits('1')),
       ethers.BigNumber.from(ethers.utils.parseUnits('1.1'))
     );
-    
+
     const setChargedSettingsTx = await protonC.connect(signerD)['setChargedSettings'](chargedSettings.address);
     await setChargedSettingsTx.wait();
     const setChargedParticlesTx = await protonC.connect(signerD)['setChargedParticles'](chargedParticles.address);
@@ -1347,15 +1374,15 @@ describe("[INTEGRATION] Charged Particles", () => {
 
     expect(createProtonForSaleId).to.be.eq(ethers.BigNumber.from(2));
     expect(await ethers.provider.getBalance(protonC.address)).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('2')));
-    
+
     // Allow list the contract into the protocol
     await chargedSettings.connect(signerD).enableNftContracts([protonC.address]);
     // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') });
-    
+
     await dai.connect(daiSigner).transfer(user1, toWei('10'));
     await dai.connect(signer1)['approve(address,uint256)'](protonC.address, toWei('10'));
-    
+
    const energizedParticleId = await callAndReturn({
       contractInstance: protonC,
       contractMethod: 'createChargedParticle',
@@ -1370,7 +1397,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         toWei('10'),                  // assetAmount
         annuityPct,                   // annuityPercent
       ],
-      callValue: ethers.utils.parseEther('1') 
+      callValue: ethers.utils.parseEther('1')
     });
 
     // Token ID should be third
@@ -1389,12 +1416,12 @@ describe("[INTEGRATION] Charged Particles", () => {
       protonBalanceAfterAllDeposits.toString()
     );
     await withdrawEthFromContractTx.wait();
-     
+
     // ProtonC should have no eth
     expect(await ethers.provider.getBalance(protonC.address)).to.be.eq(ethers.BigNumber.from(ethers.utils.parseUnits('0')));
 
     const user3BalanceAfterWithdraw = await ethers.provider.getBalance(user3);
-    
+
     expect(user3BalanceBeforeWithdraw.add(protonBalanceAfterAllDeposits)).to.be.eq(user3BalanceAfterWithdraw);
   });
 
@@ -1424,7 +1451,7 @@ describe("[INTEGRATION] Charged Particles", () => {
         100
       ],
       callValue: ethers.utils.parseEther('1')
-    }); 
+    });
 
     await expect(protonC.connect(signer1)['transferFrom'](user1, user2, mintedLockedNftId)).to.revertedWith("BondedToken: Token is locked");
 
@@ -1441,9 +1468,9 @@ describe("[INTEGRATION] Charged Particles", () => {
         0
       ],
       callValue: ethers.utils.parseEther('1')
-    }); 
+    });
 
-    const transferTokenTx = await protonC.connect(signer1)['transferFrom'](user1, user2, mintedTransferableNftId); 
+    const transferTokenTx = await protonC.connect(signer1)['transferFrom'](user1, user2, mintedTransferableNftId);
     await transferTokenTx.wait();
 
     // Check correct user has its corresponding token
@@ -1489,7 +1516,7 @@ describe("[INTEGRATION] Charged Particles", () => {
       callValue: ethers.utils.parseEther('1')
     });
 
-    // Lock minted token 
+    // Lock minted token
     await callAndReturnWithLogs({
       contractInstance: protonC,
       contractMethod: 'lockToken',
@@ -1500,4 +1527,117 @@ describe("[INTEGRATION] Charged Particles", () => {
     });
     await expect(protonC.connect(signer1)['transferFrom'](user1, user2, createProtonForSaleId)).to.revertedWith("BondedToken: Token is locked");
   });
+
+  // RewardWallet
+  // describe.only('Ionx reward program', function() {
+  //   const fundingAmount = ethers.utils.parseUnits('70');
+
+  //   it ("can succesfully stake into reward program.", async () => {
+  //     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
+  //     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
+  //     await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
+
+  //     await signerD.sendTransaction({ to: usdcHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
+
+  //     await usdc.connect(usdcSigner).transfer(user1, '100000000000');
+  //     await usdc.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+  //     await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
+  //     await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
+
+  //     // Reverts not wallet manager
+  //     await expect(
+  //       rewardProgram.connect(signerD).stake(
+  //         tokenInfoProxyMock.address,
+  //         fundingAmount
+  //       )
+  //     ).to.be.revertedWith("Not wallet");
+
+  //     const energizedParticleId = await callAndReturn({
+  //       contractInstance: proton,
+  //       contractMethod: 'createChargedParticle',
+  //       contractCaller: signer1,
+  //       contractParams: [
+  //         user1,                       // creator
+  //         user2,                       // receiver
+  //         user1,                       // referrer
+  //         TEST_NFT_TOKEN_URI,          // tokenMetaUri
+  //         'reward',                    // walletManagerId
+  //         usdcAddress,                  // assetToken
+  //         '100000000000',                  // assetAmount
+  //         0,                           // annuityPercent
+  //       ],
+  //     });
+
+  //     await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
+
+  //     const uuid = await tokenInfoProxy.getTokenUUID(proton.address, energizedParticleId);
+  //     const initiatedStakeOnEnergized = await rewardProgram.walletStake(uuid);
+  //     expect(initiatedStakeOnEnergized).to.have.property('start');
+
+  //     // fund reward program.
+  //     await ionx.connect(protocolOwnerSigner).transfer(deployer, fundingAmount).then(tx => tx.wait());
+  //     await ionx.connect(signerD).approve(rewardProgram.address, fundingAmount).then(tx => tx.wait());
+  //     await rewardProgram.connect(signerD).fund(fundingAmount).then(tx => tx.wait());
+  //     const rewardProgramIonxBalance = await ionx.balanceOf(rewardProgram.address);
+
+  //     expect(rewardProgramIonxBalance).to.equal(fundingAmount);
+
+  //     // Reverts not wallet manager
+  //     await expect(
+  //       rewardProgram.connect(signerD).unstake(
+  //         user2,
+  //         proton.address,
+  //         1,
+  //     )).to.be.revertedWith("Not wallet");
+
+  //     expect(await ionx.balanceOf(user2)).to.be.eq(0);
+
+  //     await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + 2);
+
+  //     await chargedParticles.connect(signer2).releaseParticle(
+  //       user2,
+  //       proton.address,
+  //       energizedParticleId,
+  //       'reward',
+  //       usdcAddress
+  //     );
+  //     expect(await usdc.balanceOf(user2)).to.be.above('90000000000');
+  //     const stakeOnRelease = await rewardProgram.walletStake(uuid);
+  //     expect(stakeOnRelease['generatedCharge']).gt(0);
+
+  //     expect(await ionx.balanceOf(user2)).to.be.eq(stakeOnRelease['reward']);
+  //   });
+
+  //   it ('Deployed wallet manager set in reward program', async function() {
+  //     const rewardWalletManager = getDeployData('RewardWalletManager', chainId);
+  //     expect(await rewardProgram.rewardWalletManager()).to.be.eq(rewardWalletManager.address);
+  //   });
+
+  //   it('Reverts when subscribing to the wrong reward program.', async function() {
+  //     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') });
+  //     await dai.connect(daiSigner).transfer(user1, toWei('10'));
+  //     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
+
+  //     await expect(
+  //       proton.connect(signer1).createChargedParticle(
+  //         user1,                        // creator
+  //         user1,                        // receiver
+  //         user1,                        // referrer
+  //         TEST_NFT_TOKEN_URI,           // tokenMetaUri
+  //         'reward',                    // walletManagerId
+  //         daiAddress,                  // assetToken
+  //         toWei('10'),                   // assetAmount
+  //         0,                            // annuityPercent
+  //      )
+  //     ).to.be.revertedWith("Non  existing reward program.");
+  //   });
+
+  //   it('Converts decimals', async () => {
+  //     const oneConvertedValue = await rewardProgram.convertDecimals(1);
+  //     expect(oneConvertedValue.toString().split('').filter(v => v === '0').length).to.be.eq(12);
+  //     const tenConvertedValue = await rewardProgram.convertDecimals(10);
+  //     expect(tenConvertedValue.toString().split('').filter(v => v === '0').length).to.be.eq(13);
+  //   });
+  // });
 });

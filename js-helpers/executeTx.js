@@ -51,7 +51,7 @@ const executeTx = async (txId, txDesc, callback, delay = 0) => {
     if (txId === '1-a') {
       log(`\n`);
     }
-    await log(`  - [TX-${txId}] ${txDesc}`)(delay);
+    log(`  - [TX-${txId}] ${txDesc}`)(delay);
     const tx = await callback();
     const txResult = await tx.wait();
     accumulatedGasCost(txResult);

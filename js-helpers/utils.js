@@ -40,7 +40,7 @@ const chainIdByName = (chainName) => {
     case 'zkevmtest': return 1442;
     case 'hardhat': return 31337;
     case 'coverage': return 31337;
-    // TODO: update for zk-Polygon 
+    // TODO: update for zk-Polygon
     default: return 0;
   }
 };
@@ -67,6 +67,7 @@ const chainTypeById = (chainId) => {
       return {isProd: true, isTestnet: false, isHardhat: false};
     case 3:
     case 4:
+    case 5:
     case 42:
     case 1442:
     case 80001:
@@ -74,7 +75,7 @@ const chainTypeById = (chainId) => {
     case 31337:
     default:
       return {isProd: false, isTestnet: false, isHardhat: true};
-    // TODO: update for zk-Polygon 
+    // TODO: update for zk-Polygon
   }
 };
 

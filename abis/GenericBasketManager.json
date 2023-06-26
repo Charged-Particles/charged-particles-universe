@@ -210,6 +210,19 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "rewardProgram",
+        "type": "address"
+      }
+    ],
+    "name": "RewardProgramSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "receiver",
         "type": "address"
       },
