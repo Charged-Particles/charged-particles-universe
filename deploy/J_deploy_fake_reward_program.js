@@ -165,7 +165,7 @@ module.exports = async (hre) => {
   // Load Existing Contracts
   //
 
-  log('  Loading ChargedParticles from:      ', ddChargedParticles.address, ` (${_.get(ddChargedParticles, 'deployTransaction.blockNumber', '0')})`);
+  log('\n  Loading ChargedParticles from:      ', ddChargedParticles.address, ` (${_.get(ddChargedParticles, 'deployTransaction.blockNumber', '0')})`);
   const ChargedParticles = await ethers.getContractFactory('ChargedParticles');
   const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
