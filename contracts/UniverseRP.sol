@@ -22,6 +22,7 @@
 // SOFTWARE.
 
 pragma solidity 0.6.12;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -29,10 +30,12 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 
 import "./interfaces/IUniverse.sol";
 import "./interfaces/IChargedParticles.sol";
 import "./interfaces/ILepton.sol";
+import "./interfaces/IRewardNft.sol";
 import "./lib/TokenInfo.sol";
 import "./lib/BlackholePrevention.sol";
 import "./interfaces/IRewardProgram.sol";
@@ -46,14 +49,32 @@ contract UniverseRP is IUniverse, Initializable, OwnableUpgradeable, BlackholePr
   using SafeMathUpgradeable for uint256;
   using TokenInfo for address;
   using SafeERC20Upgradeable for IERC20Upgradeable;
+  using EnumerableSet for EnumerableSet.UintSet;
 
+  event NftDeposit(address indexed contractAddress, uint256 tokenId, address indexed nftTokenAddress, uint256 nftTokenId);
+  event NftRelease(address indexed contractAddress, uint256 tokenId, address indexed nftTokenAddress, uint256 nftTokenId);
+
+  struct NftStake {
+    uint256 multiplier; // in Basis Points
+    uint256 depositBlockNumber;
+    uint256 releaseBlockNumber;
+  }
+
+  uint256 constant private LEPTON_MULTIPLIER_SCALE = 1e2;
   uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
 
   // The ChargedParticles Contract Address
   address public chargedParticles;
 
+  // The Lepton NFT Contract Address
+  address public multiplierNft;
+
   // Asset Token => Reward Program
-  mapping (address => address) internal assetRewardPrograms;
+  mapping (address => address) internal _assetRewardPrograms;
+  mapping (uint256 => EnumerableSet.UintSet) internal _multiplierNftsSet;
+
+  // Token UUID => NFT Staking Data
+  mapping (uint256 => NftStake) private _nftStake;
 
 
   /***********************************|
@@ -69,16 +90,8 @@ contract UniverseRP is IUniverse, Initializable, OwnableUpgradeable, BlackholePr
     return _getRewardProgram(asset);
   }
 
-  function registerExistingDeposits(
-    address contractAddress,
-    uint256 tokenId,
-    string calldata walletManagerId,
-    address assetToken
-  ) external {
-    address rewardProgram = getRewardProgram(assetToken);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerExistingDeposits(contractAddress, tokenId, walletManagerId);
-    }
+  function getNftStake(uint256 uuid) view external returns (NftStake memory) {
+    return _nftStake[uuid];
   }
 
 
@@ -185,10 +198,7 @@ contract UniverseRP is IUniverse, Initializable, OwnableUpgradeable, BlackholePr
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(nftTokenAddress);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerNftDeposit(contractAddress, tokenId, nftTokenAddress, nftTokenId, nftTokenAmount);
-    }
+    _registerNftDeposit(contractAddress, tokenId, nftTokenAddress, nftTokenId, nftTokenAmount);
   }
 
   function onCovalentBreak(
@@ -204,10 +214,7 @@ contract UniverseRP is IUniverse, Initializable, OwnableUpgradeable, BlackholePr
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(nftTokenAddress);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerNftRelease(contractAddress, tokenId, nftTokenAddress, nftTokenId, nftTokenAmount);
-    }
+    _registerNftRelease(contractAddress, tokenId, nftTokenAddress, nftTokenId, nftTokenAmount);
   }
 
   function onProtonSale(
@@ -252,8 +259,8 @@ contract UniverseRP is IUniverse, Initializable, OwnableUpgradeable, BlackholePr
     onlyValidContractAddress(rewardProgam)
   {
     require(assetToken != address(0x0), "UNI:E-403");
-    assetRewardPrograms[assetToken] = rewardProgam;
-    assetRewardPrograms[nftMultiplier] = rewardProgam;
+    _assetRewardPrograms[assetToken] = rewardProgam;
+    _assetRewardPrograms[nftMultiplier] = rewardProgam;
     emit RewardProgramSet(assetToken, nftMultiplier, rewardProgam);
   }
 
@@ -264,8 +271,8 @@ contract UniverseRP is IUniverse, Initializable, OwnableUpgradeable, BlackholePr
     external
     onlyOwner
   {
-    delete assetRewardPrograms[assetToken];
-    delete assetRewardPrograms[nftMultiplier];
+    delete _assetRewardPrograms[assetToken];
+    delete _assetRewardPrograms[nftMultiplier];
     emit RewardProgramRemoved(assetToken, nftMultiplier);
   }
 
@@ -291,7 +298,114 @@ contract UniverseRP is IUniverse, Initializable, OwnableUpgradeable, BlackholePr
   |__________________________________*/
 
   function _getRewardProgram(address assetToken) internal view returns (address) {
-    return assetRewardPrograms[assetToken];
+    return _assetRewardPrograms[assetToken];
+  }
+
+  function _registerNftDeposit(address contractAddress, uint256 tokenId, address depositNftAddress, uint256 depositNftTokenId, uint256 /* nftTokenAmount */)
+    internal
+  {
+    // We only care about the Multiplier NFT
+    if (multiplierNft != depositNftAddress) { return; }
+
+    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+    uint256 multiplier = _getNftMultiplier(depositNftAddress, depositNftTokenId);
+
+    if (multiplier > 0 && !_multiplierNftsSet[parentNftUuid].contains(multiplier)) {
+      // Add to Multipliers Set
+      _multiplierNftsSet[parentNftUuid].add(multiplier);
+
+      // Update NFT Stake
+      uint256 combinedMultiplier = _calculateTotalMultiplier(parentNftUuid);
+      if (_nftStake[parentNftUuid].depositBlockNumber == 0) {
+        _nftStake[parentNftUuid] = NftStake(combinedMultiplier, block.number, 0);
+      } else {
+        uint256 blockDiff = block.number - _nftStake[parentNftUuid].depositBlockNumber;
+        _nftStake[parentNftUuid].multiplier = combinedMultiplier;
+        _nftStake[parentNftUuid].depositBlockNumber = _nftStake[parentNftUuid].depositBlockNumber.add(blockDiff.div(2));
+      }
+    }
+
+    emit NftDeposit(contractAddress, tokenId, depositNftAddress, depositNftTokenId);
+  }
+
+  function _registerNftRelease(
+    address contractAddress,
+    uint256 tokenId,
+    address releaseNftAddress,
+    uint256 releaseNftTokenId,
+    uint256 /* nftTokenAmount */
+  )
+    internal
+  {
+    // We only care about the Multiplier NFT
+    if (multiplierNft != releaseNftAddress) { return; }
+
+    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+    NftStake storage nftStake = _nftStake[parentNftUuid];
+
+    // Remove from Multipliers Set
+    uint256 multiplier = _getNftMultiplier(releaseNftAddress, releaseNftTokenId);
+    _multiplierNftsSet[parentNftUuid].remove(multiplier);
+
+    // Determine New Multiplier or Mark as Released
+    if (_multiplierNftsSet[parentNftUuid].length() > 0) {
+      nftStake.multiplier = _calculateTotalMultiplier(parentNftUuid);
+    } else {
+      nftStake.releaseBlockNumber = block.number;
+    }
+
+    emit NftRelease(contractAddress, tokenId, releaseNftAddress, releaseNftTokenId);
+  }
+
+
+
+  function _calculateTotalMultiplier(uint256 parentNftUuid) internal view returns (uint256) {
+    uint256 len = _multiplierNftsSet[parentNftUuid].length();
+    uint256 indexOfSmallest = 0;
+    uint256 multiplier = 0;
+    uint256 i = 0;
+
+    // If holding all 6, Max Multiplier of 10X
+    if (len == 6) {
+      return LEPTON_MULTIPLIER_SCALE.mul(10);
+    }
+
+    // If holding more than 4, Ignore the Smallest
+    if (len > 4) {
+      for (; i < len; i++) {
+        if (_multiplierNftsSet[parentNftUuid].at(i) < _multiplierNftsSet[parentNftUuid].at(indexOfSmallest)) {
+          indexOfSmallest = i;
+        }
+      }
+      i = 0;
+    }
+
+    // If holding less than or equal to 4, Multiplier = Half of the Sum of all
+    for (; i < len; i++) {
+      if (len > 4 && i == indexOfSmallest) { continue; }
+      multiplier = multiplier.add(_multiplierNftsSet[parentNftUuid].at(i));
+    }
+
+    return len > 1 ? multiplier.div(2) : multiplier; // Half of the Sum
+  }
+
+  function _getNftDepositLength(NftStake memory nftStake) internal view returns (uint256 nftDepositLength) {
+    if (nftStake.releaseBlockNumber > 0 ) {
+      nftDepositLength = nftStake.releaseBlockNumber.sub(nftStake.depositBlockNumber);
+    } else {
+      nftDepositLength = block.number.sub(nftStake.depositBlockNumber);
+    }
+  }
+
+  function _getNftMultiplier(address contractAddress, uint256 tokenId) internal returns (uint256) {
+    bytes4 fnSig = IRewardNft.getMultiplier.selector;
+    (bool success, bytes memory returnData) = contractAddress.call(abi.encodeWithSelector(fnSig, tokenId));
+
+    if (success) {
+      return abi.decode(returnData, (uint256));
+    } else {
+      return 0;
+    }
   }
 
 

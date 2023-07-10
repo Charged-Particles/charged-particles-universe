@@ -58,9 +58,9 @@ contract RewardProgram is
   IChargedManagers private _chargedManagers;
   ProgramRewardData private _programData;
 
-  mapping(uint256 => EnumerableSet.UintSet) private _multiplierNftsSet;
+  // mapping(uint256 => EnumerableSet.UintSet) private _multiplierNftsSet;
   mapping(uint256 => AssetStake) private _assetStake;
-  mapping(uint256 => NftStake) private _nftStake;
+  // mapping(uint256 => NftStake) private _nftStake;
 
 
   /***********************************|
@@ -92,31 +92,13 @@ contract RewardProgram is
     return _assetStake[uuid];
   }
 
-  function getNftStake(uint256 uuid) view external returns (NftStake memory) {
-    return _nftStake[uuid];
-  }
+  // function getNftStake(uint256 uuid) view external returns (NftStake memory) {
+  //   return _nftStake[uuid];
+  // }
 
   /***********************************|
   |          Only Universe            |
   |__________________________________*/
-
-  function registerExistingDeposits(address contractAddress, uint256 tokenId, string calldata walletManagerId)
-    external
-    override
-    onlyUniverse
-    nonReentrant
-  {
-    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
-    require(_assetStake[parentNftUuid].start == 0 && _assetStake[parentNftUuid].claimableRewards == 0, "RP:E-002");
-
-    // Initiate Asset Stake
-    IWalletManager walletMgr = _chargedManagers.getWalletManager(walletManagerId);
-    uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, _programData.stakingToken);
-    if (principal > 0) {
-      _assetStake[parentNftUuid] = AssetStake(block.number, 0, walletManagerId);
-      emit AssetRegistered(contractAddress, tokenId, walletManagerId, principal);
-    }
-  }
 
   function registerAssetDeposit(
     address contractAddress,
@@ -170,60 +152,60 @@ contract RewardProgram is
   }
 
 
-  function registerNftDeposit(address contractAddress, uint256 tokenId, address depositNftAddress, uint256 depositNftTokenId, uint256 /* nftTokenAmount */)
-    external
-    override
-    onlyUniverse
-    nonReentrant
-  {
-    // We only care about the Multiplier NFT
-    if (_programData.multiplierNft != depositNftAddress) { return; }
+  // function registerNftDeposit(address contractAddress, uint256 tokenId, address depositNftAddress, uint256 depositNftTokenId, uint256 /* nftTokenAmount */)
+  //   external
+  //   override
+  //   onlyUniverse
+  //   nonReentrant
+  // {
+  //   // We only care about the Multiplier NFT
+  //   if (_programData.multiplierNft != depositNftAddress) { return; }
 
-    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
-    uint256 multiplier = _getNftMultiplier(depositNftAddress, depositNftTokenId);
+  //   uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+  //   uint256 multiplier = _getNftMultiplier(depositNftAddress, depositNftTokenId);
 
-    if (multiplier > 0 && !_multiplierNftsSet[parentNftUuid].contains(multiplier)) {
-      // Add to Multipliers Set
-      _multiplierNftsSet[parentNftUuid].add(multiplier);
+  //   if (multiplier > 0 && !_multiplierNftsSet[parentNftUuid].contains(multiplier)) {
+  //     // Add to Multipliers Set
+  //     _multiplierNftsSet[parentNftUuid].add(multiplier);
 
-      // Update NFT Stake
-      uint256 combinedMultiplier = _calculateTotalMultiplier(parentNftUuid);
-      _nftStake[parentNftUuid] = NftStake(combinedMultiplier, block.number, 0);
-    }
+  //     // Update NFT Stake
+  //     uint256 combinedMultiplier = _calculateTotalMultiplier(parentNftUuid);
+  //     _nftStake[parentNftUuid] = NftStake(combinedMultiplier, block.number, 0);
+  //   }
 
-    emit NftDeposit(contractAddress, tokenId, depositNftAddress, depositNftTokenId);
-  }
+  //   emit NftDeposit(contractAddress, tokenId, depositNftAddress, depositNftTokenId);
+  // }
 
-  function registerNftRelease(
-    address contractAddress,
-    uint256 tokenId,
-    address releaseNftAddress,
-    uint256 releaseNftTokenId,
-    uint256 /* nftTokenAmount */
-  )
-    external
-    override
-    onlyUniverse
-  {
-    // We only care about the Multiplier NFT
-    if (_programData.multiplierNft != releaseNftAddress) { return; }
+  // function registerNftRelease(
+  //   address contractAddress,
+  //   uint256 tokenId,
+  //   address releaseNftAddress,
+  //   uint256 releaseNftTokenId,
+  //   uint256 /* nftTokenAmount */
+  // )
+  //   external
+  //   override
+  //   onlyUniverse
+  // {
+  //   // We only care about the Multiplier NFT
+  //   if (_programData.multiplierNft != releaseNftAddress) { return; }
 
-    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
-    NftStake storage nftStake = _nftStake[parentNftUuid];
+  //   uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+  //   NftStake storage nftStake = _nftStake[parentNftUuid];
 
-    // Remove from Multipliers Set
-    uint256 multiplier = _getNftMultiplier(releaseNftAddress, releaseNftTokenId);
-    _multiplierNftsSet[parentNftUuid].remove(multiplier);
+  //   // Remove from Multipliers Set
+  //   uint256 multiplier = _getNftMultiplier(releaseNftAddress, releaseNftTokenId);
+  //   _multiplierNftsSet[parentNftUuid].remove(multiplier);
 
-    // Determine New Multiplier or Mark as Released
-    if (_multiplierNftsSet[parentNftUuid].length() > 0) {
-      nftStake.multiplier = _calculateTotalMultiplier(parentNftUuid);
-    } else {
-      nftStake.releaseBlockNumber = block.number;
-    }
+  //   // Determine New Multiplier or Mark as Released
+  //   if (_multiplierNftsSet[parentNftUuid].length() > 0) {
+  //     nftStake.multiplier = _calculateTotalMultiplier(parentNftUuid);
+  //   } else {
+  //     nftStake.releaseBlockNumber = block.number;
+  //   }
 
-    emit NftRelease(contractAddress, tokenId, releaseNftAddress, releaseNftTokenId);
-  }
+  //   emit NftRelease(contractAddress, tokenId, releaseNftAddress, releaseNftTokenId);
+  // }
 
   /***********************************|
   |         Reward Calculation        |
@@ -308,6 +290,21 @@ contract RewardProgram is
     _programData.multiplierNft = nftTokenAddress;
   }
 
+  function registerExistingDeposits(address contractAddress, uint256 tokenId, string calldata walletManagerId)
+    external
+    onlyOwner
+  {
+    uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+
+    // Initiate Asset Stake
+    IWalletManager walletMgr = _chargedManagers.getWalletManager(walletManagerId);
+    uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, _programData.stakingToken);
+    if (principal > 0) {
+      _assetStake[parentNftUuid] = AssetStake(block.number, 0, walletManagerId);
+      emit AssetRegistered(contractAddress, tokenId, walletManagerId, principal);
+    }
+  }
+
 
   /***********************************|
   |          Only Admin/DAO           |
@@ -373,54 +370,54 @@ contract RewardProgram is
     baseReward = amount.mul(_programData.baseMultiplier).div(PERCENTAGE_SCALE);
   }
 
-  function _calculateTotalMultiplier(uint256 parentNftUuid) internal view returns (uint256) {
-    uint256 len = _multiplierNftsSet[parentNftUuid].length();
-    uint256 indexOfSmallest = 0;
-    uint256 multiplier = 0;
-    uint256 i = 0;
+  // function _calculateTotalMultiplier(uint256 parentNftUuid) internal view returns (uint256) {
+  //   uint256 len = _multiplierNftsSet[parentNftUuid].length();
+  //   uint256 indexOfSmallest = 0;
+  //   uint256 multiplier = 0;
+  //   uint256 i = 0;
 
-    // If holding all 6, Max Multiplier of 10X
-    if (len == 6) {
-      return LEPTON_MULTIPLIER_SCALE.mul(10);
-    }
+  //   // If holding all 6, Max Multiplier of 10X
+  //   if (len == 6) {
+  //     return LEPTON_MULTIPLIER_SCALE.mul(10);
+  //   }
 
-    // If holding more than 4, Ignore the Smallest
-    if (len > 4) {
-      for (; i < len; i++) {
-        if (_multiplierNftsSet[parentNftUuid].at(i) < _multiplierNftsSet[parentNftUuid].at(indexOfSmallest)) {
-          indexOfSmallest = i;
-        }
-      }
-      i = 0;
-    }
+  //   // If holding more than 4, Ignore the Smallest
+  //   if (len > 4) {
+  //     for (; i < len; i++) {
+  //       if (_multiplierNftsSet[parentNftUuid].at(i) < _multiplierNftsSet[parentNftUuid].at(indexOfSmallest)) {
+  //         indexOfSmallest = i;
+  //       }
+  //     }
+  //     i = 0;
+  //   }
 
-    // If holding less than or equal to 4, Multiplier = Half of the Sum of all
-    for (; i < len; i++) {
-      if (len > 4 && i == indexOfSmallest) { continue; }
-      multiplier = multiplier.add(_multiplierNftsSet[parentNftUuid].at(i));
-    }
+  //   // If holding less than or equal to 4, Multiplier = Half of the Sum of all
+  //   for (; i < len; i++) {
+  //     if (len > 4 && i == indexOfSmallest) { continue; }
+  //     multiplier = multiplier.add(_multiplierNftsSet[parentNftUuid].at(i));
+  //   }
 
-    return len > 1 ? multiplier.div(2) : multiplier; // Half of the Sum
-  }
+  //   return len > 1 ? multiplier.div(2) : multiplier; // Half of the Sum
+  // }
 
-  function _getNftDepositLength(NftStake memory nftStake) internal view returns (uint256 nftDepositLength) {
-    if (nftStake.releaseBlockNumber > 0 ) {
-      nftDepositLength = nftStake.releaseBlockNumber.sub(nftStake.depositBlockNumber);
-    } else {
-      nftDepositLength = block.number.sub(nftStake.depositBlockNumber);
-    }
-  }
+  // function _getNftDepositLength(NftStake memory nftStake) internal view returns (uint256 nftDepositLength) {
+  //   if (nftStake.releaseBlockNumber > 0 ) {
+  //     nftDepositLength = nftStake.releaseBlockNumber.sub(nftStake.depositBlockNumber);
+  //   } else {
+  //     nftDepositLength = block.number.sub(nftStake.depositBlockNumber);
+  //   }
+  // }
 
-  function _getNftMultiplier(address contractAddress, uint256 tokenId) internal returns (uint256) {
-    bytes4 fnSig = IRewardNft.getMultiplier.selector;
-    (bool success, bytes memory returnData) = contractAddress.call(abi.encodeWithSelector(fnSig, tokenId));
+  // function _getNftMultiplier(address contractAddress, uint256 tokenId) internal returns (uint256) {
+  //   bytes4 fnSig = IRewardNft.getMultiplier.selector;
+  //   (bool success, bytes memory returnData) = contractAddress.call(abi.encodeWithSelector(fnSig, tokenId));
 
-    if (success) {
-      return abi.decode(returnData, (uint256));
-    } else {
-      return 0;
-    }
-  }
+  //   if (success) {
+  //     return abi.decode(returnData, (uint256));
+  //   } else {
+  //     return 0;
+  //   }
+  // }
 
   function _getFundBalance() internal view returns (uint256) {
     return IERC20(_programData.rewardToken).balanceOf(address(this));

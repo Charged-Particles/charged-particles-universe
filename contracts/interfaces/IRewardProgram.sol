@@ -36,15 +36,15 @@ interface IRewardProgram {
   event AssetDeposit(address indexed contractAddress, uint256 tokenId, string walletManagerId, uint256 principalAmount);
   event AssetRelease(address indexed contractAddress, uint256 tokenId, uint256 interestAmount);
 
-  event NftDeposit(address indexed contractAddress, uint256 tokenId, address indexed nftTokenAddress, uint256 nftTokenId);
-  event NftRelease(address indexed contractAddress, uint256 tokenId, address indexed nftTokenAddress, uint256 nftTokenId);
+  // event NftDeposit(address indexed contractAddress, uint256 tokenId, address indexed nftTokenAddress, uint256 nftTokenId);
+  // event NftRelease(address indexed contractAddress, uint256 tokenId, address indexed nftTokenAddress, uint256 nftTokenId);
 
   /* data types */
   struct ProgramRewardData {
     address stakingToken;
     address rewardToken;
     uint256 baseMultiplier; // Basis Points
-    address multiplierNft;
+    // address multiplierNft;
   }
 
   struct AssetStake {
@@ -53,19 +53,17 @@ interface IRewardProgram {
     string walletManagerId;
   }
 
-  struct NftStake {
-    uint256 multiplier; // in Basis Points
-    uint256 depositBlockNumber;
-    uint256 releaseBlockNumber;
-  }
+  // struct NftStake {
+  //   uint256 multiplier; // in Basis Points
+  //   uint256 depositBlockNumber;
+  //   uint256 releaseBlockNumber;
+  // }
 
   /* user functions */
   function getProgramData() external view returns (ProgramRewardData memory programData);
   function getFundBalance() external view returns (uint256);
   function getClaimableRewards(address contractAddress, uint256 tokenId) external view returns (uint256);
   // function claimRewards(address contractAddress, uint256 tokenId, address receiver) public returns (uint256 totalReward);
-
-  function registerExistingDeposits(address contractAddress, uint256 tokenId, string calldata walletManagerId) external;
 
   function registerAssetDeposit(address contractAddress, uint256 tokenId, string calldata walletManagerId, uint256 principalAmount) external;
   function registerAssetRelease(address contractAddress, uint256 tokenId, uint256 interestAmount) external returns (uint256 rewards);
