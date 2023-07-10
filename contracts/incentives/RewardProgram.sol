@@ -235,7 +235,9 @@ contract RewardProgram is
 
   function calculateRewardsEarned(uint256 parentNftUuid, uint256 interestAmount) public view returns (uint256 totalReward) {
     uint256 baseReward = _calculateBaseReward(interestAmount);
-    totalReward = calculateMultipliedReward(parentNftUuid, baseReward);
+    uint256 leptonMultipliedReward = calculateMultipliedReward(parentNftUuid, baseReward);
+
+    totalReward = convertDecimals(leptonMultipliedReward);
   }
 
   function calculateMultipliedReward(uint256 parentNftUuid, uint256 baseReward) public view returns(uint256) {
@@ -420,6 +422,24 @@ contract RewardProgram is
     } else {
       return 0;
     }
+  }
+
+  function convertDecimals(
+    uint256 reward
+  )
+    internal
+    view
+    returns (
+      uint256 rewardAjustedDecimals
+    )
+  {
+    // todo: check decimals.. ionx decimal - usdc decimals = 12
+    // 18 - 6 = 12 
+    // in order to conver usdc into ionx decimals multiply the reward 1e12
+    // test  and generic, call the decimals functions!
+    // valueB * (10**(18-6))
+
+    rewardAjustedDecimals = reward.mul(10**(18-6));
   }
 
   function _getFundBalance() internal view returns (uint256) {

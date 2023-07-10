@@ -199,7 +199,7 @@ describe('Reward program', function () {
      const reward = await rewardProgramDeployerSigner.calculateRewardsEarned(uuidBigNumber, principal);
      
       // Has multiplier but time spent is 0 so reward is multiplied by 1.
-      expect(reward).to.be.eq('1000000');
+      expect(reward).to.be.eq('1000000000000000000');
     });
 
     it('Checks lepton reward calculation with time spent', async () => {
@@ -214,27 +214,40 @@ describe('Reward program', function () {
       const stakeInfoCases = [
         {
           amount: 10,
-          blocksUntilLeptonDeposit: 0,
+          blocksUntilLeptonDeposit: 1,
           blocksUntilCalculation: 500,
           leptonStakeMultiplier: 200,
           generatedChargedBeforeLeptonRelease: 1000000,
           generatedChargeAfterLeptonRelease: 1000000,
           blocksUntilLeptonRelease: 500,
-          expectedReward: '1499500',
+          expectedReward: '1499000000000000000',
           tokenId: 42,
           description: 'Lepton deposited half of the reward length'
         },
+        
         {
           amount: 10,
-          blocksUntilLeptonDeposit: 0,
+          blocksUntilLeptonDeposit: 1,
           blocksUntilCalculation: 1000,
           leptonStakeMultiplier: 200,
           generatedChargedBeforeLeptonRelease: 1,
           generatedChargeAfterLeptonRelease: 1000000,
           blocksUntilLeptonRelease: 0,
-          expectedReward: '1998000',
+          expectedReward: '1997000000000000000',
           tokenId: 43,
           description: 'Unstake with deposited lepton inside'
+        },
+        {
+          amount: ethers.utils.parseUnits('1.0', 6),
+          blocksUntilLeptonDeposit: 0,
+          blocksUntilCalculation: 100000,
+          leptonStakeMultiplier: 100,
+          generatedChargedBeforeLeptonRelease: 0,
+          generatedChargeAfterLeptonRelease: ethers.utils.parseUnits('1.0', 6),
+          blocksUntilLeptonRelease: 0,
+          expectedReward: '10',
+          tokenId: 44,
+          description: 'Base multiplier 1x, testing returned decimals  '
         },
       ];
 
@@ -253,15 +266,16 @@ describe('Reward program', function () {
           stakeInfoCases[i].amount
         ).then(tx => tx.wait());
 
-        await mineBlocks(stakeInfoCases[i].blocksUntilLeptonDeposit);
-        
-        await rewardProgramDeployerSigner.registerNftDeposit(
-          leptonMock.address,
-          stakeInfoCases[i].tokenId,
-          leptonMock.address,
-          i + stakeInfoCases[i].tokenId,
-          0
-        ).then(tx => tx.wait());
+        if (stakeInfoCases[i]?.blocksUntilLeptonDeposit) {
+          await mineBlocks(stakeInfoCases[i].blocksUntilLeptonDeposit);
+          await rewardProgramDeployerSigner.registerNftDeposit(
+            leptonMock.address,
+            stakeInfoCases[i].tokenId,
+            leptonMock.address,
+            i + stakeInfoCases[i].tokenId,
+            0
+          ).then(tx => tx.wait());
+        }
 
         if (stakeInfoCases[i]?.blocksUntilLeptonRelease) {
           await mineBlocks(stakeInfoCases[i].blocksUntilLeptonRelease);
