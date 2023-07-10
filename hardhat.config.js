@@ -38,7 +38,7 @@ task(
 
 
 const mnemonic = {
-  testnet: `${process.env.TESTNET_MNEMONIC}`.replace(/_/g, ' '),
+  testnet: `${process.env.TESTNET_MNEMONIC_2}`.replace(/_/g, ' '),
   mainnet: `${process.env.MAINNET_MNEMONIC}`.replace(/_/g, ' '),
 };
 
