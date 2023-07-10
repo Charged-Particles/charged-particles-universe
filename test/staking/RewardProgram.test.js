@@ -245,9 +245,9 @@ describe('Reward program', function () {
           generatedChargedBeforeLeptonRelease: 0,
           generatedChargeAfterLeptonRelease: ethers.utils.parseUnits('1.0', 6),
           blocksUntilLeptonRelease: 0,
-          expectedReward: '10',
+          expectedReward: '1000000000000000000',
           tokenId: 44,
-          description: 'Base multiplier 1x, testing returned decimals  '
+          description: 'Base multiplier 1x, testing returned decimals'
         },
       ];
 
