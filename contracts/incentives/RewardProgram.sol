@@ -27,7 +27,7 @@ pragma experimental ABIEncoderV2;
 import "../interfaces/IRewardProgram.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
@@ -47,7 +47,7 @@ contract RewardProgram is
   ReentrancyGuard
 {
   using SafeMath for uint256;
-  using SafeERC20 for IERC20;
+  using SafeERC20 for ERC20;
   using TokenInfo for address;
   using EnumerableSet for EnumerableSet.UintSet;
 
@@ -237,7 +237,7 @@ contract RewardProgram is
     uint256 baseReward = _calculateBaseReward(interestAmount);
     uint256 leptonMultipliedReward = calculateMultipliedReward(parentNftUuid, baseReward);
 
-    totalReward = convertDecimals(leptonMultipliedReward);
+    totalReward = _convertDecimals(leptonMultipliedReward);
   }
 
   function calculateMultipliedReward(uint256 parentNftUuid, uint256 baseReward) public view returns(uint256) {
@@ -281,7 +281,7 @@ contract RewardProgram is
 
   function fundProgram(uint256 amount) external onlyOwner {
     require(_programData.rewardToken != address(0), "RP:E-405");
-    IERC20 token = IERC20(_programData.rewardToken);
+    ERC20 token = ERC20(_programData.rewardToken);
     token.safeTransferFrom(msg.sender, address(this), amount);
     emit RewardProgramFunded(amount);
   }
@@ -365,7 +365,7 @@ contract RewardProgram is
       // Update Asset Stake
       assetStake.claimableRewards = 0;
       // Transfer Available Rewards to Receiver
-      IERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
+      ERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
     }
 
     emit RewardsClaimed(contractAddress, tokenId, receiver, totalReward, unavailReward);
@@ -424,26 +424,14 @@ contract RewardProgram is
     }
   }
 
-  function convertDecimals(
-    uint256 reward
-  )
-    internal
-    view
-    returns (
-      uint256 rewardAjustedDecimals
-    )
+  function _convertDecimals(uint256 reward) internal view returns (uint256)
   {
-    // todo: check decimals.. ionx decimal - usdc decimals = 12
-    // 18 - 6 = 12 
-    // in order to conver usdc into ionx decimals multiply the reward 1e12
-    // test  and generic, call the decimals functions!
-    // valueB * (10**(18-6))
-
-    rewardAjustedDecimals = reward.mul(10**(18-6));
+    uint8 stakingTokenDecimals = ERC20(_programData.rewardToken).decimals();
+    return reward.mul(10**(18 - uint256(stakingTokenDecimals)));
   }
 
   function _getFundBalance() internal view returns (uint256) {
-    return IERC20(_programData.rewardToken).balanceOf(address(this));
+    return ERC20(_programData.rewardToken).balanceOf(address(this));
   }
 
   modifier onlyUniverse() {

@@ -168,8 +168,8 @@ describe('Reward program', function () {
     });
 
     it('Verifies simple lepton reward calculation', async () => {
-      const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a7';
       const tokenId = 6
+      const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a7';
       const leptonMultiplier = 200; // x2
       const principal = 1000000;
       const leptonId = 89;
@@ -199,7 +199,7 @@ describe('Reward program', function () {
      const reward = await rewardProgramDeployerSigner.calculateRewardsEarned(uuidBigNumber, principal);
      
       // Has multiplier but time spent is 0 so reward is multiplied by 1.
-      expect(reward).to.be.eq('1000000000000000000');
+      expect(reward).to.be.eq('1000000');
     });
 
     it('Checks lepton reward calculation with time spent', async () => {
@@ -257,6 +257,7 @@ describe('Reward program', function () {
         await leptonMock.mock.ownerOf.returns(receiverAddress);
         await leptonMock.mock.isApprovedForAll.returns(true);
         await ionxMock.mock.transfer.returns(true);
+        await ionxMock.mock.decimals.returns(6);
         await ionxMock.mock.balanceOf.returns(ethers.utils.parseEther('100'));
 
         await rewardProgramDeployerSigner.registerAssetDeposit(
