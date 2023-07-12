@@ -62,7 +62,6 @@ contract RewardProgram is
   mapping(uint256 => AssetStake) private _assetStake;
   mapping(uint256 => NftStake) private _nftStake;
 
-
   /***********************************|
   |          Initialization           |
   |__________________________________*/
@@ -74,8 +73,7 @@ contract RewardProgram is
   |         Public Functions          |
   |__________________________________*/
 
-
-  function getProgramData() external view override returns (ProgramRewardData memory programData) {
+  function getProgramData() external view returns (ProgramRewardData memory) {
     return _programData;
   }
 

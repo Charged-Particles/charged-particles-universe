@@ -60,7 +60,7 @@ interface IRewardProgram {
   }
 
   /* user functions */
-  function getProgramData() external view returns (ProgramRewardData memory programData);
+  // function getProgramData() external view returns (ProgramRewardData memory programData);
   function getFundBalance() external view returns (uint256);
   function getClaimableRewards(address contractAddress, uint256 tokenId) external view returns (uint256);
   // function claimRewards(address contractAddress, uint256 tokenId, address receiver) public returns (uint256 totalReward);

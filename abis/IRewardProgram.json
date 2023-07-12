@@ -242,41 +242,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getProgramData",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "stakingToken",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "rewardToken",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "baseMultiplier",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "multiplierNft",
-            "type": "address"
-          }
-        ],
-        "internalType": "struct IRewardProgram.ProgramRewardData",
-        "name": "programData",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
