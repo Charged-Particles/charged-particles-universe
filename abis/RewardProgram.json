@@ -545,7 +545,7 @@
           }
         ],
         "internalType": "struct IRewardProgram.ProgramRewardData",
-        "name": "",
+        "name": "programData",
         "type": "tuple"
       }
     ],

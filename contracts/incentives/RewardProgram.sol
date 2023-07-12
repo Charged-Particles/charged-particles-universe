@@ -73,7 +73,7 @@ contract RewardProgram is
   |         Public Functions          |
   |__________________________________*/
 
-  function getProgramData() external view returns (ProgramRewardData memory) {
+  function getProgramData() external view override returns (ProgramRewardData memory programData) {
     return _programData;
   }
 
