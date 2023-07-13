@@ -249,11 +249,6 @@
         "components": [
           {
             "internalType": "address",
-            "name": "stakingToken",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
             "name": "rewardToken",
             "type": "address"
           },
@@ -292,6 +287,11 @@
         "internalType": "string",
         "name": "walletManagerId",
         "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "stakingToken",
+        "type": "address"
       },
       {
         "internalType": "uint256",
@@ -349,6 +349,11 @@
         "internalType": "string",
         "name": "walletManagerId",
         "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "stakingToken",
+        "type": "address"
       }
     ],
     "name": "registerExistingDeposits",

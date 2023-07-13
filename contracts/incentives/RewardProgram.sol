@@ -27,7 +27,7 @@ pragma experimental ABIEncoderV2;
 import "../interfaces/IRewardProgram.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
@@ -47,7 +47,7 @@ contract RewardProgram is
   ReentrancyGuard
 {
   using SafeMath for uint256;
-  using SafeERC20 for IERC20;
+  using SafeERC20 for ERC20;
   using TokenInfo for address;
   using EnumerableSet for EnumerableSet.UintSet;
 
@@ -98,7 +98,12 @@ contract RewardProgram is
   |          Only Universe            |
   |__________________________________*/
 
-  function registerExistingDeposits(address contractAddress, uint256 tokenId, string calldata walletManagerId)
+  function registerExistingDeposits(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address stakingToken
+  )
     external
     override
     onlyUniverse
@@ -109,9 +114,9 @@ contract RewardProgram is
 
     // Initiate Asset Stake
     IWalletManager walletMgr = _chargedManagers.getWalletManager(walletManagerId);
-    uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, _programData.stakingToken);
+    uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, stakingToken);
     if (principal > 0) {
-      _assetStake[parentNftUuid] = AssetStake(block.number, 0, walletManagerId);
+      _assetStake[parentNftUuid] = AssetStake(block.number, 0, walletManagerId, stakingToken);
       emit AssetRegistered(contractAddress, tokenId, walletManagerId, principal);
     }
   }
@@ -120,6 +125,7 @@ contract RewardProgram is
     address contractAddress,
     uint256 tokenId,
     string calldata walletManagerId,
+    address stakingToken,
     uint256 principalAmount
   )
     external
@@ -132,6 +138,7 @@ contract RewardProgram is
     if (assetStake.start == 0) {
       assetStake.start = block.number;
       assetStake.walletManagerId = walletManagerId;
+      assetStake.stakingToken = stakingToken;
       emit AssetDeposit(contractAddress, tokenId, walletManagerId, principalAmount);
     }
   }
@@ -151,12 +158,12 @@ contract RewardProgram is
     AssetStake storage assetStake = _assetStake[parentNftUuid];
 
     // Update Claimable Rewards
-    uint256 newRewards = calculateRewardsEarned(parentNftUuid, interestAmount);
+    uint256 newRewards = calculateRewardsEarned(parentNftUuid, assetStake.stakingToken, interestAmount);
     assetStake.claimableRewards = assetStake.claimableRewards.add(newRewards);
 
     // Reset Stake if Principal Balance falls to Zero
     IWalletManager walletMgr = _chargedManagers.getWalletManager(assetStake.walletManagerId);
-    uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, _programData.stakingToken);
+    uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, assetStake.stakingToken);
     if (principal == 0) {
       assetStake.start = 0;
     }
@@ -231,11 +238,13 @@ contract RewardProgram is
     baseReward = _calculateBaseReward(amount);
   }
 
-  function calculateRewardsEarned(uint256 parentNftUuid, uint256 interestAmount) public view returns (uint256 totalReward) {
-    uint256 baseReward = _calculateBaseReward(interestAmount);
-    totalReward = calculateMultipliedReward(parentNftUuid, baseReward);
-  }
 
+  function calculateRewardsEarned(uint256 parentNftUuid, address stakingAsset,uint256 interestAmount) public view returns (uint256 totalReward) {
+    uint256 baseReward = _calculateBaseReward(interestAmount);
+    uint256 leptonMultipliedReward = calculateMultipliedReward(parentNftUuid, baseReward);
+
+    totalReward = _convertDecimals(leptonMultipliedReward, stakingAsset);
+  }
   function calculateMultipliedReward(uint256 parentNftUuid, uint256 baseReward) public view returns(uint256) {
     AssetStake storage assetStake = _assetStake[parentNftUuid];
     NftStake memory nftStake = _nftStake[parentNftUuid];
@@ -277,14 +286,14 @@ contract RewardProgram is
 
   function fundProgram(uint256 amount) external onlyOwner {
     require(_programData.rewardToken != address(0), "RP:E-405");
-    IERC20 token = IERC20(_programData.rewardToken);
+    IERC20 token = ERC20(_programData.rewardToken);
     token.safeTransferFrom(msg.sender, address(this), amount);
     emit RewardProgramFunded(amount);
   }
 
-  function setStakingToken(address newStakingToken) external onlyOwner {
-    _programData.stakingToken = newStakingToken;
-  }
+  // function setStakingToken(address newStakingToken) external onlyOwner {
+  //   _programData.stakingToken = newStakingToken;
+  // }
 
   function setRewardToken(address newRewardToken) external onlyOwner {
     _programData.rewardToken = newRewardToken;
@@ -361,7 +370,7 @@ contract RewardProgram is
       // Update Asset Stake
       assetStake.claimableRewards = 0;
       // Transfer Available Rewards to Receiver
-      IERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
+      ERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
     }
 
     emit RewardsClaimed(contractAddress, tokenId, receiver, totalReward, unavailReward);
@@ -419,9 +428,14 @@ contract RewardProgram is
       return 0;
     }
   }
+  function _convertDecimals(uint256 reward, address stakingAsset) internal view returns (uint256)
+  {
+    uint8 stakingTokenDecimals = ERC20(stakingAsset).decimals();
+    return reward.mul(10**(18 - uint256(stakingTokenDecimals)));
+  }
 
   function _getFundBalance() internal view returns (uint256) {
-    return IERC20(_programData.rewardToken).balanceOf(address(this));
+    return ERC20(_programData.rewardToken).balanceOf(address(this));
   }
 
   modifier onlyUniverse() {

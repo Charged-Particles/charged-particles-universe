@@ -121,6 +121,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
         contractAddress,
         tokenId,
         walletManagerId,
+        assetToken,
         assetAmount
       );
     }
@@ -403,7 +404,12 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   ) external {
     address rewardProgram = getRewardProgram(assetToken);
     if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerExistingDeposits(contractAddress, tokenId, walletManagerId);
+      IRewardProgram(rewardProgram).registerExistingDeposits(
+        contractAddress,
+        tokenId,
+        walletManagerId,
+        assetToken
+      );
     }
   }
 

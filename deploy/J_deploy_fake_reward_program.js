@@ -212,11 +212,6 @@ module.exports = async (hre) => {
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Setup RewardProgram
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  await executeTx('3-a', 'RewardProgram: Set Staking Token', async () =>
-    await rewardProgram.setStakingToken(rewardStakingToken)
-  );
-
   await executeTx('3-b', 'RewardProgram: Set Reward Token', async () =>
     await rewardProgram.setRewardToken(ionx.address)
   );

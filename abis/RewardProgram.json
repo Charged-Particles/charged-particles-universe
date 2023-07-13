@@ -379,6 +379,11 @@
         "type": "uint256"
       },
       {
+        "internalType": "address",
+        "name": "stakingAsset",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "interestAmount",
         "type": "uint256"
@@ -434,6 +439,11 @@
             "internalType": "string",
             "name": "walletManagerId",
             "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "stakingToken",
+            "type": "address"
           }
         ],
         "internalType": "struct IRewardProgram.AssetStake",
@@ -525,11 +535,6 @@
         "components": [
           {
             "internalType": "address",
-            "name": "stakingToken",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
             "name": "rewardToken",
             "type": "address"
           },
@@ -581,6 +586,11 @@
         "internalType": "string",
         "name": "walletManagerId",
         "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "stakingToken",
+        "type": "address"
       },
       {
         "internalType": "uint256",
@@ -638,6 +648,11 @@
         "internalType": "string",
         "name": "walletManagerId",
         "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "stakingToken",
+        "type": "address"
       }
     ],
     "name": "registerExistingDeposits",
@@ -766,19 +781,6 @@
       }
     ],
     "name": "setRewardToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "newStakingToken",
-        "type": "address"
-      }
-    ],
-    "name": "setStakingToken",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

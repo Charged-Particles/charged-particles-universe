@@ -12,7 +12,7 @@ const {
 } = require('../../js-helpers/deploy');
 
 describe('Reward program', function () {
-
+  const USDC_STAKING_TOKEN = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
   let rewardProgram,
     ionx,
     protocolOwnerAddress,
@@ -22,6 +22,7 @@ describe('Reward program', function () {
     chainId,
     leptonMock,
     ionxMock,
+    usdcMock,
     rewardWalletManagerMock,
     leptonData,
     rewardProgramDeployerSigner,
@@ -37,7 +38,7 @@ describe('Reward program', function () {
     deployerSigner = ethers.provider.getSigner(deployerAddress);
   });
 
-  before(async () => {
+  beforeEach(async () => {
     chainId = await getChainId();
     const ddIonx = getDeployData('Ionx', chainId);
     const Ionx = await ethers.getContractFactory('Ionx');
@@ -45,8 +46,14 @@ describe('Reward program', function () {
 
     // Ionx mock
     ionxMock = await deployMockContract(deployerSigner, ddIonx.abi);
-  });
 
+    // mock usdc
+    usdcMock = await deployMockContract(deployerSigner, ddIonx.abi);
+    await usdcMock.mock.decimals.returns(6);
+    await usdcMock.mock.transfer.returns(true);
+    await usdcMock.mock.balanceOf.returns(ethers.utils.parseEther('100'));
+  });
+  
   beforeEach(async function () {
     const ddRewardProgram = getDeployData('RewardProgram');
     const RewardProgram = await ethers.getContractFactory('RewardProgram');
@@ -64,14 +71,13 @@ describe('Reward program', function () {
     rewardWalletManagerMock = await deployMockContract(deployerSigner, walletManager.abi);
 
     await rewardProgramDeployerSigner.setUniverse(await deployerSigner.getAddress()).then(tx => tx.wait());
-    programData = await rewardProgram.getProgramData();
+    programData = await rewardProgramDeployerSigner.getProgramData();
 
     // Instantiate universe
     const Universe= await ethers.getContractFactory('Universe');
     universeData = getDeployData('Universe');
     universe = Universe.attach(universeData.address);
   });
-
 
   it('Should be deployed', async () =>{
     expect(rewardProgramDeployerSigner.address).to.not.equal(0);
@@ -137,6 +143,7 @@ describe('Reward program', function () {
         contractAddress,
         tokenId,
         'basic.B',
+        USDC_STAKING_TOKEN,
         100
       )).to.emit(rewardProgram, 'AssetDeposit');
 
@@ -169,10 +176,10 @@ describe('Reward program', function () {
 
     it('Verifies simple lepton reward calculation', async () => {
       const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a7';
-      const tokenId = 6
       const leptonMultiplier = 200; // x2
       const principal = 1000000;
       const leptonId = 89;
+      const tokenId = 6
 
       const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
       const uuidBigNumber = ethers.BigNumber.from(uuid);
@@ -183,6 +190,7 @@ describe('Reward program', function () {
         contractAddress,
         tokenId,
         'basic.B',
+        usdcMock.address,
         100
       ).then(tx => tx.wait());
 
@@ -196,10 +204,14 @@ describe('Reward program', function () {
       ).then(tx => tx.wait());
 
       // calculate reward
-     const reward = await rewardProgramDeployerSigner.calculateRewardsEarned(uuidBigNumber, principal);
+      const reward = await rewardProgramDeployerSigner.calculateRewardsEarned(
+        uuidBigNumber,
+        usdcMock.address,
+        principal
+      );
      
       // Has multiplier but time spent is 0 so reward is multiplied by 1.
-      expect(reward).to.be.eq('1000000');
+      expect(reward).to.be.eq('1000000000000000000');
     });
 
     it('Checks lepton reward calculation with time spent', async () => {
@@ -214,27 +226,40 @@ describe('Reward program', function () {
       const stakeInfoCases = [
         {
           amount: 10,
-          blocksUntilLeptonDeposit: 0,
+          blocksUntilLeptonDeposit: 1,
           blocksUntilCalculation: 500,
           leptonStakeMultiplier: 200,
           generatedChargedBeforeLeptonRelease: 1000000,
           generatedChargeAfterLeptonRelease: 1000000,
           blocksUntilLeptonRelease: 500,
-          expectedReward: '1499500',
+          expectedReward: '1499000000000000000',
           tokenId: 42,
           description: 'Lepton deposited half of the reward length'
         },
+        
         {
           amount: 10,
-          blocksUntilLeptonDeposit: 0,
+          blocksUntilLeptonDeposit: 1,
           blocksUntilCalculation: 1000,
           leptonStakeMultiplier: 200,
           generatedChargedBeforeLeptonRelease: 1,
           generatedChargeAfterLeptonRelease: 1000000,
           blocksUntilLeptonRelease: 0,
-          expectedReward: '1998000',
+          expectedReward: '1997000000000000000',
           tokenId: 43,
           description: 'Unstake with deposited lepton inside'
+        },
+        {
+          amount: ethers.utils.parseUnits('1.0', 6),
+          blocksUntilLeptonDeposit: 0,
+          blocksUntilCalculation: 100000,
+          leptonStakeMultiplier: 100,
+          generatedChargedBeforeLeptonRelease: 0,
+          generatedChargeAfterLeptonRelease: ethers.utils.parseUnits('1.0', 6),
+          blocksUntilLeptonRelease: 0,
+          expectedReward: '1000000000000000000',
+          tokenId: 44,
+          description: 'Base multiplier 1x, testing returned decimals'
         },
       ];
 
@@ -243,25 +268,28 @@ describe('Reward program', function () {
         await leptonMock.mock.getMultiplier.returns(stakeInfoCases[i].leptonStakeMultiplier);
         await leptonMock.mock.ownerOf.returns(receiverAddress);
         await leptonMock.mock.isApprovedForAll.returns(true);
-        await ionxMock.mock.transfer.returns(true);
         await ionxMock.mock.balanceOf.returns(ethers.utils.parseEther('100'));
+        await ionxMock.mock.transfer.returns(true);
+        await ionxMock.mock.decimals.returns(6);
 
         await rewardProgramDeployerSigner.registerAssetDeposit(
           leptonMock.address,
           stakeInfoCases[i].tokenId,
           'generic.B',
+          stakingToken,
           stakeInfoCases[i].amount
         ).then(tx => tx.wait());
 
-        await mineBlocks(stakeInfoCases[i].blocksUntilLeptonDeposit);
-        
-        await rewardProgramDeployerSigner.registerNftDeposit(
-          leptonMock.address,
-          stakeInfoCases[i].tokenId,
-          leptonMock.address,
-          i + stakeInfoCases[i].tokenId,
-          0
-        ).then(tx => tx.wait());
+        if (stakeInfoCases[i]?.blocksUntilLeptonDeposit) {
+          await mineBlocks(stakeInfoCases[i].blocksUntilLeptonDeposit);
+          await rewardProgramDeployerSigner.registerNftDeposit(
+            leptonMock.address,
+            stakeInfoCases[i].tokenId,
+            leptonMock.address,
+            i + stakeInfoCases[i].tokenId,
+            0
+          ).then(tx => tx.wait());
+        }
 
         if (stakeInfoCases[i]?.blocksUntilLeptonRelease) {
           await mineBlocks(stakeInfoCases[i].blocksUntilLeptonRelease);
@@ -274,7 +302,6 @@ describe('Reward program', function () {
             0
           ).then(tx => tx.wait());
         }
-
         await mineBlocks(stakeInfoCases[i].blocksUntilCalculation);
 
         expect(await rewardProgramDeployerSigner.getClaimableRewards(
@@ -311,6 +338,7 @@ describe('Reward program', function () {
         contractAddress,
         tokenId,
         'basic.B',
+        usdcMock.address,
         100
       ).then(tx => tx.wait());
   
@@ -393,6 +421,7 @@ describe('Reward program', function () {
           contractAddress,
           tokenId,
           'basic.B',
+          USDC_STAKING_TOKEN,
           100
           ).then(tx => tx.wait());
           
@@ -420,28 +449,47 @@ describe('Reward program', function () {
     it('Sets a reward program in the universe', async () => {
       await universe.setRewardProgram(
         rewardProgram.address,
-        programData.stakingToken,
+        ionxMock.address,
         programData.multiplierNft
       ).then(tx => tx.wait());
 
-      const rewardProgramSet = await universe.getRewardProgram(programData.stakingToken);
+      const rewardProgramSet = await universe.getRewardProgram(ionxMock.address);
       expect(rewardProgramSet).to.be.eq(rewardProgram.address);
 
       await universe.removeRewardProgram(
-        programData.stakingToken,
+        ionxMock.address,
         programData.multiplierNft
       ).then(tx => tx.wait());
 
-      const rewardProgramRemoved = await universe.getRewardProgram(programData.stakingToken);
+      const rewardProgramRemoved = await universe.getRewardProgram(ionxMock.address);
       expect(rewardProgramRemoved).to.be.eq('0x0000000000000000000000000000000000000000');
+    });
+
+    it ('Sets up multiple staking assets ', async() => {
+      // Set universe with IONX as asset deposit
+      await universe.setRewardProgram(
+        rewardProgram.address,
+        ionxMock.address,
+        programData.multiplierNft
+      ).then(tx => tx.wait());
 
       await universe.setRewardProgram(
         rewardProgram.address,
-        programData.stakingToken,
+        USDC_STAKING_TOKEN,
         programData.multiplierNft
       ).then(tx => tx.wait());
 
-      expect(rewardProgramSet).to.be.eq(rewardProgram.address);
+      const rewardProgramIonx = await universe.getRewardProgram(USDC_STAKING_TOKEN);
+      expect(rewardProgramIonx).to.be.eq(rewardProgram.address);
+      
+      const rewardProgramUSDc = await universe.getRewardProgram(USDC_STAKING_TOKEN);
+      expect(rewardProgramUSDc).to.be.eq(rewardProgram.address);
+
+
+  
+      // Set universe with USDC
+  
+      // Both should resolve the same reward program address
     });
   });
 });
