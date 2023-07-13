@@ -53,7 +53,7 @@ describe('Reward program', function () {
     await usdcMock.mock.transfer.returns(true);
     await usdcMock.mock.balanceOf.returns(ethers.utils.parseEther('100'));
   });
-  
+
   beforeEach(async function () {
     const ddRewardProgram = getDeployData('RewardProgram');
     const RewardProgram = await ethers.getContractFactory('RewardProgram');
@@ -167,7 +167,7 @@ describe('Reward program', function () {
       await mineBlocks(10000);
       const principalForEmptyMultiplier = 100;
       const emptyMultiplierReward = await rewardProgramDeployerSigner.callStatic.calculateMultipliedReward(uuidBigNumber, principalForEmptyMultiplier);
-      
+
       expect(emptyMultiplierReward).to.be.eq('199');
 
       const emptyRewardMultiplier = await rewardProgramDeployerSigner.callStatic.calculateMultipliedReward(uuidBigNumber, 0);
@@ -209,7 +209,7 @@ describe('Reward program', function () {
         usdcMock.address,
         principal
       );
-     
+
       // Has multiplier but time spent is 0 so reward is multiplied by 1.
       expect(reward).to.be.eq('1000000000000000000');
     });
@@ -236,7 +236,7 @@ describe('Reward program', function () {
           tokenId: 42,
           description: 'Lepton deposited half of the reward length'
         },
-        
+
         {
           amount: 10,
           blocksUntilLeptonDeposit: 1,
@@ -333,7 +333,7 @@ describe('Reward program', function () {
     it('Closes nft stake struck after all leptons are released', async () => {
       const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a2';
       const tokenId = 3;
-  
+
       await rewardProgramDeployerSigner.registerAssetDeposit(
         contractAddress,
         tokenId,
@@ -341,7 +341,7 @@ describe('Reward program', function () {
         usdcMock.address,
         100
       ).then(tx => tx.wait());
-  
+
       await leptonMock.mock.getMultiplier.returns(200);
       await rewardProgramDeployerSigner.registerNftDeposit(
         contractAddress,
@@ -350,7 +350,7 @@ describe('Reward program', function () {
         4, //lepton id
         0
       ).then(tx => tx.wait());
-  
+
       await leptonMock.mock.getMultiplier.returns(220);
       await rewardProgramDeployerSigner.registerNftDeposit(
         contractAddress,
@@ -359,7 +359,7 @@ describe('Reward program', function () {
         5, //lepton id
         0
       ).then(tx => tx.wait());
-  
+
       await leptonMock.mock.getMultiplier.returns(200);
       await rewardProgramDeployerSigner.registerNftRelease(
         contractAddress,
@@ -368,7 +368,7 @@ describe('Reward program', function () {
         4, //lepton id
         0
       ).then(tx => tx.wait());
-  
+
       await leptonMock.mock.getMultiplier.returns(220);
       await rewardProgramDeployerSigner.registerNftRelease(
         contractAddress,
@@ -377,11 +377,11 @@ describe('Reward program', function () {
         5, //lepton id
         0
       ).then(tx => tx.wait());
-  
+
       const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
       const uuidBigNumber = ethers.BigNumber.from(uuid);
       const nftStake = await rewardProgramDeployerSigner.getNftStake(uuidBigNumber);
-  
+
       expect(nftStake.multiplier).to.be.eq(220);
       expect(nftStake.releaseBlockNumber).to.be.gt(0);
     });
@@ -424,7 +424,7 @@ describe('Reward program', function () {
           USDC_STAKING_TOKEN,
           100
           ).then(tx => tx.wait());
-          
+
           for(let z = 0; z < leptonMultipliers.length; z++) {
             await leptonMock.mock.getMultiplier.returns(leptonMultipliers[z]);
             await rewardProgramDeployerSigner.registerNftDeposit(
@@ -481,14 +481,14 @@ describe('Reward program', function () {
 
       const rewardProgramIonx = await universe.getRewardProgram(USDC_STAKING_TOKEN);
       expect(rewardProgramIonx).to.be.eq(rewardProgram.address);
-      
+
       const rewardProgramUSDc = await universe.getRewardProgram(USDC_STAKING_TOKEN);
       expect(rewardProgramUSDc).to.be.eq(rewardProgram.address);
 
 
-  
+
       // Set universe with USDC
-  
+
       // Both should resolve the same reward program address
     });
   });

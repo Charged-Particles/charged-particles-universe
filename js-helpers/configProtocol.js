@@ -99,13 +99,13 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const GenericBasketManagerB = await ethers.getContractFactory('GenericBasketManagerB');
     const genericBasketManagerB = await GenericBasketManagerB.attach(ddGenericBasketManagerB.address);
 
-    // log('  Loading AaveWalletManager from:     ', ddAaveWalletManager.address, ` (${_.get(ddAaveWalletManager, 'deployTransaction.blockNumber', '0')})`);
-    // const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
-    // const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
+    log('  Loading AaveWalletManager from:     ', ddAaveWalletManager.address, ` (${_.get(ddAaveWalletManager, 'deployTransaction.blockNumber', '0')})`);
+    const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
+    const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
 
-    // log('  Loading AaveWalletManagerB from:    ', ddAaveWalletManagerB.address, ` (${_.get(ddAaveWalletManagerB, 'deployTransaction.blockNumber', '0')})`);
-    // const AaveWalletManagerB = await ethers.getContractFactory('AaveWalletManagerB');
-    // const aaveWalletManagerB = await AaveWalletManagerB.attach(ddAaveWalletManagerB.address);
+    log('  Loading AaveWalletManagerB from:    ', ddAaveWalletManagerB.address, ` (${_.get(ddAaveWalletManagerB, 'deployTransaction.blockNumber', '0')})`);
+    const AaveWalletManagerB = await ethers.getContractFactory('AaveWalletManagerB');
+    const aaveWalletManagerB = await AaveWalletManagerB.attach(ddAaveWalletManagerB.address);
 
     log('  Loading TokenInfoProxy from:        ', ddTokenInfoProxy.address, ` (${_.get(ddTokenInfoProxy, 'deployTransaction.blockNumber', '0')})`);
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
@@ -254,45 +254,45 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // Setup Aave Wallet Manager
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    // await executeTx('3-a', 'AaveWalletManager: Setting Charged Particles as Controller', async () =>
-    //   await aaveWalletManager.setController(ddChargedParticles.address)
-    // );
+    await executeTx('3-a', 'AaveWalletManager: Setting Charged Particles as Controller', async () =>
+      await aaveWalletManager.setController(ddChargedParticles.address)
+    );
 
     // await executeTx('3-b', 'AaveWalletManager: Setting Aave Bridge to V2', async () =>
     //   await aaveWalletManager.setAaveBridge(ddAaveBridgeV2.address)
     // );
 
-    // await executeTx('3-c', 'AaveWalletManager: Registering Aave as LP with ChargedParticles', async () =>
-    //   await chargedManagers.registerWalletManager('aave', ddAaveWalletManager.address)
-    // );
+    await executeTx('3-c', 'AaveWalletManager: Registering Aave as LP with ChargedParticles', async () =>
+      await chargedManagers.registerWalletManager('aave', ddAaveWalletManager.address)
+    );
 
-    // // if (referralCode.length > 0) {
-    // //   await executeTx('3-d', 'AaveWalletManager: Setting Referral Code', async () =>
-    // //     await aaveWalletManager.setReferralCode(referralCode)
-    // //   );
-    // // }
+    // if (referralCode.length > 0) {
+    //   await executeTx('3-d', 'AaveWalletManager: Setting Referral Code', async () =>
+    //     await aaveWalletManager.setReferralCode(referralCode)
+    //   );
+    // }
 
-    // await executeTx('3-e', 'AaveWalletManagerB: Setting Charged Particles as Controller', async () =>
-    //   await aaveWalletManagerB.setController(ddChargedParticles.address)
-    // );
+    await executeTx('3-e', 'AaveWalletManagerB: Setting Charged Particles as Controller', async () =>
+      await aaveWalletManagerB.setController(ddChargedParticles.address)
+    );
 
     // await executeTx('3-f', 'AaveWalletManagerB: Setting Aave Bridge to V2', async () =>
     //   await aaveWalletManagerB.setAaveBridge(ddAaveBridgeV2.address)
     // );
 
-    // await executeTx('3-g', 'AaveWalletManagerB: Registering Aave as LP with ChargedParticles', async () =>
-    //   await chargedManagers.registerWalletManager('aave.B', ddAaveWalletManagerB.address)
-    // );
+    await executeTx('3-g', 'AaveWalletManagerB: Registering Aave as LP with ChargedParticles', async () =>
+      await chargedManagers.registerWalletManager('aave.B', ddAaveWalletManagerB.address)
+    );
 
-    // await executeTx('3-h', 'AaveWalletManagerB: Registering ChargedSettings', async () =>
-    //   await aaveWalletManagerB.setChargedSettings(ddChargedSettings.address)
-    // );
+    await executeTx('3-h', 'AaveWalletManagerB: Registering ChargedSettings', async () =>
+      await aaveWalletManagerB.setChargedSettings(ddChargedSettings.address)
+    );
 
-    // // if (referralCode.length > 0) {
-    // //   await executeTx('3-i', 'AaveWalletManagerB: Setting Referral Code', async () =>
-    // //     await aaveWalletManagerB.setReferralCode(referralCode)
-    // //   );
-    // // }
+    // if (referralCode.length > 0) {
+    //   await executeTx('3-i', 'AaveWalletManagerB: Setting Referral Code', async () =>
+    //     await aaveWalletManagerB.setReferralCode(referralCode)
+    //   );
+    // }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Proton

@@ -174,7 +174,6 @@ contract RewardProgram is
     emit AssetRelease(contractAddress, tokenId, interestAmount);
   }
 
-
   function registerNftDeposit(address contractAddress, uint256 tokenId, address depositNftAddress, uint256 depositNftTokenId, uint256 /* nftTokenAmount */)
     external
     override
@@ -238,13 +237,12 @@ contract RewardProgram is
     baseReward = _calculateBaseReward(amount);
   }
 
-
   function calculateRewardsEarned(uint256 parentNftUuid, address stakingAsset,uint256 interestAmount) public view returns (uint256 totalReward) {
     uint256 baseReward = _calculateBaseReward(interestAmount);
     uint256 leptonMultipliedReward = calculateMultipliedReward(parentNftUuid, baseReward);
-
     totalReward = _convertDecimals(leptonMultipliedReward, stakingAsset);
   }
+
   function calculateMultipliedReward(uint256 parentNftUuid, uint256 baseReward) public view returns(uint256) {
     AssetStake storage assetStake = _assetStake[parentNftUuid];
     NftStake memory nftStake = _nftStake[parentNftUuid];
@@ -290,10 +288,6 @@ contract RewardProgram is
     token.safeTransferFrom(msg.sender, address(this), amount);
     emit RewardProgramFunded(amount);
   }
-
-  // function setStakingToken(address newStakingToken) external onlyOwner {
-  //   _programData.stakingToken = newStakingToken;
-  // }
 
   function setRewardToken(address newRewardToken) external onlyOwner {
     _programData.rewardToken = newRewardToken;
@@ -428,8 +422,8 @@ contract RewardProgram is
       return 0;
     }
   }
-  function _convertDecimals(uint256 reward, address stakingAsset) internal view returns (uint256)
-  {
+
+  function _convertDecimals(uint256 reward, address stakingAsset) internal view returns (uint256) {
     uint8 stakingTokenDecimals = ERC20(stakingAsset).decimals();
     return reward.mul(10**(18 - uint256(stakingTokenDecimals)));
   }

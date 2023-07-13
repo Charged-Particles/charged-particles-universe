@@ -41,7 +41,6 @@ interface IRewardProgram {
 
   /* data types */
   struct ProgramRewardData {
-    // address stakingToken;
     address rewardToken;
     uint256 baseMultiplier; // Basis Points
     address multiplierNft;
