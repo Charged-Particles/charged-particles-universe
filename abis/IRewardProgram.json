@@ -249,11 +249,6 @@
         "components": [
           {
             "internalType": "address",
-            "name": "stakingToken",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
             "name": "rewardToken",
             "type": "address"
           },

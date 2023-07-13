@@ -449,28 +449,47 @@ describe('Reward program', function () {
     it('Sets a reward program in the universe', async () => {
       await universe.setRewardProgram(
         rewardProgram.address,
-        programData.stakingToken,
+        ionxMock.address,
         programData.multiplierNft
       ).then(tx => tx.wait());
 
-      const rewardProgramSet = await universe.getRewardProgram(programData.stakingToken);
+      const rewardProgramSet = await universe.getRewardProgram(ionxMock.address);
       expect(rewardProgramSet).to.be.eq(rewardProgram.address);
 
       await universe.removeRewardProgram(
-        programData.stakingToken,
+        ionxMock.address,
         programData.multiplierNft
       ).then(tx => tx.wait());
 
-      const rewardProgramRemoved = await universe.getRewardProgram(programData.stakingToken);
+      const rewardProgramRemoved = await universe.getRewardProgram(ionxMock.address);
       expect(rewardProgramRemoved).to.be.eq('0x0000000000000000000000000000000000000000');
+    });
+
+    it ('Sets up multiple staking assets ', async() => {
+      // Set universe with IONX as asset deposit
+      await universe.setRewardProgram(
+        rewardProgram.address,
+        ionxMock.address,
+        programData.multiplierNft
+      ).then(tx => tx.wait());
 
       await universe.setRewardProgram(
         rewardProgram.address,
-        programData.stakingToken,
+        USDC_STAKING_TOKEN,
         programData.multiplierNft
       ).then(tx => tx.wait());
 
-      expect(rewardProgramSet).to.be.eq(rewardProgram.address);
+      const rewardProgramIonx = await universe.getRewardProgram(USDC_STAKING_TOKEN);
+      expect(rewardProgramIonx).to.be.eq(rewardProgram.address);
+      
+      const rewardProgramUSDc = await universe.getRewardProgram(USDC_STAKING_TOKEN);
+      expect(rewardProgramUSDc).to.be.eq(rewardProgram.address);
+
+
+  
+      // Set universe with USDC
+  
+      // Both should resolve the same reward program address
     });
   });
 });

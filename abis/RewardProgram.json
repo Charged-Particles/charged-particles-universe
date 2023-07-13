@@ -535,11 +535,6 @@
         "components": [
           {
             "internalType": "address",
-            "name": "stakingToken",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
             "name": "rewardToken",
             "type": "address"
           },
@@ -786,19 +781,6 @@
       }
     ],
     "name": "setRewardToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "newStakingToken",
-        "type": "address"
-      }
-    ],
-    "name": "setStakingToken",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

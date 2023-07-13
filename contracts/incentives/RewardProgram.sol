@@ -39,7 +39,6 @@ import "../interfaces/IRewardNft.sol";
 import "../lib/TokenInfo.sol";
 import "../lib/ReentrancyGuard.sol";
 import "../lib/BlackholePrevention.sol";
-import "hardhat/console.sol";
 
 contract RewardProgram is
   IRewardProgram,
@@ -292,9 +291,9 @@ contract RewardProgram is
     emit RewardProgramFunded(amount);
   }
 
-  function setStakingToken(address newStakingToken) external onlyOwner {
-    _programData.stakingToken = newStakingToken;
-  }
+  // function setStakingToken(address newStakingToken) external onlyOwner {
+  //   _programData.stakingToken = newStakingToken;
+  // }
 
   function setRewardToken(address newRewardToken) external onlyOwner {
     _programData.rewardToken = newRewardToken;
@@ -431,9 +430,7 @@ contract RewardProgram is
   }
   function _convertDecimals(uint256 reward, address stakingAsset) internal view returns (uint256)
   {
-    console.log('>>>>', stakingAsset);
     uint8 stakingTokenDecimals = ERC20(stakingAsset).decimals();
-    console.log(stakingTokenDecimals);
     return reward.mul(10**(18 - uint256(stakingTokenDecimals)));
   }
 
