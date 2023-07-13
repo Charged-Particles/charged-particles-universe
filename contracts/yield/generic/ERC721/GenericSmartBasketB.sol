@@ -96,7 +96,12 @@ contract GenericSmartBasketB is ISmartBasketB, BlackholePrevention, IERC721Recei
     return true;
   }
 
-  function removeFromBasket(address receiver, address contractAddress, uint256 tokenId, uint256 nftTokenAmount)
+  function removeFromBasket(
+      address receiver,
+      address contractAddress,
+      uint256 tokenId,
+      uint256 nftTokenAmount
+    )
     external
     override
     onlyBasketManager

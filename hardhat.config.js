@@ -81,14 +81,20 @@ module.exports = {
     },
     networks: {
         hardhat: {
-            blockGasLimit: 200000000,
+            // chainId: 1,
+            // blockGasLimit: 200000000,
             allowUnlimitedContractSize: true,
-            gasPrice: 1e9,
-            forking: {
-                url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-                blockNumber: 11400000,  // MUST be after Aave V2 was deployed
-                timeout: 1000000
+            // gasPrice: 1e9,
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
             },
+            // forking: {
+            //     url: 'https://eth-mainnet.g.alchemy.com/v2/onL35MUKZeTnQ3XZ3K_fbyg4ZcDyAbu5',
+            //     blockNumber: 15400000,  // MUST be after Aave V2 was deployed
+            //     timeout: 1000000
+            // },
         },
         kovan: {
             // url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
@@ -102,8 +108,8 @@ module.exports = {
             },
         },
         goerli: {
-            url: `https://eth-goerli.g.alchemy.com/v2/mCtpp6DQI8VDJ9F4kIovVrGncmsUnM_n`,
-            gasPrice: 80e9,
+            url: `https://eth-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
+            gasPrice: 'auto',
             // blockGasLimit: 12400000,
             accounts: {
                 mnemonic: mnemonic.testnet,
@@ -114,8 +120,8 @@ module.exports = {
         mumbai: {
             // url: `https://rpc-mumbai.matic.today`,
             // url: `https://rpc-mumbai.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
-            url: `https://matic-mumbai.chainstacklabs.com/`,
-            gasPrice: 50e9,
+            url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
+            // gasPrice: 50e9,
             accounts: {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
@@ -126,7 +132,7 @@ module.exports = {
         polygon: {
             // url: `https://rpc-mainnet.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
             url: `https://polygon-mainnet.g.alchemy.com/v2/HFlv2m48GYEDLf9sHMTBuy2Z80xFwlVC`,
-            gasPrice: 50e9,
+            gasPrice: 80e9,
             accounts: {
                 mnemonic: mnemonic.mainnet,
                 initialIndex: 0,
@@ -136,7 +142,7 @@ module.exports = {
         mainnet: {
             // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
             url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 30e9,
+            gasPrice: 'auto',
             blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.mainnet,
@@ -193,6 +199,7 @@ module.exports = {
       flat: true,
       only: [
         'Universe',
+        'UniverseRP',
         'ChargedState',
         'ChargedSettings',
         'ChargedManagers',
@@ -205,13 +212,14 @@ module.exports = {
         'GenericWalletManagerB',
         'GenericBasketManager',
         'GenericBasketManagerB',
+        'RewardProgram',
         'Ionx',
         'Proton',
         'ProtonB',
+        'ProtonC',
         'Lepton',
         'Lepton2',
         'ERC20',
-        'ERC721',
         'ExternalERC721',
         'FungibleERC1155',
         'NonFungibleERC1155',

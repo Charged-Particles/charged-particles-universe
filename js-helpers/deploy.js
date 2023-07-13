@@ -123,6 +123,11 @@ const presets = {
         42: '0x3E0437898a5667a4769B1Ca5A34aAB1ae7E81377', // kovan
         31337: '0xD46bA6D942050d489DBd938a2C909A5d5039A161', // Hardhat - Forked Mainnet
       },
+      usdc: {
+        1: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // mainnet
+        5: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
+        31337: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+      },
       lendingPoolProvider: {
         1: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // mainnet
         42: '0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b', // kovan
