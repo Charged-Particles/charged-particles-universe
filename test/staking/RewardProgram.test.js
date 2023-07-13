@@ -64,7 +64,7 @@ describe('Reward program', function () {
     rewardWalletManagerMock = await deployMockContract(deployerSigner, walletManager.abi);
 
     await rewardProgramDeployerSigner.setUniverse(await deployerSigner.getAddress()).then(tx => tx.wait());
-    programData = await rewardProgramDeployerSigner.getProgramData();
+    programData = await rewardProgram.getProgramData();
 
     // Instantiate universe
     const Universe= await ethers.getContractFactory('Universe');

@@ -47,7 +47,6 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ddGenericWalletManagerB = getDeployData('GenericWalletManagerB', chainId);
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddGenericBasketManagerB = getDeployData('GenericBasketManagerB', chainId);
-    const ddRewardProgram = getDeployData('RewardProgram', chainId);
     const ddProton = getDeployData('Proton', chainId);
     const ddProtonB = getDeployData('ProtonB', chainId);
     const ddLepton2 = getDeployData('Lepton2', chainId);

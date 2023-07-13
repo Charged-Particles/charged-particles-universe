@@ -84,46 +84,48 @@ module.exports = async (hre) => {
   //
   // Deploy Contracts
   //
-  // log('  Deploying UniverseRP...');
-  // const UniverseRP = await ethers.getContractFactory('UniverseRP');
-  // const UniverseRPInstance = await upgrades.deployProxy(UniverseRP, []);
-  // const universeRP = await UniverseRPInstance.deployed();
-  // deployData['UniverseRP'] = {
-  //   abi: getContractAbi('UniverseRP'),
-  //   address: universeRP.address,
-  //   deployTransaction: universeRP.deployTransaction,
-  // }
-  // saveDeploymentData(chainId, deployData);
-  // log('  - UniverseRP:       ', universeRP.address);
-  // log('     - Block:         ', universeRP.deployTransaction.blockNumber);
-  // log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universeRP.deployTransaction }));
+  log('  Deploying UniverseRP...');
+  const UniverseRP = await ethers.getContractFactory('UniverseRP');
+  const UniverseRPInstance = await upgrades.deployProxy(UniverseRP, []);
 
-  // log('\n  Deploying RewardProgram...');
-  // const RewardProgram = await ethers.getContractFactory('RewardProgram');
-  // const RewardProgramInstance = await RewardProgram.deploy();
-  // const rewardProgram = await RewardProgramInstance.deployed();
-  // deployData['RewardProgram'] = {
-  //     address: rewardProgram.address,
-  //     deployTransaction: rewardProgram.deployTransaction,
-  // }
-  // saveDeploymentData(chainId, deployData, true);
-  // log('  - RewardProgram:    ', rewardProgram.address);
-  // log('     - Block:         ', rewardProgram.deployTransaction.blockNumber);
-  // log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: rewardProgram.deployTransaction }));
+  const universeRP = await UniverseRPInstance.deployed();
+
+  deployData['UniverseRP'] = {
+    abi: getContractAbi('UniverseRP'),
+    address: universeRP.address,
+    deployTransaction: universeRP.deployTransaction,
+  }
+  saveDeploymentData(chainId, deployData);
+  log('  - UniverseRP:       ', universeRP.address);
+  log('     - Block:         ', universeRP.deployTransaction.blockNumber);
+  log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: universeRP.deployTransaction }));
+
+  log('\n  Deploying RewardProgram...');
+  const RewardProgram = await ethers.getContractFactory('RewardProgram');
+  const RewardProgramInstance = await RewardProgram.deploy();
+  const rewardProgram = await RewardProgramInstance.deployed();
+  deployData['RewardProgram'] = {
+      address: rewardProgram.address,
+      deployTransaction: rewardProgram.deployTransaction,
+  }
+  saveDeploymentData(chainId, deployData, true);
+  log('  - RewardProgram:    ', rewardProgram.address);
+  log('     - Block:         ', rewardProgram.deployTransaction.blockNumber);
+  log('     - Gas Cost:      ', getTxGasCost({ deployTransaction: rewardProgram.deployTransaction }));
 
   //
   // Load Previously Deployed Contracts
   //
 
-  const ddUniverseRP = getDeployData('UniverseRP', chainOverride);
-  log('  Loading UniverseRP from:               ', ddUniverseRP.address, ` (${_.get(ddUniverseRP, 'deployTransaction.blockNumber', '0')})`);
-  const UniverseRP = await ethers.getContractFactory('UniverseRP');
-  const universeRP = await UniverseRP.attach(ddUniverseRP.address);
+  // const ddUniverseRP = getDeployData('UniverseRP', chainOverride);
+  // log('  Loading UniverseRP from:               ', ddUniverseRP.address, ` (${_.get(ddUniverseRP, 'deployTransaction.blockNumber', '0')})`);
+  // const UniverseRP = await ethers.getContractFactory('UniverseRP');
+  // const universeRP = await UniverseRP.attach(ddUniverseRP.address);
 
-  const ddRewardProgram = getDeployData('RewardProgram', chainOverride);
-  log('  Loading RewardProgram from:               ', ddRewardProgram.address, ` (${_.get(ddRewardProgram, 'deployTransaction.blockNumber', '0')})`);
-  const RewardProgram = await ethers.getContractFactory('RewardProgram');
-  const rewardProgram = await RewardProgram.attach(ddRewardProgram.address);
+  // const ddRewardProgram = getDeployData('RewardProgram', chainOverride);
+  // log('  Loading RewardProgram from:               ', ddRewardProgram.address, ` (${_.get(ddRewardProgram, 'deployTransaction.blockNumber', '0')})`);
+  // const RewardProgram = await ethers.getContractFactory('RewardProgram');
+  // const rewardProgram = await RewardProgram.attach(ddRewardProgram.address);
 
   //
   // Load Existing Contracts
