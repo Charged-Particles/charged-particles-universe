@@ -295,7 +295,7 @@
       },
       {
         "internalType": "address",
-        "name": "stakingTokenm",
+        "name": "stakingToken",
         "type": "address"
       },
       {

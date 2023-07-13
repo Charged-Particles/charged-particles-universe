@@ -12,6 +12,7 @@ const {
 } = require('../../js-helpers/deploy');
 
 describe('Reward program', function () {
+  const USDC_STAKING_TOKEN = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
   let rewardProgram,
     ionx,
     protocolOwnerAddress,
@@ -136,6 +137,7 @@ describe('Reward program', function () {
         contractAddress,
         tokenId,
         'basic.B',
+        USDC_STAKING_TOKEN,
         100
       )).to.emit(rewardProgram, 'AssetDeposit');
 
@@ -167,11 +169,11 @@ describe('Reward program', function () {
     });
 
     it('Verifies simple lepton reward calculation', async () => {
-      const tokenId = 6
       const contractAddress = '0x5d183d790d6b570eaec299be432f0a13a00058a7';
       const leptonMultiplier = 200; // x2
       const principal = 1000000;
       const leptonId = 89;
+      const tokenId = 6
 
       const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
       const uuidBigNumber = ethers.BigNumber.from(uuid);
@@ -182,6 +184,7 @@ describe('Reward program', function () {
         contractAddress,
         tokenId,
         'basic.B',
+        USDC_STAKING_TOKEN,
         100
       ).then(tx => tx.wait());
 
@@ -263,6 +266,7 @@ describe('Reward program', function () {
           leptonMock.address,
           stakeInfoCases[i].tokenId,
           'generic.B',
+          USDC_STAKING_TOKEN,
           stakeInfoCases[i].amount
         ).then(tx => tx.wait());
 
@@ -325,6 +329,7 @@ describe('Reward program', function () {
         contractAddress,
         tokenId,
         'basic.B',
+        USDC_STAKING_TOKEN,
         100
       ).then(tx => tx.wait());
   
@@ -407,6 +412,7 @@ describe('Reward program', function () {
           contractAddress,
           tokenId,
           'basic.B',
+          USDC_STAKING_TOKEN,
           100
           ).then(tx => tx.wait());
           
