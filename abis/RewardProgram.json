@@ -434,6 +434,11 @@
             "internalType": "string",
             "name": "walletManagerId",
             "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "stakingToken",
+            "type": "address"
           }
         ],
         "internalType": "struct IRewardProgram.AssetStake",
@@ -583,6 +588,11 @@
         "type": "string"
       },
       {
+        "internalType": "address",
+        "name": "stakingToken",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "principalAmount",
         "type": "uint256"
@@ -638,6 +648,11 @@
         "internalType": "string",
         "name": "walletManagerId",
         "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "stakingToken",
+        "type": "address"
       }
     ],
     "name": "registerExistingDeposits",

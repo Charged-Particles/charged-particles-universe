@@ -12,7 +12,6 @@ const {
 } = require('../../js-helpers/deploy');
 
 describe('Reward program', function () {
-
   let rewardProgram,
     ionx,
     protocolOwnerAddress,

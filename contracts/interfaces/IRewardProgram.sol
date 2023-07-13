@@ -51,6 +51,7 @@ interface IRewardProgram {
     uint256 start;
     uint256 claimableRewards;
     string walletManagerId;
+    address stakingToken;
   }
 
   struct NftStake {
@@ -65,9 +66,9 @@ interface IRewardProgram {
   function getClaimableRewards(address contractAddress, uint256 tokenId) external view returns (uint256);
   // function claimRewards(address contractAddress, uint256 tokenId, address receiver) public returns (uint256 totalReward);
 
-  function registerExistingDeposits(address contractAddress, uint256 tokenId, string calldata walletManagerId) external;
+  function registerExistingDeposits(address contractAddress, uint256 tokenId, string calldata walletManagerId, address stakingToken) external;
 
-  function registerAssetDeposit(address contractAddress, uint256 tokenId, string calldata walletManagerId, uint256 principalAmount) external;
+  function registerAssetDeposit(address contractAddress, uint256 tokenId, string calldata walletManagerId, address stakingTokenm ,uint256 principalAmount) external;
   function registerAssetRelease(address contractAddress, uint256 tokenId, uint256 interestAmount) external returns (uint256 rewards);
 
   function registerNftDeposit(address contractAddress, uint256 tokenId, address nftTokenAddress, uint256 nftTokenId, uint256 nftTokenAmount) external;

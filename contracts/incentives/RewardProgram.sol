@@ -98,7 +98,12 @@ contract RewardProgram is
   |          Only Universe            |
   |__________________________________*/
 
-  function registerExistingDeposits(address contractAddress, uint256 tokenId, string calldata walletManagerId)
+  function registerExistingDeposits(
+    address contractAddress,
+    uint256 tokenId,
+    string calldata walletManagerId,
+    address stakingToken
+  )
     external
     override
     onlyUniverse
@@ -109,9 +114,9 @@ contract RewardProgram is
 
     // Initiate Asset Stake
     IWalletManager walletMgr = _chargedManagers.getWalletManager(walletManagerId);
-    uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, _programData.stakingToken);
+    uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, stakingToken);
     if (principal > 0) {
-      _assetStake[parentNftUuid] = AssetStake(block.number, 0, walletManagerId);
+      _assetStake[parentNftUuid] = AssetStake(block.number, 0, walletManagerId, stakingToken);
       emit AssetRegistered(contractAddress, tokenId, walletManagerId, principal);
     }
   }
@@ -120,6 +125,7 @@ contract RewardProgram is
     address contractAddress,
     uint256 tokenId,
     string calldata walletManagerId,
+    address stakingToken,
     uint256 principalAmount
   )
     external
@@ -132,6 +138,7 @@ contract RewardProgram is
     if (assetStake.start == 0) {
       assetStake.start = block.number;
       assetStake.walletManagerId = walletManagerId;
+      assetStake.stakingToken = stakingToken;
       emit AssetDeposit(contractAddress, tokenId, walletManagerId, principalAmount);
     }
   }

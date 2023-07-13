@@ -77,7 +77,12 @@ contract UniverseRP is IUniverse, Initializable, OwnableUpgradeable, BlackholePr
   ) external {
     address rewardProgram = getRewardProgram(assetToken);
     if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerExistingDeposits(contractAddress, tokenId, walletManagerId);
+      IRewardProgram(rewardProgram).registerExistingDeposits(
+        contractAddress,
+        tokenId,
+        walletManagerId,
+        assetToken
+      );
     }
   }
 
@@ -106,6 +111,7 @@ contract UniverseRP is IUniverse, Initializable, OwnableUpgradeable, BlackholePr
         contractAddress,
         tokenId,
         walletManagerId,
+        assetToken,
         assetAmount
       );
     }
