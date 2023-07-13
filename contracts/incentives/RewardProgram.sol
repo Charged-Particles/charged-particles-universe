@@ -39,6 +39,7 @@ import "../interfaces/IRewardNft.sol";
 import "../lib/TokenInfo.sol";
 import "../lib/ReentrancyGuard.sol";
 import "../lib/BlackholePrevention.sol";
+import "hardhat/console.sol";
 
 contract RewardProgram is
   IRewardProgram,
@@ -158,12 +159,12 @@ contract RewardProgram is
     AssetStake storage assetStake = _assetStake[parentNftUuid];
 
     // Update Claimable Rewards
-    uint256 newRewards = calculateRewardsEarned(parentNftUuid, interestAmount);
+    uint256 newRewards = calculateRewardsEarned(parentNftUuid, assetStake.stakingToken, interestAmount);
     assetStake.claimableRewards = assetStake.claimableRewards.add(newRewards);
 
     // Reset Stake if Principal Balance falls to Zero
     IWalletManager walletMgr = _chargedManagers.getWalletManager(assetStake.walletManagerId);
-    uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, _programData.stakingToken);
+    uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, assetStake.stakingToken);
     if (principal == 0) {
       assetStake.start = 0;
     }
@@ -239,11 +240,11 @@ contract RewardProgram is
   }
 
 
-  function calculateRewardsEarned(uint256 parentNftUuid, uint256 interestAmount) public view returns (uint256 totalReward) {
+  function calculateRewardsEarned(uint256 parentNftUuid, address stakingAsset,uint256 interestAmount) public view returns (uint256 totalReward) {
     uint256 baseReward = _calculateBaseReward(interestAmount);
     uint256 leptonMultipliedReward = calculateMultipliedReward(parentNftUuid, baseReward);
 
-    totalReward = _convertDecimals(leptonMultipliedReward);
+    totalReward = _convertDecimals(leptonMultipliedReward, stakingAsset);
   }
   function calculateMultipliedReward(uint256 parentNftUuid, uint256 baseReward) public view returns(uint256) {
     AssetStake storage assetStake = _assetStake[parentNftUuid];
@@ -428,9 +429,11 @@ contract RewardProgram is
       return 0;
     }
   }
-  function _convertDecimals(uint256 reward) internal view returns (uint256)
+  function _convertDecimals(uint256 reward, address stakingAsset) internal view returns (uint256)
   {
-    uint8 stakingTokenDecimals = ERC20(_programData.rewardToken).decimals();
+    console.log('>>>>', stakingAsset);
+    uint8 stakingTokenDecimals = ERC20(stakingAsset).decimals();
+    console.log(stakingTokenDecimals);
     return reward.mul(10**(18 - uint256(stakingTokenDecimals)));
   }
 

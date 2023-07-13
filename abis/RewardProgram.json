@@ -379,6 +379,11 @@
         "type": "uint256"
       },
       {
+        "internalType": "address",
+        "name": "stakingAsset",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "interestAmount",
         "type": "uint256"
