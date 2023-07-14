@@ -27,7 +27,6 @@ pragma experimental ABIEncoderV2;
 import "../interfaces/IRewardProgram.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
@@ -39,6 +38,7 @@ import "../interfaces/IRewardNft.sol";
 import "../lib/TokenInfo.sol";
 import "../lib/ReentrancyGuard.sol";
 import "../lib/BlackholePrevention.sol";
+import "../interfaces/IERC20Detailed.sol";
 
 contract RewardProgram is
   IRewardProgram,
@@ -47,7 +47,7 @@ contract RewardProgram is
   ReentrancyGuard
 {
   using SafeMath for uint256;
-  using SafeERC20 for ERC20;
+  using SafeERC20 for IERC20Detailed;
   using TokenInfo for address;
   using EnumerableSet for EnumerableSet.UintSet;
 
@@ -284,8 +284,8 @@ contract RewardProgram is
 
   function fundProgram(uint256 amount) external onlyOwner {
     require(_programData.rewardToken != address(0), "RP:E-405");
-    IERC20 token = ERC20(_programData.rewardToken);
-    token.safeTransferFrom(msg.sender, address(this), amount);
+    IERC20Detailed token = IERC20Detailed(_programData.rewardToken);
+    token.transferFrom(msg.sender, address(this), amount);
     emit RewardProgramFunded(amount);
   }
 
@@ -364,7 +364,7 @@ contract RewardProgram is
       // Update Asset Stake
       assetStake.claimableRewards = 0;
       // Transfer Available Rewards to Receiver
-      ERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
+      IERC20Detailed(_programData.rewardToken).transfer(receiver, totalReward);
     }
 
     emit RewardsClaimed(contractAddress, tokenId, receiver, totalReward, unavailReward);
@@ -424,12 +424,12 @@ contract RewardProgram is
   }
 
   function _convertDecimals(uint256 reward, address stakingAsset) internal view returns (uint256) {
-    uint8 stakingTokenDecimals = ERC20(stakingAsset).decimals();
+    uint8 stakingTokenDecimals = IERC20Detailed(stakingAsset).decimals();
     return reward.mul(10**(18 - uint256(stakingTokenDecimals)));
   }
 
   function _getFundBalance() internal view returns (uint256) {
-    return ERC20(_programData.rewardToken).balanceOf(address(this));
+    return IERC20Detailed(_programData.rewardToken).balanceOf(address(this));
   }
 
   modifier onlyUniverse() {
