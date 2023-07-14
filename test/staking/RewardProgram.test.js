@@ -242,7 +242,6 @@ describe('Reward program', function () {
 
       const stakeInfoCases = [
         {
-          amount: 10,
           blocksUntilLeptonDeposit: 1,
           blocksUntilCalculation: 500,
           leptonStakeMultiplier: 200,
@@ -250,12 +249,11 @@ describe('Reward program', function () {
           generatedChargeAfterLeptonRelease: 1000000,
           blocksUntilLeptonRelease: 500,
           expectedReward: '1499000000000000000',
+          stakingToken: ionxMock, 
           tokenId: 42,
           description: 'Lepton deposited half of the reward length'
         },
-
         {
-          amount: 10,
           blocksUntilLeptonDeposit: 1,
           blocksUntilCalculation: 1000,
           leptonStakeMultiplier: 200,
@@ -263,11 +261,11 @@ describe('Reward program', function () {
           generatedChargeAfterLeptonRelease: 1000000,
           blocksUntilLeptonRelease: 0,
           expectedReward: '1997000000000000000',
+          stakingToken: usdcMock, 
           tokenId: 43,
           description: 'Unstake with deposited lepton inside'
         },
         {
-          amount: ethers.utils.parseUnits('1.0', 6),
           blocksUntilLeptonDeposit: 0,
           blocksUntilCalculation: 100000,
           leptonStakeMultiplier: 100,
@@ -275,27 +273,30 @@ describe('Reward program', function () {
           generatedChargeAfterLeptonRelease: ethers.utils.parseUnits('1.0', 6),
           blocksUntilLeptonRelease: 0,
           expectedReward: '1000000000000000000',
+          stakingToken: ionxMock,
           tokenId: 44,
           description: 'Base multiplier 1x, testing returned decimals'
         },
       ];
 
       for(let i = 0; i < stakeInfoCases.length; i++) {
-        await rewardWalletManagerMock.mock.getInterest.returns(0 ,stakeInfoCases[i]?.generatedChargedBeforeLeptonRelease || 1);
+        const stakingToken = stakeInfoCases[i].stakingToken;
+
+        await rewardWalletManagerMock.mock.getInterest.returns(0, stakeInfoCases[i]?.generatedChargedBeforeLeptonRelease || 1);
         await leptonMock.mock.getMultiplier.returns(stakeInfoCases[i].leptonStakeMultiplier);
         await leptonMock.mock.ownerOf.returns(receiverAddress);
         await leptonMock.mock.isApprovedForAll.returns(true);
-        await ionxMock.mock.balanceOf.returns(ethers.utils.parseEther('100'));
-        await ionxMock.mock.transfer.returns(true);
-        await ionxMock.mock.decimals.returns(6);
-        await rewardProgramDeployerSigner.setBaseMultiplier(stakingToken, 10000);    
+        await stakingToken.mock.balanceOf.returns(ethers.utils.parseEther('100'));
+        await stakingToken.mock.transfer.returns(true);
+        await stakingToken.mock.decimals.returns(6);
+        await rewardProgramDeployerSigner.setBaseMultiplier(stakingToken.address, 10000);    
 
         await rewardProgramDeployerSigner.registerAssetDeposit(
           leptonMock.address,
           stakeInfoCases[i].tokenId,
           'generic.B',
-          stakingToken,
-          stakeInfoCases[i].amount
+          stakingToken.address,
+          100 
         ).then(tx => tx.wait());
 
         if (stakeInfoCases[i]?.blocksUntilLeptonDeposit) {
