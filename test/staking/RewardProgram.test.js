@@ -71,6 +71,8 @@ describe('Reward program', function () {
     rewardWalletManagerMock = await deployMockContract(deployerSigner, walletManager.abi);
 
     await rewardProgramDeployerSigner.setUniverse(await deployerSigner.getAddress()).then(tx => tx.wait());
+    await rewardProgramDeployerSigner.setBaseMultiplier(USDC_STAKING_TOKEN, 10000);
+
     programData = await rewardProgramDeployerSigner.getProgramData();
 
     // Instantiate universe
@@ -109,23 +111,38 @@ describe('Reward program', function () {
     });
 
     it ('Calculates reward with multiplier as 100%', async () => {
-      await rewardProgram.connect(deployerSigner).setBaseMultiplier(10000);
       const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
-      const reward = await rewardProgram.calculateBaseReward(chargedGeneratedInUsdc);
+      const reward = await rewardProgram.calculateBaseReward(USDC_STAKING_TOKEN, chargedGeneratedInUsdc);
+
       expect(ethers.utils.formatUnits(reward, 6)).to.be.eq('1.0');
     });
 
     it ('Changes the base reward multiplier', async () => {
-      await rewardProgram.connect(deployerSigner).setBaseMultiplier(5000);
+      await rewardProgramDeployerSigner.setBaseMultiplier(USDC_STAKING_TOKEN, 5000);
 
       const chargedGeneratedInUsdc = ethers.utils.parseUnits('1', 6);
-      const reward = await rewardProgram.calculateBaseReward(chargedGeneratedInUsdc);
+      const reward = await rewardProgram.calculateBaseReward(USDC_STAKING_TOKEN, chargedGeneratedInUsdc);
       expect(ethers.utils.formatUnits(reward, 6)).to.be.eq('0.5');
 
-      await rewardProgram.connect(deployerSigner).setBaseMultiplier(15000);
-      expect(ethers.utils.formatUnits(await rewardProgram.calculateBaseReward(chargedGeneratedInUsdc), 6)).to.be.eq('1.5');
+      await rewardProgramDeployerSigner.setBaseMultiplier(USDC_STAKING_TOKEN, 15000);
+      expect(ethers.utils.formatUnits(
+        await rewardProgram.calculateBaseReward(USDC_STAKING_TOKEN, chargedGeneratedInUsdc), 6)
+      ).to.be.eq('1.5');
 
-      await rewardProgram.connect(deployerSigner).setBaseMultiplier(10000);
+      await rewardProgramDeployerSigner.setBaseMultiplier(USDC_STAKING_TOKEN, 10000);
+    });
+
+    it('Sets two different base multipliers', async() => {
+      const USDC_BASE_MULTIPLIER = 1000;
+      const IONX_BASE_MULTIPLIER = 2000;
+      await rewardProgramDeployerSigner.setBaseMultiplier(USDC_STAKING_TOKEN, USDC_BASE_MULTIPLIER); 
+      await rewardProgramDeployerSigner.setBaseMultiplier(ionx.address, IONX_BASE_MULTIPLIER); 
+
+      const usdcBaseMultiplierFromContract = await rewardProgram.baseMultipliers(USDC_STAKING_TOKEN);
+      const IONXBaseMultiplierFromContract = await rewardProgram.baseMultipliers(ionx.address);
+
+      expect(usdcBaseMultiplierFromContract).to.eq(USDC_BASE_MULTIPLIER);
+      expect(IONXBaseMultiplierFromContract).to.eq(IONX_BASE_MULTIPLIER);
     });
   });
 
@@ -180,11 +197,11 @@ describe('Reward program', function () {
       const principal = 1000000;
       const leptonId = 89;
       const tokenId = 6
-
       const uuid = ethers.utils.solidityKeccak256(['address', 'uint256'], [contractAddress, tokenId]);
       const uuidBigNumber = ethers.BigNumber.from(uuid);
-
+      
       await leptonMock.mock.getMultiplier.returns(leptonMultiplier);
+      await rewardProgramDeployerSigner.setBaseMultiplier(usdcMock.address, 10000);
       // stake
       await rewardProgramDeployerSigner.registerAssetDeposit(
         contractAddress,
@@ -271,6 +288,7 @@ describe('Reward program', function () {
         await ionxMock.mock.balanceOf.returns(ethers.utils.parseEther('100'));
         await ionxMock.mock.transfer.returns(true);
         await ionxMock.mock.decimals.returns(6);
+        await rewardProgramDeployerSigner.setBaseMultiplier(stakingToken, 10000);    
 
         await rewardProgramDeployerSigner.registerAssetDeposit(
           leptonMock.address,

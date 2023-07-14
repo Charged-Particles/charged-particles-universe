@@ -61,6 +61,7 @@ contract RewardProgram is
   mapping(uint256 => EnumerableSet.UintSet) private _multiplierNftsSet;
   mapping(uint256 => AssetStake) private _assetStake;
   mapping(uint256 => NftStake) private _nftStake;
+  mapping(address => uint256) public baseMultipliers;
 
   /***********************************|
   |          Initialization           |
@@ -233,12 +234,12 @@ contract RewardProgram is
   |         Reward Calculation        |
   |__________________________________*/
 
-  function calculateBaseReward(uint256 amount) public view returns(uint256 baseReward) {
-    baseReward = _calculateBaseReward(amount);
+  function calculateBaseReward(address stakingAsset, uint256 amount) public view returns(uint256 baseReward) {
+    baseReward = _calculateBaseReward(stakingAsset, amount);
   }
 
   function calculateRewardsEarned(uint256 parentNftUuid, address stakingAsset,uint256 interestAmount) public view returns (uint256 totalReward) {
-    uint256 baseReward = _calculateBaseReward(interestAmount);
+    uint256 baseReward = _calculateBaseReward(stakingAsset, interestAmount);
     uint256 leptonMultipliedReward = calculateMultipliedReward(parentNftUuid, baseReward);
     totalReward = _convertDecimals(leptonMultipliedReward, stakingAsset);
   }
@@ -293,9 +294,13 @@ contract RewardProgram is
     _programData.rewardToken = newRewardToken;
   }
 
-  function setBaseMultiplier(uint256 newMultiplier) external onlyOwner {
-    _programData.baseMultiplier = newMultiplier; // Basis Points
+  function setBaseMultiplier(address assetToken, uint256 newMultiplier) external onlyOwner {
+    baseMultipliers[assetToken] = newMultiplier; // Basis Points
   }
+
+  // function setBaseMultiplier(uint256 newMultiplier) external onlyOwner {
+  //   _programData.baseMultiplier = newMultiplier; // Basis Points
+  // }
 
   function setChargedManagers(address manager) external onlyOwner {
     _chargedManagers = IChargedManagers(manager);
@@ -370,8 +375,11 @@ contract RewardProgram is
     emit RewardsClaimed(contractAddress, tokenId, receiver, totalReward, unavailReward);
   }
 
-  function _calculateBaseReward(uint256 amount) internal view returns (uint256 baseReward) {
-    baseReward = amount.mul(_programData.baseMultiplier).div(PERCENTAGE_SCALE);
+  function _calculateBaseReward(address assetToken, uint256 amount) internal view returns (uint256 baseReward) {
+    uint256 baseMultiplier = baseMultipliers[assetToken];
+    require(baseMultiplier >= 0, "Base multiplier not set");
+
+    baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
   }
 
   function _calculateTotalMultiplier(uint256 parentNftUuid) internal view returns (uint256) {

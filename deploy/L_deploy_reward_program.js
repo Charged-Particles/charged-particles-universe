@@ -158,9 +158,9 @@ module.exports = async (hre) => {
     await rewardProgram.setRewardToken(ddIonx.address)
   );
 
-  await executeTx('1-c', `RewardProgram: Set Base Multiplier: ${(_BASE_MULTIPLIER_BP / 100)}%`, async () =>
-    await rewardProgram.setBaseMultiplier(_BASE_MULTIPLIER_BP)
-  );
+  // await executeTx('1-c', `RewardProgram: Set Base Multiplier: ${(_BASE_MULTIPLIER_BP / 100)}%`, async () =>
+  //   await rewardProgram.setBaseMultiplier(_BASE_MULTIPLIER_BP)
+  // );
 
   await executeTx('1-d', 'RewardProgram: Set ChargedManagers', async () =>
     await rewardProgram.setChargedManagers(ddChargedManagers.address)
