@@ -216,10 +216,6 @@ module.exports = async (hre) => {
     await rewardProgram.setRewardToken(ionx.address)
   );
 
-  // await executeTx('3-c', `RewardProgram: Set Base Multiplier: ${(_BASE_MULTIPLIER_BP / 100)}%`, async () =>
-  //   await rewardProgram.setBaseMultiplier(_BASE_MULTIPLIER_BP)
-  // );
-
   await executeTx('3-d', 'RewardProgram: Set ChargedManagers', async () =>
     await rewardProgram.setChargedManagers(ddChargedManagers.address)
   );
