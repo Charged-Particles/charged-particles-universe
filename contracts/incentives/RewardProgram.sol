@@ -298,10 +298,6 @@ contract RewardProgram is
     baseMultipliers[assetToken] = newMultiplier; // Basis Points
   }
 
-  // function setBaseMultiplier(uint256 newMultiplier) external onlyOwner {
-  //   _programData.baseMultiplier = newMultiplier; // Basis Points
-  // }
-
   function setChargedManagers(address manager) external onlyOwner {
     _chargedManagers = IChargedManagers(manager);
   }

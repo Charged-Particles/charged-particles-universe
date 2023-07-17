@@ -169,7 +169,11 @@ module.exports = async (hre) => {
   // Update Universe Connections
 
   await executeTx('1-f', 'Universe: Registering Reward Program', async () =>
-    await universeRP.setRewardProgram(rewardProgram.address, rewardStakingToken, ddLepton2.address)
+    await universeRP.setRewardProgram(rewardProgram.address, daiAddress, ddLepton2.address)
+  );
+
+  await executeTx('1-f', 'Universe: Registering Reward Program', async () =>
+    await universeRP.setRewardProgram(rewardProgram.address, usdcAddress, ddLepton2.address)
   );
 
   await executeTx('1-g', 'Universe: Registering ChargedParticles', async () =>
@@ -185,7 +189,6 @@ module.exports = async (hre) => {
   );
 
   // Clear Old Protons
-
   await executeTx('1-j', 'ProtonA: Unregistering Universe', async () =>
     await protonA.setUniverse(ethers.constants.AddressZero)
   );
@@ -199,6 +202,22 @@ module.exports = async (hre) => {
   await executeTx('1-l', 'ChargedSettings: Enabling ProtonA, ProtonB & ProtonC for Charge', async () =>
     await chargedSettings.enableNftContracts([protonA.address, protonB.address, protonC.address])
   );
+
+
+  // Add staking token into Universe 
+  // await executeTx('2-l', 'Universe: set reward staking tokens', async() => {
+  //   await universeRP.setRewardProgram(rewardProgram.address, rewardStakingToken, ddLepton2.address)
+  // });
+
+  // Include staking toking into base multiplier
+  await executeTx('3-l', 'RewardProgram: set multiplier ', async() => 
+    await rewardProgram.setBaseMultiplier(daiAddress, '10000')
+  );
+
+  await executeTx('3-l', 'RewardProgram: set multiplier ', async() => 
+    await rewardProgram.setBaseMultiplier(usdcAddress, '10000')
+  );
+
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Fund RewardProgram
