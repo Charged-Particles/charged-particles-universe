@@ -82,7 +82,14 @@ contract RewardProgram is
     return _getFundBalance();
   }
 
-  function getClaimableRewards(address contractAddress, uint256 tokenId) external view override returns (uint256) {
+  function getClaimableRewards(
+    address contractAddress,
+    uint256 tokenId
+  )
+    external
+    view
+    override
+  returns (uint256) {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     return _assetStake[parentNftUuid].claimableRewards;
   }
@@ -175,12 +182,17 @@ contract RewardProgram is
     emit AssetRelease(contractAddress, tokenId, interestAmount);
   }
 
-  function registerNftDeposit(address contractAddress, uint256 tokenId, address depositNftAddress, uint256 depositNftTokenId, uint256 /* nftTokenAmount */)
+  function registerNftDeposit(
+    address contractAddress,
+    uint256 tokenId,
+    address depositNftAddress,
+    uint256 depositNftTokenId,
+    uint256 /* nftTokenAmount */
+  )
     external
     override
     onlyUniverse
-    nonReentrant
-  {
+    nonReentrant {
     // We only care about the Multiplier NFT
     if (_programData.multiplierNft != depositNftAddress) { return; }
 
@@ -238,7 +250,15 @@ contract RewardProgram is
     baseReward = _calculateBaseReward(stakingAsset, amount);
   }
 
-  function calculateRewardsEarned(uint256 parentNftUuid, address stakingAsset,uint256 interestAmount) public view returns (uint256 totalReward) {
+  function calculateRewardsEarned(
+    uint256 parentNftUuid,
+    address stakingAsset,
+    uint256 interestAmount
+  )
+    public
+    view
+    returns (uint256 totalReward) 
+  {
     uint256 baseReward = _calculateBaseReward(stakingAsset, interestAmount);
     uint256 leptonMultipliedReward = calculateMultipliedReward(parentNftUuid, baseReward);
     totalReward = _convertDecimals(leptonMultipliedReward, stakingAsset);
