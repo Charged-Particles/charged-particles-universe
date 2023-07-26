@@ -54,7 +54,7 @@ contract RewardProgram is
 {
   using SafeMath for uint256;
   using TokenInfo for address;
-  using SafeERC20 for IERC20Detailed;
+  using SafeERC20 for IERC20;
   using EnumerableSet for EnumerableSet.UintSet;
 
   uint256 constant private PERCENTAGE_SCALE = 1e4; // 10000 (100%)
@@ -124,11 +124,14 @@ contract RewardProgram is
     nonReentrant
   {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+
     require(_assetStake[parentNftUuid].start == 0 && _assetStake[parentNftUuid].claimableRewards == 0, "RP:E-002");
 
     // Initiate Asset Stake
     IWalletManager walletMgr = _chargedManagers.getWalletManager(walletManagerId);
+
     uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, stakingToken);
+
     if (principal > 0) {
       _assetStake[parentNftUuid] = AssetStake(block.number, 0, walletManagerId, stakingToken);
       emit AssetRegistered(contractAddress, tokenId, walletManagerId, principal);
@@ -151,8 +154,9 @@ contract RewardProgram is
 
     if (assetStake.start == 0) {
       assetStake.start = block.number;
-      assetStake.walletManagerId = walletManagerId;
       assetStake.stakingToken = stakingToken;
+      assetStake.walletManagerId = walletManagerId;
+
       emit AssetDeposit(contractAddress, tokenId, walletManagerId, principalAmount);
     }
   }
@@ -198,7 +202,8 @@ contract RewardProgram is
     external
     override
     onlyUniverse
-    nonReentrant {
+    nonReentrant
+  {
     // We only care about the Multiplier NFT
     if (_programData.multiplierNft != depositNftAddress) { return; }
 
@@ -332,15 +337,15 @@ contract RewardProgram is
     }
   }
 
-
   /***********************************|
   |          Only Admin/DAO           |
   |__________________________________*/
 
   function fundProgram(uint256 amount) external onlyOwner {
     require(_programData.rewardToken != address(0), "RP:E-405");
-    IERC20Detailed token = IERC20Detailed(_programData.rewardToken);
-    token.transferFrom(msg.sender, address(this), amount);
+
+    IERC20(_programData.rewardToken).safeTransferFrom(msg.sender, address(this), amount);
+
     emit RewardProgramFunded(amount);
   }
 
@@ -419,7 +424,7 @@ contract RewardProgram is
       // Update Asset Stake
       assetStake.claimableRewards = 0;
       // Transfer Available Rewards to Receiver
-      IERC20Detailed(_programData.rewardToken).transfer(receiver, totalReward);
+      IERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
     }
 
     emit RewardsClaimed(contractAddress, tokenId, receiver, totalReward, unavailReward);
