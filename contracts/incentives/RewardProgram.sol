@@ -30,6 +30,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../interfaces/IChargedManagers.sol";
 import "../interfaces/ILepton.sol";
@@ -47,11 +48,11 @@ contract RewardProgram is
   ReentrancyGuard
 {
   using SafeMath for uint256;
-  using SafeERC20 for IERC20Detailed;
   using TokenInfo for address;
+  using SafeERC20 for IERC20Detailed;
   using EnumerableSet for EnumerableSet.UintSet;
 
-  uint256 constant private PERCENTAGE_SCALE = 1e4;   // 10000 (100%)
+  uint256 constant private PERCENTAGE_SCALE = 1e4; // 10000 (100%)
   uint256 constant private LEPTON_MULTIPLIER_SCALE = 1e2;
 
   address private _universe;
@@ -296,6 +297,10 @@ contract RewardProgram is
 
     // Amount of Base Rewards + Multiplied NFT Rewards
     return amountGeneratedWithoutNftDeposit.add(multipliedReward);
+  }
+
+  function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+    return IERC721Receiver.onERC721Received.selector;
   }
 
 
