@@ -31,6 +31,7 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../interfaces/IChargedManagers.sol";
 import "../interfaces/ILepton.sol";
@@ -43,9 +44,11 @@ import "../interfaces/IERC20Detailed.sol";
 
 contract RewardProgram is
   IRewardProgram,
-  Ownable,
   BlackholePrevention,
-  ReentrancyGuard
+  Ownable,
+  ReentrancyGuard,
+  IERC721Receiver,
+  IERC1155Receiver
 {
   using SafeMath for uint256;
   using TokenInfo for address;
@@ -299,8 +302,16 @@ contract RewardProgram is
     return amountGeneratedWithoutNftDeposit.add(multipliedReward);
   }
 
-  function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+  function onERC721Received(address, address, uint256, bytes calldata) external override returns (bytes4) {
     return IERC721Receiver.onERC721Received.selector;
+  }
+
+  function onERC1155Received(address, address, uint256, uint256, bytes calldata) external override returns (bytes4) {
+    return IERC1155Receiver.onERC1155BatchReceived.selector;
+  }
+
+  function onERC1155BatchReceived(address, address, uint256[] calldata, uint256[] calldata, bytes calldata) external override returns (bytes4) {
+    return "";
   }
 
 
