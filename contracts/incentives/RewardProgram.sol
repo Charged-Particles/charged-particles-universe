@@ -27,6 +27,7 @@ pragma experimental ABIEncoderV2;
 import "../interfaces/IRewardProgram.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
@@ -46,6 +47,7 @@ contract RewardProgram is
   IRewardProgram,
   BlackholePrevention,
   Ownable,
+  IERC165,
   ReentrancyGuard,
   IERC721Receiver,
   IERC1155Receiver
@@ -312,6 +314,22 @@ contract RewardProgram is
 
   function onERC1155BatchReceived(address, address, uint256[] calldata, uint256[] calldata, bytes calldata) external override returns (bytes4) {
     return "";
+  }
+
+  function supportsInterface(bytes4 interfaceId)
+    public
+    view
+    virtual
+    override(IERC165)
+    returns (bool)
+  {
+    // default interface support
+    if (
+      interfaceId == type(IERC1155Receiver).interfaceId ||
+      interfaceId == type(IERC165).interfaceId
+    ) {
+      return true;
+    }
   }
 
 
