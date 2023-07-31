@@ -27,10 +27,12 @@ pragma experimental ABIEncoderV2;
 import "../interfaces/IRewardProgram.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/introspection/IERC165.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../interfaces/IChargedManagers.sol";
 import "../interfaces/ILepton.sol";
@@ -39,19 +41,23 @@ import "../interfaces/IRewardNft.sol";
 import "../lib/TokenInfo.sol";
 import "../lib/ReentrancyGuard.sol";
 import "../lib/BlackholePrevention.sol";
+import "../interfaces/IERC20Detailed.sol";
 
 contract RewardProgram is
   IRewardProgram,
-  Ownable,
   BlackholePrevention,
-  ReentrancyGuard
+  Ownable,
+  IERC165,
+  ReentrancyGuard,
+  IERC721Receiver,
+  IERC1155Receiver
 {
   using SafeMath for uint256;
-  using SafeERC20 for ERC20;
   using TokenInfo for address;
+  using SafeERC20 for IERC20;
   using EnumerableSet for EnumerableSet.UintSet;
 
-  uint256 constant private PERCENTAGE_SCALE = 1e4;   // 10000 (100%)
+  uint256 constant private PERCENTAGE_SCALE = 1e4; // 10000 (100%)
   uint256 constant private LEPTON_MULTIPLIER_SCALE = 1e2;
 
   address private _universe;
@@ -61,6 +67,7 @@ contract RewardProgram is
   mapping(uint256 => EnumerableSet.UintSet) private _multiplierNftsSet;
   mapping(uint256 => AssetStake) private _assetStake;
   mapping(uint256 => NftStake) private _nftStake;
+  mapping(address => uint256) public baseMultipliers;
 
   /***********************************|
   |          Initialization           |
@@ -81,7 +88,14 @@ contract RewardProgram is
     return _getFundBalance();
   }
 
-  function getClaimableRewards(address contractAddress, uint256 tokenId) external view override returns (uint256) {
+  function getClaimableRewards(
+    address contractAddress,
+    uint256 tokenId
+  )
+    external
+    view
+    override
+  returns (uint256) {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
     return _assetStake[parentNftUuid].claimableRewards;
   }
@@ -110,11 +124,14 @@ contract RewardProgram is
     nonReentrant
   {
     uint256 parentNftUuid = contractAddress.getTokenUUID(tokenId);
+
     require(_assetStake[parentNftUuid].start == 0 && _assetStake[parentNftUuid].claimableRewards == 0, "RP:E-002");
 
     // Initiate Asset Stake
     IWalletManager walletMgr = _chargedManagers.getWalletManager(walletManagerId);
+
     uint256 principal = walletMgr.getPrincipal(contractAddress, tokenId, stakingToken);
+
     if (principal > 0) {
       _assetStake[parentNftUuid] = AssetStake(block.number, 0, walletManagerId, stakingToken);
       emit AssetRegistered(contractAddress, tokenId, walletManagerId, principal);
@@ -137,8 +154,9 @@ contract RewardProgram is
 
     if (assetStake.start == 0) {
       assetStake.start = block.number;
-      assetStake.walletManagerId = walletManagerId;
       assetStake.stakingToken = stakingToken;
+      assetStake.walletManagerId = walletManagerId;
+
       emit AssetDeposit(contractAddress, tokenId, walletManagerId, principalAmount);
     }
   }
@@ -174,7 +192,13 @@ contract RewardProgram is
     emit AssetRelease(contractAddress, tokenId, interestAmount);
   }
 
-  function registerNftDeposit(address contractAddress, uint256 tokenId, address depositNftAddress, uint256 depositNftTokenId, uint256 /* nftTokenAmount */)
+  function registerNftDeposit(
+    address contractAddress,
+    uint256 tokenId,
+    address depositNftAddress,
+    uint256 depositNftTokenId,
+    uint256 /* nftTokenAmount */
+  )
     external
     override
     onlyUniverse
@@ -233,12 +257,20 @@ contract RewardProgram is
   |         Reward Calculation        |
   |__________________________________*/
 
-  function calculateBaseReward(uint256 amount) public view returns(uint256 baseReward) {
-    baseReward = _calculateBaseReward(amount);
+  function calculateBaseReward(address stakingAsset, uint256 amount) public view returns(uint256 baseReward) {
+    baseReward = _calculateBaseReward(stakingAsset, amount);
   }
 
-  function calculateRewardsEarned(uint256 parentNftUuid, address stakingAsset,uint256 interestAmount) public view returns (uint256 totalReward) {
-    uint256 baseReward = _calculateBaseReward(interestAmount);
+  function calculateRewardsEarned(
+    uint256 parentNftUuid,
+    address stakingAsset,
+    uint256 interestAmount
+  )
+    public
+    view
+    returns (uint256 totalReward) 
+  {
+    uint256 baseReward = _calculateBaseReward(stakingAsset, interestAmount);
     uint256 leptonMultipliedReward = calculateMultipliedReward(parentNftUuid, baseReward);
     totalReward = _convertDecimals(leptonMultipliedReward, stakingAsset);
   }
@@ -277,6 +309,33 @@ contract RewardProgram is
     return amountGeneratedWithoutNftDeposit.add(multipliedReward);
   }
 
+  function onERC721Received(address, address, uint256, bytes calldata) external override returns (bytes4) {
+    return IERC721Receiver.onERC721Received.selector;
+  }
+
+  function onERC1155Received(address, address, uint256, uint256, bytes calldata) external override returns (bytes4) {
+    return IERC1155Receiver.onERC1155BatchReceived.selector;
+  }
+
+  function onERC1155BatchReceived(address, address, uint256[] calldata, uint256[] calldata, bytes calldata) external override returns (bytes4) {
+    return "";
+  }
+
+  function supportsInterface(bytes4 interfaceId)
+    public
+    view
+    virtual
+    override(IERC165)
+    returns (bool)
+  {
+    // default interface support
+    if (
+      interfaceId == type(IERC1155Receiver).interfaceId ||
+      interfaceId == type(IERC165).interfaceId
+    ) {
+      return true;
+    }
+  }
 
   /***********************************|
   |          Only Admin/DAO           |
@@ -284,8 +343,9 @@ contract RewardProgram is
 
   function fundProgram(uint256 amount) external onlyOwner {
     require(_programData.rewardToken != address(0), "RP:E-405");
-    IERC20 token = ERC20(_programData.rewardToken);
-    token.safeTransferFrom(msg.sender, address(this), amount);
+
+    IERC20(_programData.rewardToken).safeTransferFrom(msg.sender, address(this), amount);
+
     emit RewardProgramFunded(amount);
   }
 
@@ -293,8 +353,8 @@ contract RewardProgram is
     _programData.rewardToken = newRewardToken;
   }
 
-  function setBaseMultiplier(uint256 newMultiplier) external onlyOwner {
-    _programData.baseMultiplier = newMultiplier; // Basis Points
+  function setBaseMultiplier(address assetToken, uint256 newMultiplier) external onlyOwner {
+    baseMultipliers[assetToken] = newMultiplier; // Basis Points
   }
 
   function setChargedManagers(address manager) external onlyOwner {
@@ -364,14 +424,17 @@ contract RewardProgram is
       // Update Asset Stake
       assetStake.claimableRewards = 0;
       // Transfer Available Rewards to Receiver
-      ERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
+      IERC20(_programData.rewardToken).safeTransfer(receiver, totalReward);
     }
 
     emit RewardsClaimed(contractAddress, tokenId, receiver, totalReward, unavailReward);
   }
 
-  function _calculateBaseReward(uint256 amount) internal view returns (uint256 baseReward) {
-    baseReward = amount.mul(_programData.baseMultiplier).div(PERCENTAGE_SCALE);
+  function _calculateBaseReward(address assetToken, uint256 amount) internal view returns (uint256 baseReward) {
+    uint256 baseMultiplier = baseMultipliers[assetToken];
+    require(baseMultiplier >= 0, "Base multiplier not set");
+
+    baseReward = amount.mul(baseMultiplier).div(PERCENTAGE_SCALE);
   }
 
   function _calculateTotalMultiplier(uint256 parentNftUuid) internal view returns (uint256) {
@@ -424,12 +487,12 @@ contract RewardProgram is
   }
 
   function _convertDecimals(uint256 reward, address stakingAsset) internal view returns (uint256) {
-    uint8 stakingTokenDecimals = ERC20(stakingAsset).decimals();
+    uint8 stakingTokenDecimals = IERC20Detailed(stakingAsset).decimals();
     return reward.mul(10**(18 - uint256(stakingTokenDecimals)));
   }
 
   function _getFundBalance() internal view returns (uint256) {
-    return ERC20(_programData.rewardToken).balanceOf(address(this));
+    return IERC20Detailed(_programData.rewardToken).balanceOf(address(this));
   }
 
   modifier onlyUniverse() {
