@@ -10,24 +10,29 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "controller",
+        "name": "contractAddress",
         "type": "address"
-      }
-    ],
-    "name": "ControllerSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
+      },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "executor",
-        "type": "address"
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "walletManagerId",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "principalAmount",
+        "type": "uint256"
       }
     ],
-    "name": "ExecutorSet",
+    "name": "AssetDeposit",
     "type": "event"
   },
   {
@@ -40,7 +45,63 @@
         "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "walletManagerId",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "principalAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "AssetRegistered",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "interestAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "AssetRelease",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
@@ -48,23 +109,48 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "smartWallet",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "creator",
+        "name": "nftTokenAddress",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "annuityPct",
+        "name": "nftTokenId",
         "type": "uint256"
       }
     ],
-    "name": "NewSmartWallet",
+    "name": "NftDeposit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "nftTokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "nftTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NftRelease",
     "type": "event"
   },
   {
@@ -91,12 +177,18 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "bool",
-        "name": "isPaused",
-        "type": "bool"
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
       }
     ],
-    "name": "PausedStateSet",
+    "name": "RewardProgramFunded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "RewardProgramOutOfFunds",
     "type": "event"
   },
   {
@@ -109,118 +201,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      },
-      {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "creatorAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "receiverAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "WalletDischarged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "creator",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "receiverAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "WalletDischargedForCreator",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "assetAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "yieldTokensAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "WalletEnergized",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "indexed": true,
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
@@ -233,67 +214,18 @@
       },
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      },
-      {
-        "indexed": false,
         "internalType": "uint256",
-        "name": "principalAmount",
+        "name": "rewarded",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "creatorAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "receiverAmount",
+        "name": "remaining",
         "type": "uint256"
       }
     ],
-    "name": "WalletReleased",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "rewardsToken",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "rewardsAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "WalletRewarded",
+    "name": "RewardsClaimed",
     "type": "event"
   },
   {
@@ -399,300 +331,124 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
-        "name": "",
+        "name": "amount",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
-    "name": "discharge",
+    "name": "calculateBaseReward",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "creatorAmount",
+        "name": "baseReward",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "parentNftUuid",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "receiverAmount",
+        "name": "baseReward",
         "type": "uint256"
       }
     ],
+    "name": "calculateMultipliedReward",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "parentNftUuid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "stakingAsset",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "interestAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "calculateRewardsEarned",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalReward",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "fundProgram",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
-        "name": "",
+        "name": "uuid",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
-    "name": "dischargeAmount",
+    "name": "getAssetStake",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "creatorAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "receiverAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "start",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "claimableRewards",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "walletManagerId",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "stakingToken",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct IRewardProgram.AssetStake",
         "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "dischargeAmountForCreator",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "receiverAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "assetAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "energize",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "yieldTokensAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "externalAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "ethValue",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes",
-        "name": "encodedParams",
-        "type": "bytes"
-      }
-    ],
-    "name": "executeForAccount",
-    "outputs": [
-      {
-        "internalType": "bytes",
-        "name": "",
-        "type": "bytes"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      }
-    ],
-    "name": "getInterest",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "creatorInterest",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "ownerInterest",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      }
-    ],
-    "name": "getPrincipal",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      }
-    ],
-    "name": "getReserveInterestToken",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
+        "type": "tuple"
       }
     ],
     "stateMutability": "view",
@@ -709,14 +465,9 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "rewardToken",
-        "type": "address"
       }
     ],
-    "name": "getRewards",
+    "name": "getClaimableRewards",
     "outputs": [
       {
         "internalType": "uint256",
@@ -724,80 +475,17 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      }
-    ],
-    "name": "getTotal",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "creator",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "annuityPct",
-        "type": "uint256"
-      }
-    ],
-    "name": "getWalletAddressById",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "isPaused",
+    "name": "getFundBalance",
     "outputs": [
       {
-        "internalType": "bool",
+        "internalType": "uint256",
         "name": "",
-        "type": "bool"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -806,27 +494,64 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
-        "name": "tokenId",
+        "name": "uuid",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
       }
     ],
-    "name": "isReserveActive",
+    "name": "getNftStake",
     "outputs": [
       {
-        "internalType": "bool",
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "multiplier",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "depositBlockNumber",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "releaseBlockNumber",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IRewardProgram.NftStake",
         "name": "",
-        "type": "bool"
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getProgramData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "rewardToken",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "baseMultiplier",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "multiplierNft",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct IRewardProgram.ProgramRewardData",
+        "name": "programData",
+        "type": "tuple"
       }
     ],
     "stateMutability": "view",
@@ -858,12 +583,22 @@
         "type": "uint256"
       },
       {
+        "internalType": "string",
+        "name": "walletManagerId",
+        "type": "string"
+      },
+      {
         "internalType": "address",
-        "name": "assetToken",
+        "name": "stakingToken",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "principalAmount",
+        "type": "uint256"
       }
     ],
-    "name": "refreshPrincipal",
+    "name": "registerAssetDeposit",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -872,11 +607,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "contractAddress",
         "type": "address"
       },
@@ -886,31 +616,16 @@
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "creatorRedirect",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "interestAmount",
+        "type": "uint256"
       }
     ],
-    "name": "release",
+    "name": "registerAssetRelease",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "principalAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "creatorAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "receiverAmount",
+        "name": "rewards",
         "type": "uint256"
       }
     ],
@@ -921,9 +636,32 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "receiver",
+        "name": "contractAddress",
         "type": "address"
       },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "walletManagerId",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "stakingToken",
+        "type": "address"
+      }
+    ],
+    "name": "registerExistingDeposits",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
         "internalType": "address",
         "name": "contractAddress",
@@ -936,38 +674,55 @@
       },
       {
         "internalType": "address",
-        "name": "assetToken",
+        "name": "depositNftAddress",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "assetAmount",
+        "name": "depositNftTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "registerNftDeposit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "creatorRedirect",
+        "name": "releaseNftAddress",
         "type": "address"
-      }
-    ],
-    "name": "releaseAmount",
-    "outputs": [
+      },
       {
         "internalType": "uint256",
-        "name": "principalAmount",
+        "name": "releaseNftTokenId",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "creatorAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "receiverAmount",
+        "name": "",
         "type": "uint256"
       }
     ],
+    "name": "registerNftRelease",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -981,12 +736,12 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "controller",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "newMultiplier",
+        "type": "uint256"
       }
     ],
-    "name": "setController",
+    "name": "setBaseMultiplier",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -995,11 +750,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "executor",
+        "name": "manager",
         "type": "address"
       }
     ],
-    "name": "setExecutor",
+    "name": "setChargedManagers",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1007,12 +762,38 @@
   {
     "inputs": [
       {
-        "internalType": "bool",
-        "name": "paused",
-        "type": "bool"
+        "internalType": "address",
+        "name": "nftTokenAddress",
+        "type": "address"
       }
     ],
-    "name": "setPausedState",
+    "name": "setRewardNft",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newRewardToken",
+        "type": "address"
+      }
+    ],
+    "name": "setRewardToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "universe",
+        "type": "address"
+      }
+    ],
+    "name": "setUniverse",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1033,8 +814,13 @@
   {
     "inputs": [
       {
+        "internalType": "address payable",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
         "internalType": "address",
-        "name": "contractAddress",
+        "name": "tokenAddress",
         "type": "address"
       },
       {
@@ -1042,6 +828,42 @@
         "name": "tokenId",
         "type": "uint256"
       },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawERC1155",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address payable",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawERC721",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
         "internalType": "address payable",
         "name": "receiver",
@@ -1058,56 +880,13 @@
         "type": "uint256"
       }
     ],
-    "name": "withdrawERC20",
+    "name": "withdrawErc20",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address payable",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "nftTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nftTokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdrawERC721",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
       {
         "internalType": "address payable",
         "name": "receiver",
@@ -1121,45 +900,6 @@
     ],
     "name": "withdrawEther",
     "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "rewardsToken",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "rewardsAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdrawRewards",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
     "stateMutability": "nonpayable",
     "type": "function"
   }

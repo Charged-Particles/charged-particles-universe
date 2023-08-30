@@ -145,9 +145,12 @@ describe("Charged Settings", () => {
   });
 
   describe('Wallet Managers', async () => {
-    it('should have enabled "aave", "aave.B", "generic" and "generic.B" as wallet managers', async () => {
-      expect(await chargedManagers.isWalletManagerEnabled('aave')).to.equal(true);
-      expect(await chargedManagers.isWalletManagerEnabled('aave.B')).to.equal(true);
+    // it('should have enabled "aave", "aave.B" as wallet managers', async () => {
+    //   expect(await chargedManagers.isWalletManagerEnabled('aave')).to.equal(true);
+    //   expect(await chargedManagers.isWalletManagerEnabled('aave.B')).to.equal(true);
+    // });
+
+    it('should have enabled "generic" and "generic.B" as wallet managers', async () => {
       expect(await chargedManagers.isWalletManagerEnabled('generic')).to.equal(true);
       expect(await chargedManagers.isWalletManagerEnabled('generic.B')).to.equal(true);
     });

@@ -5,19 +5,6 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "chargedManagers",
-        "type": "address"
-      }
-    ],
-    "name": "ChargedManagersSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
         "name": "contractAddress",
         "type": "address"
       },
@@ -30,29 +17,17 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "basketManagerId",
+        "name": "walletManagerId",
         "type": "string"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "externalAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes",
-        "name": "encodedParams",
-        "type": "bytes"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "ethValue",
+        "name": "principalAmount",
         "type": "uint256"
       }
     ],
-    "name": "ExecuteForBasket",
+    "name": "AssetDeposit",
     "type": "event"
   },
   {
@@ -77,25 +52,13 @@
         "type": "string"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "externalAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes",
-        "name": "encodedParams",
-        "type": "bytes"
-      },
-      {
         "indexed": false,
         "internalType": "uint256",
-        "name": "ethValue",
+        "name": "principalAmount",
         "type": "uint256"
       }
     ],
-    "name": "ExecuteForWallet",
+    "name": "AssetRegistered",
     "type": "event"
   },
   {
@@ -103,25 +66,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "state",
-        "type": "bool"
-      }
-    ],
-    "name": "PermsSetForExternal",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "address",
         "name": "contractAddress",
         "type": "address"
@@ -134,18 +78,12 @@
       },
       {
         "indexed": false,
-        "internalType": "string",
-        "name": "walletManagerId",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "interestAmount",
+        "type": "uint256"
       }
     ],
-    "name": "PrincipalRefreshed",
+    "name": "AssetRelease",
     "type": "event"
   },
   {
@@ -154,11 +92,116 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "tokenInfoProxy",
+        "name": "contractAddress",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "nftTokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "nftTokenId",
+        "type": "uint256"
       }
     ],
-    "name": "TokenInfoProxySet",
+    "name": "NftDeposit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "nftTokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "nftTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NftRelease",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardProgramFunded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "RewardProgramOutOfFunds",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rewarded",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "remaining",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardsClaimed",
     "type": "event"
   },
   {
@@ -172,32 +215,60 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "basketManagerId",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "externalAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes",
-        "name": "encodedParams",
-        "type": "bytes"
       }
     ],
-    "name": "executeForBasket",
+    "name": "getClaimableRewards",
     "outputs": [
       {
-        "internalType": "bytes",
+        "internalType": "uint256",
         "name": "",
-        "type": "bytes"
+        "type": "uint256"
       }
     ],
-    "stateMutability": "payable",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getFundBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getProgramData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "rewardToken",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "baseMultiplier",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "multiplierNft",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct IRewardProgram.ProgramRewardData",
+        "name": "programData",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -219,50 +290,16 @@
       },
       {
         "internalType": "address",
-        "name": "externalAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes",
-        "name": "encodedParams",
-        "type": "bytes"
-      }
-    ],
-    "name": "executeForWallet",
-    "outputs": [
-      {
-        "internalType": "bytes",
-        "name": "",
-        "type": "bytes"
-      }
-    ],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
+        "name": "stakingToken",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "tokenId",
+        "name": "principalAmount",
         "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "walletManagerId",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
       }
     ],
-    "name": "refreshWalletPrincipal",
+    "name": "registerAssetDeposit",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -271,11 +308,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "contractAddress",
         "type": "address"
       },
@@ -285,26 +317,16 @@
         "type": "uint256"
       },
       {
-        "internalType": "string",
-        "name": "basketManagerId",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "rewardsToken",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
-        "name": "rewardsAmount",
+        "name": "interestAmount",
         "type": "uint256"
       }
     ],
-    "name": "withdrawBasketRewards",
+    "name": "registerAssetRelease",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "amountWithdrawn",
+        "name": "rewards",
         "type": "uint256"
       }
     ],
@@ -313,11 +335,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      },
       {
         "internalType": "address",
         "name": "contractAddress",
@@ -335,23 +352,78 @@
       },
       {
         "internalType": "address",
-        "name": "rewardsToken",
+        "name": "stakingToken",
+        "type": "address"
+      }
+    ],
+    "name": "registerExistingDeposits",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "rewardsAmount",
+        "name": "tokenId",
         "type": "uint256"
-      }
-    ],
-    "name": "withdrawWalletRewards",
-    "outputs": [
+      },
+      {
+        "internalType": "address",
+        "name": "nftTokenAddress",
+        "type": "address"
+      },
       {
         "internalType": "uint256",
-        "name": "amountWithdrawn",
+        "name": "nftTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftTokenAmount",
         "type": "uint256"
       }
     ],
+    "name": "registerNftDeposit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "nftTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftTokenAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "registerNftRelease",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   }
