@@ -42,7 +42,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ddTokenInfoProxy = getDeployData('TokenInfoProxy', chainId);
     const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
     const ddAaveWalletManagerB = getDeployData('AaveWalletManagerB', chainId);
-    // const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
+    const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
     const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
     const ddGenericWalletManagerB = getDeployData('GenericWalletManagerB', chainId);
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
@@ -136,7 +136,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ionx = await Ionx.attach(ddIonx.address);
 
 
-    // skipToTxId('9-c');
+    skipToTxId('9-a');
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Charged Particles & Universe
@@ -258,9 +258,9 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await aaveWalletManager.setController(ddChargedParticles.address)
     );
 
-    // await executeTx('3-b', 'AaveWalletManager: Setting Aave Bridge to V2', async () =>
-    //   await aaveWalletManager.setAaveBridge(ddAaveBridgeV2.address)
-    // );
+    await executeTx('3-b', 'AaveWalletManager: Setting Aave Bridge to V2', async () =>
+      await aaveWalletManager.setAaveBridge(ddAaveBridgeV2.address)
+    );
 
     await executeTx('3-c', 'AaveWalletManager: Registering Aave as LP with ChargedParticles', async () =>
       await chargedManagers.registerWalletManager('aave', ddAaveWalletManager.address)
@@ -276,9 +276,9 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await aaveWalletManagerB.setController(ddChargedParticles.address)
     );
 
-    // await executeTx('3-f', 'AaveWalletManagerB: Setting Aave Bridge to V2', async () =>
-    //   await aaveWalletManagerB.setAaveBridge(ddAaveBridgeV2.address)
-    // );
+    await executeTx('3-f', 'AaveWalletManagerB: Setting Aave Bridge to V2', async () =>
+      await aaveWalletManagerB.setAaveBridge(ddAaveBridgeV2.address)
+    );
 
     await executeTx('3-g', 'AaveWalletManagerB: Registering Aave as LP with ChargedParticles', async () =>
       await chargedManagers.registerWalletManager('aave.B', ddAaveWalletManagerB.address)
@@ -392,13 +392,13 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // Setup Ionx
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    // await executeTx('6-a', 'Universe: Registering Ionx', async () =>
-    //   await universe.setPhoton(ddIonx.address, ionxMaxSupply.div(2))
-    // );
+    await executeTx('6-a', 'Universe: Registering Ionx', async () =>
+      await universe.setPhoton(ddIonx.address, ionxMaxSupply.div(2))
+    );
 
-    // await executeTx('6-b', 'Ionx: Setting Minter', async () =>
-    //   await ionx.setMinter(protocolOwner)
-    // );
+    await executeTx('6-b', 'Ionx: Setting Minter', async () =>
+      await ionx.setMinter(protocolOwner)
+    );
 
     // let assetTokenId;
     // let assetTokenAddress;
@@ -495,9 +495,9 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await genericBasketManagerB.setExecutor(ddParticleSplitter.address)
     );
 
-    // await executeTx('10-c', 'Aave Wallet Manager "B": Registering Executor', async () =>
-    //   await aaveWalletManagerB.setExecutor(ddParticleSplitter.address)
-    // );
+    await executeTx('10-c', 'Aave Wallet Manager "B": Registering Executor', async () =>
+      await aaveWalletManagerB.setExecutor(ddParticleSplitter.address)
+    );
 
     log(`\n  Contract Initialization Complete!`);
     const gasCosts = getAccumulatedGasCost();

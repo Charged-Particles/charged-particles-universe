@@ -98,7 +98,7 @@ module.exports = {
         },
         kovan: {
             // url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+            url: `https://eth-kovan.alchemyapi.com/v2/${process.env.ALCHEMY_APIKEY}`,
             gasPrice: 3e9,
             blockGasLimit: 12400000,
             accounts: {
@@ -108,7 +108,7 @@ module.exports = {
             },
         },
         goerli: {
-            url: `https://eth-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
+            url: `https://eth-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_GOERLI_APIKEY}`,
             gasPrice: 'auto',
             // blockGasLimit: 12400000,
             accounts: {
@@ -116,6 +116,7 @@ module.exports = {
                 initialIndex: 0,
                 count: 10,
             },
+            chainId: 5
         },
         mumbai: {
             // url: `https://rpc-mumbai.matic.today`,
@@ -141,7 +142,7 @@ module.exports = {
         },
         mainnet: {
             // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+            url: `https://eth-mainnet.alchemyapi.com/v2/${process.env.ALCHEMY_APIKEY}`,
             gasPrice: 'auto',
             blockGasLimit: 12487794,
             accounts: {
@@ -149,6 +150,16 @@ module.exports = {
                 initialIndex: 0,
                 count: 3,
             },
+        },
+        sepolia: {
+            url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_SEPOLIA_API_KEY}`,
+            gasPrice: 'auto',
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            },
+            chainId: 11155111
         },
         zkEVMtest: {
             url: 'https://rpc.public.zkevm-test.net',
@@ -163,14 +174,7 @@ module.exports = {
         },
     },
     etherscan: {
-      apiKey: {
-        mainnet: process.env.ETHERSCAN_APIKEY,
-        goerli: process.env.ETHERSCAN_APIKEY,
-        kovan: process.env.ETHERSCAN_APIKEY,
-        polygon: process.env.POLYGONSCAN_APIKEY,
-        polygonMumbai: process.env.POLYGONSCAN_APIKEY,
-        zkEVMtest: process.env.ETHERSCAN_APIKEY,
-      },
+      apiKey: process.env.ETHERSCAN_APIKEY,
       customChains: [
         {
           network: 'zkEVMtest',
@@ -212,7 +216,6 @@ module.exports = {
         'GenericWalletManagerB',
         'GenericBasketManager',
         'GenericBasketManagerB',
-        'RewardProgram',
         'Ionx',
         'Proton',
         'ProtonB',
