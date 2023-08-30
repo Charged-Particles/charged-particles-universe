@@ -35,7 +35,6 @@ import "./interfaces/IChargedParticles.sol";
 import "./interfaces/ILepton.sol";
 import "./lib/TokenInfo.sol";
 import "./lib/BlackholePrevention.sol";
-import "./interfaces/IRewardProgram.sol";
 
 
 /**
@@ -115,15 +114,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(assetToken);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerAssetDeposit(
-        contractAddress,
-        tokenId,
-        walletManagerId,
-        assetAmount
-      );
-    }
+    // no-op
   }
 
   function onDischarge(
@@ -139,11 +130,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(assetToken);
-    if (rewardProgram != address(0)) {
-      uint256 totalInterest = receiverEnergy.add(creatorEnergy);
-      IRewardProgram(rewardProgram).registerAssetRelease(contractAddress, tokenId, totalInterest);
-    }
+    // no-op
   }
 
   function onDischargeForCreator(
@@ -159,10 +146,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(assetToken);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerAssetRelease(contractAddress, tokenId, receiverEnergy);
-    }
+    // no-op
   }
 
   function onRelease(
@@ -179,12 +163,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(assetToken);
-    if (rewardProgram != address(0)) {
-      // "receiverEnergy" includes the "principalAmount"
-      uint256 totalInterest = receiverEnergy.sub(principalAmount).add(creatorEnergy);
-      IRewardProgram(rewardProgram).registerAssetRelease(contractAddress, tokenId, totalInterest);
-    }
+    // no-op
   }
 
   function onCovalentBond(
@@ -200,10 +179,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(nftTokenAddress);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerNftDeposit(contractAddress, tokenId, nftTokenAddress, nftTokenId, nftTokenAmount);
-    }
+    // no-op
   }
 
   function onCovalentBreak(
@@ -219,10 +195,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(nftTokenAddress);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerNftRelease(contractAddress, tokenId, nftTokenAddress, nftTokenId, nftTokenAmount);
-    }
+    // no-op
   }
 
   function onProtonSale(
@@ -381,60 +354,5 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   modifier onlyProton() {
     require(proton == msg.sender, "UNI:E-110");
     _;
-  }
-
-
-  /***********************************|
-  |    Upgrade 1 - Reward Program     |
-  |__________________________________*/
-
-  // Asset Token => Reward Program
-  mapping (address => address) internal assetRewardPrograms;
-
-  function getRewardProgram(address asset) public view returns (address) {
-    return _getRewardProgram(asset);
-  }
-
-  function registerExistingDeposits(
-    address contractAddress,
-    uint256 tokenId,
-    string calldata walletManagerId,
-    address assetToken
-  ) external {
-    address rewardProgram = getRewardProgram(assetToken);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerExistingDeposits(contractAddress, tokenId, walletManagerId);
-    }
-  }
-
-  function setRewardProgram(
-    address rewardProgam,
-    address assetToken,
-    address nftMultiplier
-  )
-    external
-    onlyOwner
-    onlyValidContractAddress(rewardProgam)
-  {
-    require(assetToken != address(0x0), "UNI:E-403");
-    assetRewardPrograms[assetToken] = rewardProgam;
-    assetRewardPrograms[nftMultiplier] = rewardProgam;
-    emit RewardProgramSet(assetToken, nftMultiplier, rewardProgam);
-  }
-
-  function removeRewardProgram(
-    address assetToken,
-    address nftMultiplier
-  )
-    external
-    onlyOwner
-  {
-    delete assetRewardPrograms[assetToken];
-    delete assetRewardPrograms[nftMultiplier];
-    emit RewardProgramRemoved(assetToken, nftMultiplier);
-  }
-
-  function _getRewardProgram(address assetToken) internal view returns (address) {
-    return assetRewardPrograms[assetToken];
   }
 }

@@ -65,8 +65,6 @@ describe("[INTEGRATION] Charged Particles", () => {
   let chargedManagers;
   let chargedParticles;
   let particleSplitter;
-  let rewardProgram;
-  let rewardWalletManager;
   let aaveWalletManager;
   let genericWalletManager;
   let genericBasketManager;
@@ -156,14 +154,12 @@ describe("[INTEGRATION] Charged Particles", () => {
     const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
     const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
     const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
-    const RewardWalletManager = await ethers.getContractFactory('RewardWalletManager');
     const Proton = await ethers.getContractFactory('Proton');
     const ProtonB = await ethers.getContractFactory('ProtonB');
     const ProtonC = await ethers.getContractFactory('ProtonC');
     const Lepton = await ethers.getContractFactory('Lepton2');
     const Ionx = await ethers.getContractFactory('Ionx');
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
-    const RewardProgram = await ethers.getContractFactory('RewardProgram');
 
     universe = Universe.attach(getDeployData('Universe', chainId).address);
     chargedState = ChargedState.attach(getDeployData('ChargedState', chainId).address);
@@ -180,8 +176,6 @@ describe("[INTEGRATION] Charged Particles", () => {
     lepton = Lepton.attach(getDeployData('Lepton2', chainId).address);
     ionx = Ionx.attach(getDeployData('Ionx', chainId).address);
     tokenInfoProxy = TokenInfoProxy.attach(getDeployData('TokenInfoProxy', chainId).address);
-    rewardProgram = RewardProgram.attach(getDeployData('RewardProgram', chainId).address);
-    rewardWalletManager = RewardWalletManager.attach(getDeployData('RewardWalletManager', chainId).address);
 
     await proton.connect(signerD).setPausedState(false);
     await protonB.connect(signerD).setPausedState(false);
@@ -1527,117 +1521,4 @@ describe("[INTEGRATION] Charged Particles", () => {
     });
     await expect(protonC.connect(signer1)['transferFrom'](user1, user2, createProtonForSaleId)).to.revertedWith("BondedToken: Token is locked");
   });
-
-  // RewardWallet
-  // describe.only('Ionx reward program', function() {
-  //   const fundingAmount = ethers.utils.parseUnits('70');
-
-  //   it ("can succesfully stake into reward program.", async () => {
-  //     await chargedState.setController(tokenInfoProxyMock.address, 'tokeninfo');
-  //     await chargedSettings.setController(tokenInfoProxyMock.address, 'tokeninfo');
-  //     await chargedManagers.setController(tokenInfoProxyMock.address, 'tokeninfo');
-
-  //     await signerD.sendTransaction({ to: usdcHodler, value: toWei('10') }); // charge up the dai hodler with a few ether in order for it to be able to transfer us some tokens
-
-  //     await usdc.connect(usdcSigner).transfer(user1, '100000000000');
-  //     await usdc.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
-
-  //     await tokenInfoProxyMock.mock.isNFTContractOrCreator.returns(true);
-  //     await tokenInfoProxyMock.mock.getTokenCreator.returns(user1);
-
-  //     // Reverts not wallet manager
-  //     await expect(
-  //       rewardProgram.connect(signerD).stake(
-  //         tokenInfoProxyMock.address,
-  //         fundingAmount
-  //       )
-  //     ).to.be.revertedWith("Not wallet");
-
-  //     const energizedParticleId = await callAndReturn({
-  //       contractInstance: proton,
-  //       contractMethod: 'createChargedParticle',
-  //       contractCaller: signer1,
-  //       contractParams: [
-  //         user1,                       // creator
-  //         user2,                       // receiver
-  //         user1,                       // referrer
-  //         TEST_NFT_TOKEN_URI,          // tokenMetaUri
-  //         'reward',                    // walletManagerId
-  //         usdcAddress,                  // assetToken
-  //         '100000000000',                  // assetAmount
-  //         0,                           // annuityPercent
-  //       ],
-  //     });
-
-  //     await tokenInfoProxyMock.mock.getTokenOwner.withArgs(proton.address, energizedParticleId.toString()).returns(user2);
-
-  //     const uuid = await tokenInfoProxy.getTokenUUID(proton.address, energizedParticleId);
-  //     const initiatedStakeOnEnergized = await rewardProgram.walletStake(uuid);
-  //     expect(initiatedStakeOnEnergized).to.have.property('start');
-
-  //     // fund reward program.
-  //     await ionx.connect(protocolOwnerSigner).transfer(deployer, fundingAmount).then(tx => tx.wait());
-  //     await ionx.connect(signerD).approve(rewardProgram.address, fundingAmount).then(tx => tx.wait());
-  //     await rewardProgram.connect(signerD).fund(fundingAmount).then(tx => tx.wait());
-  //     const rewardProgramIonxBalance = await ionx.balanceOf(rewardProgram.address);
-
-  //     expect(rewardProgramIonxBalance).to.equal(fundingAmount);
-
-  //     // Reverts not wallet manager
-  //     await expect(
-  //       rewardProgram.connect(signerD).unstake(
-  //         user2,
-  //         proton.address,
-  //         1,
-  //     )).to.be.revertedWith("Not wallet");
-
-  //     expect(await ionx.balanceOf(user2)).to.be.eq(0);
-
-  //     await setNetworkAfterBlockNumber(Number((await getNetworkBlockNumber()).toString()) + 2);
-
-  //     await chargedParticles.connect(signer2).releaseParticle(
-  //       user2,
-  //       proton.address,
-  //       energizedParticleId,
-  //       'reward',
-  //       usdcAddress
-  //     );
-  //     expect(await usdc.balanceOf(user2)).to.be.above('90000000000');
-  //     const stakeOnRelease = await rewardProgram.walletStake(uuid);
-  //     expect(stakeOnRelease['generatedCharge']).gt(0);
-
-  //     expect(await ionx.balanceOf(user2)).to.be.eq(stakeOnRelease['reward']);
-  //   });
-
-  //   it ('Deployed wallet manager set in reward program', async function() {
-  //     const rewardWalletManager = getDeployData('RewardWalletManager', chainId);
-  //     expect(await rewardProgram.rewardWalletManager()).to.be.eq(rewardWalletManager.address);
-  //   });
-
-  //   it('Reverts when subscribing to the wrong reward program.', async function() {
-  //     await signerD.sendTransaction({ to: daiHodler, value: toWei('10') });
-  //     await dai.connect(daiSigner).transfer(user1, toWei('10'));
-  //     await dai.connect(signer1)['approve(address,uint256)'](proton.address, toWei('10'));
-
-  //     await expect(
-  //       proton.connect(signer1).createChargedParticle(
-  //         user1,                        // creator
-  //         user1,                        // receiver
-  //         user1,                        // referrer
-  //         TEST_NFT_TOKEN_URI,           // tokenMetaUri
-  //         'reward',                    // walletManagerId
-  //         daiAddress,                  // assetToken
-  //         toWei('10'),                   // assetAmount
-  //         0,                            // annuityPercent
-  //      )
-  //     ).to.be.revertedWith("Non  existing reward program.");
-  //   });
-
-  //   it('Converts decimals', async () => {
-  //     const oneConvertedValue = await rewardProgram.convertDecimals(1);
-  //     expect(oneConvertedValue.toString().split('').filter(v => v === '0').length).to.be.eq(12);
-  //     const tenConvertedValue = await rewardProgram.convertDecimals(10);
-  //     expect(tenConvertedValue.toString().split('').filter(v => v === '0').length).to.be.eq(13);
-  //   });
-  // });
 });
