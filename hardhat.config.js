@@ -172,6 +172,26 @@ module.exports = {
             timeout: 400000,
             chainId: 1442,
         },
+        mantle: {
+            url: 'https://rpc.mantle.xyz',
+            gasPrice: 'auto',
+            accounts: {
+                mnemonic: mnemonic.mainnet,
+                initialIndex: 0,
+                count: 10,
+            },
+            chainId: 5000,
+        },
+        mantleTest: {
+            url: 'https://rpc.testnet.mantle.xyz',
+            gasPrice: 'auto',
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            },
+            chainId: 5001,
+        },
     },
     etherscan: {
       apiKey: process.env.ETHERSCAN_APIKEY,

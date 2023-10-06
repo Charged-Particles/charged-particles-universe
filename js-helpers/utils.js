@@ -79,6 +79,18 @@ const chainTypeById = (chainId) => {
   }
 };
 
+const isAaveSupported = (chainId) => {
+  switch (parseInt(chainId, 10)) {
+    case 1:
+    case 5:
+    case 137:
+    case 80001:
+      return true;
+    default:
+      return false;
+  }
+};
+
 const blockTimeFromDate = (dateStr) => {
   return Date.parse(dateStr) / 1000;
 };
@@ -122,4 +134,5 @@ module.exports = {
   ensureDirectoryExistence,
   calculateSumArithmeticSeriesAtN,
   // distributeInitialFunds,
+  isAaveSupported,
 }

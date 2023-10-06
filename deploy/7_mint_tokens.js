@@ -24,7 +24,7 @@ const testHelpers = require('../js-helpers/test');
 const _ = require('lodash');
 
 
-let _DEPLOY_ROBS_NFTS = true;
+let _DEPLOY_ROBS_NFTS = false;
 const RobsTestCollection = [
   "ipfs://QmcbUiZVJVGMXKGV453YFhKxVKpQZKQSSvz8HAcSZxUBmr",
   "ipfs://QmUi3rmHLiQaEHziR4rKrCwA1a2ZuqNvaCDGoZDHHm85YG",

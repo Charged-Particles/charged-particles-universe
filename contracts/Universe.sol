@@ -48,32 +48,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
 
   // The ChargedParticles Contract Address
   address public chargedParticles;
-  address public proton;
-  address public lepton;
-  address public quark;
-  address public boson;
-
-  uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
-
-  // Positive Charge
-  uint256 internal photonMaxSupply;
-  uint256 internal totalPhotonDischarged;
-
-  // Source of Positive Charge
-  IERC20Upgradeable public photonSource;
-
-  //   Asset Token => Electrostatic Attraction Multiplier
-  mapping (address => uint256) internal esaMultiplier;
-
-  //       Account => Electrostatic Attraction Levels
-  mapping (address => uint256) internal esaLevel;
-
-  // Energizing Account => Referral Source
-  mapping (address => address) internal referralSource;
-
-  // NFT Token UUID => Bonded Lepton Mass
-  mapping (uint256 => uint256) internal bondedLeptonMass;
-
 
   /***********************************|
   |          Initialization           |
@@ -81,19 +55,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
 
   function initialize() public initializer {
     __Ownable_init();
-  }
-
-
-  /***********************************|
-  |         Public Functions          |
-  |__________________________________*/
-
-  function getStaticCharge(address /* account */) external pure virtual returns (uint256 positiveEnergy) {
-    return 0;
-  }
-
-  function conductElectrostaticDischarge(address /* account */, uint256 /* amount */) external pure virtual returns (uint256 positiveEnergy) {
-    return 0;
   }
 
   /***********************************|
@@ -210,7 +171,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     external
     virtual
     override
-    onlyProton
   {
     // no-op
   }
@@ -231,80 +191,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     emit ChargedParticlesSet(controller);
   }
 
-  function setPhoton(
-    address token,
-    uint256 maxSupply
-  )
-    external
-    virtual
-    onlyOwner
-    onlyValidContractAddress(token)
-  {
-    photonSource = IERC20Upgradeable(token);
-    photonMaxSupply = maxSupply;
-    emit PhotonSet(token, maxSupply);
-  }
-
-  function setProtonToken(
-    address token
-  )
-    external
-    virtual
-    onlyOwner
-    onlyValidContractAddress(token)
-  {
-    proton = token;
-    emit ProtonTokenSet(token);
-  }
-
-  function setLeptonToken(
-    address token
-  )
-    external
-    virtual
-    onlyOwner
-    onlyValidContractAddress(token)
-  {
-    lepton = token;
-    emit LeptonTokenSet(token);
-  }
-
-  function setQuarkToken(
-    address token
-  )
-    external
-    virtual
-    onlyOwner
-    onlyValidContractAddress(token)
-  {
-    quark = token;
-    emit QuarkTokenSet(token);
-  }
-
-  function setBosonToken(
-    address token
-  )
-    external
-    virtual
-    onlyOwner
-    onlyValidContractAddress(token)
-  {
-    boson = token;
-    emit BosonTokenSet(token);
-  }
-
-  function setEsaMultiplier(
-    address assetToken,
-    uint256 multiplier
-  )
-    external
-    virtual
-    onlyOwner
-  {
-    esaMultiplier[assetToken] = multiplier;
-    emit EsaMultiplierSet(assetToken, multiplier);
-  }
-
   function withdrawEther(address payable receiver, uint256 amount) external virtual onlyOwner {
     _withdrawEther(receiver, amount);
   }
@@ -322,18 +208,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   }
 
 
-
-  /***********************************|
-  |         Private Functions         |
-  |__________________________________*/
-
-  function _electrostaticAttraction(uint256 tokenUuid, address receiver, address assetToken, uint256 baseAmount) internal virtual {
-  }
-
-  function _conductElectrostaticDischarge(address /* account */, uint256 /* energy */) internal virtual pure returns (uint256) {
-    return 0;
-  }
-
   /***********************************|
   |             Modifiers             |
   |__________________________________*/
@@ -347,12 +221,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   /// @dev Throws if called by any account other than the Charged Particles contract
   modifier onlyChargedParticles() {
     require(chargedParticles == msg.sender, "UNI:E-108");
-    _;
-  }
-
-  /// @dev Throws if called by any account other than the Proton NFT contract
-  modifier onlyProton() {
-    require(proton == msg.sender, "UNI:E-110");
     _;
   }
 }

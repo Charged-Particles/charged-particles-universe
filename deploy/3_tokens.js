@@ -33,25 +33,25 @@ module.exports = async (hre) => {
   log('  - Trusted Forwarder: ', trustedForwarder);
   log(' ');
 
-  log('\n  Deploying Proton NFT...');
-  const Proton = await ethers.getContractFactory('Proton');
-  const ProtonInstance = await Proton.deploy();
-  const proton = await ProtonInstance.deployed();
-  deployData['Proton'] = {
-    abi: getContractAbi('Proton'),
-    address: proton.address,
-    deployTransaction: proton.deployTransaction,
-  }
+  // log('\n  Deploying Proton NFT...');
+  // const Proton = await ethers.getContractFactory('Proton');
+  // const ProtonInstance = await Proton.deploy();
+  // const proton = await ProtonInstance.deployed();
+  // deployData['Proton'] = {
+  //   abi: getContractAbi('Proton'),
+  //   address: proton.address,
+  //   deployTransaction: proton.deployTransaction,
+  // }
 
-  log('\n  Deploying ProtonB NFT...');
-  const ProtonB = await ethers.getContractFactory('ProtonB');
-  const ProtonBInstance = await ProtonB.deploy();
-  const protonB = await ProtonBInstance.deployed();
-  deployData['ProtonB'] = {
-    abi: getContractAbi('ProtonB'),
-    address: protonB.address,
-    deployTransaction: protonB.deployTransaction,
-  }
+  // log('\n  Deploying ProtonB NFT...');
+  // const ProtonB = await ethers.getContractFactory('ProtonB');
+  // const ProtonBInstance = await ProtonB.deploy();
+  // const protonB = await ProtonBInstance.deployed();
+  // deployData['ProtonB'] = {
+  //   abi: getContractAbi('ProtonB'),
+  //   address: protonB.address,
+  //   deployTransaction: protonB.deployTransaction,
+  // }
 
   log('\n  Deploying ProtonC NFT...');
   const ProtonC = await ethers.getContractFactory('ProtonC');
@@ -64,7 +64,7 @@ module.exports = async (hre) => {
   }
 
   let LeptonInstance, Lepton, lepton;
-  if (isHardhat) {
+  if (isHardhat || chainId === 1) {
     log('\n  Deploying Lepton NFT...');
     Lepton = await ethers.getContractFactory('Lepton');
     LeptonInstance = await Lepton.deploy();
@@ -74,26 +74,26 @@ module.exports = async (hre) => {
       address: lepton.address,
       deployTransaction: lepton.deployTransaction,
     }
-  }
 
-  log('\n  Deploying Lepton2 NFT...');
-  const Lepton2 = await ethers.getContractFactory('Lepton2');
-  const Lepton2Instance = await Lepton2.deploy();
-  const lepton2 = await Lepton2Instance.deployed();
-  deployData['Lepton2'] = {
-    abi: getContractAbi('Lepton2'),
-    address: lepton2.address,
-    deployTransaction: lepton2.deployTransaction,
-  }
+    log('\n  Deploying Lepton2 NFT...');
+    const Lepton2 = await ethers.getContractFactory('Lepton2');
+    const Lepton2Instance = await Lepton2.deploy();
+    const lepton2 = await Lepton2Instance.deployed();
+    deployData['Lepton2'] = {
+      abi: getContractAbi('Lepton2'),
+      address: lepton2.address,
+      deployTransaction: lepton2.deployTransaction,
+    }
 
-  log('\n  Deploying Ionx FT...');
-  const Ionx = await ethers.getContractFactory('Ionx');
-  const IonxInstance = await Ionx.deploy();
-  const ionx = await IonxInstance.deployed();
-  deployData['Ionx'] = {
-    abi: getContractAbi('Ionx'),
-    address: ionx.address,
-    deployTransaction: ionx.deployTransaction,
+    log('\n  Deploying Ionx FT...');
+    const Ionx = await ethers.getContractFactory('Ionx');
+    const IonxInstance = await Ionx.deploy();
+    const ionx = await IonxInstance.deployed();
+    deployData['Ionx'] = {
+      abi: getContractAbi('Ionx'),
+      address: ionx.address,
+      deployTransaction: ionx.deployTransaction,
+    }
   }
 
   let externalERC721, nonFungibleERC1155, fungibleERC1155
@@ -131,26 +131,26 @@ module.exports = async (hre) => {
 
   // Display Contract Addresses
   log('\n  Contract Deployments Complete!\n\n  Contracts:');
-  log('  - Proton:      ', proton.address);
-  log('     - Block:    ', proton.deployTransaction.blockNumber);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
-  log('  - ProtonB:     ', protonB.address);
-  log('     - Block:    ', protonB.deployTransaction.blockNumber);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: protonB.deployTransaction }));
+  // log('  - Proton:      ', proton.address);
+  // log('     - Block:    ', proton.deployTransaction.blockNumber);
+  // log('     - Gas Cost: ', getTxGasCost({ deployTransaction: proton.deployTransaction }));
+  // log('  - ProtonB:     ', protonB.address);
+  // log('     - Block:    ', protonB.deployTransaction.blockNumber);
+  // log('     - Gas Cost: ', getTxGasCost({ deployTransaction: protonB.deployTransaction }));
   log('  - ProtonC:     ', protonC.address);
   log('     - Block:    ', protonC.deployTransaction.blockNumber);
   log('     - Gas Cost: ', getTxGasCost({ deployTransaction: protonC.deployTransaction }));
-  if (isHardhat) {
+  if (isHardhat || chainId === 1) {
     log('  - Lepton:      ', lepton.address);
     log('     - Block:    ', lepton.deployTransaction.blockNumber);
     log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton.deployTransaction }));
+    log('  - Lepton2:     ', lepton2.address);
+    log('     - Block:    ', lepton2.deployTransaction.blockNumber);
+    log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
+    log('  - Ionx:        ', ionx.address);
+    log('     - Block:    ', ionx.deployTransaction.blockNumber);
+    log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionx.deployTransaction }));
   }
-  log('  - Lepton2:     ', lepton2.address);
-  log('     - Block:    ', lepton2.deployTransaction.blockNumber);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: lepton2.deployTransaction }));
-  log('  - Ionx:        ', ionx.address);
-  log('     - Block:    ', ionx.deployTransaction.blockNumber);
-  log('     - Gas Cost: ', getTxGasCost({ deployTransaction: ionx.deployTransaction }));
   if (!isProd) {
     log('  - ExternalERC721:     ', externalERC721.address);
     log('     - Block:           ', externalERC721.deployTransaction.blockNumber);

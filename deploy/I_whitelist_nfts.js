@@ -86,6 +86,7 @@ const _WHITELISTED_CONTRACTS = {
     // "0x517fEfB53b58Ec8764ca885731Db20Ca2dcac7b7", // Proton B
     // "0xF0e4ed501ED7d960886e3f9E8d569e1a1253Eb53", // Proton B
     // "0x6D05f07c30be99317D649302dA2054C667Cdd93D", // Proton C (Soul)
+    // "0x92971E5bB4d098CaCf2314292bDb5eDC3f5CF25e", // Proton C (Soul)
     // "0xc191e3De6e8ab034Adc4B199749F7199DA9a98e6", // Lepton 2
     // "0xef815ad5401cee4b8b2e6bc2f8c481d84e5d0871", // External NFT Example Contract
   ],
@@ -110,7 +111,7 @@ const _WHITELISTED_CONTRACTS = {
     // "0x96c89cc7c5d2fbfa41afa10da5917742ff35941b", // Elder ENTS
     // "0x135dE69e2C8A6f14f00dcf9c9e8D8120FBebeF5a", // HMNZone
     // "0x4bf5a99ea2f8de061f7d77ba9edd749503d945da", // .BASIN (FlexiPunkTLD)
-    "0xf6a44012d24ca5d67ece21ea7d34886a55754e86" // TaterDAO Land
+    // "0xf6a44012d24ca5d67ece21ea7d34886a55754e86" // TaterDAO Land
   ],
   '80001': [
     // "0xd02cB38f5D68333219d32Ea2a08c3BCdC92753F2", // Proton
@@ -135,10 +136,10 @@ module.exports = async (hre) => {
     // if (chainId !== 42) { return; } // Kovan only
 
     const ddChargedSettings = getDeployData('ChargedSettings', chainId);
-    const ddProton = getDeployData('Proton', chainId);
-    const ddProtonB = getDeployData('ProtonB', chainId);
-    const ddLepton = getDeployData('Lepton', chainId);
-    const ddTokenInfoProxy = getDeployData('TokenInfoProxy', chainId);
+    // const ddProton = getDeployData('Proton', chainId);
+    // const ddProtonB = getDeployData('ProtonB', chainId);
+    // const ddLepton = getDeployData('Lepton', chainId);
+    // const ddTokenInfoProxy = getDeployData('TokenInfoProxy', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - External NFTs');
@@ -154,19 +155,19 @@ module.exports = async (hre) => {
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     const chargedSettings = await ChargedSettings.attach(ddChargedSettings.address);
 
-    log('  Loading TokenInfoProxy from: ', ddTokenInfoProxy.address);
-    const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
-    const tokenInfoProxy = await TokenInfoProxy.attach(ddTokenInfoProxy.address);
+    // log('  Loading TokenInfoProxy from: ', ddTokenInfoProxy.address);
+    // const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
+    // const tokenInfoProxy = await TokenInfoProxy.attach(ddTokenInfoProxy.address);
 
-    if (chainId === 31337) {
-      const ddExternalERC721 = getDeployData('ExternalERC721', chainId);
-      _WHITELISTED_CONTRACTS['31337'] = [
-        ddProton.address,
-        ddProtonB.address,
-        ddLepton.address,
-        ddExternalERC721.address,
-      ];
-    }
+    // if (chainId === 31337) {
+    //   const ddExternalERC721 = getDeployData('ExternalERC721', chainId);
+    //   _WHITELISTED_CONTRACTS['31337'] = [
+    //     ddProton.address,
+    //     ddProtonB.address,
+    //     ddLepton.address,
+    //     ddExternalERC721.address,
+    //   ];
+    // }
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

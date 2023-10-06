@@ -14,6 +14,7 @@ const {
   chainTypeById,
   chainNameById,
   chainIdByName,
+  isAaveSupported,
 } = require('./utils');
 
 const _ = require('lodash');
@@ -24,14 +25,15 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const network = await hre.network;
     const chainId = chainIdByName(network.name);
     const {isProd, isHardhat} = chainTypeById(chainId);
+    const isAave = isAaveSupported(chainId);
 
-    const referralCode = presets.Aave.referralCode[chainId];
-    const ionxMaxSupply = presets.Ionx.maxSupply;
-    const leptonMaxMint = presets.Lepton.maxMintPerTx;
-    const depositCaps = presets.ChargedParticles.maxDeposits;
-    const rewardsForAssetTokens = presets.Ionx.rewardsForAssetTokens;
+    // const referralCode = presets.Aave.referralCode[chainId];
+    // const ionxMaxSupply = presets.Ionx.maxSupply;
+    // const leptonMaxMint = presets.Lepton.maxMintPerTx;
+    // const depositCaps = presets.ChargedParticles.maxDeposits;
+    // const rewardsForAssetTokens = presets.Ionx.rewardsForAssetTokens;
     const tempLockExpiryBlocks = presets.ChargedParticles.tempLockExpiryBlocks;
-    const usdcAddress = presets.Aave.v2.usdc[chainId];
+    // const usdcAddress = presets.Aave.v2.usdc[chainId];
 
     const ddUniverse = getDeployData('Universe', chainId);
     const ddChargedState = getDeployData('ChargedState', chainId);
@@ -40,17 +42,16 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ddChargedParticles = getDeployData('ChargedParticles', chainId);
     const ddParticleSplitter = getDeployData('ParticleSplitter', chainId);
     const ddTokenInfoProxy = getDeployData('TokenInfoProxy', chainId);
-    const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
-    const ddAaveWalletManagerB = getDeployData('AaveWalletManagerB', chainId);
-    const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
-    const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
+    // const ddGenericWalletManager = getDeployData('GenericWalletManager', chainId);
     const ddGenericWalletManagerB = getDeployData('GenericWalletManagerB', chainId);
-    const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
+    // const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddGenericBasketManagerB = getDeployData('GenericBasketManagerB', chainId);
-    const ddProton = getDeployData('Proton', chainId);
-    const ddProtonB = getDeployData('ProtonB', chainId);
-    const ddLepton2 = getDeployData('Lepton2', chainId);
-    const ddIonx = getDeployData('Ionx', chainId);
+    // const ddProton = getDeployData('Proton', chainId);
+    // const ddProtonB = getDeployData('ProtonB', chainId);
+    const ddProtonC = getDeployData('ProtonC', chainId);
+    // const ddLepton2 = getDeployData('Lepton2', chainId);
+    // const ddIonx = getDeployData('Ionx', chainId);
+
 
     log(`  Using Network: ${chainNameById(chainId)} (${chainId})`);
     log('  Using Accounts:');
@@ -83,60 +84,56 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const ParticleSplitter = await ethers.getContractFactory('ParticleSplitter');
     const particleSplitter = await ParticleSplitter.attach(ddParticleSplitter.address);
 
-    log('  Loading GenericWalletManager from:  ', ddGenericWalletManager.address, ` (${_.get(ddGenericWalletManager, 'deployTransaction.blockNumber', '0')})`);
-    const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
-    const genericWalletManager = await GenericWalletManager.attach(ddGenericWalletManager.address);
+    // log('  Loading GenericWalletManager from:  ', ddGenericWalletManager.address, ` (${_.get(ddGenericWalletManager, 'deployTransaction.blockNumber', '0')})`);
+    // const GenericWalletManager = await ethers.getContractFactory('GenericWalletManager');
+    // const genericWalletManager = await GenericWalletManager.attach(ddGenericWalletManager.address);
 
     log('  Loading GenericWalletManagerB from: ', ddGenericWalletManagerB.address, ` (${_.get(ddGenericWalletManagerB, 'deployTransaction.blockNumber', '0')})`);
     const GenericWalletManagerB = await ethers.getContractFactory('GenericWalletManagerB');
     const genericWalletManagerB = await GenericWalletManagerB.attach(ddGenericWalletManagerB.address);
 
-    log('  Loading GenericBasketManager from:  ', ddGenericBasketManager.address, ` (${_.get(ddGenericBasketManager, 'deployTransaction.blockNumber', '0')})`);
-    const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
-    const genericBasketManager = await GenericBasketManager.attach(ddGenericBasketManager.address);
+    // log('  Loading GenericBasketManager from:  ', ddGenericBasketManager.address, ` (${_.get(ddGenericBasketManager, 'deployTransaction.blockNumber', '0')})`);
+    // const GenericBasketManager = await ethers.getContractFactory('GenericBasketManager');
+    // const genericBasketManager = await GenericBasketManager.attach(ddGenericBasketManager.address);
 
     log('  Loading GenericBasketManagerB from: ', ddGenericBasketManagerB.address, ` (${_.get(ddGenericBasketManagerB, 'deployTransaction.blockNumber', '0')})`);
     const GenericBasketManagerB = await ethers.getContractFactory('GenericBasketManagerB');
     const genericBasketManagerB = await GenericBasketManagerB.attach(ddGenericBasketManagerB.address);
 
-    log('  Loading AaveWalletManager from:     ', ddAaveWalletManager.address, ` (${_.get(ddAaveWalletManager, 'deployTransaction.blockNumber', '0')})`);
-    const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
-    const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
-
-    log('  Loading AaveWalletManagerB from:    ', ddAaveWalletManagerB.address, ` (${_.get(ddAaveWalletManagerB, 'deployTransaction.blockNumber', '0')})`);
-    const AaveWalletManagerB = await ethers.getContractFactory('AaveWalletManagerB');
-    const aaveWalletManagerB = await AaveWalletManagerB.attach(ddAaveWalletManagerB.address);
-
     log('  Loading TokenInfoProxy from:        ', ddTokenInfoProxy.address, ` (${_.get(ddTokenInfoProxy, 'deployTransaction.blockNumber', '0')})`);
     const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
     const tokenInfoProxy = await TokenInfoProxy.attach(ddTokenInfoProxy.address);
 
-    log('  Loading Proton from:                ', ddProton.address, ` (${_.get(ddProton, 'deployTransaction.blockNumber', '0')})`);
-    const Proton = await ethers.getContractFactory('Proton');
-    const proton = await Proton.attach(ddProton.address);
+    // log('  Loading Proton from:                ', ddProton.address, ` (${_.get(ddProton, 'deployTransaction.blockNumber', '0')})`);
+    // const Proton = await ethers.getContractFactory('Proton');
+    // const proton = await Proton.attach(ddProton.address);
 
-    log('  Loading ProtonB from:               ', ddProtonB.address, ` (${_.get(ddProtonB, 'deployTransaction.blockNumber', '0')})`);
-    const ProtonB = await ethers.getContractFactory('ProtonB');
-    const protonB = await ProtonB.attach(ddProtonB.address);
+    // log('  Loading ProtonB from:               ', ddProtonB.address, ` (${_.get(ddProtonB, 'deployTransaction.blockNumber', '0')})`);
+    // const ProtonB = await ethers.getContractFactory('ProtonB');
+    // const protonB = await ProtonB.attach(ddProtonB.address);
 
-    let ddLepton, Lepton, lepton;
-    if (isHardhat) {
-      ddLepton = getDeployData('Lepton', chainId);
-      log('  Loading Lepton from:                ', ddLepton.address, ` (${_.get(ddLepton, 'deployTransaction.blockNumber', '0')})`);
-      Lepton = await ethers.getContractFactory('Lepton');
-      lepton = await Lepton.attach(ddLepton.address);
-    }
+    log('  Loading ProtonC from:               ', ddProtonC.address, ` (${_.get(ddProtonC, 'deployTransaction.blockNumber', '0')})`);
+    const ProtonC = await ethers.getContractFactory('ProtonC');
+    const protonC = await ProtonC.attach(ddProtonC.address);
 
-    log('  Loading Lepton2 from:               ', ddLepton2.address, ` (${_.get(ddLepton2, 'deployTransaction.blockNumber', '0')})`);
-    const Lepton2 = await ethers.getContractFactory('Lepton2');
-    const lepton2 = await Lepton2.attach(ddLepton2.address);
+    // let ddLepton, Lepton, lepton;
+    // if (isHardhat) {
+    //   ddLepton = getDeployData('Lepton', chainId);
+    //   log('  Loading Lepton from:                ', ddLepton.address, ` (${_.get(ddLepton, 'deployTransaction.blockNumber', '0')})`);
+    //   Lepton = await ethers.getContractFactory('Lepton');
+    //   lepton = await Lepton.attach(ddLepton.address);
+    // }
 
-    log('  Loading Ionx from:                  ', ddIonx.address, ` (${_.get(ddIonx, 'deployTransaction.blockNumber', '0')})`);
-    const Ionx = await ethers.getContractFactory('Ionx');
-    const ionx = await Ionx.attach(ddIonx.address);
+    // log('  Loading Lepton2 from:               ', ddLepton2.address, ` (${_.get(ddLepton2, 'deployTransaction.blockNumber', '0')})`);
+    // const Lepton2 = await ethers.getContractFactory('Lepton2');
+    // const lepton2 = await Lepton2.attach(ddLepton2.address);
+
+    // log('  Loading Ionx from:                  ', ddIonx.address, ` (${_.get(ddIonx, 'deployTransaction.blockNumber', '0')})`);
+    // const Ionx = await ethers.getContractFactory('Ionx');
+    // const ionx = await Ionx.attach(ddIonx.address);
 
 
-    skipToTxId('9-a');
+    skipToTxId('2-i');
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Charged Particles & Universe
@@ -213,13 +210,13 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // Setup Generic Wallet Managers
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('2-a', 'GenericWalletManager: Setting Charged Particles as Controller', async () =>
-      await genericWalletManager.setController(ddChargedParticles.address)
-    );
+    // await executeTx('2-a', 'GenericWalletManager: Setting Charged Particles as Controller', async () =>
+    //   await genericWalletManager.setController(ddChargedParticles.address)
+    // );
 
-    await executeTx('2-b', 'GenericWalletManager: Registering Generic Wallet Manager with ChargedParticles', async () =>
-      await chargedManagers.registerWalletManager('generic', ddGenericWalletManager.address)
-    );
+    // await executeTx('2-b', 'GenericWalletManager: Registering Generic Wallet Manager with ChargedParticles', async () =>
+    //   await chargedManagers.registerWalletManager('generic', ddGenericWalletManager.address)
+    // );
 
     await executeTx('2-c', 'GenericWalletManagerB: Setting Charged Particles as Controller', async () =>
       await genericWalletManagerB.setController(ddChargedParticles.address)
@@ -229,13 +226,13 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
       await chargedManagers.registerWalletManager('generic.B', ddGenericWalletManagerB.address)
     );
 
-    await executeTx('2-e', 'GenericBasketManager: Setting Charged Particles as Controller', async () =>
-      await genericBasketManager.setController(ddChargedParticles.address)
-    );
+    // await executeTx('2-e', 'GenericBasketManager: Setting Charged Particles as Controller', async () =>
+    //   await genericBasketManager.setController(ddChargedParticles.address)
+    // );
 
-    await executeTx('2-f', 'GenericBasketManager: Registering Generic Basket Manager with ChargedParticles', async () =>
-      await chargedManagers.registerBasketManager('generic', ddGenericBasketManager.address)
-    );
+    // await executeTx('2-f', 'GenericBasketManager: Registering Generic Basket Manager with ChargedParticles', async () =>
+    //   await chargedManagers.registerBasketManager('generic', ddGenericBasketManager.address)
+    // );
 
     await executeTx('2-g', 'GenericBasketManagerB: Setting Charged Particles as Controller', async () =>
       await genericBasketManagerB.setController(ddChargedParticles.address)
@@ -254,69 +251,87 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // Setup Aave Wallet Manager
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('3-a', 'AaveWalletManager: Setting Charged Particles as Controller', async () =>
-      await aaveWalletManager.setController(ddChargedParticles.address)
-    );
+    if (isAave) {
+      // const ddAaveWalletManager = getDeployData('AaveWalletManager', chainId);
+      const ddAaveWalletManagerB = getDeployData('AaveWalletManagerB', chainId);
+      const ddAaveBridgeV2 = getDeployData('AaveBridgeV2', chainId);
 
-    await executeTx('3-b', 'AaveWalletManager: Setting Aave Bridge to V2', async () =>
-      await aaveWalletManager.setAaveBridge(ddAaveBridgeV2.address)
-    );
+      // log('  Loading AaveWalletManager from:     ', ddAaveWalletManager.address, ` (${_.get(ddAaveWalletManager, 'deployTransaction.blockNumber', '0')})`);
+      // const AaveWalletManager = await ethers.getContractFactory('AaveWalletManager');
+      // const aaveWalletManager = await AaveWalletManager.attach(ddAaveWalletManager.address);
 
-    await executeTx('3-c', 'AaveWalletManager: Registering Aave as LP with ChargedParticles', async () =>
-      await chargedManagers.registerWalletManager('aave', ddAaveWalletManager.address)
-    );
+      log('  Loading AaveWalletManagerB from:    ', ddAaveWalletManagerB.address, ` (${_.get(ddAaveWalletManagerB, 'deployTransaction.blockNumber', '0')})`);
+      const AaveWalletManagerB = await ethers.getContractFactory('AaveWalletManagerB');
+      const aaveWalletManagerB = await AaveWalletManagerB.attach(ddAaveWalletManagerB.address);
 
-    // if (referralCode.length > 0) {
-    //   await executeTx('3-d', 'AaveWalletManager: Setting Referral Code', async () =>
-    //     await aaveWalletManager.setReferralCode(referralCode)
-    //   );
-    // }
+      // await executeTx('3-a', 'AaveWalletManager: Setting Charged Particles as Controller', async () =>
+      //   await aaveWalletManager.setController(ddChargedParticles.address)
+      // );
 
-    await executeTx('3-e', 'AaveWalletManagerB: Setting Charged Particles as Controller', async () =>
-      await aaveWalletManagerB.setController(ddChargedParticles.address)
-    );
+      // await executeTx('3-b', 'AaveWalletManager: Setting Aave Bridge to V2', async () =>
+      //   await aaveWalletManager.setAaveBridge(ddAaveBridgeV2.address)
+      // );
 
-    await executeTx('3-f', 'AaveWalletManagerB: Setting Aave Bridge to V2', async () =>
-      await aaveWalletManagerB.setAaveBridge(ddAaveBridgeV2.address)
-    );
+      // await executeTx('3-c', 'AaveWalletManager: Registering Aave as LP with ChargedParticles', async () =>
+      //   await chargedManagers.registerWalletManager('aave', ddAaveWalletManager.address)
+      // );
 
-    await executeTx('3-g', 'AaveWalletManagerB: Registering Aave as LP with ChargedParticles', async () =>
-      await chargedManagers.registerWalletManager('aave.B', ddAaveWalletManagerB.address)
-    );
+      // if (referralCode.length > 0) {
+      //   await executeTx('3-d', 'AaveWalletManager: Setting Referral Code', async () =>
+      //     await aaveWalletManager.setReferralCode(referralCode)
+      //   );
+      // }
 
-    await executeTx('3-h', 'AaveWalletManagerB: Registering ChargedSettings', async () =>
-      await aaveWalletManagerB.setChargedSettings(ddChargedSettings.address)
-    );
+      await executeTx('3-e', 'AaveWalletManagerB: Setting Charged Particles as Controller', async () =>
+        await aaveWalletManagerB.setController(ddChargedParticles.address)
+      );
 
-    // if (referralCode.length > 0) {
-    //   await executeTx('3-i', 'AaveWalletManagerB: Setting Referral Code', async () =>
-    //     await aaveWalletManagerB.setReferralCode(referralCode)
-    //   );
-    // }
+      await executeTx('3-f', 'AaveWalletManagerB: Setting Aave Bridge to V2', async () =>
+        await aaveWalletManagerB.setAaveBridge(ddAaveBridgeV2.address)
+      );
+
+      await executeTx('3-g', 'AaveWalletManagerB: Registering Aave as LP with ChargedParticles', async () =>
+        await chargedManagers.registerWalletManager('aave.B', ddAaveWalletManagerB.address)
+      );
+
+      await executeTx('3-h', 'AaveWalletManagerB: Registering ChargedSettings', async () =>
+        await aaveWalletManagerB.setChargedSettings(ddChargedSettings.address)
+      );
+
+      // if (referralCode.length > 0) {
+      //   await executeTx('3-i', 'AaveWalletManagerB: Setting Referral Code', async () =>
+      //     await aaveWalletManagerB.setReferralCode(referralCode)
+      //   );
+      // }
+
+      await executeTx('10-c', 'Aave Wallet Manager "B": Registering Executor', async () =>
+        await aaveWalletManagerB.setExecutor(ddParticleSplitter.address)
+      );
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup Proton
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('4-a', 'Proton: Registering Universe', async () =>
-      await proton.setUniverse(ddUniverse.address)
-    );
+    // await executeTx('4-a', 'Proton: Registering Universe', async () =>
+    //   await proton.setUniverse(ddUniverse.address)
+    // );
 
-    await executeTx('4-b', 'Proton: Registering ChargedState', async () =>
-      await proton.setChargedState(ddChargedState.address)
-    );
+    // await executeTx('4-b', 'Proton: Registering ChargedState', async () =>
+    //   await proton.setChargedState(ddChargedState.address)
+    // );
 
-    await executeTx('4-c', 'Proton: Registering ChargedSettings', async () =>
-      await proton.setChargedSettings(ddChargedSettings.address)
-    );
+    // await executeTx('4-c', 'Proton: Registering ChargedSettings', async () =>
+    //   await proton.setChargedSettings(ddChargedSettings.address)
+    // );
 
-    await executeTx('4-d', 'Proton: Registering ChargedParticles', async () =>
-      await proton.setChargedParticles(ddChargedParticles.address)
-    );
+    // await executeTx('4-d', 'Proton: Registering ChargedParticles', async () =>
+    //   await proton.setChargedParticles(ddChargedParticles.address)
+    // );
 
-    await executeTx('4-e', 'ChargedSettings: Enabling Proton for Charge', async () =>
-      await chargedSettings.enableNftContracts([ddProton.address])
-    );
+    // await executeTx('4-e', 'ChargedSettings: Enabling Proton for Charge', async () =>
+    //   await chargedSettings.enableNftContracts([ddProton.address])
+    // );
 
     // await executeTx('4-f', 'Universe: Registering Proton', async () =>
     //   await universe.setProtonToken(ddProton.address)
@@ -326,32 +341,56 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // Setup ProtonB
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('4-a', 'ProtonB: Registering Universe', async () =>
-      await protonB.setUniverse(ddUniverse.address)
+    // await executeTx('4-a', 'ProtonB: Registering Universe', async () =>
+    //   await protonB.setUniverse(ddUniverse.address)
+    // );
+
+    // await executeTx('4-b', 'ProtonB: Registering ChargedState', async () =>
+    //   await protonB.setChargedState(ddChargedState.address)
+    // );
+
+    // await executeTx('4-c', 'ProtonB: Registering ChargedSettings', async () =>
+    //   await protonB.setChargedSettings(ddChargedSettings.address)
+    // );
+
+    // await executeTx('4-d', 'ProtonB: Registering ChargedParticles', async () =>
+    //   await protonB.setChargedParticles(ddChargedParticles.address)
+    // );
+
+    // await executeTx('4-e', 'ChargedSettings: Enabling ProtonB for Charge', async () =>
+    //   await chargedSettings.enableNftContracts([ddProtonB.address])
+    // );
+
+    // await executeTx('4-f', 'ProtonA: Unregistering Universe', async () =>
+    //   await proton.setUniverse(ethers.constants.AddressZero)
+    // );
+
+    // await executeTx('4-g', 'Universe: Registering ProtonB', async () =>
+    //   await universe.setProtonToken(ddProtonB.address)
+    // );
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Setup ProtonC
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    await executeTx('4-h', 'ProtonC: Registering Universe', async () =>
+      await protonC.setUniverse(ddUniverse.address)
     );
 
-    await executeTx('4-b', 'ProtonB: Registering ChargedState', async () =>
-      await protonB.setChargedState(ddChargedState.address)
+    await executeTx('4-i', 'ProtonC: Registering ChargedState', async () =>
+      await protonC.setChargedState(ddChargedState.address)
     );
 
-    await executeTx('4-c', 'ProtonB: Registering ChargedSettings', async () =>
-      await protonB.setChargedSettings(ddChargedSettings.address)
+    await executeTx('4-j', 'ProtonC: Registering ChargedSettings', async () =>
+      await protonC.setChargedSettings(ddChargedSettings.address)
     );
 
-    await executeTx('4-d', 'ProtonB: Registering ChargedParticles', async () =>
-      await protonB.setChargedParticles(ddChargedParticles.address)
+    await executeTx('4-k', 'ProtonC: Registering ChargedParticles', async () =>
+      await protonC.setChargedParticles(ddChargedParticles.address)
     );
 
-    await executeTx('4-e', 'ChargedSettings: Enabling Proton & ProtonB for Charge', async () =>
-      await chargedSettings.enableNftContracts([ddProtonB.address])
-    );
-
-    await executeTx('4-f', 'ProtonA: Unregistering Universe', async () =>
-      await proton.setUniverse(ethers.constants.AddressZero)
-    );
-
-    await executeTx('4-g', 'Universe: Registering ProtonB', async () =>
-      await universe.setProtonToken(ddProtonB.address)
+    await executeTx('4-l', 'ChargedSettings: Enabling ProtonC for Charge', async () =>
+      await chargedSettings.enableNftContracts([ddProtonC.address])
     );
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -392,13 +431,13 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // Setup Ionx
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('6-a', 'Universe: Registering Ionx', async () =>
-      await universe.setPhoton(ddIonx.address, ionxMaxSupply.div(2))
-    );
+    // await executeTx('6-a', 'Universe: Registering Ionx', async () =>
+    //   await universe.setPhoton(ddIonx.address, ionxMaxSupply.div(2))
+    // );
 
-    await executeTx('6-b', 'Ionx: Setting Minter', async () =>
-      await ionx.setMinter(protocolOwner)
-    );
+    // await executeTx('6-b', 'Ionx: Setting Minter', async () =>
+    //   await ionx.setMinter(protocolOwner)
+    // );
 
     // let assetTokenId;
     // let assetTokenAddress;
@@ -451,37 +490,37 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // Setup Lepton2
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    await executeTx('9-a', 'Lepton2: Setting Max Mint per Transaction', async () =>
-      await lepton2.setMaxMintPerTx(leptonMaxMint)
-    );
+    // await executeTx('9-a', 'Lepton2: Setting Max Mint per Transaction', async () =>
+    //   await lepton2.setMaxMintPerTx(leptonMaxMint)
+    // );
 
-    await executeTx('9-b', 'ChargedParticles: Registering Lepton2', async () =>
-      await chargedParticles.setController(ddLepton2.address, 'leptons')
-    );
+    // await executeTx('9-b', 'ChargedParticles: Registering Lepton2', async () =>
+    //   await chargedParticles.setController(ddLepton2.address, 'leptons')
+    // );
 
-    await executeTx('9-c', 'ChargedParticles: Enabling Lepton2', async () =>
-      await chargedSettings.enableNftContracts([ddLepton2.address])
-    );
+    // await executeTx('9-c', 'ChargedParticles: Enabling Lepton2', async () =>
+    //   await chargedSettings.enableNftContracts([ddLepton2.address])
+    // );
 
-    let useChainId = parseInt(chainId, 10);
-    if (useChainId === 5) { useChainId = 42; }
-    if (useChainId === 80001) { useChainId = 42; }
-    if (useChainId === 137) { useChainId = 1; }
+    // let useChainId = parseInt(chainId, 10);
+    // if (useChainId === 5) { useChainId = 42; }
+    // if (useChainId === 80001) { useChainId = 42; }
+    // if (useChainId === 137) { useChainId = 1; }
 
-    // let lepton2Type;
-    for (let i = 0; i < presets.Lepton.types.length; i++) {
-      lepton2Type = presets.Lepton.types[i];
+    // // let lepton2Type;
+    // for (let i = 0; i < presets.Lepton.types.length; i++) {
+    //   lepton2Type = presets.Lepton.types[i];
 
-      await executeTx(`9-d-${i}`, `Lepton2: Adding Lepton Type: ${lepton2Type.name}`, async () =>
-        await lepton2.addLeptonType(
-          lepton2Type.tokenUri,
-          lepton2Type.price[useChainId],
-          lepton2Type.supply[useChainId],
-          lepton2Type.multiplier,
-          lepton2Type.bonus,
-        )
-      );
-    }
+    //   await executeTx(`9-d-${i}`, `Lepton2: Adding Lepton Type: ${lepton2Type.name}`, async () =>
+    //     await lepton2.addLeptonType(
+    //       lepton2Type.tokenUri,
+    //       lepton2Type.price[useChainId],
+    //       lepton2Type.supply[useChainId],
+    //       lepton2Type.multiplier,
+    //       lepton2Type.bonus,
+    //     )
+    //   );
+    // }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Setup External Executors
@@ -493,10 +532,6 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
 
     await executeTx('11-b', 'Generic Basket Manager "B": Registering Executor', async () =>
       await genericBasketManagerB.setExecutor(ddParticleSplitter.address)
-    );
-
-    await executeTx('10-c', 'Aave Wallet Manager "B": Registering Executor', async () =>
-      await aaveWalletManagerB.setExecutor(ddParticleSplitter.address)
     );
 
     log(`\n  Contract Initialization Complete!`);

@@ -10,6 +10,7 @@ const {
   chainTypeById,
   chainNameById,
   chainIdByName,
+  isAaveSupported,
 } = require('../js-helpers/utils');
 
 module.exports = async (hre) => {
@@ -19,9 +20,9 @@ module.exports = async (hre) => {
     const deployData = {};
 
     const chainId = chainIdByName(network.name);
-    const {isProd, isHardhat} = chainTypeById(chainId);
-    const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
+    if (!isAaveSupported(chainId)) { return; }
 
+    const lendingPoolProviderV2 = presets.Aave.v2.lendingPoolProvider[chainId];
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles LP: Aave - Contract Deployment');
