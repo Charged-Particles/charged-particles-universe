@@ -182,7 +182,7 @@ module.exports = {
             },
             chainId: 5000,
         },
-        mantleTest: {
+        mantletest: {
             url: 'https://rpc.testnet.mantle.xyz',
             gasPrice: 'auto',
             accounts: {
