@@ -5,80 +5,23 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "bosonToken",
+        "name": "contractAddress",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isAllowed",
+        "type": "bool"
       }
     ],
-    "name": "BosonTokenSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "chargedParticles",
-        "type": "address"
-      }
-    ],
-    "name": "ChargedParticlesSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "photonSource",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "energy",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "multiplier",
-        "type": "uint256"
-      }
-    ],
-    "name": "ElectrostaticAttraction",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "photonSource",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "energy",
-        "type": "uint256"
-      }
-    ],
-    "name": "ElectrostaticDischarge",
+    "name": "AllowedAssetTokenSet",
     "type": "event"
   },
   {
@@ -92,12 +35,12 @@
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "multiplier",
-        "type": "uint256"
+        "internalType": "bool",
+        "name": "invalidity",
+        "type": "bool"
       }
     ],
-    "name": "EsaMultiplierSet",
+    "name": "AssetInvaliditySet",
     "type": "event"
   },
   {
@@ -106,49 +49,29 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "leptonToken",
-        "type": "address"
-      }
-    ],
-    "name": "LeptonTokenSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "previousOwner",
+        "name": "contractAddress",
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
-      }
-    ],
-    "name": "OwnershipTransferred",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "photonToken",
+        "name": "assetToken",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "maxSupply",
+        "name": "assetDepositMin",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "assetDepositMax",
         "type": "uint256"
       }
     ],
-    "name": "PhotonSet",
+    "name": "AssetTokenLimitsSet",
     "type": "event"
   },
   {
@@ -157,11 +80,68 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "protonToken",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "restrictionsEnabled",
+        "type": "bool"
+      }
+    ],
+    "name": "AssetTokenRestrictionsSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "controllerAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "controllerId",
+        "type": "string"
+      }
+    ],
+    "name": "ControllerSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "depositCap",
+        "type": "uint256"
+      }
+    ],
+    "name": "DepositCapSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "initiator",
         "type": "address"
       }
     ],
-    "name": "ProtonTokenSet",
+    "name": "Initialized",
     "type": "event"
   },
   {
@@ -170,26 +150,159 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "quarkToken",
-        "type": "address"
-      }
-    ],
-    "name": "QuarkTokenSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "receiver",
+        "name": "contractAddress",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "tokenAddress",
+        "name": "nftTokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxNfts",
+        "type": "uint256"
+      }
+    ],
+    "name": "MaxNftsSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "state",
+        "type": "bool"
+      }
+    ],
+    "name": "PermsSetForBasket",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "state",
+        "type": "bool"
+      }
+    ],
+    "name": "PermsSetForCharge",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "state",
+        "type": "bool"
+      }
+    ],
+    "name": "PermsSetForTimelockAny",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "state",
+        "type": "bool"
+      }
+    ],
+    "name": "PermsSetForTimelockSelf",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "basketManager",
+        "type": "string"
+      }
+    ],
+    "name": "RequiredBasketManagerSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "walletManager",
+        "type": "string"
+      }
+    ],
+    "name": "RequiredWalletManagerSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "expiryBlocks",
+        "type": "uint256"
+      }
+    ],
+    "name": "TempLockExpirySet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "contractAddress",
         "type": "address"
       },
       {
@@ -199,13 +312,13 @@
         "type": "uint256"
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
+        "indexed": true,
+        "internalType": "address",
+        "name": "redirectAddress",
+        "type": "address"
       }
     ],
-    "name": "WithdrawStuckERC1155",
+    "name": "TokenCreatorAnnuitiesRedirected",
     "type": "event"
   },
   {
@@ -214,38 +327,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "WithdrawStuckERC20",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "tokenAddress",
+        "name": "contractAddress",
         "type": "address"
       },
       {
@@ -253,33 +335,138 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
-      }
-    ],
-    "name": "WithdrawStuckERC721",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
+      },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "receiver",
+        "name": "creatorAddress",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amount",
+        "name": "annuityPercent",
         "type": "uint256"
       }
     ],
-    "name": "WithdrawStuckEther",
+    "name": "TokenCreatorConfigsSet",
     "type": "event"
   },
   {
-    "inputs": [],
-    "name": "chargedParticles",
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "contracts",
+        "type": "address[]"
+      }
+    ],
+    "name": "enableNftContracts",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      }
+    ],
+    "name": "getAssetRequirements",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "requiredWalletManager",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "energizeEnabled",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "restrictedAssets",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "validAsset",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "depositCap",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "depositMin",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "depositMax",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "invalidAsset",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getCreatorAnnuities",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "annuityPct",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getCreatorAnnuitiesRedirect",
     "outputs": [
       {
         "internalType": "address",
@@ -291,86 +478,74 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "nftTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getNftAssetRequirements",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "requiredBasketManager",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "basketEnabled",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxNfts",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
-    "name": "initialize",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "contractAddress",
-        "type": "address"
-      },
+    "name": "getTempLockExpiryBlocks",
+    "outputs": [
       {
         "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
         "name": "",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "nftTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nftTokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nftTokenAmount",
         "type": "uint256"
       }
     ],
-    "name": "onCovalentBond",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "address",
-        "name": "contractAddress",
+        "name": "operator",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "nftTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nftTokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "nftTokenAmount",
-        "type": "uint256"
       }
     ],
-    "name": "onCovalentBreak",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "getTimelockApprovals",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "timelockAny",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "timelockOwn",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -379,16 +554,6 @@
         "internalType": "address",
         "name": "contractAddress",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
       },
       {
         "internalType": "address",
@@ -396,17 +561,30 @@
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "creatorEnergy",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "receiverEnergy",
-        "type": "uint256"
+        "internalType": "bool",
+        "name": "isAllowed",
+        "type": "bool"
       }
     ],
-    "name": "onDischarge",
+    "name": "setAllowedAssetToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "assetToken",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "invalidity",
+        "type": "bool"
+      }
+    ],
+    "name": "setAssetInvalidity",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -416,21 +594,6 @@
       {
         "internalType": "address",
         "name": "contractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "",
         "type": "address"
       },
       {
@@ -440,11 +603,16 @@
       },
       {
         "internalType": "uint256",
-        "name": "receiverEnergy",
+        "name": "depositMin",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "depositMax",
         "type": "uint256"
       }
     ],
-    "name": "onDischargeForCreator",
+    "name": "setAssetTokenLimits",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -453,41 +621,16 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "contractAddress",
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "walletManagerId",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "assetAmount",
-        "type": "uint256"
+        "internalType": "bool",
+        "name": "restrictionsEnabled",
+        "type": "bool"
       }
     ],
-    "name": "onEnergize",
+    "name": "setAssetTokenRestrictions",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -502,21 +645,6 @@
       {
         "internalType": "uint256",
         "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "oldOwner",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "salePrice",
         "type": "uint256"
       },
       {
@@ -526,11 +654,11 @@
       },
       {
         "internalType": "uint256",
-        "name": "creatorRoyalties",
+        "name": "annuityPercent",
         "type": "uint256"
       }
     ],
-    "name": "onProtonSale",
+    "name": "setCreatorAnnuities",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -548,52 +676,125 @@
         "type": "uint256"
       },
       {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      }
+    ],
+    "name": "setCreatorAnnuitiesRedirect",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "nftTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxNfts",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaxNfts",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "state",
+        "type": "bool"
+      }
+    ],
+    "name": "setPermsForBasket",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "state",
+        "type": "bool"
+      }
+    ],
+    "name": "setPermsForCharge",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "state",
+        "type": "bool"
+      }
+    ],
+    "name": "setPermsForTimelockAny",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "state",
+        "type": "bool"
+      }
+    ],
+    "name": "setPermsForTimelockSelf",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
         "internalType": "string",
-        "name": "",
+        "name": "basketManager",
         "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "assetToken",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "principalAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "creatorEnergy",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "receiverEnergy",
-        "type": "uint256"
       }
     ],
-    "name": "onRelease",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "renounceOwnership",
+    "name": "setRequiredBasketManager",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -602,116 +803,16 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "controller",
+        "name": "contractAddress",
         "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "walletManager",
+        "type": "string"
       }
     ],
-    "name": "setChargedParticles",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
-      }
-    ],
-    "name": "transferOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address payable",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdrawERC1155",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address payable",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdrawERC721",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address payable",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdrawErc20",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address payable",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdrawEther",
+    "name": "setRequiredWalletManager",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
