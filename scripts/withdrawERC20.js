@@ -41,24 +41,22 @@ async function main() {
   const totalAmplAmount = await walletAave.callStatic.getRewards(AMPL_ADDRESS);
 
   // add ampl contract to splitter allow list
-  // const addAmplToSplitterTx = await particleSplitter.setExternalContracts([AMPL_ADDRESS], true).then(tx => tx.wait());
+  const addAmplToSplitterTx = await particleSplitter.setExternalContracts([AMPL_ADDRESS], true).then(tx => tx.wait());
 
-  // // set splitter as contoller in manager
-  // const splitterAsControllerTx = await aaveWalletManager.setExecutor(ddParticleSplitter.address).then(tx => tx.wait());
+  // set splitter as contoller in manager
+  const splitterAsControllerTx = await aaveWalletManager.setExecutor(ddParticleSplitter.address).then(tx => tx.wait());
 
-  // // execute transaction 
-  // const withdrawAmmpl = await particleSplitter.executeForWallet(
-  //   '0x63174fa9680c674a5580f7d747832b2a2133ad8f',
-  //   103,
-  //   'aave',
-  //   AMPL_ADDRESS,
-  //   getTransferEncodeMethod(totalAmplAmount) 
-  // ).then(tx => tx.wait());
+  // execute transaction 
+  const withdrawAmmpl = await particleSplitter.executeForWallet(
+    '0x63174fa9680c674a5580f7d747832b2a2133ad8f',
+    103,
+    'aave',
+    AMPL_ADDRESS,
+    getTransferEncodeMethod(totalAmplAmount) 
+  ).then(tx => tx.wait());
 
-  console.log(getTransferEncodeMethod(totalAmplAmount), totalAmplAmount.toString());
-
-//   log('\n  Transaction Execution Complete!');
-//   log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
+  log('\n  Transaction Execution Complete!');
+  log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 }
 
 const getTransferEncodeMethod = (totalAmplAmount) => {
