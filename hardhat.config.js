@@ -142,7 +142,7 @@ module.exports = {
         },
         mainnet: {
             // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            url: `https://eth-mainnet.alchemyapi.com/v2/${process.env.ALCHEMY_APIKEY}`,
+            url: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
             gasPrice: 'auto',
             blockGasLimit: 12487794,
             accounts: {

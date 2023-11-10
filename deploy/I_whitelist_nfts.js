@@ -76,6 +76,7 @@ const _WHITELISTED_CONTRACTS = {
     // "0xe6A5e67F92CC6219E9c210f2734A6175Ee4eE6D1", // Moda Dropcase NFT (DropCase)
     // "0x5d183d790d6b570eaec299be432f0a13a00058a9", // HMNZone
     // "0x92939Fc66f67017832be6b279410a59cA6A42a20", // APE Domains .ape
+    "0xA5685Ecc8813831c23Da4079CFcB824F38Df3462", // WoofWorkers
   ],
   '5': [
     // "0xAEdEDf4A27d4Ea6f658b5F69F70a72d12BDeb937", // Proton
