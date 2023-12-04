@@ -79,7 +79,7 @@ describe('Reward program', function () {
     universe = Universe.attach(universeData.address);
   });
 
-  it('Should be deployed', async () =>{
+  it('Should be deployed', async () => {
     expect(rewardProgramDeployerSigner.address).to.not.equal(0);
     const rewardData = await rewardProgramDeployerSigner.getProgramData();
 
@@ -484,8 +484,6 @@ describe('Reward program', function () {
 
       const rewardProgramUSDc = await universe.getRewardProgram(USDC_STAKING_TOKEN);
       expect(rewardProgramUSDc).to.be.eq(rewardProgram.address);
-
-
 
       // Set universe with USDC
 
