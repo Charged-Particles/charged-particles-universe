@@ -76,7 +76,9 @@ const _WHITELISTED_CONTRACTS = {
     // "0xe6A5e67F92CC6219E9c210f2734A6175Ee4eE6D1", // Moda Dropcase NFT (DropCase)
     // "0x5d183d790d6b570eaec299be432f0a13a00058a9", // HMNZone
     // "0x92939Fc66f67017832be6b279410a59cA6A42a20", // APE Domains .ape
-    "0xA5685Ecc8813831c23Da4079CFcB824F38Df3462", // WoofWorkers
+    // "0xA5685Ecc8813831c23Da4079CFcB824F38Df3462", // WoofWorkers
+    // "0x12632d6e11c6bbc0c53f3e281ea675e5899a5df5", // STOICS
+    // "0xd652Eeb3431f1113312E5c763CE1d0846Aa4d7BC", // Scary Garys
   ],
   '5': [
     // "0xAEdEDf4A27d4Ea6f658b5F69F70a72d12BDeb937", // Proton
@@ -113,6 +115,20 @@ const _WHITELISTED_CONTRACTS = {
     // "0x135dE69e2C8A6f14f00dcf9c9e8D8120FBebeF5a", // HMNZone
     // "0x4bf5a99ea2f8de061f7d77ba9edd749503d945da", // .BASIN (FlexiPunkTLD)
     // "0xf6a44012d24ca5d67ece21ea7d34886a55754e86" // TaterDAO Land
+  ],
+  '5000': [
+    "0x76a5df1c6F53A4B80c8c8177edf52FBbC368E825", // Proton C (Soul)
+    "0x7cf4ac414c94e03ecb2a7d6ea8f79087453caef0", // Citizens of Mantle
+    "0x7e762d9638b9aa750a0409b36ea55522aa00ef73", // Pixel Moles
+    "0xcf32863dddd992d86103eb373254a05731c7412b", // Mantle's Skulls
+    "0x7c0792ec5ed5362c4efac4317689accd98b129bb", // Mantle Doges
+    "0xafc7649b722adb34463576a15eeb08bc0d692b4a", // Star Voyager Medal
+    "0x1d2b17c6e5d0d617f69c2c017dc19eb5fa85cb3c", // OmniKingdoms
+    "0x03ddc4b60d6bbf399a8397d73462060fdfb83476", // Pandra: CodeConqueror
+    "0x5025fa31f72950295875a209e5e05f29b68b8457", // Path2Pro Collection (Mobile Edition)
+  ],
+  '5001': [
+    // "0x9E5Ed965810ABbF9820F83Ac39A15D5e269FBDa3", // Proton C (Soul)
   ],
   '80001': [
     // "0xd02cB38f5D68333219d32Ea2a08c3BCdC92753F2", // Proton

@@ -204,6 +204,22 @@ module.exports = {
             browserURL: 'https://explorer.public.zkevm-test.net',
           },
         },
+        {
+          network: 'mantletest',
+          chainId: 5001,
+          urls: {
+            apiURL: 'https://rpc.testnet.mantle.xyz/api',
+            browserURL: 'https://explorer.testnet.mantle.xyz',
+          },
+        },
+        {
+          network: 'mantle',
+          chainId: 5000,
+          urls: {
+            apiURL: "https://api.routescan.io/v2/network/mainnet/evm/5000/etherscan",
+            browserURL: "https://mantlescan.info",
+          },
+        },
       ],
     },
     // polygonscan: {

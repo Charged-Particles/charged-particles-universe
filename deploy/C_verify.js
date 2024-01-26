@@ -102,7 +102,7 @@ module.exports = async (hre) => {
 
   // Protocol
   await _verifyProxyContract({name: 'Universe', networkName});
-  await _verifyProxyContract({name: 'ChargedParticles', networkName, implAddressOverride: '0xA85B3d84f54Fb238Ef257158da99FdfCe905C7aA'});
+  await _verifyProxyContract({name: 'ChargedParticles', networkName});
   await _verifyProxyContract({name: 'ChargedState', networkName});
   await _verifyProxyContract({name: 'ChargedSettings', networkName});
   await _verifyProxyContract({name: 'ChargedManagers', networkName});
