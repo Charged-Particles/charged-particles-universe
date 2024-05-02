@@ -30,6 +30,7 @@
     "deploy-fresh-v2": "hardhat deploy --tags protocol,generic,aave,tokens,setup --network",
     "deploy-zkevm": "hardhat deploy --tags protocol,generic,tokens,setup --network zkEVMtest",
     "deploy-mantle": "hardhat deploy --tags protocol,generic,tokens,setup --network mantle",
+    "deploy-sepolia": "hardhat deploy --tags protocol,generic,tokens,setup --network sepolia",
     "deploy-mantle-test": "hardhat deploy --tags protocol,generic,tokens,setup --network mantletest",
     "deploy-upgrade-v2": "hardhat deploy --tags upgrades --network",
     "migrate-v2": "hardhat deploy --tags migrations --network",

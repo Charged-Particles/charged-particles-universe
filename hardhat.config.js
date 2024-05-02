@@ -118,11 +118,18 @@ module.exports = {
             },
             chainId: 5
         },
+        sepolia: {
+          url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
+          gasPrice: 'auto',
+          accounts: {
+              mnemonic: mnemonic.testnet,
+              initialIndex: 0,
+              count: 10,
+          },
+          chainId: 11155111 
+        },
         mumbai: {
-            // url: `https://rpc-mumbai.matic.today`,
-            // url: `https://rpc-mumbai.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
             url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
-            // gasPrice: 50e9,
             accounts: {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
@@ -150,16 +157,6 @@ module.exports = {
                 initialIndex: 0,
                 count: 3,
             },
-        },
-        sepolia: {
-            url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_SEPOLIA_API_KEY}`,
-            gasPrice: 'auto',
-            accounts: {
-                mnemonic: mnemonic.testnet,
-                initialIndex: 0,
-                count: 10,
-            },
-            chainId: 11155111
         },
         zkEVMtest: {
             url: 'https://rpc.public.zkevm-test.net',

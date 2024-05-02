@@ -42,6 +42,7 @@ const chainIdByName = (chainName) => {
     case 'mantletest': return 5001;
     case 'hardhat': return 31337;
     case 'coverage': return 31337;
+    case 'sepolia': return 11155111;
     // TODO: update for zk-Polygon
     default: return 0;
   }
@@ -60,6 +61,7 @@ const chainNameById = (chainId) => {
     case 5000: return 'Mantle';
     case 5001: return 'Mantle Testnet';
     case 31337: return 'Hardhat';
+    case 11155111: return 'Sepolia';
     default: return 'Unknown';
   }
 };
