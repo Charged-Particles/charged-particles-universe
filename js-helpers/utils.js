@@ -38,8 +38,11 @@ const chainIdByName = (chainName) => {
     case 'polygon': return 137;
     case 'mumbai': return 80001;
     case 'zkevmtest': return 1442;
+    case 'mantle': return 5000;
+    case 'mantletest': return 5001;
     case 'hardhat': return 31337;
     case 'coverage': return 31337;
+    case 'sepolia': return 11155111;
     // TODO: update for zk-Polygon
     default: return 0;
   }
@@ -55,7 +58,10 @@ const chainNameById = (chainId) => {
     case 137: return 'Polygon';
     case 1442: return 'zkEVM-Testnet';
     case 80001: return 'Mumbai';
+    case 5000: return 'Mantle';
+    case 5001: return 'Mantle Testnet';
     case 31337: return 'Hardhat';
+    case 11155111: return 'Sepolia';
     default: return 'Unknown';
   }
 };
@@ -64,18 +70,32 @@ const chainTypeById = (chainId) => {
   switch (parseInt(chainId, 10)) {
     case 1:
     case 137:
+    case 5000:
       return {isProd: true, isTestnet: false, isHardhat: false};
     case 3:
     case 4:
     case 5:
     case 42:
     case 1442:
+    case 5001:
     case 80001:
       return {isProd: false, isTestnet: true, isHardhat: false};
     case 31337:
     default:
       return {isProd: false, isTestnet: false, isHardhat: true};
     // TODO: update for zk-Polygon
+  }
+};
+
+const isAaveSupported = (chainId) => {
+  switch (parseInt(chainId, 10)) {
+    case 1:
+    case 5:
+    case 137:
+    case 80001:
+      return true;
+    default:
+      return false;
   }
 };
 
@@ -122,4 +142,5 @@ module.exports = {
   ensureDirectoryExistence,
   calculateSumArithmeticSeriesAtN,
   // distributeInitialFunds,
+  isAaveSupported,
 }

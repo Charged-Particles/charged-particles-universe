@@ -35,7 +35,6 @@ import "./interfaces/IChargedParticles.sol";
 import "./interfaces/ILepton.sol";
 import "./lib/TokenInfo.sol";
 import "./lib/BlackholePrevention.sol";
-import "./interfaces/IRewardProgram.sol";
 
 
 /**
@@ -49,32 +48,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
 
   // The ChargedParticles Contract Address
   address public chargedParticles;
-  address public proton;
-  address public lepton;
-  address public quark;
-  address public boson;
-
-  uint256 constant internal PERCENTAGE_SCALE = 1e4;  // 10000  (100%)
-
-  // Positive Charge
-  uint256 internal photonMaxSupply;
-  uint256 internal totalPhotonDischarged;
-
-  // Source of Positive Charge
-  IERC20Upgradeable public photonSource;
-
-  //   Asset Token => Electrostatic Attraction Multiplier
-  mapping (address => uint256) internal esaMultiplier;
-
-  //       Account => Electrostatic Attraction Levels
-  mapping (address => uint256) internal esaLevel;
-
-  // Energizing Account => Referral Source
-  mapping (address => address) internal referralSource;
-
-  // NFT Token UUID => Bonded Lepton Mass
-  mapping (uint256 => uint256) internal bondedLeptonMass;
-
 
   /***********************************|
   |          Initialization           |
@@ -82,19 +55,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
 
   function initialize() public initializer {
     __Ownable_init();
-  }
-
-
-  /***********************************|
-  |         Public Functions          |
-  |__________________________________*/
-
-  function getStaticCharge(address /* account */) external pure virtual returns (uint256 positiveEnergy) {
-    return 0;
-  }
-
-  function conductElectrostaticDischarge(address /* account */, uint256 /* amount */) external pure virtual returns (uint256 positiveEnergy) {
-    return 0;
   }
 
   /***********************************|
@@ -115,16 +75,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(assetToken);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerAssetDeposit(
-        contractAddress,
-        tokenId,
-        walletManagerId,
-        assetToken,
-        assetAmount
-      );
-    }
+    // no-op
   }
 
   function onDischarge(
@@ -140,11 +91,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(assetToken);
-    if (rewardProgram != address(0)) {
-      uint256 totalInterest = receiverEnergy.add(creatorEnergy);
-      IRewardProgram(rewardProgram).registerAssetRelease(contractAddress, tokenId, totalInterest);
-    }
+    // no-op
   }
 
   function onDischargeForCreator(
@@ -160,10 +107,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(assetToken);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerAssetRelease(contractAddress, tokenId, receiverEnergy);
-    }
+    // no-op
   }
 
   function onRelease(
@@ -180,12 +124,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(assetToken);
-    if (rewardProgram != address(0)) {
-      // "receiverEnergy" includes the "principalAmount"
-      uint256 totalInterest = receiverEnergy.sub(principalAmount).add(creatorEnergy);
-      IRewardProgram(rewardProgram).registerAssetRelease(contractAddress, tokenId, totalInterest);
-    }
+    // no-op
   }
 
   function onCovalentBond(
@@ -201,10 +140,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(nftTokenAddress);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerNftDeposit(contractAddress, tokenId, nftTokenAddress, nftTokenId, nftTokenAmount);
-    }
+    // no-op
   }
 
   function onCovalentBreak(
@@ -220,10 +156,7 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     override
     onlyChargedParticles
   {
-    address rewardProgram = getRewardProgram(nftTokenAddress);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerNftRelease(contractAddress, tokenId, nftTokenAddress, nftTokenId, nftTokenAmount);
-    }
+    // no-op
   }
 
   function onProtonSale(
@@ -238,7 +171,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     external
     virtual
     override
-    onlyProton
   {
     // no-op
   }
@@ -259,80 +191,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
     emit ChargedParticlesSet(controller);
   }
 
-  function setPhoton(
-    address token,
-    uint256 maxSupply
-  )
-    external
-    virtual
-    onlyOwner
-    onlyValidContractAddress(token)
-  {
-    photonSource = IERC20Upgradeable(token);
-    photonMaxSupply = maxSupply;
-    emit PhotonSet(token, maxSupply);
-  }
-
-  function setProtonToken(
-    address token
-  )
-    external
-    virtual
-    onlyOwner
-    onlyValidContractAddress(token)
-  {
-    proton = token;
-    emit ProtonTokenSet(token);
-  }
-
-  function setLeptonToken(
-    address token
-  )
-    external
-    virtual
-    onlyOwner
-    onlyValidContractAddress(token)
-  {
-    lepton = token;
-    emit LeptonTokenSet(token);
-  }
-
-  function setQuarkToken(
-    address token
-  )
-    external
-    virtual
-    onlyOwner
-    onlyValidContractAddress(token)
-  {
-    quark = token;
-    emit QuarkTokenSet(token);
-  }
-
-  function setBosonToken(
-    address token
-  )
-    external
-    virtual
-    onlyOwner
-    onlyValidContractAddress(token)
-  {
-    boson = token;
-    emit BosonTokenSet(token);
-  }
-
-  function setEsaMultiplier(
-    address assetToken,
-    uint256 multiplier
-  )
-    external
-    virtual
-    onlyOwner
-  {
-    esaMultiplier[assetToken] = multiplier;
-    emit EsaMultiplierSet(assetToken, multiplier);
-  }
-
   function withdrawEther(address payable receiver, uint256 amount) external virtual onlyOwner {
     _withdrawEther(receiver, amount);
   }
@@ -350,18 +208,6 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   }
 
 
-
-  /***********************************|
-  |         Private Functions         |
-  |__________________________________*/
-
-  function _electrostaticAttraction(uint256 tokenUuid, address receiver, address assetToken, uint256 baseAmount) internal virtual {
-  }
-
-  function _conductElectrostaticDischarge(address /* account */, uint256 /* energy */) internal virtual pure returns (uint256) {
-    return 0;
-  }
-
   /***********************************|
   |             Modifiers             |
   |__________________________________*/
@@ -376,71 +222,5 @@ contract Universe is IUniverse, Initializable, OwnableUpgradeable, BlackholePrev
   modifier onlyChargedParticles() {
     require(chargedParticles == msg.sender, "UNI:E-108");
     _;
-  }
-
-  /// @dev Throws if called by any account other than the Proton NFT contract
-  modifier onlyProton() {
-    require(proton == msg.sender, "UNI:E-110");
-    _;
-  }
-
-
-  /***********************************|
-  |    Upgrade 1 - Reward Program     |
-  |__________________________________*/
-
-  // Asset Token => Reward Program
-  mapping (address => address) internal assetRewardPrograms;
-
-  function getRewardProgram(address asset) public view returns (address) {
-    return _getRewardProgram(asset);
-  }
-
-  function registerExistingDeposits(
-    address contractAddress,
-    uint256 tokenId,
-    string calldata walletManagerId,
-    address assetToken
-  ) external {
-    address rewardProgram = getRewardProgram(assetToken);
-    if (rewardProgram != address(0)) {
-      IRewardProgram(rewardProgram).registerExistingDeposits(
-        contractAddress,
-        tokenId,
-        walletManagerId,
-        assetToken
-      );
-    }
-  }
-
-  function setRewardProgram(
-    address rewardProgam,
-    address assetToken,
-    address nftMultiplier
-  )
-    external
-    onlyOwner
-    onlyValidContractAddress(rewardProgam)
-  {
-    require(assetToken != address(0x0), "UNI:E-403");
-    assetRewardPrograms[assetToken] = rewardProgam;
-    assetRewardPrograms[nftMultiplier] = rewardProgam;
-    emit RewardProgramSet(assetToken, nftMultiplier, rewardProgam);
-  }
-
-  function removeRewardProgram(
-    address assetToken,
-    address nftMultiplier
-  )
-    external
-    onlyOwner
-  {
-    delete assetRewardPrograms[assetToken];
-    delete assetRewardPrograms[nftMultiplier];
-    emit RewardProgramRemoved(assetToken, nftMultiplier);
-  }
-
-  function _getRewardProgram(address assetToken) internal view returns (address) {
-    return assetRewardPrograms[assetToken];
   }
 }

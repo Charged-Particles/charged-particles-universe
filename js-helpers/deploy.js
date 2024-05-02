@@ -105,6 +105,7 @@ const presets = {
   Aave: {
     referralCode: {
       1: '',
+      5: '',
       42: '',
       137: '',
       80001: '',
@@ -130,6 +131,7 @@ const presets = {
       },
       lendingPoolProvider: {
         1: '0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5', // mainnet
+        5: '0x5E52dEc931FFb32f609681B8438A51c675cc232d', // goerli
         42: '0x652B2937Efd0B5beA1c8d54293FC1289672AFC6b', // kovan
         137: '0xd05e3E715d945B59290df0ae8eF85c1BdB684744', // polygon mainnet
         80001: '0x178113104fEcbcD7fF8669a0150721e231F0FD4B', // polygon testnet
@@ -171,16 +173,16 @@ const presets = {
     1: { // Mainnet
       // airdrop: {  //  AIRDROP # 1
       //   merkleRoot: '0x58756dddb7c90cd6eb82cde8dea667eb364056f52d18d437838a26afd2accce0',
-      //   totalIonx: tokensBN(bn(1_000_000)),
+      //   totalIonx: tokensBN(bn(1000000)),
       // },
       // airdrop: {  //  AIRDROP # 2
       //   merkleRoot: '0x31340c29d25b57749abae264a051c31a96d6b79a24776ffc91a8d46d4a9258a5',
-      //   totalIonx: tokensBN(bn(1_000_000)),
+      //   totalIonx: tokensBN(bn(1000000)),
       //   expiryDate: LIVE_EXPIRY,
       // },
       airdrop: {  //  AIRDROP # 3
         merkleRoot: '0x57a3449b2574a7fe391a62fbb1d15456b7c39422bbeee27d64cef4502cdf613a',
-        totalIonx: tokensBN(bn(1_000_000)),
+        totalIonx: tokensBN(bn(1000000)),
         expiryDate: LIVE_EXPIRY,
       },
       staking: {
@@ -204,7 +206,7 @@ const presets = {
     42: { // Kovan Testnet
       airdrop: {
         merkleRoot: '0x57a3449b2574a7fe391a62fbb1d15456b7c39422bbeee27d64cef4502cdf613a',
-        totalIonx: tokensBN(bn(1_000_000)),
+        totalIonx: tokensBN(bn(1000000)),
         expiryDate: TEST_EXPIRY,
       },
       staking: {
@@ -250,7 +252,7 @@ const presets = {
     31337: { // Hardhat - Forked Mainnet
       airdrop: {
         merkleRoot: '0x42607ac6583b70ed3bb26c8583844da4b5ca1099ecf3f0252de4dd60d17c2fc3',
-        totalIonx: tokensBN(bn(1_000_000)),
+        totalIonx: tokensBN(bn(1000000)),
         expiryDate: LIVE_EXPIRY,
       },
       staking: {

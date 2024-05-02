@@ -32,19 +32,19 @@ module.exports = async (hre) => {
     log('  - Owner:       ', protocolOwner);
     log(' ');
 
-    log('\n  Deploying GenericWalletManager...');
-    const GenericWalletManager = await hre.ethers.getContractFactory('GenericWalletManager');
-    const GenericWalletManagerInstance = await GenericWalletManager.deploy();
-    const genericWalletManager = await GenericWalletManagerInstance.deployed();
-    deployData['GenericWalletManager'] = {
-      abi: getContractAbi('GenericWalletManager'),
-      address: genericWalletManager.address,
-      deployTransaction: genericWalletManager.deployTransaction,
-    }
-    saveDeploymentData(chainId, deployData);
-    log('  - GenericWalletManager:  ', genericWalletManager.address);
-    log('     - Block:              ', genericWalletManager.deployTransaction.blockNumber);
-    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
+    // log('\n  Deploying GenericWalletManager...');
+    // const GenericWalletManager = await hre.ethers.getContractFactory('GenericWalletManager');
+    // const GenericWalletManagerInstance = await GenericWalletManager.deploy();
+    // const genericWalletManager = await GenericWalletManagerInstance.deployed();
+    // deployData['GenericWalletManager'] = {
+    //   abi: getContractAbi('GenericWalletManager'),
+    //   address: genericWalletManager.address,
+    //   deployTransaction: genericWalletManager.deployTransaction,
+    // }
+    // saveDeploymentData(chainId, deployData);
+    // log('  - GenericWalletManager:  ', genericWalletManager.address);
+    // log('     - Block:              ', genericWalletManager.deployTransaction.blockNumber);
+    // log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManager.deployTransaction }));
 
     log('\n  Deploying GenericWalletManagerB...');
     const GenericWalletManagerB = await hre.ethers.getContractFactory('GenericWalletManagerB');
@@ -60,19 +60,19 @@ module.exports = async (hre) => {
     log('     - Block:              ', genericWalletManagerB.deployTransaction.blockNumber);
     log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericWalletManagerB.deployTransaction }));
 
-    log('  Deploying GenericBasketManager...');
-    const GenericBasketManager = await hre.ethers.getContractFactory('GenericBasketManager');
-    const GenericBasketManagerInstance = await GenericBasketManager.deploy();
-    const genericBasketManager = await GenericBasketManagerInstance.deployed();
-    deployData['GenericBasketManager'] = {
-      abi: getContractAbi('GenericBasketManager'),
-      address: genericBasketManager.address,
-      deployTransaction: genericBasketManager.deployTransaction,
-    }
-    saveDeploymentData(chainId, deployData);
-    log('  - GenericBasketManager:  ', genericBasketManager.address);
-    log('     - Block:              ', genericBasketManager.deployTransaction.blockNumber);
-    log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericBasketManager.deployTransaction }));
+    // log('  Deploying GenericBasketManager...');
+    // const GenericBasketManager = await hre.ethers.getContractFactory('GenericBasketManager');
+    // const GenericBasketManagerInstance = await GenericBasketManager.deploy();
+    // const genericBasketManager = await GenericBasketManagerInstance.deployed();
+    // deployData['GenericBasketManager'] = {
+    //   abi: getContractAbi('GenericBasketManager'),
+    //   address: genericBasketManager.address,
+    //   deployTransaction: genericBasketManager.deployTransaction,
+    // }
+    // saveDeploymentData(chainId, deployData);
+    // log('  - GenericBasketManager:  ', genericBasketManager.address);
+    // log('     - Block:              ', genericBasketManager.deployTransaction.blockNumber);
+    // log('     - Gas Cost:           ', getTxGasCost({ deployTransaction: genericBasketManager.deployTransaction }));
 
     log('  Deploying GenericBasketManagerB...');
     const GenericBasketManagerB = await hre.ethers.getContractFactory('GenericBasketManagerB');

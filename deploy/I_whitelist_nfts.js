@@ -76,6 +76,9 @@ const _WHITELISTED_CONTRACTS = {
     // "0xe6A5e67F92CC6219E9c210f2734A6175Ee4eE6D1", // Moda Dropcase NFT (DropCase)
     // "0x5d183d790d6b570eaec299be432f0a13a00058a9", // HMNZone
     // "0x92939Fc66f67017832be6b279410a59cA6A42a20", // APE Domains .ape
+    // "0xA5685Ecc8813831c23Da4079CFcB824F38Df3462", // WoofWorkers
+    // "0x12632d6e11c6bbc0c53f3e281ea675e5899a5df5", // STOICS
+    // "0xd652Eeb3431f1113312E5c763CE1d0846Aa4d7BC", // Scary Garys
   ],
   '5': [
     // "0xAEdEDf4A27d4Ea6f658b5F69F70a72d12BDeb937", // Proton
@@ -86,6 +89,7 @@ const _WHITELISTED_CONTRACTS = {
     // "0x517fEfB53b58Ec8764ca885731Db20Ca2dcac7b7", // Proton B
     // "0xF0e4ed501ED7d960886e3f9E8d569e1a1253Eb53", // Proton B
     // "0x6D05f07c30be99317D649302dA2054C667Cdd93D", // Proton C (Soul)
+    // "0x92971E5bB4d098CaCf2314292bDb5eDC3f5CF25e", // Proton C (Soul)
     // "0xc191e3De6e8ab034Adc4B199749F7199DA9a98e6", // Lepton 2
     // "0xef815ad5401cee4b8b2e6bc2f8c481d84e5d0871", // External NFT Example Contract
   ],
@@ -110,7 +114,21 @@ const _WHITELISTED_CONTRACTS = {
     // "0x96c89cc7c5d2fbfa41afa10da5917742ff35941b", // Elder ENTS
     // "0x135dE69e2C8A6f14f00dcf9c9e8D8120FBebeF5a", // HMNZone
     // "0x4bf5a99ea2f8de061f7d77ba9edd749503d945da", // .BASIN (FlexiPunkTLD)
-    "0xf6a44012d24ca5d67ece21ea7d34886a55754e86" // TaterDAO Land
+    // "0xf6a44012d24ca5d67ece21ea7d34886a55754e86" // TaterDAO Land
+  ],
+  '5000': [
+    "0x76a5df1c6F53A4B80c8c8177edf52FBbC368E825", // Proton C (Soul)
+    "0x7cf4ac414c94e03ecb2a7d6ea8f79087453caef0", // Citizens of Mantle
+    "0x7e762d9638b9aa750a0409b36ea55522aa00ef73", // Pixel Moles
+    "0xcf32863dddd992d86103eb373254a05731c7412b", // Mantle's Skulls
+    "0x7c0792ec5ed5362c4efac4317689accd98b129bb", // Mantle Doges
+    "0xafc7649b722adb34463576a15eeb08bc0d692b4a", // Star Voyager Medal
+    "0x1d2b17c6e5d0d617f69c2c017dc19eb5fa85cb3c", // OmniKingdoms
+    "0x03ddc4b60d6bbf399a8397d73462060fdfb83476", // Pandra: CodeConqueror
+    "0x5025fa31f72950295875a209e5e05f29b68b8457", // Path2Pro Collection (Mobile Edition)
+  ],
+  '5001': [
+    // "0x9E5Ed965810ABbF9820F83Ac39A15D5e269FBDa3", // Proton C (Soul)
   ],
   '80001': [
     // "0xd02cB38f5D68333219d32Ea2a08c3BCdC92753F2", // Proton
@@ -135,10 +153,10 @@ module.exports = async (hre) => {
     // if (chainId !== 42) { return; } // Kovan only
 
     const ddChargedSettings = getDeployData('ChargedSettings', chainId);
-    const ddProton = getDeployData('Proton', chainId);
-    const ddProtonB = getDeployData('ProtonB', chainId);
-    const ddLepton = getDeployData('Lepton', chainId);
-    const ddTokenInfoProxy = getDeployData('TokenInfoProxy', chainId);
+    // const ddProton = getDeployData('Proton', chainId);
+    // const ddProtonB = getDeployData('ProtonB', chainId);
+    // const ddLepton = getDeployData('Lepton', chainId);
+    // const ddTokenInfoProxy = getDeployData('TokenInfoProxy', chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - External NFTs');
@@ -154,19 +172,19 @@ module.exports = async (hre) => {
     const ChargedSettings = await ethers.getContractFactory('ChargedSettings');
     const chargedSettings = await ChargedSettings.attach(ddChargedSettings.address);
 
-    log('  Loading TokenInfoProxy from: ', ddTokenInfoProxy.address);
-    const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
-    const tokenInfoProxy = await TokenInfoProxy.attach(ddTokenInfoProxy.address);
+    // log('  Loading TokenInfoProxy from: ', ddTokenInfoProxy.address);
+    // const TokenInfoProxy = await ethers.getContractFactory('TokenInfoProxy');
+    // const tokenInfoProxy = await TokenInfoProxy.attach(ddTokenInfoProxy.address);
 
-    if (chainId === 31337) {
-      const ddExternalERC721 = getDeployData('ExternalERC721', chainId);
-      _WHITELISTED_CONTRACTS['31337'] = [
-        ddProton.address,
-        ddProtonB.address,
-        ddLepton.address,
-        ddExternalERC721.address,
-      ];
-    }
+    // if (chainId === 31337) {
+    //   const ddExternalERC721 = getDeployData('ExternalERC721', chainId);
+    //   _WHITELISTED_CONTRACTS['31337'] = [
+    //     ddProton.address,
+    //     ddProtonB.address,
+    //     ddLepton.address,
+    //     ddExternalERC721.address,
+    //   ];
+    // }
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

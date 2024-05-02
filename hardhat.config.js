@@ -98,7 +98,7 @@ module.exports = {
         },
         kovan: {
             // url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            url: `https://eth-kovan.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+            url: `https://eth-kovan.alchemyapi.com/v2/${process.env.ALCHEMY_APIKEY}`,
             gasPrice: 3e9,
             blockGasLimit: 12400000,
             accounts: {
@@ -108,7 +108,7 @@ module.exports = {
             },
         },
         goerli: {
-            url: `https://eth-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
+            url: `https://eth-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_GOERLI_APIKEY}`,
             gasPrice: 'auto',
             // blockGasLimit: 12400000,
             accounts: {
@@ -116,12 +116,20 @@ module.exports = {
                 initialIndex: 0,
                 count: 10,
             },
+            chainId: 5
+        },
+        sepolia: {
+          url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
+          gasPrice: 'auto',
+          accounts: {
+              mnemonic: mnemonic.testnet,
+              initialIndex: 0,
+              count: 10,
+          },
+          chainId: 11155111 
         },
         mumbai: {
-            // url: `https://rpc-mumbai.matic.today`,
-            // url: `https://rpc-mumbai.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
             url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
-            // gasPrice: 50e9,
             accounts: {
                 mnemonic: mnemonic.testnet,
                 initialIndex: 0,
@@ -141,7 +149,7 @@ module.exports = {
         },
         mainnet: {
             // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_APIKEY}`,
+            url: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
             gasPrice: 'auto',
             blockGasLimit: 12487794,
             accounts: {
@@ -161,16 +169,29 @@ module.exports = {
             timeout: 400000,
             chainId: 1442,
         },
+        mantle: {
+            url: 'https://rpc.mantle.xyz',
+            gasPrice: 'auto',
+            accounts: {
+                mnemonic: mnemonic.mainnet,
+                initialIndex: 0,
+                count: 10,
+            },
+            chainId: 5000,
+        },
+        mantletest: {
+            url: 'https://rpc.testnet.mantle.xyz',
+            gasPrice: 'auto',
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            },
+            chainId: 5001,
+        },
     },
     etherscan: {
-      apiKey: {
-        mainnet: process.env.ETHERSCAN_APIKEY,
-        goerli: process.env.ETHERSCAN_APIKEY,
-        kovan: process.env.ETHERSCAN_APIKEY,
-        polygon: process.env.POLYGONSCAN_APIKEY,
-        polygonMumbai: process.env.POLYGONSCAN_APIKEY,
-        zkEVMtest: process.env.ETHERSCAN_APIKEY,
-      },
+      apiKey: process.env.ETHERSCAN_APIKEY,
       customChains: [
         {
           network: 'zkEVMtest',
@@ -178,6 +199,22 @@ module.exports = {
           urls: {
             apiURL: 'https://rpc.public.zkevm-test.net',
             browserURL: 'https://explorer.public.zkevm-test.net',
+          },
+        },
+        {
+          network: 'mantletest',
+          chainId: 5001,
+          urls: {
+            apiURL: 'https://rpc.testnet.mantle.xyz/api',
+            browserURL: 'https://explorer.testnet.mantle.xyz',
+          },
+        },
+        {
+          network: 'mantle',
+          chainId: 5000,
+          urls: {
+            apiURL: "https://api.routescan.io/v2/network/mainnet/evm/5000/etherscan",
+            browserURL: "https://mantlescan.info",
           },
         },
       ],
@@ -212,7 +249,6 @@ module.exports = {
         'GenericWalletManagerB',
         'GenericBasketManager',
         'GenericBasketManagerB',
-        'RewardProgram',
         'Ionx',
         'Proton',
         'ProtonB',

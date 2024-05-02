@@ -37,7 +37,6 @@ interface IBasketManager {
   event BasketAdd(address indexed contractAddress, uint256 indexed tokenId, address basketTokenAddress, uint256 basketTokenId, uint256 basketTokenAmount);
   event BasketRemove(address indexed receiver, address indexed contractAddress, uint256 indexed tokenId, address basketTokenAddress, uint256 basketTokenId, uint256 basketTokenAmount);
   event BasketRewarded(address indexed contractAddress, uint256 indexed tokenId, address indexed receiver, address rewardsToken, uint256 rewardsAmount);
-  event RewardProgramSet(address indexed rewardProgram);
 
   function isPaused() external view returns (bool);
 
