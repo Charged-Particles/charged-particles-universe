@@ -20,7 +20,7 @@ module.exports = async (hre) => {
     const deployData = {};
 
     const chainId = chainIdByName(network.name);
-    const {isProd, isHardhat} = chainTypeById(chainId);
+    const {isProd, isTestnet, isHardhat} = chainTypeById(chainId);
 
     log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     log('Charged Particles Protocol - Contract Deployment');
