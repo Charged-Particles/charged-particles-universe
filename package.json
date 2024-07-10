@@ -16,7 +16,6 @@
     "clean": "rm -rf build cache coverage coverage.json test-results.xml",
     "clean-deployed": "rm -rf abis && rm -f .openzeppelin/unknown-31337.json && rm -f .openzeppelin/kovan.json",
     "clean-test": "rm -rf abis .openzeppelin/${npm_config_network:-'unknown-31337'}.json deployments/${npm_config_network:-hardhat}/*.json test-results.xml",
-    "verify": "yarn hint && yarn test",
     "compile": "hardhat --show-stack-traces --max-memory 8192 compile",
     "test": "yarn clean-test && hardhat test --show-stack-traces && yarn clean-test",
     "test-only": "yarn clean-test && hardhat test --show-stack-traces",
@@ -32,6 +31,7 @@
     "deploy-mantle": "hardhat deploy --tags protocol,generic,tokens,setup --network mantle",
     "deploy-sepolia": "hardhat deploy --tags protocol,generic,tokens,setup --network sepolia",
     "deploy-mantle-test": "hardhat deploy --tags protocol,generic,tokens,setup --network mantletest",
+    "deploy-l2": "hardhat deploy --tags protocol,generic,tokens,setup --network",
     "deploy-upgrade-v2": "hardhat deploy --tags upgrades --network",
     "migrate-v2": "hardhat deploy --tags migrations --network",
     "deploy-setup": "hardhat deploy --tags setup --network",
@@ -42,7 +42,7 @@
     "deploy-airdrop": "hardhat deploy --tags airdrop --network",
     "deploy-incentives": "hardhat deploy --tags incentives --network",
     "deploy-vesting": "hardhat deploy --tags vesting --network",
-    "etherscan-verify": "hardhat deploy --tags verify --network",
+    "verify": "hardhat deploy --tags verify --network",
     "gen-docs": "solidity-docgen -i contracts -o docs"
   },
   "devDependencies": {

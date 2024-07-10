@@ -189,9 +189,33 @@ module.exports = {
             },
             chainId: 5001,
         },
+        modeSepolia: {
+          url: "https://sepolia.mode.network",
+          gasPrice: 2e9,
+          accounts: {
+              mnemonic: mnemonic.testnet,
+              initialIndex: 0,
+              count: 10,
+          },
+          chainId: 919,
+        },
+        mode: {
+          url: "https://mainnet.mode.network",
+          gasPrice: 'auto',
+          accounts: {
+              mnemonic: mnemonic.mainnet,
+              initialIndex: 0,
+              count: 10,
+          },
+          chainId: 34443,
+        },
     },
     etherscan: {
-      apiKey: process.env.ETHERSCAN_APIKEY,
+      apiKey: {
+        mainnet: process.env.ETHERSCAN_APIKEY ?? '',
+        sepolia: process.env.ETHERSCAN_APIKEY ?? '',
+        modeSepolia: 'MODE-NETWORK-TESTNET',
+      },
       customChains: [
         {
           network: 'zkEVMtest',
@@ -216,6 +240,14 @@ module.exports = {
             apiURL: "https://api.routescan.io/v2/network/mainnet/evm/5000/etherscan",
             browserURL: "https://mantlescan.info",
           },
+        },
+        {
+          network: 'modeSepolia',
+          chainId: 919,
+          urls: {
+            apiURL: 'https://sepolia.explorer.mode.network/api',
+            browserURL: 'https://sepolia.explorer.mode.network'
+          }
         },
       ],
     },

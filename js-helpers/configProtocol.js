@@ -24,7 +24,7 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     const { deployer, protocolOwner, trustedForwarder } = await getNamedAccounts();
     const network = await hre.network;
     const chainId = chainIdByName(network.name);
-    const {isProd, isHardhat} = chainTypeById(chainId);
+    const {isProd, isTestnet, isHardhat} = chainTypeById(chainId);
     const isAave = isAaveSupported(chainId);
 
     // const referralCode = presets.Aave.referralCode[chainId];
@@ -52,6 +52,10 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     // const ddLepton2 = getDeployData('Lepton2', chainId);
     // const ddIonx = getDeployData('Ionx', chainId);
 
+    // Mode SFS Registry
+    const sfsRegistry = isTestnet
+      ? '0xBBd707815a7F7eb6897C7686274AFabd7B579Ff6'
+      : '0x8680CEaBcb9b56913c519c069Add6Bc3494B7020';
 
     log(`  Using Network: ${chainNameById(chainId)} (${chainId})`);
     log('  Using Accounts:');
@@ -162,6 +166,10 @@ module.exports = async (hre, afterUpgradesV2 = false) => {
     await executeTx('1-f', 'ChargedParticles: Registering TokenInfoProxy', async () =>
       await chargedParticles.setController(ddTokenInfoProxy.address, 'tokeninfo')
     );
+
+    // await executeTx('1-f', 'ChargedParticles: Registering Mode-L2 SFS', async () =>
+    //   await chargedParticles.registerSFS(sfsRegistry)
+    // );
 
     // if (isHardhat && !afterUpgradesV2) {
     //   await executeTx('1-g', 'ChargedParticles: Registering Lepton', async () =>
