@@ -126,7 +126,7 @@ module.exports = {
               initialIndex: 0,
               count: 10,
           },
-          chainId: 11155111 
+          chainId: 11155111
         },
         mumbai: {
             url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
@@ -215,6 +215,7 @@ module.exports = {
         mainnet: process.env.ETHERSCAN_APIKEY ?? '',
         sepolia: process.env.ETHERSCAN_APIKEY ?? '',
         modeSepolia: 'MODE-NETWORK-TESTNET',
+        mode: process.env.ETHERSCAN_APIKEY ?? '',
       },
       customChains: [
         {
@@ -247,6 +248,14 @@ module.exports = {
           urls: {
             apiURL: 'https://sepolia.explorer.mode.network/api',
             browserURL: 'https://sepolia.explorer.mode.network'
+          }
+        },
+        {
+          network: 'mode',
+          chainId: 34443,
+          urls: {
+            apiURL: 'https://explorer.mode.network/api',
+            browserURL: 'https://explorer.mode.network'
           }
         },
       ],
@@ -315,7 +324,7 @@ module.exports = {
         },
         protocolOwner: {
           default: 1,
-          1: '0x0Ca678b984186b0117501C00d4A6B4F8F342D06D', // IONX Gnosis Multisig
+          // 1: '0x0Ca678b984186b0117501C00d4A6B4F8F342D06D', // IONX Gnosis Multisig
         },
         initialMinter: {
           default: 2,
