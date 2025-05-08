@@ -219,7 +219,7 @@ module.exports = {
         },
         ink: {
           url: 'https://rpc-qnd.inkonchain.com',
-          gasPrice: 'auto',
+          gasPrice: 1e8, // 0.1 GWEI
           accounts: {
               mnemonic: mnemonic.mainnet,
               initialIndex: 0,

@@ -101,11 +101,11 @@ module.exports = async (hre) => {
   log(' ');
 
   // Protocol
-  await _verifyProxyContract({name: 'Universe', networkName, implAddressOverride: '0x2D2f186BB2579A6A7995e7ABFd13daf1d12196ED'});
-  await _verifyProxyContract({name: 'ChargedParticles', networkName, implAddressOverride: '0x62881e9C2a374c71093577A417dB4024cB5c442d'});
-  await _verifyProxyContract({name: 'ChargedState', networkName, implAddressOverride: '0xb0064deb5F939dB557853775683802c47B0f68Cf'});
-  await _verifyProxyContract({name: 'ChargedSettings', networkName, implAddressOverride: '0xC6C7EC1a4338Cf004817ad54E40f923Fcac187ba'});
-  await _verifyProxyContract({name: 'ChargedManagers', networkName, implAddressOverride: '0x9664188F2f2cb17bDc85EeD28404A12f5bEafE49'});
+  await _verifyProxyContract({name: 'Universe', networkName, implAddressOverride: '0x73fbEBFF977c0083acfcE1D9f2a8645AFA39D91E'});
+  await _verifyProxyContract({name: 'ChargedParticles', networkName, implAddressOverride: '0x0288280Df6221E7e9f23c1BB398c820ae0Aa6c10'});
+  await _verifyProxyContract({name: 'ChargedState', networkName, implAddressOverride: '0x2691B4f4251408bA4b8bf9530B6961b9D0C1231F'});
+  await _verifyProxyContract({name: 'ChargedSettings', networkName, implAddressOverride: '0xB55E96d519Fbf225b1E5fb3e22ACEa9B7e255224'});
+  await _verifyProxyContract({name: 'ChargedManagers', networkName, implAddressOverride: '0xaB1a1410EA40930755C1330Cc0fB3367897C8c41'});
   // await _verifyContract({name: 'Ionx', networkName});
   await _verifyContract({name: 'ParticleSplitter', networkName});
   await _verifyContract({name: 'TokenInfoProxy', networkName});
