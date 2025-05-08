@@ -11,7 +11,6 @@ require('@nomiclabs/hardhat-ethers');
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-gas-reporter');
 require('hardhat-abi-exporter');
-require('solidity-coverage');
 require('hardhat-deploy-ethers');
 require('hardhat-deploy');
 require('hardhat-watcher');
@@ -24,11 +23,11 @@ task(TASK_COMPILE_GET_COMPILER_INPUT).setAction(async (_, __, runSuper) => {
   return input;
 });
 
-// Task to run deployment fixtures before tests without the need of "--deploy-fixture"
+// Task to run deployment fixtures before tests without the need of '--deploy-fixture'
 //  - Required to get fixtures deployed before running Coverage Reports
 task(
   TASK_TEST,
-  "Runs the coverage report",
+  'Runs the coverage report',
   async (args, hre, runSuper) => {
     await hre.run('compile');
     await hre.deployments.fixture();
@@ -72,9 +71,9 @@ module.exports = {
         ]
     },
     paths: {
-        sources: "./contracts",
-        tests: "./test",
-        cache: "./cache",
+        sources: './contracts',
+        tests: './test',
+        cache: './cache',
         artifacts: './build/contracts',
         deploy: './deploy',
         deployments: './deployments'
@@ -128,6 +127,17 @@ module.exports = {
           },
           chainId: 11155111
         },
+        mainnet: {
+            // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
+            url: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
+            gasPrice: 'auto',
+            blockGasLimit: 12487794,
+            accounts: {
+                mnemonic: mnemonic.mainnet,
+                initialIndex: 0,
+                count: 3,
+            },
+        },
         mumbai: {
             url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
             accounts: {
@@ -141,17 +151,6 @@ module.exports = {
             // url: `https://rpc-mainnet.maticvigil.com/v1/${process.env.MATIC_APIKEY}`,
             url: `https://polygon-mainnet.g.alchemy.com/v2/HFlv2m48GYEDLf9sHMTBuy2Z80xFwlVC`,
             gasPrice: 80e9,
-            accounts: {
-                mnemonic: mnemonic.mainnet,
-                initialIndex: 0,
-                count: 3,
-            },
-        },
-        mainnet: {
-            // url: `https://mainnet.infura.io/v3/${process.env.INFURA_APIKEY}`,
-            url: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
-            gasPrice: 'auto',
-            blockGasLimit: 12487794,
             accounts: {
                 mnemonic: mnemonic.mainnet,
                 initialIndex: 0,
@@ -190,7 +189,7 @@ module.exports = {
             chainId: 5001,
         },
         modeSepolia: {
-          url: "https://sepolia.mode.network",
+          url: 'https://sepolia.mode.network',
           gasPrice: 2e9,
           accounts: {
               mnemonic: mnemonic.testnet,
@@ -200,7 +199,7 @@ module.exports = {
           chainId: 919,
         },
         mode: {
-          url: "https://mainnet.mode.network",
+          url: 'https://mainnet.mode.network',
           gasPrice: 'auto',
           accounts: {
               mnemonic: mnemonic.mainnet,
@@ -209,6 +208,57 @@ module.exports = {
           },
           chainId: 34443,
         },
+        inkSepolia: {
+          url: 'https://rpc-gel-sepolia.inkonchain.com',
+          gasPrice: 1e8, // 0.1 GWEI
+          accounts: {
+              mnemonic: mnemonic.testnet,
+              initialIndex: 0,
+              count: 10,
+          },
+        },
+        ink: {
+          url: 'https://rpc-qnd.inkonchain.com',
+          gasPrice: 'auto',
+          accounts: {
+              mnemonic: mnemonic.mainnet,
+              initialIndex: 0,
+              count: 10,
+          },
+          chainId: 57073,
+        },
+        berachainBepolia: {
+          url: 'https://bepolia.rpc.berachain.com',
+          gasPrice: 1e8, // 0.1 GWEI
+          accounts: {
+              mnemonic: mnemonic.testnet,
+              initialIndex: 0,
+              count: 10,
+          },
+        },
+        berachain: {
+          url: 'https://rpc.berachain.com',
+          gasPrice: 'auto',
+          accounts: {
+              mnemonic: mnemonic.mainnet,
+              initialIndex: 0,
+              count: 10,
+          },
+        },
+        bscTestnet: {
+          url: 'https://data-seed-prebsc-1-s1.binance.org:8545', // `https://bnb-testnet.g.alchemy.com/v2/${process.env.ALCHEMY_APIKEY}`,
+          gasPrice: 10000000000,
+          gas: 3000000,
+          accounts: {
+              mnemonic: mnemonic.testnet,
+              initialIndex: 0,
+              count: 10,
+          },
+          chainId: 97,
+        },
+        // bsc: {
+
+        // },
     },
     etherscan: {
       apiKey: {
@@ -216,6 +266,11 @@ module.exports = {
         sepolia: process.env.ETHERSCAN_APIKEY ?? '',
         modeSepolia: 'MODE-NETWORK-TESTNET',
         mode: process.env.ETHERSCAN_APIKEY ?? '',
+        bscTestnet: process.env.BSCSCAN_APIKEY ?? '',
+        inkSepolia: process.env.BLOCKSCOUT_APIKEY ?? '',
+        ink: process.env.BLOCKSCOUT_APIKEY ?? '',
+        berachain: process.env.BERASCAN_APIKEY ?? '',
+        berachainBepolia: process.env.BERASCAN_APIKEY ?? '',
       },
       customChains: [
         {
@@ -238,8 +293,8 @@ module.exports = {
           network: 'mantle',
           chainId: 5000,
           urls: {
-            apiURL: "https://api.routescan.io/v2/network/mainnet/evm/5000/etherscan",
-            browserURL: "https://mantlescan.info",
+            apiURL: 'https://api.routescan.io/v2/network/mainnet/evm/5000/etherscan',
+            browserURL: 'https://mantlescan.info',
           },
         },
         {
@@ -258,11 +313,48 @@ module.exports = {
             browserURL: 'https://explorer.mode.network'
           }
         },
+        {
+          network: 'inkSepolia',
+          chainId: 763373,
+          urls: {
+            apiURL: 'https://explorer-sepolia.inkonchain.com/api',
+            browserURL: 'https://explorer-sepolia.inkonchain.com/',
+          },
+        },
+        {
+          network: 'ink',
+          chainId: 57073,
+          urls: {
+            apiURL: 'https://explorer.inkonchain.com/api',
+            browserURL: 'https://explorer.inkonchain.com/',
+          },
+        },
+        {
+          network: 'berachain',
+          chainId: 80094,
+          urls: {
+            apiURL: 'https://api.berascan.com/api',
+            browserURL: 'https://berascan.com/',
+          },
+        },
+        {
+          network: 'berachainBepolia',
+          chainId: 80069,
+          urls: {
+            apiURL: 'https://api-testnet.berascan.com/api',
+            browserURL: 'https://testnet.berascan.com/',
+          },
+        },
+        {
+          network: 'bscTestnet',
+          chainId: 97,
+          urls: {
+            apiURL: 'https://bsc-testnet-dataseed.bnbchain.org',
+            browserURL: 'https://testnet.bscscan.com'
+          }
+        },
       ],
     },
-    // polygonscan: {
-    //   apiKey: process.env.POLYGONSCAN_APIKEY
-    // },
     gasReporter: {
         currency: 'USD',
         gasPrice: 1,
@@ -350,8 +442,8 @@ module.exports = {
     },
     watcher: {
       compilation: {
-        tasks: ["compile"],
-        files: ["./contracts"],
+        tasks: ['compile'],
+        files: ['./contracts'],
         verbose: true,
       },
       test: {

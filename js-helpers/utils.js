@@ -42,6 +42,12 @@ const chainIdByName = (chainName) => {
     case 'mantletest': return 5001;
     case 'mode': return 34443;
     case 'modesepolia': return 919;
+    case 'ink': return 57073;
+    case 'inksepolia': return 763373;
+    case 'bsctestnet': return 97;
+    case 'bsc': return 56;
+    case 'berachain': return 80094;
+    case 'berachainbepolia': return 80069;
     case 'hardhat': return 31337;
     case 'coverage': return 31337;
     case 'sepolia': return 11155111;
@@ -64,6 +70,12 @@ const chainNameById = (chainId) => {
     case 5001: return 'Mantle Testnet';
     case 34443: return 'Mode';
     case 919: return 'Mode Sepolia';
+    case 57073: return 'INK';
+    case 763373: return 'INK Sepolia';
+    case 56: return 'BSC';
+    case 97: return 'BSC Testnet';
+    case 80094: return 'Berachain';
+    case 80069: return 'Berachain Bepolia';
     case 31337: return 'Hardhat';
     case 11155111: return 'Sepolia';
     default: return 'Unknown';
@@ -73,17 +85,24 @@ const chainNameById = (chainId) => {
 const chainTypeById = (chainId) => {
   switch (parseInt(chainId, 10)) {
     case 1:
+    case 56:
     case 137:
     case 5000:
+    case 57073:
+    case 80094:
     case 34443:
       return {isProd: true, isTestnet: false, isHardhat: false};
     case 3:
     case 4:
     case 5:
     case 42:
+    case 97:
     case 919:
     case 1442:
     case 5001:
+    case 80069:
+    case 763373:
+    case 11155111:
     case 80001:
       return {isProd: false, isTestnet: true, isHardhat: false};
     case 31337:

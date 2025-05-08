@@ -101,11 +101,11 @@ module.exports = async (hre) => {
   log(' ');
 
   // Protocol
-  await _verifyProxyContract({name: 'Universe', networkName});
-  await _verifyProxyContract({name: 'ChargedParticles', networkName});
-  await _verifyProxyContract({name: 'ChargedState', networkName});
-  await _verifyProxyContract({name: 'ChargedSettings', networkName});
-  await _verifyProxyContract({name: 'ChargedManagers', networkName});
+  await _verifyProxyContract({name: 'Universe', networkName, implAddressOverride: '0x2D2f186BB2579A6A7995e7ABFd13daf1d12196ED'});
+  await _verifyProxyContract({name: 'ChargedParticles', networkName, implAddressOverride: '0x62881e9C2a374c71093577A417dB4024cB5c442d'});
+  await _verifyProxyContract({name: 'ChargedState', networkName, implAddressOverride: '0xb0064deb5F939dB557853775683802c47B0f68Cf'});
+  await _verifyProxyContract({name: 'ChargedSettings', networkName, implAddressOverride: '0xC6C7EC1a4338Cf004817ad54E40f923Fcac187ba'});
+  await _verifyProxyContract({name: 'ChargedManagers', networkName, implAddressOverride: '0x9664188F2f2cb17bDc85EeD28404A12f5bEafE49'});
   // await _verifyContract({name: 'Ionx', networkName});
   await _verifyContract({name: 'ParticleSplitter', networkName});
   await _verifyContract({name: 'TokenInfoProxy', networkName});
