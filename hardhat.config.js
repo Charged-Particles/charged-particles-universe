@@ -161,6 +161,17 @@ module.exports = {
             timeout: 400000,
             chainId: 1442,
         },
+        somniaTestnet: {
+            url: 'https://dream-rpc.somnia.network',
+            gasPrice: 'auto',
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            },
+            timeout: 400000,
+            chainId: 50312,
+        },
     },
     etherscan: {
       apiKey: {
@@ -170,6 +181,7 @@ module.exports = {
         polygon: process.env.POLYGONSCAN_APIKEY,
         polygonMumbai: process.env.POLYGONSCAN_APIKEY,
         zkEVMtest: process.env.ETHERSCAN_APIKEY,
+        somniaTestnet: 'placeholder',
       },
       customChains: [
         {
@@ -178,6 +190,14 @@ module.exports = {
           urls: {
             apiURL: 'https://rpc.public.zkevm-test.net',
             browserURL: 'https://explorer.public.zkevm-test.net',
+          },
+        },
+        {
+          network: 'somniaTestnet',
+          chainId: 50312,
+          urls: {
+            apiURL: 'https://shannon-explorer.somnia.network/api',
+            browserURL: 'https://shannon-explorer.somnia.network',
           },
         },
       ],
