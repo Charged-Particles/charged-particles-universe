@@ -30,7 +30,6 @@ module.exports = async (hre) => {
     const ddGenericWalletManagerB = getDeployData('GenericWalletManagerB', chainId);
     const ddGenericBasketManager = getDeployData('GenericBasketManager', chainId);
     const ddGenericBasketManagerB = getDeployData('GenericBasketManagerB', chainId);
-    const ddProtonC = getDeployData('ProtonC', chainId);
 
     log(`\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`);
     log(`Charged Particles: Somnia Custom Setup`);
@@ -68,9 +67,6 @@ module.exports = async (hre) => {
 
     const GenericBasketManagerB = await ethers.getContractFactory('GenericBasketManagerB');
     const genericBasketManagerB = await GenericBasketManagerB.attach(ddGenericBasketManagerB.address);
-
-    const ProtonC = await ethers.getContractFactory('ProtonC');
-    const protonC = await ProtonC.attach(ddProtonC.address);
 
     // --- Core Protocol Configuration ---
     await executeTx('1-a', 'Universe: Registering ChargedParticles', async () =>
@@ -134,23 +130,6 @@ module.exports = async (hre) => {
     );
     await executeTx('2-h', 'GenericBasketManagerB: Registering Generic Basket Manager "B" with ChargedParticles', async () =>
       await chargedManagers.registerBasketManager('generic.B', ddGenericBasketManagerB.address)
-    );
-
-    // --- ProtonC Configuration ---
-    await executeTx('X-a', 'ProtonC: Registering Universe', async () =>
-      await protonC.setUniverse(ddUniverse.address)
-    );
-    await executeTx('X-b', 'ProtonC: Registering ChargedState', async () =>
-      await protonC.setChargedState(ddChargedState.address)
-    );
-    await executeTx('X-c', 'ProtonC: Registering ChargedSettings', async () =>
-      await protonC.setChargedSettings(ddChargedSettings.address)
-    );
-    await executeTx('X-d', 'ProtonC: Registering ChargedParticles', async () =>
-      await protonC.setChargedParticles(ddChargedParticles.address)
-    );
-    await executeTx('X-e', 'ChargedSettings: Enabling ProtonC for Charge', async () =>
-      await chargedSettings.enableNftContracts([ddProtonC.address])
     );
 
     log('\\n  Somnia Custom Setup Complete!');
