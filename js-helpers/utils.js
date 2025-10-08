@@ -38,6 +38,7 @@ const chainIdByName = (chainName) => {
     case 'polygon': return 137;
     case 'mumbai': return 80001;
     case 'zkevmtest': return 1442;
+    case 'somnia-testnet': return 50312;
     case 'hardhat': return 31337;
     case 'coverage': return 31337;
     // TODO: update for zk-Polygon
@@ -56,6 +57,7 @@ const chainNameById = (chainId) => {
     case 1442: return 'zkEVM-Testnet';
     case 80001: return 'Mumbai';
     case 31337: return 'Hardhat';
+    case 50312: return 'somnia-testnet';
     default: return 'Unknown';
   }
 };
@@ -71,6 +73,7 @@ const chainTypeById = (chainId) => {
     case 42:
     case 1442:
     case 80001:
+    case 50312:
       return {isProd: false, isTestnet: true, isHardhat: false};
     case 31337:
     default:
