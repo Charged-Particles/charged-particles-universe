@@ -45,7 +45,6 @@
     "deploy-vesting": "hardhat deploy --tags vesting --network",
     "etherscan-verify": "hardhat deploy --tags verify --network",
     "deploy:somnia": "yarn deploy-only --network somniaTestnet protocol,generic,protonC && yarn hardhat deploy --network somniaTestnet --tags somnia-setup",
-    "deploy:somnia-fork": "yarn deploy-only --network hardhat protocol,generic,protonC && yarn hardhat deploy --network hardhat --tags somnia-setup",
     "gen-docs": "solidity-docgen -i contracts -o docs"
   },
   "devDependencies": {
