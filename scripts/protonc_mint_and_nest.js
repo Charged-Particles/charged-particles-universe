@@ -1,3 +1,4 @@
+// yarn hardhat run scripts/protonc_mint_and_nest.js --network somnia-testnet
 const hre = require("hardhat");
 const {
     getDeployData,
