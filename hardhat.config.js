@@ -215,7 +215,7 @@ module.exports = {
           network: 'somnia-main',
           chainId: 5031,
           urls: {
-            apiURL: 'https://explorer.somnia.network/api',
+            apiURL: 'https://mainnet.somnia.w3us.site/api',
             browserURL: 'https://explorer.somnia.network',
           },
         },

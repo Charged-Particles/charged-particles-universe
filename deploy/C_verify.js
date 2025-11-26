@@ -80,10 +80,9 @@ const _verifyContract = async ({name, networkName, contractRef = null, addressOv
 module.exports = async (hre) => {
   const { ethers, getNamedAccounts } = hre;
   const { deployer, protocolOwner } = await getNamedAccounts();
-
+  
   const network = await hre.network;
   const chainId = chainIdByName(network.name);
-
   const {isHardhat} = chainTypeById(chainId);
   if (isHardhat) { return; }
 
