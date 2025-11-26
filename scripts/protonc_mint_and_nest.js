@@ -37,19 +37,19 @@ async function main() {
     const chargedParticles = await ChargedParticles.attach(ddChargedParticles.address);
 
     // Mint first ProtonC NFT
-    //   log('  Minting first ProtonC NFT...');
-    //   const tokenId1 = await protonC.callStatic.createBasicProton(deployer, deployer, 'https://example.com/token1');
-    //   await protonC.createBasicProton(deployer, deployer, 'https://example.com/token1').then(tx => tx.wait());
-    //   log('  Minted ProtonC NFT #', tokenId1.toString());
+      log('  Minting first ProtonC NFT...');
+      const tokenId1 = await protonC.callStatic.createBasicProton(deployer, deployer, 'https://example.com/token1');
+      await protonC.createBasicProton(deployer, deployer, 'https://example.com/token1').then(tx => tx.wait());
+      log('  Minted ProtonC NFT #', tokenId1.toString());
 
-    //   // Mint second ProtonC NFT
-    //   log('  Minting second ProtonC NFT...');
-    //   const tokenId2 = await protonC.callStatic.createBasicProton(deployer, deployer, 'https://example.com/token2');
-    //   await protonC.createBasicProton(deployer, deployer, 'https://example.com/token2').then(tx => tx.wait());
-    //   log('  Minted ProtonC NFT #', tokenId2.toString());
+      // Mint second ProtonC NFT
+      log('  Minting second ProtonC NFT...');
+      const tokenId2 = await protonC.callStatic.createBasicProton(deployer, deployer, 'https://example.com/token2');
+      await protonC.createBasicProton(deployer, deployer, 'https://example.com/token2').then(tx => tx.wait());
+      log('  Minted ProtonC NFT #', tokenId2.toString());
 
-    const tokenId1 = 1;
-    const tokenId2 = 2;
+    // const tokenId1 = 1;
+    // const tokenId2 = 2;
     const basketManagerId = 'generic.B';
 
     // Approve ChargedParticles to transfer the second NFT
