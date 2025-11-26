@@ -171,6 +171,17 @@ module.exports = {
             timeout: 400000,
             chainId: 50312,
         },
+        'somnia-main': {
+            url: 'https://api.infra.mainnet.somnia.network/',
+            gasPrice: 'auto',
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            },
+            timeout: 400000,
+            chainId: 5031,
+        },
     },
     etherscan: {
       apiKey: {
@@ -181,6 +192,7 @@ module.exports = {
         polygonMumbai: process.env.POLYGONSCAN_APIKEY,
         zkEVMtest: process.env.ETHERSCAN_APIKEY,
         'somnia-testnet': 'placeholder',
+        'somnia-main': 'placeholder',
       },
       customChains: [
         {
@@ -197,6 +209,14 @@ module.exports = {
           urls: {
             apiURL: 'https://shannon-explorer.somnia.network/api',
             browserURL: 'https://shannon-explorer.somnia.network',
+          },
+        },
+        {
+          network: 'somnia-main',
+          chainId: 5031,
+          urls: {
+            apiURL: 'https://explorer.somnia.network/api',
+            browserURL: 'https://explorer.somnia.network',
           },
         },
       ],
