@@ -81,7 +81,7 @@ module.exports = {
     },
     networks: {
         hardhat: {
-            // chainId: 1,
+            // chainId: 50312, // Somnia testnet chainId for local forking
             // blockGasLimit: 200000000,
             allowUnlimitedContractSize: true,
             // gasPrice: 1e9,
@@ -90,11 +90,10 @@ module.exports = {
                 initialIndex: 0,
                 count: 10,
             },
-            // forking: {
-            //     url: 'https://eth-mainnet.g.alchemy.com/v2/onL35MUKZeTnQ3XZ3K_fbyg4ZcDyAbu5',
-            //     blockNumber: 15400000,  // MUST be after Aave V2 was deployed
-            //     timeout: 1000000
-            // },
+            forking: {
+                url: 'https://dream-rpc.somnia.network',
+                timeout: 1000000
+            },
         },
         kovan: {
             // url: `https://kovan.infura.io/v3/${process.env.INFURA_APIKEY}`,
@@ -161,6 +160,28 @@ module.exports = {
             timeout: 400000,
             chainId: 1442,
         },
+        'somnia-testnet': {
+            url: 'https://dream-rpc.somnia.network',
+            gasPrice: 'auto',
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            },
+            timeout: 400000,
+            chainId: 50312,
+        },
+        'somnia-main': {
+            url: 'https://api.infra.mainnet.somnia.network/',
+            gasPrice: 'auto',
+            accounts: {
+                mnemonic: mnemonic.testnet,
+                initialIndex: 0,
+                count: 10,
+            },
+            timeout: 400000,
+            chainId: 5031,
+        },
     },
     etherscan: {
       apiKey: {
@@ -170,6 +191,8 @@ module.exports = {
         polygon: process.env.POLYGONSCAN_APIKEY,
         polygonMumbai: process.env.POLYGONSCAN_APIKEY,
         zkEVMtest: process.env.ETHERSCAN_APIKEY,
+        'somnia-testnet': 'placeholder',
+        'somnia-main': 'placeholder',
       },
       customChains: [
         {
@@ -178,6 +201,22 @@ module.exports = {
           urls: {
             apiURL: 'https://rpc.public.zkevm-test.net',
             browserURL: 'https://explorer.public.zkevm-test.net',
+          },
+        },
+        {
+          network: 'somnia-testnet',
+          chainId: 50312,
+          urls: {
+            apiURL: 'https://shannon-explorer.somnia.network/api',
+            browserURL: 'https://shannon-explorer.somnia.network',
+          },
+        },
+        {
+          network: 'somnia-main',
+          chainId: 5031,
+          urls: {
+            apiURL: 'https://mainnet.somnia.w3us.site/api',
+            browserURL: 'https://explorer.somnia.network',
           },
         },
       ],
